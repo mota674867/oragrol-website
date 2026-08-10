@@ -1,0 +1,122 @@
+/**
+ * Global design-token system.
+ *
+ * Source of truth: Website Implementation Brief, Step 1.
+ * Every hex value below is copied verbatim from the approved brief — do not
+ * add, change, or reinterpret any value here without updating the brief.
+ *
+ * Structure:
+ *   1. Raw palette   — the approved hex values, named after the value itself.
+ *   2. Semantic layer — what each raw value MEANS (background, text, accent…).
+ *      This is the layer components should reference (via Tailwind utilities
+ *      below), never the raw palette directly.
+ *   3. Section environments — Dark / White / Light-blue. Sections opt into an
+ *      environment with a class (`.env-dark`, `.env-white`, `.env-light-blue`)
+ *      which repoints the semantic layer for everything inside it.
+ *   4. Tailwind wiring — exposes the semantic layer as Tailwind utilities
+ *      (bg-background, text-text-secondary, font-heading, etc.) via
+ *      `@theme inline`.
+ */
+
+:root {
+  /* 1. Raw palette — approved values only */
+  --palette-black-900: #0a0a0a; /* Background (dark) */
+  --palette-black-800: #141414; /* Surface (dark) */
+  --palette-black-700: #262626; /* Border (dark) */
+  --palette-blue-600: #018abe; /* Primary accent */
+  --palette-blue-300: #97cadb; /* Light tint */
+  --palette-white: #ffffff; /* Text primary */
+  --palette-gray-400: #9ca3af; /* Text secondary */
+  --palette-gray-500: #6b7280; /* Text muted */
+  --palette-red-500: #e24b4a; /* Risk: Critical */
+  --palette-orange-400: #f2994a; /* Risk: High */
+  --palette-yellow-400: #f2c94c; /* Risk: Medium */
+  --palette-green-500: #27ae60; /* Risk: Low */
+
+  /* 2. Semantic layer — defaults to the Dark environment, since the site
+     base (including the 3D hero, which stays untouched) is dark. */
+  --background: var(--palette-black-900);
+  --surface: var(--palette-black-800);
+  --border: var(--palette-black-700);
+  --text-primary: var(--palette-white);
+  --text-secondary: var(--palette-gray-400);
+  --text-muted: var(--palette-gray-500);
+  --accent: var(--palette-blue-600);
+  --accent-light: var(--palette-blue-300);
+
+  /* Risk-tier colors are functional data indicators only (severity labels,
+     score badges, charts) — never use them decoratively. */
+  --risk-critical: var(--palette-red-500);
+  --risk-high: var(--palette-orange-400);
+  --risk-medium: var(--palette-yellow-400);
+  --risk-low: var(--palette-green-500);
+}
+
+/* 3. Section environments — applied per-section, not tied to a fixed
+   rhythm or to OS light/dark preference. Each overrides only what the
+   brief specifies for that environment; anything unspecified (border,
+   text-muted, accent) inherits the root/Dark values unchanged. */
+
+/* Dark — explicit class form of the root default, for clarity when a
+   Dark section is nested inside a non-Dark one. */
+.env-dark {
+  --background: var(--palette-black-900);
+  --surface: var(--palette-black-800);
+  --border: var(--palette-black-700);
+  --text-primary: var(--palette-white);
+  --text-secondary: var(--palette-gray-400);
+}
+
+/* White */
+.env-white {
+  --background: var(--palette-white);
+  --text-primary: var(--palette-black-900);
+  --text-secondary: var(--palette-black-800);
+}
+
+/* Light-blue */
+.env-light-blue {
+  --background: var(--palette-blue-300);
+  --text-primary: var(--palette-black-900);
+  --text-secondary: var(--palette-black-800);
+}
+
+/* 4. Tailwind wiring — `inline` so these resolve the CSS variables above at
+   utility-use time (respecting .env-* overrides), not at build time. Fonts
+   are indirected through next/font CSS variables (set in app/layout.tsx) so
+   the typeface choices below stay swappable in one place. */
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-risk-critical: var(--risk-critical);
+  --color-risk-high: var(--risk-high);
+  --color-risk-medium: var(--risk-medium);
+  --color-risk-low: var(--risk-low);
+
+  /* Typography — current baseline, intentionally NOT locked. Swap a
+     typeface by changing its next/font import in app/layout.tsx; nothing
+     else needs to change. */
+  --font-heading: var(--font-space-grotesk); /* Headings */
+  --font-body: var(--font-inter); /* Body / UI */
+  --font-data: var(--font-jetbrains-mono); /* Scores / data */
+  --font-brand: var(--font-epilogue); /* Logo / brand only */
+}
+
+/*
+ * Spacing, radius, shadows, breakpoints: intentionally undefined here.
+ * None of these were previously locked by any design decision, so this
+ * token system uses Tailwind's built-in default scale as-is (e.g. p-4,
+ * gap-6, rounded-lg, shadow-md, sm:/md:/lg: breakpoints) rather than
+ * inventing custom values.
+ *
+ * Motion: no custom duration/easing tokens either — use Tailwind's default
+ * duration utilities, restricted by convention to duration-150, duration-200,
+ * or duration-300 (conservative, "matte and refined", nothing cinematic).
+ * Do not use duration-500+ or the more dramatic default easings.
+ */
