@@ -1,9 +1,10 @@
 /**
  * Global design-token system.
  *
- * Source of truth: Website Implementation Brief, Step 1.
- * Every hex value below is copied verbatim from the approved brief — do not
- * add, change, or reinterpret any value here without updating the brief.
+ * Source of truth: Website Implementation Brief, Step 1 (amended in Step 3
+ * — see the Step 3 note in section 3 below for the one addition since).
+ * Every hex value below is copied verbatim from an approved brief — do not
+ * add, change, or reinterpret any value here without approval.
  *
  * Structure:
  *   1. Raw palette   — the approved hex values, named after the value itself.
@@ -23,6 +24,8 @@
   --palette-black-900: #0a0a0a; /* Background (dark) */
   --palette-black-800: #141414; /* Surface (dark) */
   --palette-black-700: #262626; /* Border (dark) */
+  --palette-gray-100: #f4f4f5; /* Surface (White env) — Step 3 addition, see note below */
+  --palette-gray-200: #e4e4e7; /* Border (White / Light-blue envs) — Step 3 addition */
   --palette-blue-600: #018abe; /* Primary accent */
   --palette-blue-300: #97cadb; /* Light tint */
   --palette-white: #ffffff; /* Text primary */
@@ -54,8 +57,19 @@
 
 /* 3. Section environments — applied per-section, not tied to a fixed
    rhythm or to OS light/dark preference. Each overrides only what the
-   brief specifies for that environment; anything unspecified (border,
-   text-muted, accent) inherits the root/Dark values unchanged. */
+   brief specifies for that environment; anything unspecified (text-muted,
+   accent) inherits the root/Dark values unchanged.
+
+   Step 3 addition: .env-white and .env-light-blue now also repoint
+   --surface/--border. Originally (Step 1) they didn't, which meant every
+   environment inherited the Dark surface/border (#141414 / #262626) —
+   fine for Dark, but on a white or light-blue background it rendered
+   bordered cards, secondary buttons, and form inputs as near-black boxes
+   with near-black text on top (text-secondary is also near-black in these
+   two environments), which is illegible. Confirmed visually while building
+   the Step 3 component kit (app/components/ui/), approved to fix here.
+   --palette-gray-100/200 are new — not in either brief — chosen as the
+   minimal light-neutral pair needed to keep those components legible. */
 
 /* Dark — explicit class form of the root default, for clarity when a
    Dark section is nested inside a non-Dark one. */
@@ -70,6 +84,8 @@
 /* White */
 .env-white {
   --background: var(--palette-white);
+  --surface: var(--palette-gray-100);
+  --border: var(--palette-gray-200);
   --text-primary: var(--palette-black-900);
   --text-secondary: var(--palette-black-800);
 }
@@ -77,6 +93,8 @@
 /* Light-blue */
 .env-light-blue {
   --background: var(--palette-blue-300);
+  --surface: var(--palette-white);
+  --border: var(--palette-gray-200);
   --text-primary: var(--palette-black-900);
   --text-secondary: var(--palette-black-800);
 }

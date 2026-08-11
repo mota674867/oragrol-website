@@ -1,0 +1,46 @@
+import type { ComponentPropsWithoutRef } from "react";
+import Link from "next/link";
+import { cn } from "./cn";
+
+/**
+ * Links — Website Implementation Brief, Step 3.
+ *
+ * TextLink: inline prose link, underlined by default (so it reads as a link
+ * without relying on color alone), accent on hover.
+ *
+ * NavLink: chromeless nav item, accent on hover/active — reused by the
+ * navigation primitives in nav.tsx.
+ */
+
+export type LinkComponentProps = ComponentPropsWithoutRef<typeof Link>;
+
+export function TextLink({ className, ...props }: LinkComponentProps) {
+  return (
+    <Link
+      className={cn(
+        "rounded-sm font-body text-text-primary underline decoration-text-secondary/50 decoration-1 underline-offset-4 transition-colors duration-150 hover:text-accent hover:decoration-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export interface NavLinkProps extends LinkComponentProps {
+  /** Marks this as the current page — accent color, no underline needed. */
+  active?: boolean;
+}
+
+export function NavLink({ active = false, className, ...props }: NavLinkProps) {
+  return (
+    <Link
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "rounded-sm font-body text-sm font-medium transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+        active ? "text-accent" : "text-text-secondary hover:text-text-primary",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
