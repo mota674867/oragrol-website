@@ -98,9 +98,11 @@ Design: no 8 identical cards. Asymmetric layouts, varied scale, custom iconograp
 
 Individual service page template: Hero, Problem, What Oragrol Does, What You Get, How It Works, Who It's For, Related Services, CTA.
 
-### Step 6 — Solutions Page — PENDING
+### Step 6 — Solutions Page — IMPLEMENTED
 Services = individual capabilities. Solutions = packaged protection levels — keep distinct.
 3 core tiers plus pentest as add-on, distinctive branded names, clear progression.
+
+Built at `/solutions`: Hero (with `StrataVisual`, D-008's "ascending stacked planes" page-specific motif — 3 plates sharing a baseline, increasing height/accent intensity, first use of the `--color-accent-light` token) → 3 generic Level 01/02/03 tier cards (no branded names — still unconfirmed, see pricing table below) → Pentest add-on (visually a "satellite," dashed border + a `+` badge, not a 4th rung in the stack) + status disclaimer → shared `FinalCta`. Verified: typecheck/lint/build clean, scroll-verified screenshots desktop+mobile, zero console errors.
 
 Pricing — UNCONFIRMED, internal reference only, do not publish:
 | Tier | Includes | 12-mo | Month-to-month |
@@ -189,8 +191,9 @@ Final hero visual, final typography choice, exact service-page visuals, exact pa
 ---
 
 ## 7. Current Position
-Complete: Steps 1-5 (Step 4 hero motion frozen as-is — DECISIONS.md D-006; Step 5 scoped to hub page only, individual service detail pages deferred — D-007).
-Next: Step 6 — Solutions Page.
+Complete: Steps 1-6 (Step 4 hero motion frozen as-is — D-006; Step 5 scoped to hub page only — D-007; Step 6 built with its D-008 visual direction from the start).
+Also active: D-008 per-page visual identity system — applied to Solutions; Services (built before D-008) still awaits its schematic-linework retrofit, explicitly ordered after other step work, not an oversight.
+Next: Step 7 — Cyber Health Page (or the Services D-008 retrofit — order not yet decided, ask before starting either).
 
 ---
 

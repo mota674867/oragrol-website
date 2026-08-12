@@ -5,12 +5,13 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 ---
 
 ## Current Status
-Home (Step 4) and Services hub (Step 5, `/services`) both complete and approved. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006). **New: a per-page visual-identity system is now approved (D-008)** — each of the 9 pages gets its own code-generated visual metaphor (not just background-color differentiation), sharing one underlying material (locked tokens/type/spacing/motion). Not yet applied to Services (built before D-008). Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
+Home (Step 4), Services hub (Step 5, `/services`), and Solutions (Step 6, `/solutions`) all complete. Solutions is the first page built under D-008's per-page visual-identity system — its `StrataVisual` (ascending stacked planes) is live, verified, not yet reviewed by Mohammad in-browser (built this session, awaiting sign-off same as Services was). Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006). Services still awaits its own D-008 retrofit (schematic linework) — explicitly ordered after other step work, not an oversight. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Step 6 — Solutions Page, built from the start with its D-008 visual direction (ascending stacked planes/strata). Pricing/package names/inclusions remain UNCONFIRMED — keep "currently being finalized" language.
-2. Services retrofit (D-008 schematic-linework motif) is explicitly ORDERED AFTER Step 6 — user's call, not an oversight. Don't retrofit Services opportunistically while working on Solutions; it's its own separate pass.
-3. Hero frame resolution/quality is NOT an open item — see D-006.
+1. Mohammad to review `/solutions` in-browser (structure, copy, and the new StrataVisual treatment) — same review step Services went through.
+2. Order not yet decided: Step 7 (Cyber Health) vs. the Services D-008 retrofit — ask before starting either.
+3. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
+4. Hero frame resolution/quality is NOT an open item — see D-006.
 
 ---
 
@@ -181,11 +182,40 @@ Home (Step 4) and Services hub (Step 5, `/services`) both complete and approved.
 - N/A.
 
 **Still open / needs verification:**
-- Whether Services (already built under the old color-only treatment) gets retrofitted with its D-008 schematic-linework motif before, alongside, or after Step 6 — not yet decided, needs a call before Step 6 starts or shortly after.
-- Nav contrast (visual check only, carried over).
+- Whether Services (already built under the old color-only treatment) gets retrofitted with its D-008 schematic-linework motif before, alongside, or after Step 6 — resolved next session (user chose: Solutions first, Services retrofit after — logged, see below).
 
 **Next recommended step:**
-- Resolve the Services-retrofit-timing question, then Step 6 — Solutions Page, built with its D-008 visual direction (ascending stacked planes/strata) from the start rather than added later.
+- Step 6 — Solutions Page, built with its D-008 visual direction (ascending stacked planes/strata) from the start rather than added later.
+
+---
+
+### 2026-08-12 (later same day) — Build Solutions page (Step 6)
+**Completed:**
+- Confirmed build order first (asked, didn't assume): Solutions built now, Services' D-008 retrofit explicitly deferred to its own later pass.
+- Inspected before coding: no `/solutions` route existed, only the Home teaser (generic "Level 01/02/03" labels, no branded names — already correctly avoiding the unconfirmed-pricing trap) and Services' own dead `/solutions` cross-link. Re-confirmed `PROJECT_MASTER.md`'s Step 6 governance: pricing table is internal-reference-only, tier *names* aren't confirmed either ("distinctive branded names" is a goal, not a delivered decision) — carried the Home teaser's existing discipline (generic labels, no numbers) onto the dedicated page rather than inventing names to fill space.
+- Designed and built `StrataVisual` (`app/components/sections/solutions/strata-visual.tsx`) — Solutions' D-008 signature graphic: 3 plates sharing a baseline, increasing height and accent-intensity, using the same `color-mix(in srgb, var(--color-accent) X%, ...)` technique already established in `Approach.tsx` (not a new pattern) plus the first-ever use of `--color-accent-light` (the locked "Light tint" #97CADB token — wired into `tokens.css` since Step 1 but unused anywhere until now) for the plate-top highlight.
+- Built the full page: `SolutionsHero` (dark environment — same header-contrast reasoning as `ServicesHero`, flagged again in a comment that this recurring constraint across every future page argues for eventually making `SiteHeader` read its entry section's real environment rather than assuming dark) → `TierCards` (3 cards, each with a small bar echoing its StrataVisual plate) → `PentestAddon` (dashed border + a `+` badge on the icon, deliberately reading as a "satellite" outside the 3-level stack, not a 4th rung) + reused status-disclaimer/CTA copy verbatim → reused `FinalCta` directly.
+- Caught and fixed a real bug before it shipped: initially passed a conflicting `className="h-3 w-3"` alongside `Icon`'s `size="sm"` prop on the pentest badge — since `cn()` is plain concatenation with no conflict resolution (confirmed earlier this project, see `nav.tsx`'s own comment on the same issue), this would have been the exact class of bug already flagged as a known risk. Fixed by not fighting the size system — resized the badge circle instead.
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean (new static `/solutions` route). Scroll-verified Playwright screenshots (not `fullPage` — applying last session's lesson) at desktop and mobile widths, zero console/network errors.
+- Updated `PROJECT_MASTER.md` (Step 6 → IMPLEMENTED, Current Position → Step 7 or Services retrofit next, order not yet decided).
+
+**Files changed:**
+- New: `app/solutions/page.tsx`, `app/components/sections/solutions/{hero,strata-visual,tier-cards,pentest-addon}.tsx`
+- `PROJECT_MASTER.md` (Step 6 + Current Position)
+
+**Problems found:**
+- The `Icon` component `className` conflict described above — caught before commit, not shipped.
+
+**Problems solved:**
+- First real application of D-008's per-page visual system, proving the "code-generated, shares the existing color-mix/token idioms" approach works without inventing new patterns or new tokens beyond what's already locked.
+
+**Still open / needs verification:**
+- Mohammad's in-browser review of `/solutions` (same step Services went through) — not yet done.
+- Order of Step 7 vs. the Services D-008 retrofit — not yet decided.
+- Nav contrast (visual check only, carried over) — still the only long-standing open item.
+
+**Next recommended step:**
+- Get Solutions reviewed/approved, then decide Step 7 vs. Services retrofit order.
 
 ---
 *(New sessions get added above this line, newest first. When this file passes ~10 sessions, move the oldest ones into PROJECT_MEMORY_ARCHIVE.md.)*
