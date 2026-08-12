@@ -8,8 +8,8 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4) and Services hub (Step 5, `/services`) both complete and approved. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006). **New: a per-page visual-identity system is now approved (D-008)** — each of the 9 pages gets its own code-generated visual metaphor (not just background-color differentiation), sharing one underlying material (locked tokens/type/spacing/motion). Not yet applied to Services (built before D-008). Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Decide whether Services gets retrofitted with its D-008 schematic-linework motif before or alongside Step 6, or after — open question, not yet decided (see latest session log).
-2. Step 6 — Solutions Page, incorporating its D-008 direction (ascending stacked planes/strata). Pricing/package names/inclusions remain UNCONFIRMED — keep "currently being finalized" language.
+1. Step 6 — Solutions Page, built from the start with its D-008 visual direction (ascending stacked planes/strata). Pricing/package names/inclusions remain UNCONFIRMED — keep "currently being finalized" language.
+2. Services retrofit (D-008 schematic-linework motif) is explicitly ORDERED AFTER Step 6 — user's call, not an oversight. Don't retrofit Services opportunistically while working on Solutions; it's its own separate pass.
 3. Hero frame resolution/quality is NOT an open item — see D-006.
 
 ---
