@@ -30,3 +30,12 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Decision:** Both were deleted. Pricing will resurface only as part of Step 6 (Solutions page), using the "This section is currently being finalized" status language — not as its own route.
 - **Alternatives considered:** Keep `/pricing` live with placeholder copy — rejected, an indexed route with no real content ahead of Step 6 isn't worth the SEO/UX cost.
 - **Status:** Active
+
+---
+
+### D-004 — Hero stays a single-pass scroll-scrub; no auto-loop, no wrap-around
+- **Date:** 2026-08-12
+- **Context:** All 16 planned hero frames became available (previously only 8 existed). The request to wire them in mentioned "a short crossfade transition when the sequence loops from frame-16 back to frame-01," which doesn't describe any mechanism the existing scroll-driven `hero.tsx` actually has — it's a one-pass scrub (frame-01 at scroll start, frame-16 at scroll end, then releases to the next section), never a timer-based or wrap-around loop. Asked the user to clarify rather than assume a mechanism change, since it would have meant picking between (a) a genuine auto-playing ambient loop matching `PROJECT_MASTER.md`'s original "seamless loop" language, or (b) extending the scroll range so scrolling further wraps back to frame-01.
+- **Decision:** Neither. Keep the scroll-scrub exactly as it already was — frame-01 at scroll start, frame-16 at scroll end, normal release, reverse-scroll just plays the same envelopes backward. No timer, no wrap-around, no crossfade added, because the sequence never cuts from frame-16 directly to frame-01 in this mechanism — the visual mismatch between those two frames (confirmed: frame-01 is a calm dark-blue night sky, frame-16 is a warm orange sky with a teal network overlay) never becomes visible.
+- **Alternatives considered:** Auto-playing ambient loop (would match the original brief's language but is a real architecture change to a scroll-scrub that was already tuned and shipped); scroll wrap-around (would mean continuing to scroll down replays the hero instead of advancing to the next section — likely to read as broken/confusing). Both explicitly declined by the user.
+- **Status:** Active

@@ -5,11 +5,11 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 ---
 
 ## Current Status
-Home page (Step 4) fully implemented — all 11 sections (Hero → Security Challenge → Approach → Services → Solutions → Cyber Health → Trust → How We Work → Insights → FAQ → Final CTA) plus global SiteHeader/SiteFooter wired into `layout.tsx`. Header Fix Passes 1-3 complete (search icon, spacing, transparent/gradient background, no-max-width layout, real-logo-geometry inline SVG). Standalone `/pricing` route removed (see D-003). Typecheck/lint/build all clean; visually verified at 375/768/1280/1440/1920/2560px with no console errors.
+Home page (Step 4) fully implemented — all 11 sections (Hero → Security Challenge → Approach → Services → Solutions → Cyber Health → Trust → How We Work → Insights → FAQ → Final CTA) plus global SiteHeader/SiteFooter wired into `layout.tsx`. Header Fix Passes 1-3 complete (search icon, spacing, transparent/gradient background, no-max-width layout, real-logo-geometry inline SVG). Standalone `/pricing` route removed (see D-003). Hero now has all 16 planned scroll-sequence frames wired in (see D-004) — motion system (Step 18) considered functionally complete for the scroll-scrub mechanism; only the 4K-source-resolution gap remains open. Typecheck/lint/build all clean; visually verified at 375/768/1280/1440/1920/2560px with no console errors.
 
 ## Next Steps
 1. Step 5 — Services Page (per `PROJECT_MASTER.md`). Inspect current page/design system/content first; report before coding.
-2. Hero motion (16-frame sequence) integration remains a separate, non-blocking track — `public/hero/` currently has 8 of the planned 16 scroll-sequence PNGs (`hero-01-initial.png` through `hero-08-scroll7.png`), all correctly wired into `HERO_IMAGES` in `hero.tsx` and crossfading via scroll-driven opacity/scale (a deliberate pivot from live Three.js/R3F rendering to locked offline-rendered reference frames — see file header comment). Frames 9-16 don't exist yet.
+2. Confirm with Mohammad whether the 1672×941 hero frame resolution (vs. the 3840×2160 4K spec in `PROJECT_MASTER.md`) needs re-rendering at full 4K, or whether 1672×941 is the accepted final resolution — currently unresolved, see D-004.
 
 ---
 
@@ -37,8 +37,32 @@ Home page (Step 4) fully implemented — all 11 sections (Hero → Security Chal
 
 **Still open / needs verification:**
 - Stray `app/CLAUDE.md` / `app/DECISIONS.md` / `app/PROJECT_MEMORY.md` duplicates — not yet resolved.
-- Hero motion sequence incomplete (8 of 16 frames present in `public/hero/`, all wired into `hero.tsx`'s crossfade sequence — see Next Steps for the correction from an earlier miscount).
 - Nav-link color contrast against the Hero image was checked visually only (screenshots), not with an automated contrast tool.
+- Hero frames are 1672×941, not the 3840×2160 spec in `PROJECT_MASTER.md` — flagged, needs a call from Mohammad on whether to re-render.
+
+**Next recommended step:**
+- Step 5 — Services Page.
+
+---
+
+### 2026-08-12 (later same day) — Hero: wire in all 16 frames
+**Completed:**
+- User supplied the full 16-frame set as `public/hero/hero-frames-final.zip` (not loose files as described — extracted it to `public/hero/frame-01.png` … `frame-16.png`, then deleted the zip). Old 8-file set (`hero-01-initial.png` etc.) no longer present on disk.
+- Clarified with the user before building anything: confirmed the Hero stays purely scroll-scrubbed (frame-01 at scroll start, frame-16 at scroll end, releases normally, no timer auto-loop, no wrap-around) — the earlier "crossfade when it loops from 16 back to 1" phrasing in the request didn't describe an actual mechanism in the code, since a one-pass scroll-scrub never cuts from frame-16 directly to frame-01. No crossfade-on-loop was built, by design — see the request/response exchange, not a separate D-00x entry (no durable decision was made, just a clarification of existing behavior).
+- Updated `HERO_IMAGES` in `hero.tsx` to all 16 frames in order; `frameEnvelope`/`frameOpacityStops` needed no changes (already generic on array length). Updated the file's header comment (frame count, explicit note on no-loop behavior) and simplified-path comment (`hero-01` → `frame-01`).
+
+**Files changed:**
+- `app/components/sections/home/hero.tsx` (HERO_IMAGES array + comments)
+- `public/hero/`: added `frame-01.png` … `frame-16.png`; removed old 8-file set and the intermediate zip.
+
+**Problems found:**
+- Hero frames are 1672×941 px, not the 3840×2160 4K called for in `PROJECT_MASTER.md` Step 4. Not blocking (aspect ratio is correct, ~16:9), but flagged as an open question, not silently accepted as final.
+
+**Problems solved:**
+- N/A — straightforward swap once frames were extracted and the loop-mechanism question was resolved.
+
+**Still open / needs verification:**
+- Same as above (stray `app/` duplicates, nav contrast, hero frame resolution).
 
 **Next recommended step:**
 - Step 5 — Services Page.

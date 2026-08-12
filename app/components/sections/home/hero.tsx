@@ -10,7 +10,7 @@ import { useMediaQuery } from "../../motion/use-media-query";
 /**
  * Hero — image-based scroll sequence.
  *
- * The Hero approach changed from live Three.js/R3F 3D rendering to 8
+ * The Hero approach changed from live Three.js/R3F 3D rendering to 16
  * locked, offline-rendered reference frames (public/hero/) — a real-time
  * WebGL scene can't be pixel-identical to an AI-rendered image, so the
  * images themselves are now the source of truth. This file only
@@ -18,11 +18,19 @@ import { useMediaQuery } from "../../motion/use-media-query";
  * content. Copy, layout, header, and CTA structure are unchanged from
  * every earlier pass.
  *
- * Mechanism: the 8 frames are stacked (`absolute inset-0`) and
+ * Mechanism: the 16 frames are stacked (`absolute inset-0`) and
  * crossfaded via opacity, each driven by the same `scrollYProgress`
  * MotionValue the rest of the Hero already used for its scroll pin (no
  * GSAP, no Three.js) — read via `useTransform`, so it's pure CSS opacity
- * animation under the hood, not per-frame imperative work.
+ * animation under the hood, not per-frame imperative work. This is a
+ * single scroll-scrubbed pass only: frame-01 at scroll start, frame-16 at
+ * scroll end, then the section releases normally to whatever follows.
+ * There is no timer-based auto-play and no wrap-around back to frame-01
+ * — scrolling back up simply reverses the same envelopes, which is
+ * already smooth with no special-casing needed. (Frame-01 and frame-16
+ * don't visually match each other — the sky/lighting differ — but since
+ * the sequence never cuts from one directly to the other, that mismatch
+ * never becomes visible.)
  *
  * Continuous-motion tuning (round 2): the blend envelopes deliberately
  * OVERLAP each other by more than one segment-width (`ENVELOPE_HALF_WIDTH`
@@ -34,24 +42,32 @@ import { useMediaQuery } from "../../motion/use-media-query";
  * opacity and scale/drift curves are eased (not linear) so the motion
  * accelerates/decelerates instead of moving at a constant, mechanical
  * rate — that combination is what reads as one continuous camera move
- * through the scene rather than 8 photos dissolving into each other.
+ * through the scene rather than 16 photos dissolving into each other.
  *
  * Mobile and reduced-motion collapse to the SAME simplified path: a
- * single static hero-01 image, no crossfade, no scroll pin (the section
+ * single static frame-01 image, no crossfade, no scroll pin (the section
  * is a plain 100svh block, not a tall pinned one — forcing extra scroll
  * distance for an animation that isn't happening would be poor UX, not
  * just wasted motion).
  */
 
 const HERO_IMAGES = [
-  "/hero/hero-01-initial.png",
-  "/hero/hero-02-scroll1.png",
-  "/hero/hero-03-scroll2.png",
-  "/hero/hero-04-scroll3.png",
-  "/hero/hero-05-scroll4.png",
-  "/hero/hero-06-scroll5.png",
-  "/hero/hero-07-scroll6.png",
-  "/hero/hero-08-scroll7.png",
+  "/hero/frame-01.png",
+  "/hero/frame-02.png",
+  "/hero/frame-03.png",
+  "/hero/frame-04.png",
+  "/hero/frame-05.png",
+  "/hero/frame-06.png",
+  "/hero/frame-07.png",
+  "/hero/frame-08.png",
+  "/hero/frame-09.png",
+  "/hero/frame-10.png",
+  "/hero/frame-11.png",
+  "/hero/frame-12.png",
+  "/hero/frame-13.png",
+  "/hero/frame-14.png",
+  "/hero/frame-15.png",
+  "/hero/frame-16.png",
 ] as const;
 
 const TOTAL = HERO_IMAGES.length;
