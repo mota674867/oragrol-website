@@ -62,7 +62,22 @@ Home page (Step 4) fully implemented — all 11 sections (Hero → Security Chal
 - N/A — straightforward swap once frames were extracted and the loop-mechanism question was resolved.
 
 **Still open / needs verification:**
-- Same as above (stray `app/` duplicates, nav contrast, hero frame resolution).
+- Nav contrast (visual check only), hero frame resolution (see Next Steps).
+
+**Next recommended step:**
+- Step 5 — Services Page.
+
+---
+
+### 2026-08-12 (later same day) — Remove stray app/ duplicate files
+**Completed:**
+- Deleted `app/CLAUDE.md`, `app/DECISIONS.md`, `app/PROJECT_MEMORY.md` — untracked, blank/duplicate copies of the root files (confirmed unchanged since being read in full earlier this session before deleting). `app/` directory itself untouched, all real component/route files still present.
+
+**Files changed:**
+- Removed: `app/CLAUDE.md`, `app/DECISIONS.md`, `app/PROJECT_MEMORY.md` (were never tracked in git, so no commit diff for the deletion itself — nothing to `git rm`).
+
+**Still open / needs verification:**
+- Nav contrast (visual check only), hero frame resolution (3840x2160 spec vs. actual 1672x941 — needs a call from Mohammad).
 
 **Next recommended step:**
 - Step 5 — Services Page.
