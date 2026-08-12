@@ -5,11 +5,12 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 ---
 
 ## Current Status
-Home page (Step 4) fully implemented — all 11 sections (Hero → Security Challenge → Approach → Services → Solutions → Cyber Health → Trust → How We Work → Insights → FAQ → Final CTA) plus global SiteHeader/SiteFooter wired into `layout.tsx`. Header Fix Passes 1-3 complete (search icon, spacing, transparent/gradient background, no-max-width layout, real-logo-geometry inline SVG). Standalone `/pricing` route removed (see D-003). Hero has all 16 scroll-sequence frames wired in, scroll-to-frame mapping bug fixed and verified monotonic (D-005). Hero's visual quality/depth/cinematic feel is a **known, intentionally accepted limitation** for now — explicitly closed, not to be touched without explicit instruction (D-006). Typecheck/lint/build all clean; visually verified at 375/768/1280/1440/1920/2560px with no console errors.
+Home page (Step 4) fully implemented — all 11 sections plus global SiteHeader/SiteFooter. Header Fix Passes 1-3 complete. Standalone `/pricing` route removed (D-003). Hero has all 16 frames, scroll-mapping bug fixed (D-005), visual-quality gap intentionally frozen (D-006) — not an open item. **Step 5 — Services hub page (`/services`) is now built and verified** (typecheck/lint/build clean, scroll-verified screenshots desktop+mobile, zero console errors) — see D-007 for scope (hub only, Lucide icons, detail pages deferred). The per-service problem/what-we-do/what-you-get/outcome breakdown is draft copy, not yet reviewed by Mohammad.
 
 ## Next Steps
-1. Step 5 — Services Page (per `PROJECT_MASTER.md`). Inspection in progress/complete this session — see latest Session Log entry. Awaiting user review of proposed structure before any code changes.
-2. Hero frame resolution/quality is NOT an open item — see D-006. Do not raise again unless the user brings it up.
+1. Mohammad to review Step 5's new draft copy (the expanded 4-field breakdown per live service — the one-liners themselves were already locked/confirmed).
+2. Step 6 — Solutions Page, after Step 5 copy review. Pricing/package names/inclusions remain UNCONFIRMED — do not invent, keep the "currently being finalized" status language (already used consistently in Solutions.tsx and Faq.tsx).
+3. Hero frame resolution/quality is NOT an open item — see D-006. Do not raise again unless the user brings it up.
 
 ---
 
@@ -107,6 +108,33 @@ Home page (Step 4) fully implemented — all 11 sections (Hero → Security Chal
 
 **Next recommended step:**
 - Step 5 — Services Page (inspection phase; awaiting user review of proposed structure before any changes).
+
+---
+
+### 2026-08-12 (later same day) — Build Services hub page (Step 5)
+**Completed:**
+- Inspected before coding, per process: no `/services` route existed (only a Home-page teaser section with the 8 confirmed service one-liners + icons); catalogued the full `app/components/ui/` design system and the asymmetric-layout patterns already established in other Home sections (Approach's connected spine, How We Work's alternating stepper, Solutions' 3+1 layout).
+- Reported findings + a proposed 5-section hub-page structure; got explicit approval with two clarifications: (1) Lucide icons for now, not custom — logged as D-007, same pattern as D-006; (2) hub page only, individual per-service detail pages explicitly deferred.
+- Built `/services`: `ServicesHero` (dark environment — deliberately matches Home's opening section so SiteHeader's current dark-entry-section assumption still holds, avoiding an out-of-scope SiteHeader change), `LiveServices` (4 full-width alternating feature rows, each with Challenge/What Oragrol Does/What You Get/Outcome + a CTA — new draft copy, flagged in the component's own comment, not yet reviewed), `AdditionalCapabilities` (4 condensed cards reusing the exact locked one-liners + status badge from the Home teaser), `SolutionsBridge` (reuses Faq.tsx's existing Services-vs-Solutions copy verbatim rather than inventing new phrasing), and reused the existing `FinalCta` component directly rather than duplicating it.
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean (one real error caught and fixed — an unescaped apostrophe), `npm run build` succeeded (new static `/services` route). Visual verification caught a real methodology mistake worth remembering: a `fullPage: true` Playwright screenshot showed most sections as empty/blank — traced to `Reveal`'s `whileInView` needing genuine scroll events to fire, which Playwright's single-shot fullPage capture doesn't reliably provide. Re-verified correctly via the same incremental real-scroll methodology already used for the Hero (scrollTo + wait + screenshot per step) — page renders completely correctly; the blank sections were a screenshot-method artifact, not a real bug.
+- Updated `PROJECT_MASTER.md` (Step 5 status, Current Position) to reflect the build and the still-open copy-review item.
+
+**Files changed:**
+- New: `app/services/page.tsx`, `app/components/sections/services/{hero,live-services,additional-capabilities,solutions-bridge}.tsx`
+- `DECISIONS.md` (D-007), `PROJECT_MASTER.md` (Step 5 + Current Position)
+
+**Problems found:**
+- `fullPage` Playwright screenshots are unreliable for verifying `whileInView`-based reveal animations — worth remembering for future page verifications on this project (Solutions, Cyber Health, etc. will use the same `Reveal` component).
+
+**Problems solved:**
+- Correctly distinguished a screenshot-methodology artifact from a real rendering bug before reporting anything as broken.
+
+**Still open / needs verification:**
+- Mohammad's review of the new draft copy (problem/what-we-do/what-you-get/outcome per live service).
+- Nav contrast (visual check only, carried over from earlier sessions).
+
+**Next recommended step:**
+- Review Step 5 copy, then Step 6 — Solutions Page.
 
 ---
 *(New sessions get added above this line, newest first. When this file passes ~10 sessions, move the oldest ones into PROJECT_MEMORY_ARCHIVE.md.)*

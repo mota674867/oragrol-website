@@ -88,8 +88,8 @@ Full home flow (verify all sections exist): Hero, Security Challenge, Oragrol Ap
 
 **Hero motion (in progress, separate track, not blocking):** 16 frames, 16:9, 4K (3840x2160), PNG. Continuous rotating sweep, progressive city/network resolution, seamless loop. Do not block other steps waiting on this.
 
-### Step 5 — Services Page — NEXT
-Inspect current page, design system, and content first; report before coding.
+### Step 5 — Services Page — IMPLEMENTED (hub page only), copy pending review
+Inspected current page, design system, and content first; reported before coding, per process. Hub page (`/services`) built and verified (typecheck/lint/build clean, scrolled-through Playwright screenshots at desktop/mobile, zero console errors). The 8 confirmed service one-liners are locked/reused verbatim; the problem/what-we-do/what-you-get/outcome breakdown per live service is **new draft copy, not yet reviewed** — flagged in the component's own comments, same as Faq.tsx's existing draft-copy precedent. Individual per-service detail pages (Hero/Problem/What Oragrol Does/What You Get/How It Works/Who It's For/Related Services/CTA) are explicitly deferred — see DECISIONS.md D-007.
 
 Confirmed/live services (1-4): Virtual CISO, Risk Assessment & Compliance, Vulnerability Assessment & Management, Security Awareness Training.
 Additional (5-8, design but don't claim operational): Managed Security Services/24-7 MDR, Penetration Testing, Endpoint Protection/EDR, Incident Response. Status language: "Capability currently being finalized."
@@ -189,8 +189,9 @@ Final hero visual, final typography choice, exact service-page visuals, exact pa
 ---
 
 ## 7. Current Position
-Complete: Steps 1-4 (Step 4 hero motion still in progress separately).
-Next: Step 5 — Services Page.
+Complete: Steps 1-4 (Step 4 hero motion frozen as-is for now — see DECISIONS.md D-006, not still in progress).
+Step 5 (Services hub page) implemented, awaiting copy review (see Step 5 above) — individual service detail pages deferred.
+Next: review Step 5 copy, then Step 6 — Solutions Page.
 
 ---
 
