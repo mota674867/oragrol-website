@@ -5,11 +5,11 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 ---
 
 ## Current Status
-Home page (Step 4) fully implemented — all 11 sections (Hero → Security Challenge → Approach → Services → Solutions → Cyber Health → Trust → How We Work → Insights → FAQ → Final CTA) plus global SiteHeader/SiteFooter wired into `layout.tsx`. Header Fix Passes 1-3 complete (search icon, spacing, transparent/gradient background, no-max-width layout, real-logo-geometry inline SVG). Standalone `/pricing` route removed (see D-003). Hero now has all 16 planned scroll-sequence frames wired in (see D-004) — motion system (Step 18) considered functionally complete for the scroll-scrub mechanism; only the 4K-source-resolution gap remains open. Typecheck/lint/build all clean; visually verified at 375/768/1280/1440/1920/2560px with no console errors.
+Home page (Step 4) fully implemented — all 11 sections (Hero → Security Challenge → Approach → Services → Solutions → Cyber Health → Trust → How We Work → Insights → FAQ → Final CTA) plus global SiteHeader/SiteFooter wired into `layout.tsx`. Header Fix Passes 1-3 complete (search icon, spacing, transparent/gradient background, no-max-width layout, real-logo-geometry inline SVG). Standalone `/pricing` route removed (see D-003). Hero has all 16 scroll-sequence frames wired in, scroll-to-frame mapping bug fixed and verified monotonic (D-005). Hero's visual quality/depth/cinematic feel is a **known, intentionally accepted limitation** for now — explicitly closed, not to be touched without explicit instruction (D-006). Typecheck/lint/build all clean; visually verified at 375/768/1280/1440/1920/2560px with no console errors.
 
 ## Next Steps
-1. Step 5 — Services Page (per `PROJECT_MASTER.md`). Inspect current page/design system/content first; report before coding.
-2. Confirm with Mohammad whether the 1672×941 hero frame resolution (vs. the 3840×2160 4K spec in `PROJECT_MASTER.md`) needs re-rendering at full 4K, or whether 1672×941 is the accepted final resolution — currently unresolved, see D-004.
+1. Step 5 — Services Page (per `PROJECT_MASTER.md`). Inspection in progress/complete this session — see latest Session Log entry. Awaiting user review of proposed structure before any code changes.
+2. Hero frame resolution/quality is NOT an open item — see D-006. Do not raise again unless the user brings it up.
 
 ---
 
@@ -81,6 +81,32 @@ Home page (Step 4) fully implemented — all 11 sections (Hero → Security Chal
 
 **Next recommended step:**
 - Step 5 — Services Page.
+
+---
+
+### 2026-08-12 (later same day) — Diagnose and fix hero scroll flicker (frame-02/frame-01)
+**Completed:**
+- User reported a visible flicker at the very start of the Hero's scroll range (frame-02 briefly showing, then correcting back to frame-01) and asked for the exact scrollYProgress→frame-index mapping code plus a root cause.
+- Proved `frameEnvelope`/`frameOpacityStops`' math correct by hand (traced against framer-motion's own `interpolate()` clamp/per-segment-easing source in `node_modules`), then verified empirically with Playwright: rest-state and SSR markup were both correct, but a live scroll sweep revealed the real bug — framer-motion's automatic ViewTimeline hardware acceleration (triggered because `useScroll`'s `offset: ["start start", "end end"]` matches the library's "contain" preset) desyncing badly across the Hero's ~32 concurrent scroll-linked transforms. Confirmed via `getAnimations()` that a native WAAPI Animation (not plain JS) was driving opacity, and via a full-range scroll sweep that frame-01 went non-monotonic (declining correctly, then climbing back to a stuck opacity 1 for any scrollY past ~2250px, simultaneous with frame-16 also at 1).
+- Fixed by deleting `scrollYProgress.accelerate` synchronously right after the `useScroll()` call in `Hero()`, forcing framer-motion onto its plain JS/rAF path. Re-verified with the same Playwright sweeps: perfectly monotonic frame progression at every scrollY tested, frame-02 now peaks at scrollY≈210px (matches hand-calculated center≈211px almost exactly), frame-16 reached exactly at scrollY=2250 (matches hand-calculated p=1).
+- Logged the full root-cause chain and fix as DECISIONS.md D-005, including a "watch for" note since this is a project-wide framer-motion gotcha (any future `useScroll({ target, offset })` matching a named preset gets the same silent acceleration), not Hero-specific.
+- User then logged a separate, explicit decision (D-006): Hero motion quality/depth/cinematic feel is intentionally left as-is for now to unblock the rest of the site — not to be touched again without explicit instruction. Session moved on to inspecting Step 5 (Services Page) — read-only inspection, no changes made pending the user's review of a proposed structure.
+
+**Files changed:**
+- `app/components/sections/home/hero.tsx` (added the `.accelerate = undefined` line + explanatory comment, no other logic changed)
+- `DECISIONS.md` (D-005, D-006)
+
+**Problems found:**
+- Third-party library behavior (framer-motion's automatic scroll acceleration), not a bug in this project's own code — but required deep source-diving into `node_modules/framer-motion` to root-cause rather than guess.
+
+**Problems solved:**
+- Hero scroll sequence is now provably monotonic and correct end-to-end (frame-01 through frame-16), verified against hand-calculated math, not just "looks right."
+
+**Still open / needs verification:**
+- Nav contrast (visual check only). Hero frame resolution/visual-quality question is now explicitly closed per D-006 — not open, intentionally deferred, do not revisit without explicit instruction.
+
+**Next recommended step:**
+- Step 5 — Services Page (inspection phase; awaiting user review of proposed structure before any changes).
 
 ---
 *(New sessions get added above this line, newest first. When this file passes ~10 sessions, move the oldest ones into PROJECT_MEMORY_ARCHIVE.md.)*

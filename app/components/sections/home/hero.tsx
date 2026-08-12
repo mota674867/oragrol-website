@@ -149,6 +149,39 @@ export function Hero() {
     target: sectionRef,
     offset: ["start start", "end end"],
   });
+  // Force scrollYProgress onto framer-motion's plain JS/rAF-driven update
+  // path instead of its automatic WAAPI/native-ViewTimeline acceleration.
+  // `target` + an offset that normalizes to the "contain" preset (which
+  // ["start start", "end end"] does — see `presets` in framer-motion's
+  // useScroll source) makes the library set a private `.accelerate` config
+  // on the returned MotionValue and hand this frame sequence's ~32
+  // concurrent scroll-linked opacity/scale animations off to the browser's
+  // native ViewTimeline. Confirmed via direct measurement (Playwright,
+  // sweeping scrollY and reading getComputedStyle) that this accelerated
+  // path badly desyncs with this many concurrent derived transforms:
+  // frame-01's opacity went non-monotonic — declining correctly through
+  // ~0-300px of scroll, then climbing back to a stuck 1.0 for any scrollY
+  // beyond ~2250px, simultaneously with frame-16 also reading 1.0 — which
+  // is exactly the class of bug reported ("frame-02 shows, then corrects
+  // back to frame-01"). Deleting `.accelerate` right after the hook call
+  // (same property the library itself sets, not a private field we're
+  // inventing) makes framer-motion skip that path entirely. Verified this
+  // restores exact agreement with frameOpacityStops' hand-calculated
+  // breakpoints (e.g. frame-02 peaks at scrollY≈210px, matching its
+  // center = 0.09375 × 2250px ≈ 211px) and eliminates the non-monotonic
+  // behavior at every scroll depth tested, including well past the
+  // pinned section's end.
+  //
+  // Must happen synchronously here, not in an effect: framer-motion sets
+  // `.accelerate` itself synchronously during render, inside useScroll,
+  // before any of its own effects run — a layoutEffect on our side would
+  // fire after useScroll's internal one and could race the attachment,
+  // letting the accelerated path attach at least once before being undone.
+  // `react-hooks/immutability` can't know MotionValue is a mutable,
+  // ref-like object owned by framer-motion (not React-tracked state), so
+  // this specific, load-bearing mutation is intentionally exempted.
+  // eslint-disable-next-line react-hooks/immutability -- see comment above
+  (scrollYProgress as unknown as { accelerate?: unknown }).accelerate = undefined;
 
   // Subtle parallax: the copy drifts up a little slower than the frames
   // transition, for depth — skipped entirely (not just shortened) when
