@@ -66,4 +66,22 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Context:** Step 5 (Services Page) inspection found no custom iconography prepared anywhere in the project — every icon used site-wide so far (Home teaser, Approach, Trust, Solutions) is a stock Lucide icon via the shared `Icon` wrapper, even though `PROJECT_MASTER.md` names "custom iconography" as a design goal for this page. Also found `PROJECT_MASTER.md` describing two distinct layers of scope: the main `/services` hub page, and a separate 8-page "individual service page template" (Hero/Problem/What Oragrol Does/What You Get/How It Works/Who It's For/Related Services/CTA) — a much larger, separately-reviewable body of work.
 - **Decision:** (1) Ship the hub page with refined Lucide icons, consistent with the rest of the site — same pattern as [[D-006]] (accept a known gap now, revisit deliberately later rather than block progress on an unavailable asset). (2) Scope this pass to the `/services` hub page only. The 8 individual service detail pages are explicitly deferred to a separate future step, not built or stubbed as part of this pass.
 - **Alternatives considered:** Commissioning/generating custom icons before building the page — rejected for now, matches the hero precedent of not letting a visual-polish gap block forward progress through the build sequence. Building the hub page + all 8 detail pages together — rejected as too large a unit to review in one pass; user explicitly chose to defer detail pages.
-- **Status:** Active
+- **Status:** Active — superseded in part by [[D-008]] on the icon question specifically: Services' schematic-linework treatment is the intended direction going forward, Lucide icons remain the stopgap until that's built.
+
+---
+
+### D-008 — Per-page visual identity system: distinct motif per page, code-generated, same shared material
+- **Date:** 2026-08-12
+- **Context:** After Home + Services were both built, the user flagged a real design-direction problem: the two pages were differentiated mostly by `Section` background color (dark/white/light-blue) and icon choice, not by actual distinct visual content — a pattern that, if repeated across all 9 pages, would make the site feel like "one template, nine colors" rather than nine purposeful pages. Asked for a proposed visual direction per page before any Step 6 work, explicitly not asking for final art yet.
+- **Decision:** Each of the 9 pages gets its own content-specific visual metaphor, expressed as code-generated SVG/CSS (not commissioned imagery, not stock photography) for now, while all pages continue sharing one underlying "material" — the already-locked color tokens, typography, spacing, line-weight/corner-radius language, and `Reveal` motion restraint. Approved per-page directions:
+  - **Home** — ring + city skyline, scroll-driven (built; reserved to Home, not reused elsewhere per the existing "never invent a similar ring" rule).
+  - **Services** — systems/schematic linework (connector lines + nodes, blueprint-like). Not yet retrofitted onto the already-built hub page — current icon-only treatment (D-007) is the interim state.
+  - **Solutions** — ascending stacked planes / strata, conveying escalating protection levels spatially.
+  - **Cyber Health** — instrument-panel data visuals: segmented arcs/gauges (deliberately not closed rings, to keep the ring motif reserved to Home) and bar-based score meters, leaning on JetBrains Mono.
+  - **How We Work** — a path/route motif that visually resolves from chaotic to ordered across the 4 stages, literalizing "security clarity."
+  - **Industries** — a distinct abstract line-motif per sector, revealed via in-page interaction/selection (not 9 separate pages, per the existing brief constraint).
+  - **Resources/Insights** — editorial/publication layout, typography-led, minimal signal/waveform accents.
+  - **Company** — architectural/material-study abstractions (structural cross-sections, light studies) — no fabricated people/office photography, since none exists.
+  - **Contact** — a single minimal wayfinding line resolving to one point — deliberately the quietest page.
+- **Alternatives considered:** Commissioned/generated imagery for every page (like the Hero's 16 frames) — rejected for now as too slow across 9 pages; user chose code-generated for speed and full editability. Photographic treatment for Company/Industries specifically was raised as having a real ceiling code can't reach — user explicitly deferred that as a **separate future decision**, not blocking, same pattern as [[D-006]]'s hero deferral.
+- **Status:** Active. Not yet applied to Services (built before this decision) or any future page — retrofit timing for Services is an open question, not yet decided.

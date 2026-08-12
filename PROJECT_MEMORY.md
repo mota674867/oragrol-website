@@ -5,11 +5,12 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 ---
 
 ## Current Status
-Home page (Step 4) fully implemented — all 11 sections plus global SiteHeader/SiteFooter. Header Fix Passes 1-3 complete. Standalone `/pricing` route removed (D-003). Hero has all 16 frames, scroll-mapping bug fixed (D-005), visual-quality gap intentionally frozen (D-006) — not an open item. **Step 5 — Services hub page (`/services`) reviewed by Mohammad in-browser and approved** (structure + copy both signed off) — the one spacing defect found (excessive gap before Additional Capabilities) is fixed and re-verified. Individual service detail pages remain deferred (D-007).
+Home (Step 4) and Services hub (Step 5, `/services`) both complete and approved. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006). **New: a per-page visual-identity system is now approved (D-008)** — each of the 9 pages gets its own code-generated visual metaphor (not just background-color differentiation), sharing one underlying material (locked tokens/type/spacing/motion). Not yet applied to Services (built before D-008). Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Step 6 — Solutions Page. Pricing/package names/inclusions remain UNCONFIRMED — do not invent, keep the "currently being finalized" status language (already used consistently in Solutions.tsx and Faq.tsx).
-2. Hero frame resolution/quality is NOT an open item — see D-006. Do not raise again unless the user brings it up.
+1. Decide whether Services gets retrofitted with its D-008 schematic-linework motif before or alongside Step 6, or after — open question, not yet decided (see latest session log).
+2. Step 6 — Solutions Page, incorporating its D-008 direction (ascending stacked planes/strata). Pricing/package names/inclusions remain UNCONFIRMED — keep "currently being finalized" language.
+3. Hero frame resolution/quality is NOT an open item — see D-006.
 
 ---
 
@@ -158,6 +159,33 @@ Home page (Step 4) fully implemented — all 11 sections plus global SiteHeader/
 
 **Next recommended step:**
 - Step 6 — Solutions Page.
+
+---
+
+### 2026-08-12 (later same day) — Per-page visual identity system, proposed and approved (no build)
+**Completed:**
+- User raised a real design-direction problem before Step 6: Home and Services were differentiated mostly by `Section` background color/icon choice, not actual distinct visual content — risked all 9 pages feeling interchangeable if repeated.
+- Proposed a per-page visual metaphor for all 9 pages (report only, no code) — table of core concept / visual metaphor / distinctness per page — plus a unifying principle (shared color/type/spacing/motion "material," distinct "shape" per page). Explicit design constraint carried through: Home's ring+skyline stays reserved to Home (existing "never invent a similar ring" rule), so Cyber Health's data visuals use arcs/gauges, not closed rings.
+- Asked and got an answer on production method: code-generated SVG/CSS for all pages now (not commissioned imagery), with Company and Industries explicitly flagged as candidates for a future photographic/commissioned upgrade — deferred, not blocking, same pattern as D-006's hero deferral.
+- Logged the full per-page direction table and production-method decision as DECISIONS.md D-008.
+- **No code was built this session** — per explicit instruction, this was direction-approval only.
+
+**Files changed:**
+- `DECISIONS.md` (D-008, and a cross-reference note on D-007)
+- `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- N/A — process/direction session, no implementation.
+
+**Problems solved:**
+- N/A.
+
+**Still open / needs verification:**
+- Whether Services (already built under the old color-only treatment) gets retrofitted with its D-008 schematic-linework motif before, alongside, or after Step 6 — not yet decided, needs a call before Step 6 starts or shortly after.
+- Nav contrast (visual check only, carried over).
+
+**Next recommended step:**
+- Resolve the Services-retrofit-timing question, then Step 6 — Solutions Page, built with its D-008 visual direction (ascending stacked planes/strata) from the start rather than added later.
 
 ---
 *(New sessions get added above this line, newest first. When this file passes ~10 sessions, move the oldest ones into PROJECT_MEMORY_ARCHIVE.md.)*
