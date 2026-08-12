@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Container, Grid, NavLink, Section, Text } from "../ui";
-import { OragrolRing } from "../brand/oragrol-ring";
+import { OragrolLogo } from "../brand/oragrol-logo";
 
 /**
  * SiteFooter — Step 4. Structure per brief section 21: logo + short
@@ -8,6 +8,13 @@ import { OragrolRing } from "../brand/oragrol-ring";
  * EN | FR, LinkedIn, legal links. All destination pages other than Home
  * don't exist yet (later build phases) — links point at their intended
  * final paths so nothing needs rewiring when those pages ship.
+ *
+ * Logo: reuses OragrolLogo (the same component SiteHeader uses), not a
+ * hand-typed "ORAGROL" span + bare OragrolRing — a prior version of this
+ * file recreated the wordmark separately, which drifted from the header
+ * (wrong case, missing the "GLOBAL" subtitle, wrong ring-to-text gap).
+ * OragrolLogo is the single source of truth for the full lockup; every
+ * place the logo appears should import it, never re-approximate it.
  *
  * LinkedIn href is "#": no real profile URL was supplied, and the brief
  * prohibits inventing partner/company details, so this is left as an
@@ -41,11 +48,8 @@ export function SiteFooter() {
       <Container size="xl" className="py-16">
         <Grid cols={{ base: 1, md: 4 }} gap="lg">
           <div className="flex flex-col gap-4 md:col-span-2">
-            <Link href="/" className="flex items-center gap-2.5 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
-              <OragrolRing size={26} />
-              <span className="font-brand text-lg font-semibold tracking-tight text-text-primary">
-                ORAGROL
-              </span>
+            <Link href="/" className="inline-flex w-fit rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
+              <OragrolLogo height={36} />
             </Link>
             <Text size="sm" tone="secondary" className="max-w-sm">
               Cybersecurity clarity for modern businesses.

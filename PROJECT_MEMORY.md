@@ -5,13 +5,13 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 ---
 
 ## Current Status
-Home (Step 4), Services hub (Step 5, `/services`), and Solutions (Step 6, `/solutions`) all complete. Solutions is the first page built under D-008's per-page visual-identity system — its `StrataVisual` (ascending stacked planes) is live, verified, not yet reviewed by Mohammad in-browser (built this session, awaiting sign-off same as Services was). Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006). Services still awaits its own D-008 retrofit (schematic linework) — explicitly ordered after other step work, not an oversight. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
+Home (Step 4), Services hub (Step 5, `/services`), and Solutions (Step 6, `/solutions`) all complete and **reviewed/approved by Mohammad**, including two fixes found in review: `StrataVisual` rebuilt as genuine overlapping isometric blocks (was flat rectangles), and the footer logo fixed to reuse `OragrolLogo` (was hand-typed text that had drifted from the header). Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006). Services still awaits its own D-008 retrofit (schematic linework) — explicitly ordered after other step work, not an oversight. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Mohammad to review `/solutions` in-browser (structure, copy, and the new StrataVisual treatment) — same review step Services went through.
-2. Order not yet decided: Step 7 (Cyber Health) vs. the Services D-008 retrofit — ask before starting either.
-3. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
-4. Hero frame resolution/quality is NOT an open item — see D-006.
+1. Order not yet decided: Step 7 (Cyber Health) vs. the Services D-008 retrofit — ask before starting either.
+2. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
+3. Hero frame resolution/quality is NOT an open item — see D-006.
+4. Worth a systematic check: are there other places besides the footer that recreated a brand element (logo, ring) by hand instead of importing the shared component? The footer bug suggests this pattern may recur — no full audit done yet, just the one instance found and fixed.
 
 ---
 
@@ -210,12 +210,40 @@ Home (Step 4), Services hub (Step 5, `/services`), and Solutions (Step 6, `/solu
 - First real application of D-008's per-page visual system, proving the "code-generated, shares the existing color-mix/token idioms" approach works without inventing new patterns or new tokens beyond what's already locked.
 
 **Still open / needs verification:**
-- Mohammad's in-browser review of `/solutions` (same step Services went through) — not yet done.
 - Order of Step 7 vs. the Services D-008 retrofit — not yet decided.
 - Nav contrast (visual check only, carried over) — still the only long-standing open item.
 
 **Next recommended step:**
-- Get Solutions reviewed/approved, then decide Step 7 vs. Services retrofit order.
+- Decide Step 7 vs. Services retrofit order.
+
+---
+
+### 2026-08-12 (later same day) — Solutions review: fix strata visual + footer logo
+**Completed:**
+- Mohammad reviewed `/solutions` in-browser. Two defects found:
+  1. `StrataVisual` didn't match the approved plan — rendered as 3 plain flat rectangles of increasing height (no overlap, no perspective), not the "overlapping/offset, isometric terrace" effect described when the direction was proposed.
+  2. Footer logo didn't match the header logo — footer was hand-typing a bold all-caps "ORAGROL" span next to a bare `OragrolRing`, instead of reusing `OragrolLogo` (the single component that owns the correct case, the "GLOBAL" subtitle, and the exact ring-to-text geometry). Visibly wrong (missing subtitle, wrong case) and architecturally wrong (a second, drifted recreation of the logo instead of one source of truth).
+- Rebuilt `StrataVisual` from scratch as true isometric geometry: each block is a top rhombus face + two extruded side faces (standard isometric-tile construction), positioned with real x/y overlap so each subsequent block visibly layers in front of the previous one (SVG document order = z-order, later-drawn on top) — not a bar-chart-style row of separate rectangles. Side faces get progressively darker `color-mix` fills than the top face per block, faking a lit-top/shadowed-side look consistent with the brief's "subtle depth, controlled reflections" direction. Kept the same design tokens/technique as v1 (no new colors invented).
+- Fixed `SiteFooter` to import and render `OragrolLogo` directly (same import SiteHeader uses) instead of hand-composing `OragrolRing` + a text span. Removed the now-unused `OragrolRing` import.
+- Verified both fixes: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean. Screenshotted the rebuilt strata visual (full hero, taller viewport to avoid fold-cropping) and a side-by-side header-vs-footer logo closeup confirming pixel-identical rendering. Re-ran the full Solutions scroll-through to confirm no regressions elsewhere on the page. Sent screenshots to Mohammad before committing, per his explicit request — got confirmation before this commit.
+
+**Files changed:**
+- `app/components/sections/solutions/strata-visual.tsx` (full rewrite — isometric block geometry)
+- `app/components/site/site-footer.tsx` (logo: `OragrolRing` + hand-typed text → `OragrolLogo`)
+
+**Problems found:**
+- The footer logo bug raises a pattern worth checking elsewhere: is `OragrolRing` (the bare ring, no text) used correctly everywhere it appears (e.g. `FinalCta`'s background accent, which is meant to be ring-only, not a full lockup), or could a similar "recreated instead of reused" drift exist anywhere else? Not audited this session — flagged in Next Steps.
+
+**Problems solved:**
+- Both defects fixed and confirmed by direct visual comparison (isometric geometry inspected at a taller viewport to see the whole shape; logos compared side-by-side crop-for-crop), not just "looks better."
+
+**Still open / needs verification:**
+- A broader audit of whether any other component recreated a brand asset by hand instead of importing it — not done, just this one instance.
+- Order of Step 7 vs. the Services D-008 retrofit — not yet decided.
+- Nav contrast (visual check only, carried over).
+
+**Next recommended step:**
+- Decide Step 7 (Cyber Health) vs. Services D-008 retrofit order.
 
 ---
 *(New sessions get added above this line, newest first. When this file passes ~10 sessions, move the oldest ones into PROJECT_MEMORY_ARCHIVE.md.)*
