@@ -98,7 +98,19 @@ function ServiceField({ label, children }: { label: string; children: string }) 
 export function LiveServices() {
   return (
     <Section environment="white">
-      <Container size="lg" className="py-24 md:py-32">
+      {/*
+        Asymmetric pt/pb, not the usual py-24/32: each row below already
+        carries its own py-14 (top AND bottom padding, for the divide-y
+        rhythm between rows). A uniform py-24/32 here would stack its own
+        bottom padding on top of the last row's already-present pb-14,
+        producing a much bigger gap before the next section than the
+        entrance gap before the first row — confirmed as the reported
+        "excessive blank gap" before Additional Capabilities. Top padding
+        stays the standard 24/32 (unaffected, wasn't part of the report);
+        bottom is cut down since the last row's own pb-14 already covers
+        most of that space.
+      */}
+      <Container size="lg" className="pt-24 pb-8 md:pt-32 md:pb-12">
         <Reveal>
           <Caption tone="accent">Live capabilities</Caption>
         </Reveal>

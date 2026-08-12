@@ -5,12 +5,11 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 ---
 
 ## Current Status
-Home page (Step 4) fully implemented — all 11 sections plus global SiteHeader/SiteFooter. Header Fix Passes 1-3 complete. Standalone `/pricing` route removed (D-003). Hero has all 16 frames, scroll-mapping bug fixed (D-005), visual-quality gap intentionally frozen (D-006) — not an open item. **Step 5 — Services hub page (`/services`) is now built and verified** (typecheck/lint/build clean, scroll-verified screenshots desktop+mobile, zero console errors) — see D-007 for scope (hub only, Lucide icons, detail pages deferred). The per-service problem/what-we-do/what-you-get/outcome breakdown is draft copy, not yet reviewed by Mohammad.
+Home page (Step 4) fully implemented — all 11 sections plus global SiteHeader/SiteFooter. Header Fix Passes 1-3 complete. Standalone `/pricing` route removed (D-003). Hero has all 16 frames, scroll-mapping bug fixed (D-005), visual-quality gap intentionally frozen (D-006) — not an open item. **Step 5 — Services hub page (`/services`) reviewed by Mohammad in-browser and approved** (structure + copy both signed off) — the one spacing defect found (excessive gap before Additional Capabilities) is fixed and re-verified. Individual service detail pages remain deferred (D-007).
 
 ## Next Steps
-1. Mohammad to review Step 5's new draft copy (the expanded 4-field breakdown per live service — the one-liners themselves were already locked/confirmed).
-2. Step 6 — Solutions Page, after Step 5 copy review. Pricing/package names/inclusions remain UNCONFIRMED — do not invent, keep the "currently being finalized" status language (already used consistently in Solutions.tsx and Faq.tsx).
-3. Hero frame resolution/quality is NOT an open item — see D-006. Do not raise again unless the user brings it up.
+1. Step 6 — Solutions Page. Pricing/package names/inclusions remain UNCONFIRMED — do not invent, keep the "currently being finalized" status language (already used consistently in Solutions.tsx and Faq.tsx).
+2. Hero frame resolution/quality is NOT an open item — see D-006. Do not raise again unless the user brings it up.
 
 ---
 
@@ -135,6 +134,30 @@ Home page (Step 4) fully implemented — all 11 sections plus global SiteHeader/
 
 **Next recommended step:**
 - Review Step 5 copy, then Step 6 — Solutions Page.
+
+---
+
+### 2026-08-12 (later same day) — Services page: fix spacing defect, sign-off
+**Completed:**
+- Mohammad reviewed `/services` directly in-browser: structure and copy both approved. One defect found: excessive blank gap between the last live-service row (Security Awareness Training) and the Additional Capabilities section start.
+- Root-caused: `LiveServices`' outer `Container` carried its own `py-24 md:py-32` (top+bottom padding), stacking on top of the last row's own `py-14` (each row's individual top+bottom padding, used for the `divide-y` inter-row rhythm) — a doubled-up bottom gap unique to this section, since no other section in the codebase wraps a `divide-y` list with per-row `py-*` inside a `Container` that also carries its own `py-*`.
+- Fixed by making the Container's padding asymmetric: `pt-24 pb-8 md:pt-32 md:pb-12` — top (entrance spacing, not flagged) stays exactly as it was; bottom is reduced since the last row's own `pb-14` already covers most of that space. Left the per-row `py-14` and the section's top padding untouched, keeping the fix scoped to exactly the reported symptom.
+- Re-verified: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean, and a targeted Playwright screenshot centered on the exact section boundary (found via `.env-light-blue`'s live `getBoundingClientRect()`, not a guessed scroll offset) confirms the gap now reads as a normal, proportionate section transition.
+
+**Files changed:**
+- `app/components/sections/services/live-services.tsx` (Container className only — `py-24 md:py-32` → `pt-24 pb-8 md:pt-32 md:pb-12`, plus an explanatory comment)
+
+**Problems found:**
+- N/A — the fix matched the initial root-cause diagnosis on the first attempt.
+
+**Problems solved:**
+- Services page spacing defect, confirmed fixed by direct measurement of the section boundary, not just "looks better."
+
+**Still open / needs verification:**
+- Nav contrast (visual check only, carried over from earlier sessions) — the only remaining open item site-wide.
+
+**Next recommended step:**
+- Step 6 — Solutions Page.
 
 ---
 *(New sessions get added above this line, newest first. When this file passes ~10 sessions, move the oldest ones into PROJECT_MEMORY_ARCHIVE.md.)*
