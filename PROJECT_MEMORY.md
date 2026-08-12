@@ -5,13 +5,13 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 ---
 
 ## Current Status
-Home (Step 4), Services hub (Step 5, `/services`), and Solutions (Step 6, `/solutions`) all complete and **reviewed/approved by Mohammad**, including two fixes found in review: `StrataVisual` rebuilt as genuine overlapping isometric blocks (was flat rectangles), and the footer logo fixed to reuse `OragrolLogo` (was hand-typed text that had drifted from the header). Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006). Services still awaits its own D-008 retrofit (schematic linework) — explicitly ordered after other step work, not an oversight. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
+Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A repo-wide sweep confirmed the footer logo (fixed last session) was the *only* hand-recreated brand element — no other instances found (checked via text search, the ring's exact geometry signature, and cross-referencing every `OragrolLogo`/`OragrolRing` import site). Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — that flow is out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006). Services still awaits its D-008 retrofit — explicitly ordered after other step work. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking. Solutions/Cyber Health not yet reviewed by Mohammad in-browser (built this session).
 
 ## Next Steps
-1. Order not yet decided: Step 7 (Cyber Health) vs. the Services D-008 retrofit — ask before starting either.
-2. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
-3. Hero frame resolution/quality is NOT an open item — see D-006.
-4. Worth a systematic check: are there other places besides the footer that recreated a brand element (logo, ring) by hand instead of importing the shared component? The footer bug suggests this pattern may recur — no full audit done yet, just the one instance found and fixed.
+1. Mohammad to review `/cyber-health` in-browser (structure, copy, the GaugeVisual, and confirm the Tally link/new-tab behavior feels right).
+2. Order not yet decided: Step 8 (How We Work) vs. the Services D-008 retrofit — ask before starting either.
+3. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
+4. Hero frame resolution/quality is NOT an open item — see D-006.
 
 ---
 
@@ -244,6 +244,37 @@ Home (Step 4), Services hub (Step 5, `/services`), and Solutions (Step 6, `/solu
 
 **Next recommended step:**
 - Decide Step 7 (Cyber Health) vs. Services D-008 retrofit order.
+
+---
+
+### 2026-08-12 (later same day) — Brand-asset sweep + build Cyber Health (Step 7)
+**Completed:**
+- **Sweep (requested item 1):** searched the whole repo for hand-recreated brand elements — plain-text "ORAGROL"/"Oragrol" hits (all legitimate prose/metadata, none a visual recreation), the ring's exact geometry signature (`strokeDasharray="365 24"` — found only in the two canonical components, nowhere else), and every import site of `OragrolLogo`/`OragrolRing` (header, footer, `FinalCta`'s ring-only background accent — exactly the expected set, no extras). Conclusion: the footer (fixed last session) was the only instance. No further fixes needed.
+- **Order decision (requested item 2):** confirmed Step 7 (Cyber Health) before the Services retrofit, same reasoning as before — prove the D-008 pattern on a second page first.
+- Inspected before coding: no `/cyber-health` route existed, only the Home teaser with LOCKED content (the 7-step flow, the 6-item output shape, an explicitly-labeled illustrative mock score). Re-read `PROJECT_MASTER.md` Step 7's "Existing MVP flow (Tally-based) stays live underneath" line, searched the whole repo for any Tally URL/API route/CRM-AI-email SDK — found none, confirming the real assessment/scoring/AI/CRM pipeline runs entirely outside this codebase. Reported this gap rather than inventing a destination, and asked where the CTA should actually point.
+- User supplied the real, live URL (`https://tally.so/r/2EzROb`, already receiving real submissions). Fetched it directly to confirm it's the correct "Free Cyber Health Assessment" form and to pull real, confirmed facts (5-7 min, no commitment, AI-generated suggestions, executive PDF report) for the Reassurance section — not invented.
+- Chose link-out-in-new-tab over iframe embed (my call, as the user authorized) and explained why: no way to confirm this specific form allows iframing, and a live form with real submissions shouldn't risk a broken/blocked embed when a plain link is guaranteed to work.
+- Built `/cyber-health`: `CyberHealthHero` (dark env, same SiteHeader-contrast reasoning as every other page + `GaugeVisual`, D-008's instrument-panel motif — a 4-segment arc gauge using the risk-tier tokens as a legitimate *functional* data use, not decoration) → `Flow` (the locked 7-step sequence at full page weight, reusing Approach.tsx's connecting-spine pattern extended from 4 to 7 items via hand-written grid classes, same as Approach.tsx already does for its own non-standard column count) → `OutputShape` (the locked 6-item list + an illustrative report preview reusing the exact 78/Medium example already approved on the Home teaser, plus new illustrative "Top Risks" bars using generic, non-proprietary security-domain names, explicitly labeled illustrative) → `Reassurance` (facts sourced from the live form) → `ClosingCta` (page-specific — NOT the reused `FinalCta`, since FinalCta's own CTA points *to* `/cyber-health`, which would be circular on this exact page).
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean (new static `/cyber-health` route). Scroll-verified screenshots desktop+mobile. Caught and correctly diagnosed a screenshot-methodology artifact (not a real bug): the last Flow step looked faded in one screenshot — traced to the item's staggered `Reveal` delay (0.36s) + animation duration (0.5s) exceeding my script's 400ms wait, confirmed by re-screenshotting with a longer wait. Directly verified (via DOM query, not assumption) that both on-page action CTAs resolve to the exact Tally URL with `target="_blank"`/proper `rel`, while the header/nav CTA correctly still points to `/cyber-health` itself.
+- Updated `PROJECT_MASTER.md` (Step 7 → IMPLEMENTED, Current Position, and an explicit note that the Tally flow is out of scope for this codebase).
+
+**Files changed:**
+- New: `app/cyber-health/page.tsx`, `app/components/sections/cyber-health/{hero,gauge-visual,flow,output-shape,reassurance,closing-cta}.tsx`
+- `PROJECT_MASTER.md` (Step 7 + Current Position)
+
+**Problems found:**
+- None in the sweep. One screenshot-methodology artifact during verification (described above), correctly identified as such before it could be misreported as a bug.
+
+**Problems solved:**
+- Resolved a real content-governance risk before it became a mistake: PROJECT_MASTER.md referenced an "existing MVP" without a URL anywhere in the repo — surfaced the gap and got the real answer instead of guessing or inventing a placeholder link.
+
+**Still open / needs verification:**
+- Mohammad's in-browser review of `/cyber-health` — not yet done.
+- Order of Step 8 vs. the Services D-008 retrofit — not yet decided.
+- Nav contrast (visual check only, carried over) — still the only long-standing open item.
+
+**Next recommended step:**
+- Get Cyber Health reviewed, then decide Step 8 vs. Services retrofit order.
 
 ---
 *(New sessions get added above this line, newest first. When this file passes ~10 sessions, move the oldest ones into PROJECT_MEMORY_ARCHIVE.md.)*
