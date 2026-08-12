@@ -9,7 +9,7 @@ Home page (Step 4) fully implemented — all 11 sections (Hero → Security Chal
 
 ## Next Steps
 1. Step 5 — Services Page (per `PROJECT_MASTER.md`). Inspect current page/design system/content first; report before coding.
-2. Hero motion (16-frame sequence) integration remains a separate, non-blocking track — `public/hero/` currently has 8 of the planned scroll-sequence PNGs (`hero-01-initial.png` through `hero-07-scroll6.png`, no frame 08+), so this is still in progress.
+2. Hero motion (16-frame sequence) integration remains a separate, non-blocking track — `public/hero/` currently has 8 of the planned 16 scroll-sequence PNGs (`hero-01-initial.png` through `hero-08-scroll7.png`), all correctly wired into `HERO_IMAGES` in `hero.tsx` and crossfading via scroll-driven opacity/scale (a deliberate pivot from live Three.js/R3F rendering to locked offline-rendered reference frames — see file header comment). Frames 9-16 don't exist yet.
 
 ---
 
@@ -37,7 +37,7 @@ Home page (Step 4) fully implemented — all 11 sections (Hero → Security Chal
 
 **Still open / needs verification:**
 - Stray `app/CLAUDE.md` / `app/DECISIONS.md` / `app/PROJECT_MEMORY.md` duplicates — not yet resolved.
-- Hero motion sequence incomplete (7 of 16 frames present in `public/hero/`).
+- Hero motion sequence incomplete (8 of 16 frames present in `public/hero/`, all wired into `hero.tsx`'s crossfade sequence — see Next Steps for the correction from an earlier miscount).
 - Nav-link color contrast against the Hero image was checked visually only (screenshots), not with an automated contrast tool.
 
 **Next recommended step:**
