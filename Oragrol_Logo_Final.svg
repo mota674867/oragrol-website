@@ -1,0 +1,17 @@
+<svg width="900" height="300" viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg">
+  <title>Oragrol fused-O concept demo</title>
+  <rect x="0" y="0" width="900" height="300" fill="#FFFFFF"/>
+
+  <!-- fused O: near-complete ring with a deliberate small gap -->
+  <circle cx="110" cy="150" r="62" fill="none" stroke="#018ABE" stroke-width="26"
+          stroke-dasharray="365 24" stroke-dashoffset="0"
+          stroke-linecap="round"
+          transform="rotate(35 110 150)"/>
+
+  <!-- rest of wordmark, medium weight, dark neutral -->
+  <text x="185" y="172" font-family="'Epilogue','Inter',sans-serif" font-weight="500" font-size="72" fill="#1F2937">ragrol</text>
+
+  <text x="187" y="215" font-family="'Epilogue','Inter',sans-serif" font-weight="500" font-size="20" letter-spacing="7" fill="#9CA3AF">GLOBAL</text>
+
+  <text x="30" y="270" font-family="Inter, sans-serif" font-size="13" fill="#9CA3AF">Concept only — gap size/position/weight all adjustable</text>
+</svg>

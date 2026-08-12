@@ -1,0 +1,19 @@
+<svg width="150" height="150" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Oragrol ring mark">
+  <!--
+    Oragrol ring — extracted from Oragrol_Logo_Final.svg, the confirmed
+    Oragrol logo/ring asset (see app/components/brand/oragrol-ring.tsx).
+    Geometry is a 1:1 crop, not a redraw: same r, stroke-width, dasharray gap,
+    and rotation as the source circle, just recentered into its own viewBox
+    with the wordmark/background removed so only the ring element remains.
+  -->
+  <circle
+    cx="75" cy="75" r="62"
+    fill="none"
+    stroke="#018ABE"
+    stroke-width="26"
+    stroke-dasharray="365 24"
+    stroke-dashoffset="0"
+    stroke-linecap="round"
+    transform="rotate(35 75 75)"
+  />
+</svg>

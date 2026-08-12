@@ -10,11 +10,25 @@ import { cn } from "./cn";
  * unchanged across the Dark / White / Light-blue section environments.
  */
 
-export function H1({ className, ...props }: ComponentPropsWithoutRef<"h1">) {
+export type H1Size = "default" | "xl";
+
+const h1SizeClasses: Record<H1Size, string> = {
+  default: "text-4xl md:text-5xl",
+  // Hero-scale — deliberately larger than the standard H1 ladder, for the
+  // one bespoke, editorial headline treatment the brief calls for.
+  xl: "text-4xl sm:text-5xl md:text-6xl",
+};
+
+export interface H1Props extends ComponentPropsWithoutRef<"h1"> {
+  size?: H1Size;
+}
+
+export function H1({ size = "default", className, ...props }: H1Props) {
   return (
     <h1
       className={cn(
-        "font-heading text-4xl font-semibold leading-tight tracking-tight text-text-primary md:text-5xl",
+        "font-heading font-semibold leading-tight tracking-tight text-text-primary",
+        h1SizeClasses[size],
         className,
       )}
       {...props}
