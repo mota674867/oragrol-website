@@ -1,8 +1,8 @@
 import type { ComponentType, SVGProps } from "react";
 import { Laptop, Radar, Siren, Target } from "lucide-react";
-import { Badge, Card, Caption, Container, H2, Icon, Section, Text } from "../../ui";
+import { Badge, Card, Caption, Container, H2, Section, Text } from "../../ui";
 import { Reveal } from "../../motion/reveal";
-import { SchematicMark } from "./schematic-visual";
+import { CapabilitySpotlightMark } from "./capability-spotlight";
 
 /**
  * Additional Capabilities (5-8) — Step 5. Same one-liners as the Home
@@ -56,22 +56,14 @@ export function AdditionalCapabilities() {
           {FINALIZING_SERVICES.map((service, i) => (
             <Reveal key={service.name} delay={i * 0.06}>
               <Card variant="surface" className="flex h-full flex-col gap-3">
-                {/* Compact schematic-linework mark (D-008/D-011 retrofit,
-                    approved from Prototype 2) — same visual language as
-                    LiveServices' full SchematicVisual, scaled down for this
-                    card. Kept visually lighter than the live rows (smaller
-                    mark, muted icon tone, badge) — these 4 aren't live yet,
-                    and that distinction is deliberate (D-007), not an
-                    oversight. */}
-                <div className="relative h-12 w-12">
-                  <SchematicMark className="h-full w-full" />
-                  <span
-                    className="absolute left-1/2 top-[53%] flex h-6 w-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center"
-                    aria-hidden="true"
-                  >
-                    <Icon icon={service.icon} size="sm" className="text-text-secondary" />
-                  </span>
-                </div>
+                {/* Compact Design Correction mark (D-013/D-014) — same
+                    dark glow-lit visual language as LiveServices' full
+                    CapabilitySpotlightVisual, scaled down and simplified
+                    (no schematic diagram, no numeral) for this card. Kept
+                    visually lighter than the live rows — these 4 aren't
+                    live yet, and that distinction is deliberate (D-007),
+                    not an oversight. */}
+                <CapabilitySpotlightMark icon={service.icon} className="h-14 w-14" />
                 <h3 className="font-heading text-base font-semibold text-text-primary">
                   {service.name}
                 </h3>

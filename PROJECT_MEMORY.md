@@ -8,11 +8,11 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Awaiting Mohammad's review of the D-013 Design Correction prototype (`/services/prototype`, noindex) — a bigger, glow-lit, dark-panel-elevated version of the D-012 schematic row, built against `SERVICES_REDESIGN_PROMPT.md`'s 3 Dribbble references. D-012 (shipped, all 8 capabilities) was found not to meet the bar on live review — this prototype is the correction, not yet applied anywhere live.
-2. If approved: apply `CapabilitySpotlight`'s treatment (or a refined version of it) to the remaining 7 capabilities — same "keep both structures, adapt per section" question likely applies again (LiveServices rows vs AdditionalCapabilities' compact cards) — ask before assuming scope, same as D-012's process.
-3. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully approved.
-4. `21st` MCP is now authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating.
-5. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in `SchematicVisual`/`SchematicMark`/`HeroSchematicVisual` — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
+1. Services Design Correction is COMPLETE (D-014) — all 8 capabilities now use the CapabilitySpotlight visual language (full treatment on the 4 live rows, compact on the 4 finalizing cards). Mohammad has not yet done a final in-browser pass over the fully rolled-out page (screenshots sent, not yet explicitly confirmed).
+2. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully approved.
+3. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating.
+4. A third-party site, `ui-ux-pro-max-skill.nextlevelbuilder.io` (design-reference database, Claude-Code-integrated, `uip`/`uipro init` setup command), was raised mid-D-013-rollout as a possible improvement source. Its "How it Works" page hung the browser tab twice — never got to see the actual setup command. No install/init command was run. Mohammad chose to skip it for this round; if revisited later, verify the setup command's actual behavior before running it, same standing rule as any third-party install.
+5. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in the Services visual components — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
 6. Hero: current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
 7. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
 
@@ -97,7 +97,22 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **Decisions:** D-013 logged (prototype round; does not change D-012's shipped state).
 
-**Next:** Awaiting Mohammad's review of `/services/prototype`'s new Capability Spotlight treatment before any further rollout.
+---
+
+### 2026-08-13 (continued 5) — Design Correction shipped to all 8 capabilities (D-014)
+**Completed:**
+- Mohammad reviewed the D-013 prototype live — "this is a real improvement, meets the brief" — approved it for the remaining 7 capabilities, adapted per the existing size/weight distinction (same split as D-012).
+- Mid-rollout: Mohammad asked me to check a third-party site, `ui-ux-pro-max-skill.nextlevelbuilder.io` ("UI UX Pro Max" — design-reference database, Claude-Code-integrated, `uip`/`uipro init` setup command), for anything that would improve the approved prototype further, before touching the other rows. Homepage loaded fine; its "How it Works" page hung the browser tab twice (30s CDP timeouts, unresponsive renderer) before any setup command could be seen. Did not run any install/init command — flagged as a standing rule (verify what a third-party setup script does before running it), independent of the hang. Asked Mohammad how to proceed; he chose to skip it and continue with the already-approved 21st.dev-based version.
+- Generalized `capability-spotlight.tsx` from the single hardcoded prototype into `CapabilitySpotlightVisual({ n, icon })` (full treatment) and `CapabilitySpotlightMark({ icon })` (compact treatment) — same relationship as D-012's `SchematicVisual`/`SchematicMark`.
+- `live-services.tsx`: all 4 rows (was 1 prototyped + 3 old-schematic) now use `CapabilitySpotlightVisual`. `additional-capabilities.tsx`: all 4 cards now use `CapabilitySpotlightMark` in place of `SchematicMark`.
+- Deleted `/services/prototype` — no longer needed. Cleared `.next` cache, confirmed clean typecheck after.
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run build` succeeded (8 routes, `/services/prototype` gone). Full-page Playwright screenshots (real incremental scroll) at 1440px and 390px — zero console errors, zero horizontal overflow. Confirmed on a freshly restarted dev server that `/services` returns 200 and `/services/prototype` returns 404.
+- Sent a full-page screenshot of the fully rolled-out `/services` page to Mohammad.
+- Logged as D-014 — Services Design Correction is now COMPLETE across all 8 capabilities.
+
+**Decisions:** D-014 logged.
+
+**Next:** Awaiting Mohammad's final review of the fully rolled-out `/services` page; per the blueprint's Rollout section, no other page gets touched until that's confirmed.
 
 ---
 

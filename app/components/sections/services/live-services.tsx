@@ -1,8 +1,8 @@
 import type { ComponentType, SVGProps } from "react";
 import { Bug, ClipboardCheck, GraduationCap, UserRound } from "lucide-react";
-import { ButtonLink, Caption, Container, H2, H3, Icon, Section, Text } from "../../ui";
+import { ButtonLink, Caption, Container, H2, H3, Section, Text } from "../../ui";
 import { Reveal } from "../../motion/reveal";
-import { SchematicVisual } from "./schematic-visual";
+import { CapabilitySpotlightVisual } from "./capability-spotlight";
 
 /**
  * Live Services (1-4) — Step 5.
@@ -126,22 +126,11 @@ export function LiveServices() {
               <Reveal key={service.name} delay={i * 0.06}>
                 <div className="grid gap-8 py-14 md:grid-cols-2 md:items-center md:gap-16">
                   <div className={reverse ? "md:order-2" : undefined}>
-                    {/* Schematic-linework treatment (D-008/D-011 retrofit,
-                        approved from Prototype 2) — same SchematicVisual +
-                        HTML icon-overlay pattern for every row, replacing
-                        the old bare icon-circle. */}
-                    <div className="relative mx-auto max-w-sm">
-                      <SchematicVisual className="w-full" />
-                      <span className="absolute left-2 top-2 font-data text-[10px] tracking-wider text-text-muted">
-                        FIG.{service.n}
-                      </span>
-                      <span
-                        className="absolute left-1/2 top-[54.2%] flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-accent/40 bg-surface"
-                        aria-hidden="true"
-                      >
-                        <Icon icon={service.icon} size="md" className="text-accent" />
-                      </span>
-                    </div>
+                    {/* Design Correction treatment (D-013/D-014) — bigger
+                        hero-scale illustration in a nested dark, glow-lit,
+                        shadow-elevated panel, replacing D-012's flatter
+                        schematic-linework mark. */}
+                    <CapabilitySpotlightVisual n={service.n} icon={service.icon} />
                     <H3 className="mt-6">{service.name}</H3>
                     <ButtonLink href={service.cta.href} variant="secondary" size="md" className="mt-6">
                       {service.cta.label}
