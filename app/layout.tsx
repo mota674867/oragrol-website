@@ -3,6 +3,7 @@ import { Space_Grotesk, Inter, JetBrains_Mono, Epilogue } from "next/font/google
 import "./globals.css";
 import { SiteHeader } from "./components/site/site-header";
 import { SiteFooter } from "./components/site/site-footer";
+import { EmergencyCta } from "./components/site/emergency-cta";
 
 // Design-token typefaces (current baseline — swappable, see app/styles/tokens.css).
 // Changing a typeface only requires editing the import + call below; every
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <SiteFooter />
+        <EmergencyCta />
       </body>
     </html>
   );

@@ -8,9 +8,9 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Awaiting Mohammad's review of D-016 (container/sidebar-nav fix, stronger typography, hover motion) — screenshots sent, item 1 proven with DOM measurements + screenshots at 1440/1920/2560px per his explicit requirement.
-2. Item 5 (footer overhaul, site-wide, separate commit) still to build — needs project-docs investigation first (Blog/Resources page existence, real social URLs, real emergency-contact route) before writing any code; flag gaps rather than invent, per Mohammad's own instruction.
-3. Item 5 from the D-015/D-016 instruction chain (regrouping the 8 capabilities into categories, structure/copy pattern only, benchmarked against a Bell Business reference page — not its visual style) is STILL explicitly held pending a separate scope confirmation from Mohammad. (Note: this is a different "item 5" than the footer — D-015's round had 5 items ending in capability-regrouping; D-016's round had 5 items ending in the footer. Both are still open, unrelated to each other.)
+1. Awaiting Mohammad's review of D-016 (container/sidebar-nav fix, stronger typography, hover motion) and D-017 (footer overhaul, site-wide).
+2. Two explicit flags still open from D-017, not resolved: Instagram has no real URL yet (`href="#"` placeholder); the emergency-CTA phone number (`+60 18-377-2761`) is a TEMPORARY placeholder pending a real Canadian contact line before public launch — both flagged with code comments, don't remove without confirming real values first.
+3. A different, still-open "item 5" from the D-015 instruction chain (regrouping the 8 capabilities into categories, structure/copy pattern only) remains explicitly held pending a separate scope confirmation from Mohammad — unrelated to the now-built footer.
 4. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully approved.
 5. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating.
 6. Known Tailwind v4 gotcha worth remembering: arbitrary-value utilities with `color-mix()` (or similar multi-comma CSS functions) nested inside bracket syntax can silently generate no CSS at all — confirmed with `shadow-[...color-mix(in_srgb,...)]`. Prefer Tailwind's built-in `{utility}-{registered-color}/{opacity}` mechanic (e.g. `shadow-accent/30`) over hand-rolled arbitrary values when a registered theme color is involved. Also: Tailwind v4 uses standalone `translate`/`scale`/`rotate` CSS properties, not the composed `transform` — don't debug hover/motion utilities by checking `getComputedStyle(el).transform`.
@@ -141,7 +141,22 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **Decisions:** D-016 logged.
 
-**Next:** Awaiting Mohammad's review of D-016. Item 5 (footer overhaul) still to build — needs a project-docs investigation pass first (see Next Steps above).
+---
+
+### 2026-08-13 (continued 8) — Footer overhaul, site-wide, separate commit (D-017)
+**Completed:**
+- Investigated project docs before building anything, per Mohammad's own instruction: "Blog" isn't a real page name here — the real planned page is "Resources / Insights" (Step 10, PENDING), already linked as "Resources" in the header/prior footer. Found no LinkedIn/Instagram URLs or emergency-contact info in any project doc — the existing footer already had LinkedIn flagged as a `href="#"` placeholder for the same reason. Presented all of this and asked directly rather than guessing.
+- Mohammad supplied real values: LinkedIn (`https://www.linkedin.com/company/oragrol-global/`, now live), Instagram (no real page yet, explicit placeholder), emergency contact (`+60 18-377-2761`, explicitly TEMPORARY pending a real Canadian line — flagged in a code comment), and confirmed keeping the "Resources" label (not introducing "Blog").
+- Rebuilt `SiteFooter`: Company/Resources/Legal 3-column grid from real existing nav items only (Resources column deliberately has just the one real item, not padded). `Grid`'s `md` column map didn't support 5 (needed for brand-block + 3 nav columns) — added it, additive/non-breaking.
+- Built small hand-drawn outline social icons (`social-icons.tsx`) since `lucide-react` has no brand icon exports — matches the site's existing icon style, not the platforms' literal filled logos.
+- Built `EmergencyCta` (new) — fixed bottom-right "Under attack?" pill, rendered from `RootLayout` (not `SiteFooter`) so it's genuinely site-wide/scroll-independent. Locked cyan/navy palette, no new urgency color.
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run build` succeeded. Fresh production server. Zero horizontal overflow at 1440/1920/390px across 4 pages. Zero non-pre-existing console errors. Confirmed via DOM query that every href resolves to the exact real/placeholder value intended, nothing silently wrong.
+- Committed separately from D-016's items 1-4, per instruction.
+- Logged as D-017.
+
+**Decisions:** D-017 logged. Two explicit flags carried forward unresolved: Instagram URL, real emergency contact number.
+
+**Next:** Awaiting Mohammad's review of both D-016 and D-017.
 
 ---
 

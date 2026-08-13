@@ -28,6 +28,9 @@ const mdColsMap: Record<number, string> = {
   2: "md:grid-cols-2",
   3: "md:grid-cols-3",
   4: "md:grid-cols-4",
+  // 5 added for the footer overhaul (D-017): brand block (col-span-2) +
+  // 3 nav columns (Company/Resources/Legal) needs 5 total md: units.
+  5: "md:grid-cols-5",
   6: "md:grid-cols-6",
 };
 const lgColsMap: Record<number, string> = {
