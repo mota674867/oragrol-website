@@ -36,6 +36,9 @@
  * environments by design, not repointed per-Section. Logged as D-011.
  *
  * Pure decoration: aria-hidden, no text content.
+ *
+ * See also `SchematicMark` below — the compact variant used by
+ * AdditionalCapabilities' smaller cards.
  */
 
 const HUB = { cx: 150, cy: 130, r: 42 };
@@ -96,6 +99,45 @@ export function SchematicVisual({ className }: { className?: string }) {
         strokeWidth={1.5}
       />
       <circle cx={HUB.cx} cy={HUB.cy} r={HUB.r - 8} fill="none" stroke="var(--border)" strokeWidth={1} />
+    </svg>
+  );
+}
+
+/**
+ * SchematicMark — compact variant of SchematicVisual for AdditionalCapabilities'
+ * smaller cards (D-008/D-011 retrofit). Same hub + orthogonal-connector
+ * language, reduced to a single pair of short corner ticks (no dot grid, no
+ * third output node) — the full diagram doesn't fit a compact card's icon
+ * slot proportionately. Icon overlay composed by the caller, same pattern
+ * as SchematicVisual.
+ */
+const MARK_HUB = { cx: 32, cy: 34, r: 16 };
+
+export function SchematicMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 64 64" aria-hidden="true" className={className}>
+      <path
+        d={`M8,8 V${MARK_HUB.cy} H${MARK_HUB.cx - MARK_HUB.r}`}
+        fill="none"
+        stroke="color-mix(in srgb, var(--color-accent) 45%, var(--border))"
+        strokeWidth={1.25}
+      />
+      <path
+        d={`M56,8 V${MARK_HUB.cy} H${MARK_HUB.cx + MARK_HUB.r}`}
+        fill="none"
+        stroke="color-mix(in srgb, var(--color-accent) 45%, var(--border))"
+        strokeWidth={1.25}
+      />
+      <circle cx="8" cy="8" r="2.5" fill="color-mix(in srgb, var(--color-accent) 70%, var(--surface))" stroke="var(--color-accent)" strokeWidth={0.75} />
+      <circle cx="56" cy="8" r="2.5" fill="color-mix(in srgb, var(--color-accent) 70%, var(--surface))" stroke="var(--color-accent)" strokeWidth={0.75} />
+      <circle
+        cx={MARK_HUB.cx}
+        cy={MARK_HUB.cy}
+        r={MARK_HUB.r}
+        fill="color-mix(in srgb, var(--color-accent) 12%, var(--surface))"
+        stroke="var(--color-accent-light)"
+        strokeWidth={1}
+      />
     </svg>
   );
 }

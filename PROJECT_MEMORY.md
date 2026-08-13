@@ -8,12 +8,11 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Awaiting Mohammad's review of Prototype 2 (`/services/prototype`, noindex) — one Services row (Risk Assessment & Compliance) rebuilt with the schematic-linework treatment, next to the current live version. Not wired into the live `/services` page yet.
-2. If approved: apply `SchematicVisual`/the schematic-row layout to the remaining 7 capability rows on the live `/services` page (both `LiveServices.tsx`'s 4 live rows and `AdditionalCapabilities.tsx`'s 4 finalizing rows), then delete the `/services/prototype` route.
-3. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully built and approved against the blueprint.
-4. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in `SchematicVisual` — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
-5. Hero: current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
-6. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
+1. Services D-008 retrofit is COMPLETE (D-012) — all 8 capabilities now use the schematic-linework visual language. Mohammad has not yet done a final in-browser pass over the shipped `/services` page (screenshots sent, not yet explicitly confirmed).
+2. Decide next: per the blueprint's Rollout section, expansion continues page-by-page only after Services is reviewed and approved — Home/Solutions/Cyber Health extensions and Step 8 (How We Work) are both still on hold pending that.
+3. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in `SchematicVisual`/`SchematicMark` — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
+4. Hero: current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
+5. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
 
 ---
 
@@ -66,7 +65,21 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **Decisions:** D-011 logged (Prototype 2 + the discovered token bug).
 
-**Next:** Awaiting Mohammad's review of `/services/prototype` before rolling the schematic-linework treatment out to the remaining 7 rows.
+---
+
+### 2026-08-13 (continued 3) — Services D-008 retrofit shipped, prototype route removed
+**Completed:**
+- Mohammad approved Prototype 2. Asked one clarifying question before proceeding (the 8 capabilities span two structurally different sections — 4 full-width rows in `LiveServices`, 4 compact no-CTA cards in `AdditionalCapabilities`, a deliberate live/not-yet-live distinction from D-007) — answer: keep both structures, adapt the schematic motif to each rather than unifying into one layout.
+- `LiveServices.tsx`: remaining 3 rows (Virtual CISO, Vulnerability Assessment & Management, Security Awareness Training) now use the same `SchematicVisual` treatment as the approved prototype's row — all 4 live rows visually consistent.
+- `AdditionalCapabilities.tsx`: added `SchematicMark`, a compact variant (two short corner ticks, no dot grid, no output node) replacing the plain Lucide icon in each of the 4 cards — carries the visual language through without giving not-yet-live capabilities the same visual weight as live ones (existing card grid, no-CTA, "finalizing" badge all kept as-is).
+- Deleted `/services/prototype` and `SchematicRowPrototype` — no longer needed now that the treatment is live. Cleared `.next` cache to drop the stale route from Next's generated type validator after deletion (confirmed clean typecheck after).
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run build` succeeded (8 routes, `/services/prototype` gone). Full-page Playwright screenshots (real incremental scroll, not `fullPage`-only) at 1440px and 390px — zero console errors, zero horizontal overflow. Confirmed on a freshly restarted dev server that `/services` returns 200 and `/services/prototype` returns 404.
+- Sent a full-page screenshot of the shipped `/services` page to Mohammad.
+- Logged as D-012 — the D-008 Services retrofit ([[D-007]]) is now COMPLETE.
+
+**Decisions:** D-012 logged.
+
+**Next:** Awaiting Mohammad's final review of the shipped `/services` page; per the blueprint's Rollout section, no other page gets touched until that's confirmed.
 
 ---
 
