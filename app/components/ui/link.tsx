@@ -26,17 +26,33 @@ export function TextLink({ className, ...props }: LinkComponentProps) {
   );
 }
 
+export type NavLinkSize = "default" | "lg";
+
+const navLinkSizeClasses: Record<NavLinkSize, string> = {
+  default: "text-sm font-medium",
+  // Added for Services' CategoryNav (D-018, item 2): the sidebar was
+  // judged too quiet to read as a primary nav element next to Bell's
+  // reference. Weight lives entirely in this table (not the shared base
+  // string below) so default/lg never emit two conflicting font-weight
+  // utility classes at once — see cn.ts's own documented plain-
+  // concatenation gotcha (the same reason H3/Caption's size variants do
+  // this too).
+  lg: "text-base font-semibold",
+};
+
 export interface NavLinkProps extends LinkComponentProps {
   /** Marks this as the current page — accent color, no underline needed. */
   active?: boolean;
+  size?: NavLinkSize;
 }
 
-export function NavLink({ active = false, className, ...props }: NavLinkProps) {
+export function NavLink({ active = false, size = "default", className, ...props }: NavLinkProps) {
   return (
     <Link
       aria-current={active ? "page" : undefined}
       className={cn(
-        "rounded-sm font-body text-sm font-medium transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+        "rounded-sm font-body transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+        navLinkSizeClasses[size],
         active ? "text-accent" : "text-text-secondary hover:text-text-primary",
         className,
       )}

@@ -163,29 +163,40 @@ export function LiveServices() {
                   <Reveal key={service.name} delay={i * 0.06}>
                     <div
                       id={`capability-${service.n}`}
-                      className="grid scroll-mt-28 gap-8 py-14 md:grid-cols-2 md:items-center md:gap-16"
+                      className="grid scroll-mt-28 gap-8 py-14 md:grid-cols-[0.9fr_1.1fr] md:items-center md:gap-16"
                     >
                       <div className={reverse ? "md:order-2" : undefined}>
                         {/* Design Correction treatment (D-013/D-014) —
                             hero-scale illustration in a nested dark,
                             glow-lit, shadow-elevated panel; hover motion
-                            (D-016). */}
-                        <CapabilitySpotlightVisual n={service.n} icon={service.icon} />
-                        {/* Accent eyebrow + size="lg" H3 — D-016: a real
-                            color + scale jump ahead of the headline, not
-                            just a size bump (D-015 alone wasn't enough). */}
-                        <Caption tone="accent" className="mt-6">
-                          Capability {service.n}
-                        </Caption>
-                        <H3 size="lg" className="mt-2">
-                          {service.name}
-                        </H3>
+                            (D-016). Capped narrower (D-018, item 3) — was
+                            filling its whole grid column; now gives the
+                            content column more room, per Mohammad's
+                            explicit "scale down a bit, don't redesign"
+                            instruction (all internal elements/proportions
+                            untouched, just a max-width cap). */}
+                        <CapabilitySpotlightVisual n={service.n} icon={service.icon} className="mx-auto max-w-md" />
                         <ButtonLink href={service.cta.href} variant="secondary" size="md" className="mt-6">
                           {service.cta.label}
                         </ButtonLink>
                       </div>
                       <div className={reverse ? "md:order-1" : undefined}>
-                        <div className="grid gap-6 sm:grid-cols-2">
+                        {/* Large content-area headline (D-018, item 1):
+                            D-016's H3 lived only in the visual column,
+                            beside the graphic — the content area itself
+                            (this column) had no headline at all, just the
+                            small field labels immediately above body
+                            text, which is what actually read as "no
+                            hierarchy." Same capability name already shown
+                            in the sidebar, not new copy. Three tiers now
+                            unambiguous within this one column: this
+                            headline > ServiceField's body text >
+                            ServiceField's category label. */}
+                        <Caption tone="accent">Capability {service.n}</Caption>
+                        <H3 size="lg" className="mt-2">
+                          {service.name}
+                        </H3>
+                        <div className="mt-8 grid gap-6 sm:grid-cols-2">
                           <ServiceField label="The Challenge">{service.problem}</ServiceField>
                           <ServiceField label="What Oragrol Does">{service.whatWeDo}</ServiceField>
                           <ServiceField label="What You Get">{service.whatYouGet}</ServiceField>

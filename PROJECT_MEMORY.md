@@ -8,15 +8,16 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Awaiting Mohammad's review of D-016 (container/sidebar-nav fix, stronger typography, hover motion) and D-017 (footer overhaul, site-wide).
-2. Two explicit flags still open from D-017, not resolved: Instagram has no real URL yet (`href="#"` placeholder); the emergency-CTA phone number (`+60 18-377-2761`) is a TEMPORARY placeholder pending a real Canadian contact line before public launch — both flagged with code comments, don't remove without confirming real values first.
-3. A different, still-open "item 5" from the D-015 instruction chain (regrouping the 8 capabilities into categories, structure/copy pattern only) remains explicitly held pending a separate scope confirmation from Mohammad — unrelated to the now-built footer.
-4. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully approved.
-5. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating.
-6. Known Tailwind v4 gotcha worth remembering: arbitrary-value utilities with `color-mix()` (or similar multi-comma CSS functions) nested inside bracket syntax can silently generate no CSS at all — confirmed with `shadow-[...color-mix(in_srgb,...)]`. Prefer Tailwind's built-in `{utility}-{registered-color}/{opacity}` mechanic (e.g. `shadow-accent/30`) over hand-rolled arbitrary values when a registered theme color is involved. Also: Tailwind v4 uses standalone `translate`/`scale`/`rotate` CSS properties, not the composed `transform` — don't debug hover/motion utilities by checking `getComputedStyle(el).transform`.
-7. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in the Services visual components — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
-8. Hero (Home): current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
-9. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
+1. Awaiting Mohammad's review of D-018 (content-area headline, sidebar weight, panel shrink, footer discrepancy investigated/ruled out).
+2. If Instagram/emergency-CTA still don't appear for Mohammad after D-018's fresh rebuild+restart, the next step is to ask him directly what URL he's viewing and whether he did a hard refresh — the discrepancy could not be reproduced or explained by anything on the code/server side after four independent verification methods (source read, process check, raw HTML via curl, fresh-context Playwright render).
+3. Two explicit flags still open from D-017, not resolved: Instagram has no real URL yet (`href="#"` placeholder); the emergency-CTA phone number (`+60 18-377-2761`) is a TEMPORARY placeholder pending a real Canadian contact line before public launch — both flagged with code comments, don't remove without confirming real values first.
+4. A different, still-open "item 5" from the D-015 instruction chain (regrouping the 8 capabilities into categories, structure/copy pattern only) remains explicitly held pending a separate scope confirmation from Mohammad.
+5. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully approved.
+6. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating.
+7. Known Tailwind v4 gotcha worth remembering: arbitrary-value utilities with `color-mix()` (or similar multi-comma CSS functions) nested inside bracket syntax can silently generate no CSS at all — confirmed with `shadow-[...color-mix(in_srgb,...)]`. Prefer Tailwind's built-in `{utility}-{registered-color}/{opacity}` mechanic (e.g. `shadow-accent/30`) over hand-rolled arbitrary values when a registered theme color is involved. Also: Tailwind v4 uses standalone `translate`/`scale`/`rotate` CSS properties, not the composed `transform` — don't debug hover/motion utilities by checking `getComputedStyle(el).transform`.
+8. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in the Services visual components — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
+9. Hero (Home): current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
+10. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
 
 ---
 
@@ -156,7 +157,20 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **Decisions:** D-017 logged. Two explicit flags carried forward unresolved: Instagram URL, real emergency contact number.
 
-**Next:** Awaiting Mohammad's review of both D-016 and D-017.
+---
+
+### 2026-08-13 (continued 9) — Round 3: content-area headline, sidebar weight, panel shrink; footer discrepancy investigated (D-018)
+**Completed:**
+- Mohammad reported item 4 as a real discrepancy: commit b2a7717 claimed Instagram + emergency CTA were added and visible, but his own screenshot showed neither. Investigated thoroughly rather than just re-screenshotting: read the actual current source of all three touched files (all unconditional, no hiding logic found), checked for stray duplicate server processes on the machine (found only one process ever listening on port 3000), fetched the raw server HTML via `curl` (both markers present in the literal bytes sent, zero browser/cache involved), and loaded the page in a brand-new Playwright context with fresh cache/cookies (both elements confirmed via computed style + bounding rect + screenshot). Could not reproduce the absence through any method. Most likely explanation is a stale browser tab/cache on Mohammad's side, but flagged this as the *likely* explanation, not a certainty, since his own browser can't be directly observed. Did a fully clean rebuild (killed all node processes, cleared `.next`, fresh `npm run start`) before any of this round's screenshots regardless, to rule out staleness on this end too.
+- Item 1: found the real structural issue — the row's `H3` headline lived only in the *visual* column, physically apart from the content column (Challenge/Does/Get/Outcome) it was meant to anchor, so the content area itself had no headline at all. Moved the eyebrow+headline into the content column, above the field grid; removed the now-redundant duplicate from the visual column.
+- Item 2: added a non-breaking `size` variant to the shared `NavLink` component (same pattern as `H1`/`H3`/`Caption`), new `lg` tier for `CategoryNav` only. Active-state logic untouched.
+- Item 3: `CapabilitySpotlightVisual` capped at `max-w-md`, row grid ratio shifted from even `md:grid-cols-2` to `md:grid-cols-[0.9fr_1.1fr]` — content column gets real extra width, not just empty space in the visual's own column.
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run build` succeeded, fresh production server after a full process/cache clear. Zero horizontal overflow at 1440/1920/2560/768/375px. Zero non-pre-existing console errors. Screenshots reviewed directly before reporting (row hierarchy, sidebar, full page, mobile) — not claimed from code alone, per Mohammad's explicit "do not report resolved without direct visual confirmation" instruction.
+- Logged as D-018.
+
+**Decisions:** D-018 logged.
+
+**Next:** Awaiting Mohammad's review. If the footer discrepancy persists after this round's fresh rebuild, ask him directly what URL/browser state he's viewing rather than re-investigating the code again — four independent methods already ruled it out on this end.
 
 ---
 

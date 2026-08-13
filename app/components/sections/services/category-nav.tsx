@@ -65,8 +65,11 @@ export function CategoryNav({ items }: { items: CategoryNavItem[] }) {
                 active ? "border-accent" : "border-border",
               )}
             >
-              <NavLink href={`#${item.id}`} active={active} className="flex items-baseline gap-2">
-                <span className="font-data text-[11px] text-text-muted">{item.n}</span>
+              {/* size="lg" — D-018, item 2: reads as a primary nav
+                  element now, not a quiet side note. Active-state color/
+                  border logic is unchanged, just the text scale. */}
+              <NavLink href={`#${item.id}`} active={active} size="lg" className="flex items-baseline gap-2">
+                <span className="font-data text-xs text-text-muted">{item.n}</span>
                 <span>{item.label}</span>
               </NavLink>
             </li>
