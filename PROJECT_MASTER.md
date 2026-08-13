@@ -196,7 +196,7 @@ Final hero visual, final typography choice, exact service-page visuals, exact pa
 Complete: Steps 1-7 (Step 4 hero motion frozen as-is — D-006; Step 5 scoped to hub page only — D-007; Steps 6-7 both built with their D-008 visual direction from the start).
 Also active: D-008 per-page visual identity system — applied to Solutions and Cyber Health; Services (built before D-008) still awaits its schematic-linework retrofit, explicitly ordered after other step work, not an oversight.
 Also active: `/cyber-health`'s CTAs link to the real, live external assessment (`https://tally.so/r/2EzROb`) — that flow itself is out of scope for this website codebase; do not attempt to rebuild or replace it.
-Next: Step 8 — How We Work Page (or the Services D-008 retrofit — order not yet decided, ask before starting either).
+Next: Step 8 (How We Work) and the Services D-008 retrofit are both on hold pending Mohammad's review of the Visual Redesign Blueprint (D-009, 2026-08-13 audit). Once approved, the retrofit builds on `/services` only, per D-009's rollout gate — do not start Step 8 or extend the new visual system to any other page before that approval.
 
 ---
 

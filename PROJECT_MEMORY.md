@@ -5,17 +5,41 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 ---
 
 ## Current Status
-Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A repo-wide sweep confirmed the footer logo (fixed last session) was the *only* hand-recreated brand element — no other instances found (checked via text search, the ring's exact geometry signature, and cross-referencing every `OragrolLogo`/`OragrolRing` import site). Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — that flow is out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006). Services still awaits its D-008 retrofit — explicitly ordered after other step work. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking. Solutions/Cyber Health not yet reviewed by Mohammad in-browser (built this session).
+Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built — no code changes since last session. A full visual/UX audit (2026-08-13, AUDIT ONLY, no site changes) inspected all 4 built pages live in-browser at desktop/tablet/mobile and produced the **Oragrol Visual Redesign Blueprint** (delivered as a private Claude artifact, link given to Mohammad in-session). Confirmed rollout order per D-009: blueprint awaits Mohammad's approval; once approved, the new visual system is implemented on **Services only** first (proving ground), and must NOT extend to any other page until Services is explicitly reviewed and approved. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — that flow is out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by the "Aperture O" hero concept introduced in the audit brief, itself not yet prototyped or approved. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Mohammad to review `/cyber-health` in-browser (structure, copy, the GaugeVisual, and confirm the Tally link/new-tab behavior feels right).
-2. Order not yet decided: Step 8 (How We Work) vs. the Services D-008 retrofit — ask before starting either.
-3. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
-4. Hero frame resolution/quality is NOT an open item — see D-006.
+1. Mohammad to review the Visual Redesign Blueprint artifact and approve/amend before any implementation begins — see D-009.
+2. Once approved: implement the new visual system on `/services` ONLY (schematic-linework motif, per D-008); do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is reviewed and approved against the blueprint.
+3. Two real (not new) defects surfaced by the audit, independent of the blueprint, fixable any time: mobile nav overlay doesn't cover the full viewport (hero/CTA visible underneath when menu is open); two WCAG AA contrast shortfalls computed from locked tokens — primary CTA white-on-accent text (3.90:1) and `text-muted` on dark backgrounds (4.09:1), both below the 4.5:1 normal-text threshold.
+4. Hero: current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — audit recommends prototyping it in isolation (Prototype 1 in the blueprint) before deciding if it changes the scroll-scrub mechanism too.
+5. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
 
 ---
 
 ## Session Log
+
+### 2026-08-13
+**Completed:**
+- Full visual/UX audit of the live site — AUDIT ONLY, explicitly no code/copy/component changes made or intended this session.
+- Confirmed scope before starting: an example audit-report-layout image supplied alongside the brief was formatting reference only — no finding, number, or wording from it was used; every finding below came from actually opening the rendered site.
+- Started `npm run dev`, used Playwright (`playwright-core`, per CLAUDE.md's documented method) to capture real incremental-scroll screenshots (not `fullPage`) of all 4 built pages (`/`, `/services`, `/solutions`, `/cyber-health`) at desktop (1440px), tablet (834px), and mobile (390px) — 48 screenshots, zero console/network errors.
+- Verified no horizontal overflow at 1440/834/390/320px on any built page (`scrollWidth` vs `clientWidth` check).
+- Exercised interactive elements directly: mobile hamburger nav, desktop search modal, FAQ accordion, CTA hover, keyboard Tab focus order.
+- Computed WCAG contrast ratios directly from the locked hex values in `tokens.css` (not estimated): white text on primary accent button = 3.90:1 (fails AA normal-text 4.5:1, passes large-text/UI-component 3:1); `--color-text-muted` on dark background = 4.09:1 (also fails AA normal-text). Both are new findings, not previously logged.
+- Found and screenshotted a real mobile nav defect: the open-state menu overlay doesn't extend to a full-height solid background — hero content, including a second "Get Your Cyber Health Score" button, is visible underneath it.
+- Found the closing-CTA section (`FinalCta`-pattern: ring decoration + "Know where you stand. Know what to do next." + dual buttons) is pixel-identical across Home, Services, and Solutions — confirmed via direct side-by-side screenshot comparison at matched scroll depth. Cyber Health is the one exception (different copy, same layout/decoration).
+- Confirmed the D-008 per-page-motif pattern is only half-applied on both pages that have one: Solutions' isometric strata and Cyber Health's arc gauge both appear once in their hero and never again on the same page — the Level cards / Flow / Reassurance sections directly below revert to the generic bordered-card-with-circle-icon pattern used everywhere else on the site.
+- Produced the **Oragrol Visual Redesign Blueprint** — executive summary, top-10 prioritized problem list, page-by-page audit (4 pages), visual-system-gap breakdown (incl. a dedicated Hero/"Aperture O" section — a new hero direction named in this session's brief as the successor to the frozen 16-frame sequence), 3 highest-impact changes, 3 recommended prototypes, and a full strategy blueprint (background/typography/hero/motion/3D/interaction/responsive) — published as a private Claude artifact, link delivered to Mohammad in-chat.
+- Logged the rollout sequencing as D-009 (see `DECISIONS.md`): blueprint stops for review/approval; once approved, implement on `/services` ONLY first (agreed proving ground); do not extend to any other page until Services is reviewed and approved.
+- Stopped the dev server; confirmed no files under source control were modified this session (`git status` clean going in, still clean at audit's end aside from this memory-file update).
+
+**Decisions:** D-009 logged (blueprint approval gate + Services-first rollout order; see `DECISIONS.md`).
+
+**Verification:** No build/typecheck/lint run — no code was touched. Screenshot evidence and computed contrast ratios are the audit's own verification method; both are embedded in the delivered artifact as exhibits.
+
+**Next:** Awaiting Mohammad's review of the blueprint artifact. Do not begin implementation, on Services or any other page, before that approval — see Next Steps above.
+
+---
 
 ### 2026-08-12
 **Completed:**
