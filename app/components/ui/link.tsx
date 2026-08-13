@@ -37,7 +37,11 @@ const navLinkSizeClasses: Record<NavLinkSize, string> = {
   // utility classes at once — see cn.ts's own documented plain-
   // concatenation gotcha (the same reason H3/Caption's size variants do
   // this too).
-  lg: "text-base font-semibold",
+  // font-semibold → font-medium (D-019, item 1): semibold read as bold
+  // next to the page's other type — size increase alone was the actual
+  // fix needed; the active state still carries the accent color + left
+  // border, unaffected by this.
+  lg: "text-base font-medium",
 };
 
 export interface NavLinkProps extends LinkComponentProps {

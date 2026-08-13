@@ -8,16 +8,17 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Awaiting Mohammad's review of D-018 (content-area headline, sidebar weight, panel shrink, footer discrepancy investigated/ruled out).
-2. If Instagram/emergency-CTA still don't appear for Mohammad after D-018's fresh rebuild+restart, the next step is to ask him directly what URL he's viewing and whether he did a hard refresh — the discrepancy could not be reproduced or explained by anything on the code/server side after four independent verification methods (source read, process check, raw HTML via curl, fresh-context Playwright render).
-3. Two explicit flags still open from D-017, not resolved: Instagram has no real URL yet (`href="#"` placeholder); the emergency-CTA phone number (`+60 18-377-2761`) is a TEMPORARY placeholder pending a real Canadian contact line before public launch — both flagged with code comments, don't remove without confirming real values first.
-4. A different, still-open "item 5" from the D-015 instruction chain (regrouping the 8 capabilities into categories, structure/copy pattern only) remains explicitly held pending a separate scope confirmation from Mohammad.
-5. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully approved.
-6. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating.
-7. Known Tailwind v4 gotcha worth remembering: arbitrary-value utilities with `color-mix()` (or similar multi-comma CSS functions) nested inside bracket syntax can silently generate no CSS at all — confirmed with `shadow-[...color-mix(in_srgb,...)]`. Prefer Tailwind's built-in `{utility}-{registered-color}/{opacity}` mechanic (e.g. `shadow-accent/30`) over hand-rolled arbitrary values when a registered theme color is involved. Also: Tailwind v4 uses standalone `translate`/`scale`/`rotate` CSS properties, not the composed `transform` — don't debug hover/motion utilities by checking `getComputedStyle(el).transform`.
-8. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in the Services visual components — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
-9. Hero (Home): current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
-10. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
+1. Awaiting Mohammad's review of D-019 (sidebar/label weight, CTA consistency, headline font-family investigated — no bug found).
+2. If the headline still visually reads as "not Space Grotesk" for Mohammad after this round's fresh rebuild, the computed value has now been checked twice (D-019) and genuinely is Space Grotesk both times — next step is asking him to hard-refresh/open a fresh tab rather than re-investigating the same code again, same pattern as D-018's footer discrepancy.
+3. If Instagram/emergency-CTA still don't appear for Mohammad, same advice — four independent methods in D-018 already ruled out a code-side cause.
+4. Two explicit flags still open from D-017, not resolved: Instagram has no real URL yet (`href="#"` placeholder); the emergency-CTA phone number (`+60 18-377-2761`) is a TEMPORARY placeholder pending a real Canadian contact line before public launch — both flagged with code comments, don't remove without confirming real values first.
+5. A different, still-open "item 5" from the D-015 instruction chain (regrouping the 8 capabilities into categories, structure/copy pattern only) remains explicitly held pending a separate scope confirmation from Mohammad.
+6. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully approved.
+7. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating.
+8. Known Tailwind v4 gotcha worth remembering: arbitrary-value utilities with `color-mix()` (or similar multi-comma CSS functions) nested inside bracket syntax can silently generate no CSS at all — confirmed with `shadow-[...color-mix(in_srgb,...)]`. Prefer Tailwind's built-in `{utility}-{registered-color}/{opacity}` mechanic (e.g. `shadow-accent/30`) over hand-rolled arbitrary values when a registered theme color is involved. Also: Tailwind v4 uses standalone `translate`/`scale`/`rotate` CSS properties, not the composed `transform` — don't debug hover/motion utilities by checking `getComputedStyle(el).transform`.
+9. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in the Services visual components — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
+10. Hero (Home): current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
+11. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
 
 ---
 
@@ -170,7 +171,20 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **Decisions:** D-018 logged.
 
-**Next:** Awaiting Mohammad's review. If the footer discrepancy persists after this round's fresh rebuild, ask him directly what URL/browser state he's viewing rather than re-investigating the code again — four independent methods already ruled it out on this end.
+---
+
+### 2026-08-13 (continued 10) — Round 4: weight reductions, CTA fix, font-family investigated (D-019)
+**Completed:**
+- Item 2 first (font-family bug check): checked computed `font-family` for all 8 capability headlines on a fresh, `.next`-cleared production build. Before and after (no code changed): all 8 compute to `"Space Grotesk", "Space Grotesk Fallback"`, weight 700/600 — genuinely distinct from body's `Inter, "Inter Fallback"`. No bug found in the code; reported the actual values rather than asserting "fixed" for something that was never broken. Flagged the possibility this is another instance of D-018's pattern (what Mohammad sees not matching what the code/browser computes) — recommend a hard refresh if the perception persists.
+- Item 1: `NavLink`'s `lg` tier (used by `CategoryNav`) dropped `font-semibold`→`font-medium`; confirmed 600→500 computed. Active-state color/border untouched.
+- Item 3: `Caption`'s `sm` tier (used only by `ServiceField` labels) dropped from the shared `font-medium` (baked into Caption's base string) to a per-tier `font-normal`; confirmed 500→400 computed. `default` tier (every other Caption usage sitewide) explicitly kept at `font-medium` in its own tier string — nothing else on the site changes.
+- Item 4: found `LIVE_SERVICES[1]` (Risk Assessment & Compliance) was the one outlier — `"Get Your Cyber Health Score"` → `/cyber-health`, while the other 3 rows already used `"Talk to Oragrol"` → `/contact`. Changed both label and href to match (leaving the old href under new text would have been a mismatched link). Confirmed via DOM query all 4 rows now emit identical CTA pairs.
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run build` succeeded. Fully clean rebuild (all node processes killed, `.next` cleared) before this round's own screenshots, given last round's stale-cache lesson. Zero horizontal overflow at 4 widths, zero non-pre-existing console errors. Full-page screenshot captured showing all 8 capability panels for the CTA-consistency check specifically, per instruction.
+- Logged as D-019.
+
+**Decisions:** D-019 logged.
+
+**Next:** Awaiting Mohammad's review. If either the footer discrepancy or the font-family perception persists after this round's fresh rebuild, the recommended next step is asking what URL/browser state he's viewing rather than re-investigating the same code a third time — both have now been independently verified clean on the code/server side.
 
 ---
 

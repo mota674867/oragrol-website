@@ -137,14 +137,19 @@ export function Text({
 export type CaptionSize = "default" | "sm";
 
 const captionSizeClasses: Record<CaptionSize, string> = {
-  default: "text-xs tracking-widest",
+  default: "text-xs tracking-widest font-medium",
   // Quieter variant — added for the Services capability-row hierarchy fix
   // (D-015, tracking widened further in D-016): smaller and more
   // letter-spaced than the default, so a repeated field label (e.g. four
   // per row — "THE CHALLENGE", "WHAT ORAGROL DOES"...) reads as a quiet
   // category tag rather than repeatedly competing with the row's own
-  // headline for attention.
-  sm: "text-[10px] tracking-[0.22em]",
+  // headline for attention. Weight dropped to font-normal (D-019, item
+  // 3): computed at font-medium/500 before, which — combined with
+  // uppercase + small size — still read as too heavy/competing. Weight
+  // now lives per-tier (not the shared base string) so default/sm never
+  // emit two conflicting font-weight classes at once, same reasoning as
+  // H3/NavLink's own size variants.
+  sm: "text-[10px] tracking-[0.22em] font-normal",
 };
 
 export interface CaptionProps extends ComponentPropsWithoutRef<"p"> {
@@ -162,7 +167,7 @@ export function Caption({
   return (
     <p
       className={cn(
-        "font-body font-medium uppercase",
+        "font-body uppercase",
         captionSizeClasses[size],
         toneClasses[tone],
         className,

@@ -68,7 +68,13 @@ const LIVE_SERVICES: LiveService[] = [
       "We assess the current environment against what's relevant to the business and translate findings into a prioritized, practical plan.",
     whatYouGet: "A clear risk picture and a prioritized roadmap — not a report that sits unread.",
     outcome: "You know exactly where you stand, and what to fix first.",
-    cta: { label: "Get Your Cyber Health Score", href: "/cyber-health" },
+    // "Get Your Cyber Health Score" → "Talk to Oragrol" (D-019, item 4):
+    // that label/href pair is Cyber Health's own primary CTA, not
+    // Services' — was the one outlier among the 4 live rows (the other 3
+    // already used "Talk to Oragrol" → /contact). href changed to match;
+    // leaving it at /cyber-health with this button's new text would have
+    // been a mismatched link (says "talk to us", goes to an assessment).
+    cta: { label: "Talk to Oragrol", href: "/contact" },
   },
   {
     n: "03",
