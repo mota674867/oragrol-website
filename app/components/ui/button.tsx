@@ -29,7 +29,10 @@ const sizeClasses: Record<ButtonSize, string> = {
 };
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: "bg-accent text-white hover:bg-accent/90",
+  // bg-accent-strong, not bg-accent: white text directly on --accent only
+  // computes to 3.90:1 (fails WCAG AA's 4.5:1 for normal text) — see D-010.
+  // accent-strong is the same blue family, just dark enough to clear AA.
+  primary: "bg-accent-strong text-white hover:bg-accent-strong/90",
   secondary:
     "border border-border bg-surface text-text-primary hover:border-text-secondary hover:bg-text-primary/5",
   ghost: "text-text-primary hover:bg-text-primary/5",

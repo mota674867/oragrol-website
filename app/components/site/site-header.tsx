@@ -90,6 +90,19 @@ export function SiteHeader() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [mobileOpen]);
 
+  // Lock page scroll while the mobile panel is open — it's now a
+  // full-viewport overlay (see mobile-nav-panel below), so a scrollable
+  // page underneath would be visible/scrollable behind it, which reads as
+  // broken in the same way the old bleed-through bug did.
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileOpen]);
+
   return (
     <div className="env-dark fixed inset-x-0 top-0 z-50 text-text-primary">
       <div className="relative">
@@ -153,14 +166,29 @@ export function SiteHeader() {
         />
       </div>
 
+      {/*
+        Fix (2026-08-13 audit, #5 / D-010): this used to be an in-flow
+        max-height accordion capped at 28rem. On any page whose content sits
+        directly below the header, once open it revealed page content
+        (including a second "Get Your Cyber Health Score" button) bleeding
+        in underneath its own bottom edge — two instances of the same CTA
+        visible on screen at once. Fixed by making it a real full-viewport
+        overlay instead: `fixed` from the header's own bottom edge (`top-20`
+        matches NavBar's `h-20`) to the bottom of the viewport, opaque
+        `bg-background`, so nothing behind it can show through regardless of
+        how tall its own content is. `overflow-y-auto` covers the case where
+        a future longer link list doesn't fit a short mobile viewport.
+      */}
       <div
         id="mobile-nav-panel"
         className={cn(
-          "overflow-hidden border-b border-border bg-background transition-[max-height] duration-300 lg:hidden",
-          mobileOpen ? "max-h-[28rem]" : "max-h-0 border-b-0",
+          "fixed inset-x-0 top-20 bottom-0 overflow-y-auto bg-background transition-opacity duration-200 lg:hidden",
+          mobileOpen ? "opacity-100" : "pointer-events-none opacity-0",
         )}
+        aria-hidden={!mobileOpen}
+        inert={!mobileOpen}
       >
-        <nav className="flex flex-col gap-1 px-6 py-4" aria-label="Mobile">
+        <nav className="flex flex-col gap-1 px-6 py-6" aria-label="Mobile">
           {NAV_LINKS.map((link) => (
             <NavLink
               key={link.href}

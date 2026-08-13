@@ -27,9 +27,11 @@
   --palette-gray-100: #f4f4f5; /* Surface (White env) — Step 3 addition, see note below */
   --palette-gray-200: #e4e4e7; /* Border (White / Light-blue envs) — Step 3 addition */
   --palette-blue-600: #018abe; /* Primary accent */
+  --palette-blue-700: #017cac; /* Accent, darkened — text-on-fill contrast fix, D-010 */
   --palette-blue-300: #97cadb; /* Light tint */
   --palette-white: #ffffff; /* Text primary */
   --palette-gray-400: #9ca3af; /* Text secondary */
+  --palette-gray-450: #75828d; /* Text muted, Dark env only — contrast fix, D-010 */
   --palette-gray-500: #6b7280; /* Text muted */
   --palette-red-500: #e24b4a; /* Risk: Critical */
   --palette-orange-400: #f2994a; /* Risk: High */
@@ -46,6 +48,16 @@
   --text-muted: var(--palette-gray-500);
   --accent: var(--palette-blue-600);
   --accent-light: var(--palette-blue-300);
+  /* Accent-on-fill contrast fix (D-010, 2026-08-13 audit finding #6): white
+     text on --accent computes to 3.90:1, below WCAG AA's 4.5:1 for normal
+     text (it does clear the 3:1 large-text/UI-component threshold). Rather
+     than change the locked brand --accent itself — used everywhere, not
+     just text-on-fill — --accent-strong is a dedicated, slightly darker
+     value (~4.7:1 with white text) for the one context that needs it: the
+     Button/ButtonLink primary variant's solid fill. Same hue/family as
+     --accent, not a different color. Constant across environments, same as
+     --accent itself (not repointed per section below). */
+  --accent-strong: var(--palette-blue-700);
 
   /* Risk-tier colors are functional data indicators only (severity labels,
      score badges, charts) — never use them decoratively. */
@@ -79,6 +91,12 @@
   --border: var(--palette-black-700);
   --text-primary: var(--palette-white);
   --text-secondary: var(--palette-gray-400);
+  /* Contrast fix (D-010, 2026-08-13 audit finding #7): the root/default
+     --text-muted (--palette-gray-500, #6B7280) computes to 4.09:1 on this
+     environment's #0A0A0A background — below WCAG AA's 4.5:1 for normal
+     text. On White/Light-blue it's ~4.84:1, already passing, so only Dark
+     needs an override here rather than changing the shared raw value. */
+  --text-muted: var(--palette-gray-450);
 }
 
 /* White */
@@ -112,6 +130,7 @@
   --color-text-muted: var(--text-muted);
   --color-accent: var(--accent);
   --color-accent-light: var(--accent-light);
+  --color-accent-strong: var(--accent-strong);
   --color-risk-critical: var(--risk-critical);
   --color-risk-high: var(--risk-high);
   --color-risk-medium: var(--risk-medium);

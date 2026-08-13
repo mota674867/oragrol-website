@@ -5,14 +5,13 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 ---
 
 ## Current Status
-Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built — no code changes since last session. A full visual/UX audit (2026-08-13, AUDIT ONLY, no site changes) inspected all 4 built pages live in-browser at desktop/tablet/mobile and produced the **Oragrol Visual Redesign Blueprint** (delivered as a private Claude artifact, link given to Mohammad in-session). Confirmed rollout order per D-009: blueprint awaits Mohammad's approval; once approved, the new visual system is implemented on **Services only** first (proving ground), and must NOT extend to any other page until Services is explicitly reviewed and approved. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — that flow is out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by the "Aperture O" hero concept introduced in the audit brief, itself not yet prototyped or approved. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
+Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Mohammad to review the Visual Redesign Blueprint artifact and approve/amend before any implementation begins — see D-009.
-2. Once approved: implement the new visual system on `/services` ONLY (schematic-linework motif, per D-008); do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is reviewed and approved against the blueprint.
-3. Two real (not new) defects surfaced by the audit, independent of the blueprint, fixable any time: mobile nav overlay doesn't cover the full viewport (hero/CTA visible underneath when menu is open); two WCAG AA contrast shortfalls computed from locked tokens — primary CTA white-on-accent text (3.90:1) and `text-muted` on dark backgrounds (4.09:1), both below the 4.5:1 normal-text threshold.
-4. Hero: current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — audit recommends prototyping it in isolation (Prototype 1 in the blueprint) before deciding if it changes the scroll-scrub mechanism too.
-5. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
+1. Blueprint approved by Mohammad (2026-08-13). Build Prototype 2 next: one Services capability row (e.g. Risk Assessment & Compliance) in the schematic-linework treatment, shown for review before applying to all 8 rows — per the blueprint's own "prove it small, then roll out" sequencing.
+2. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully built and approved against the blueprint.
+3. Hero: current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
+4. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
 
 ---
 
@@ -38,6 +37,21 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 **Verification:** No build/typecheck/lint run — no code was touched. Screenshot evidence and computed contrast ratios are the audit's own verification method; both are embedded in the delivered artifact as exhibits.
 
 **Next:** Awaiting Mohammad's review of the blueprint artifact. Do not begin implementation, on Services or any other page, before that approval — see Next Steps above.
+
+---
+
+### 2026-08-13 (continued) — approval, two bug fixes, plain-markdown copy
+**Completed:**
+- Saved the blueprint content verbatim as `VISUAL_REDESIGN_BLUEPRINT.md` in the project root, on request, for reading/sharing without the artifact viewer. Noted in D-009.
+- Mohammad approved the blueprint and confirmed the two independent bugs it surfaced (#5 mobile nav, #6/#7 contrast) should be fixed immediately, not gated behind blueprint rollout.
+- Fixed the mobile nav overlay (`app/components/site/site-header.tsx`): converted from an in-flow `max-height` accordion to a `fixed` full-viewport panel (opaque background, body-scroll lock while open, `inert`+`aria-hidden` while closed). Verified via Playwright: body overflow toggles correctly, `panel.inert` is `true` when closed, no bleed-through at 390px.
+- Fixed both WCAG AA contrast failures via new scoped tokens in `tokens.css`, not by changing the locked `--accent` or the shared `--text-muted` raw value: added `--accent-strong` (`#017CAC`, ~4.7:1 with white text, used only by `Button`/`ButtonLink`'s primary variant) and an `.env-dark`-only `--text-muted` override (`#75828D`, ~5.0:1, since White/Light-blue already passed). Reviewed every other `bg-accent` usage site-wide (pentest-addon badge icon, tier-cards progress bar, checkbox/radio) and confirmed none are text-on-fill, so none needed the swap.
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run build` succeeded (all 5 routes present). Playwright screenshots + computed-style checks confirmed both fixes render correctly and produce zero console errors; screenshots sent to Mohammad.
+- Logged as D-010 in `DECISIONS.md`.
+
+**Decisions:** D-010 logged.
+
+**Next:** Build Prototype 2 — one Services capability row in the schematic-linework treatment (D-008/blueprint), for review before applying to all 8 rows.
 
 ---
 
