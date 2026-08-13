@@ -8,10 +8,12 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Blueprint approved by Mohammad (2026-08-13). Build Prototype 2 next: one Services capability row (e.g. Risk Assessment & Compliance) in the schematic-linework treatment, shown for review before applying to all 8 rows — per the blueprint's own "prove it small, then roll out" sequencing.
-2. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully built and approved against the blueprint.
-3. Hero: current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
-4. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
+1. Awaiting Mohammad's review of Prototype 2 (`/services/prototype`, noindex) — one Services row (Risk Assessment & Compliance) rebuilt with the schematic-linework treatment, next to the current live version. Not wired into the live `/services` page yet.
+2. If approved: apply `SchematicVisual`/the schematic-row layout to the remaining 7 capability rows on the live `/services` page (both `LiveServices.tsx`'s 4 live rows and `AdditionalCapabilities.tsx`'s 4 finalizing rows), then delete the `/services/prototype` route.
+3. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully built and approved against the blueprint.
+4. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in `SchematicVisual` — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
+5. Hero: current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
+6. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
 
 ---
 
@@ -51,7 +53,20 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **Decisions:** D-010 logged.
 
-**Next:** Build Prototype 2 — one Services capability row in the schematic-linework treatment (D-008/blueprint), for review before applying to all 8 rows.
+---
+
+### 2026-08-13 (continued 2) — Prototype 2 built
+**Completed:**
+- Built `SchematicVisual` (`app/components/sections/services/schematic-visual.tsx`) — the Services schematic-linework motif (D-008): a hub-and-spoke blueprint diagram, orthogonal connector traces, faint dot-grid background, same `color-mix` fill-progression technique already established by StrataVisual.
+- Applied it to exactly one row — "Risk Assessment & Compliance" — via `SchematicRowPrototype`, copy copied verbatim from `live-services.tsx`, nothing new written.
+- Shown on a new noindex, nav-unlinked route `/services/prototype`, next to the current live row for direct comparison — same disposable-preview pattern as `/style-guide`. The live `/services` page itself was not touched.
+- Found and fixed a real, previously-latent bug while building this: `var(--color-surface)`/`var(--color-border)` don't reliably track a Section's per-environment override when read directly via `var()` (rendered the hub solid black on this White-environment page instead of a light accent-tinted panel). Root-caused via computed-style inspection, fixed by consuming the raw semantic tokens (`var(--surface)`/`var(--border)`) instead — confirmed correct after the fix. `StrataVisual`/`GaugeVisual` have the same latent issue but are unaffected today (Dark-only) — flagged for later, not fixed in this pass (see Next Steps).
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run build` succeeded (6 routes, `/services/prototype` added). Playwright screenshots at desktop (1280px) and mobile (390px), zero console errors, zero horizontal overflow. Confirmed `/services` renders unchanged (no regression — no existing file was modified).
+- Logged as D-011.
+
+**Decisions:** D-011 logged (Prototype 2 + the discovered token bug).
+
+**Next:** Awaiting Mohammad's review of `/services/prototype` before rolling the schematic-linework treatment out to the remaining 7 rows.
 
 ---
 
