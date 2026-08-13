@@ -8,11 +8,13 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Services D-008 retrofit is COMPLETE (D-012) — all 8 capabilities now use the schematic-linework visual language. Mohammad has not yet done a final in-browser pass over the shipped `/services` page (screenshots sent, not yet explicitly confirmed).
-2. Decide next: per the blueprint's Rollout section, expansion continues page-by-page only after Services is reviewed and approved — Home/Solutions/Cyber Health extensions and Step 8 (How We Work) are both still on hold pending that.
-3. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in `SchematicVisual`/`SchematicMark` — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
-4. Hero: current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
-5. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
+1. Awaiting Mohammad's review of the D-013 Design Correction prototype (`/services/prototype`, noindex) — a bigger, glow-lit, dark-panel-elevated version of the D-012 schematic row, built against `SERVICES_REDESIGN_PROMPT.md`'s 3 Dribbble references. D-012 (shipped, all 8 capabilities) was found not to meet the bar on live review — this prototype is the correction, not yet applied anywhere live.
+2. If approved: apply `CapabilitySpotlight`'s treatment (or a refined version of it) to the remaining 7 capabilities — same "keep both structures, adapt per section" question likely applies again (LiveServices rows vs AdditionalCapabilities' compact cards) — ask before assuming scope, same as D-012's process.
+3. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully approved.
+4. `21st` MCP is now authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating.
+5. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in `SchematicVisual`/`SchematicMark`/`HeroSchematicVisual` — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
+6. Hero: current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
+7. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
 
 ---
 
@@ -79,7 +81,23 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **Decisions:** D-012 logged.
 
-**Next:** Awaiting Mohammad's final review of the shipped `/services` page; per the blueprint's Rollout section, no other page gets touched until that's confirmed.
+---
+
+### 2026-08-13 (continued 4) — Design Correction round (D-013), 21st.dev authorized
+**Completed:**
+- Mohammad reviewed the shipped D-012 page live and rejected it — "still small icon decoration on a flat background, not real graphic design" — and supplied `SERVICES_REDESIGN_PROMPT.md` (via `C:\Users\60183\Downloads\`) with 3 concrete Dribbble references and 7 specific, checkable requirements, plus explicit process rules (use 21st.dev/Magic if available, benchmark against references, state technique before generating, one row first, side-by-side review).
+- Opened and viewed all 3 references directly in Chrome (QClay: dark atmospheric glow + light-beam sweeps; Cybershield: photographic imagery + dark shadowed icon cards; Tokenex: dark card on gradient canvas + one large radial illustration). None showed a literal 3D-rendered object — that specific claim in the brief came from a broader search, not these 3 links — flagged that distinction to Mohammad rather than silently building toward the more literal wording.
+- `21st` MCP was unauthenticated. Asked Mohammad how to proceed (authorize now vs. skip and build from references directly) — he chose to authorize; completed the OAuth flow. Also asked his preference on 3D-rendered vs. CSS-simulated depth — he chose CSS-simulated (no new asset pipeline).
+- Used `21st`'s `get_inspiration`/`search` (free) then `get_component` (paid retrieval) to pull real code for **"Card with Glow" (id 59, ibelick)** — a `motion/react` gradient-glow layer — adapted into `glow-effect.tsx`: locked-accent-only palette, defaulted to `mode="static"` since the original's other modes loop infinitely, which conflicts with this project's own documented motion restraint (flagged explicitly, not silently chosen).
+- Stated the full technique plan in chat (which of the brief's 7 requirements map to which technique, and why) before writing any component code, per the brief's own required process step.
+- Built, prototype-only, not wired into the live page: `glow-effect.tsx`, `hero-schematic-visual.tsx` (~40% bigger than the shipped `SchematicVisual`, kept as a separate file so D-012's live component isn't touched), `capability-spotlight.tsx` (the full row — nested `.env-dark` elevated panel, glow layer, oversized real-index numeral, soft-3D gradient/shadow icon badge). Recreated `/services/prototype` (noindex) showing the shipped D-012 row next to the new prototype, with a written 3-reference benchmark table.
+- Color governance: flagged that white/black appear once, mixed into the accent as tonal highlight/shadow inside the icon badge — not a new decorative hue, per the brief's own color note.
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean (one `react/no-unescaped-entities` catch, fixed), `npm run build` succeeded (9 routes). Playwright screenshots at desktop (1280px) and mobile (390px), zero console errors, zero horizontal overflow. Confirmed via `git status` that no existing/shipped file was modified — only new files added, `/services` itself unaffected.
+- Logged as D-013.
+
+**Decisions:** D-013 logged (prototype round; does not change D-012's shipped state).
+
+**Next:** Awaiting Mohammad's review of `/services/prototype`'s new Capability Spotlight treatment before any further rollout.
 
 ---
 

@@ -194,10 +194,10 @@ Final hero visual, final typography choice, exact service-page visuals, exact pa
 
 ## 7. Current Position
 Complete: Steps 1-7 (Step 4 hero motion frozen as-is — D-006; Step 5 scoped to hub page only — D-007; Steps 6-7 both built with their D-008 visual direction from the start).
-D-008 per-page visual identity system: applied to Solutions, Cyber Health, and now Services (schematic-linework retrofit shipped 2026-08-13, D-012) — every built page now carries its own distinct visual motif. D-008 is effectively fully applied across all 4 built pages.
-Also active: a full visual/UX audit (2026-08-13, D-009) produced the Oragrol Visual Redesign Blueprint (artifact + `VISUAL_REDESIGN_BLUEPRINT.md`), approved by Mohammad; two independent bugs it found (mobile nav overlay, WCAG AA contrast) were fixed the same day (D-010). Prototype 2 (one Services row) was built, approved, then rolled out to all 8 capabilities (D-011, D-012).
+D-008 per-page visual identity system: applied to Solutions, Cyber Health, and Services (schematic-linework retrofit shipped 2026-08-13, D-012) — but Mohammad reviewed the shipped Services page live and found it doesn't meet the bar ("still small icon decoration on a flat background, not real graphic design"). A Design Correction round is underway (D-013): a prototype rebuilding one Services row against 3 concrete Dribbble references (bigger hero-scale illustration, nested dark glow-lit elevated panel, soft-3D icon, large numerals) is live at `/services/prototype` (noindex), not yet applied to the live page.
+Also active: a full visual/UX audit (2026-08-13, D-009) produced the Oragrol Visual Redesign Blueprint (artifact + `VISUAL_REDESIGN_BLUEPRINT.md`), approved by Mohammad; two independent bugs it found (mobile nav overlay, WCAG AA contrast) were fixed the same day (D-010). The `21st` MCP (Magic component search) is now authenticated for future rounds.
 Also active: `/cyber-health`'s CTAs link to the real, live external assessment (`https://tally.so/r/2EzROb`) — that flow itself is out of scope for this website codebase; do not attempt to rebuild or replace it.
-Next: Awaiting Mohammad's final review of the shipped `/services` page. Per the blueprint's Rollout section, Step 8 (How We Work) and any extension of the new visual system to Home/Solutions/Cyber Health both stay on hold until that review confirms Services meets the blueprint's standard — expansion is page-by-page, not all at once.
+Next: Awaiting Mohammad's review of the D-013 prototype at `/services/prototype`. Step 8 (How We Work) and any extension of the new visual system to Home/Solutions/Cyber Health all stay on hold until Services actually meets the bar and is approved — expansion is page-by-page, not all at once.
 
 ---
 
