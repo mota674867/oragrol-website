@@ -1,8 +1,9 @@
 import type { ComponentType, SVGProps } from "react";
 import { Bug, ClipboardCheck, GraduationCap, UserRound } from "lucide-react";
-import { ButtonLink, Caption, Container, H2, H3, Section, Text } from "../../ui";
+import { ButtonLink, Caption, H2, H3, Section, Text } from "../../ui";
 import { Reveal } from "../../motion/reveal";
 import { CapabilitySpotlightVisual } from "./capability-spotlight";
+import { CategoryNav, type CategoryNavItem } from "./category-nav";
 
 /**
  * Live Services (1-4) — Step 5.
@@ -21,6 +22,15 @@ import { CapabilitySpotlightVisual } from "./capability-spotlight";
  * larger scale would be the exact "identical cards" the brief calls out
  * to avoid. `divide-y` borders (same device as Faq.tsx) instead of boxed
  * Cards, for an editorial rather than boxy read.
+ *
+ * D-016 (item 1 + item 3, resolved together): the outer wrapper widened
+ * from a standard `Container size="lg"` (1280px) to a custom 1680px one
+ * with a `[220px_1fr]` grid — CategoryNav now occupies real width in what
+ * was previously just empty margin at 1920/2560px viewports, instead of
+ * trying to fix "dead space" by chasing the max-width number itself
+ * (mathematically can't reach zero gutter while capped — confirmed with
+ * Mohammad before this approach). Row content's own width is effectively
+ * unchanged (~1280px-equivalent minus the nav column + gap).
  */
 
 interface LiveService {
@@ -85,15 +95,34 @@ const LIVE_SERVICES: LiveService[] = [
   },
 ];
 
+/**
+ * Nav items for all 8 capabilities — 01-04 here, 05-08 render in
+ * AdditionalCapabilities below (D-007's finalizing tier). Names for 05-08
+ * are copied verbatim from additional-capabilities.tsx's FINALIZING_SERVICES
+ * — keep both lists in sync if either changes; not extracted to a shared
+ * module since the two sections' own data shapes differ (full copy vs.
+ * name+one-liner) and duplicating just the label/id pair here is simpler
+ * than a shared indirection for 4 static strings.
+ */
+const NAV_ITEMS: CategoryNavItem[] = [
+  ...LIVE_SERVICES.map((s) => ({ id: `capability-${s.n}`, n: s.n, label: s.name })),
+  { id: "capability-05", n: "05", label: "Managed Security Services / 24/7 MDR" },
+  { id: "capability-06", n: "06", label: "Penetration Testing" },
+  { id: "capability-07", n: "07", label: "Endpoint Protection / EDR" },
+  { id: "capability-08", n: "08", label: "Incident Response" },
+];
+
 function ServiceField({ label, children }: { label: string; children: string }) {
   return (
     <div>
-      {/* size="sm" — hierarchy fix (D-015): quieter than the headline
-          below, not competing with it. */}
+      {/* size="sm" — hierarchy fix (D-015/D-016): quieter than the
+          headline, not competing with it. */}
       <Caption tone="muted" size="sm">
         {label}
       </Caption>
-      <Text size="sm" tone="secondary" className="mt-1.5">
+      {/* size="base" (was "sm") — D-016: body copy needs to read as its
+          own distinct tier, not visually adjacent to the tiny label. */}
+      <Text size="base" tone="secondary" className="mt-1.5">
         {children}
       </Text>
     </div>
@@ -115,49 +144,62 @@ export function LiveServices() {
         bottom is cut down since the last row's own pb-14 already covers
         most of that space.
       */}
-      <Container size="lg" className="pt-24 pb-8 md:pt-32 md:pb-12">
-        <Reveal>
-          <Caption tone="accent">Live capabilities</Caption>
-        </Reveal>
-        <Reveal delay={0.05}>
-          <H2 className="mt-4 max-w-xl">Available today.</H2>
-        </Reveal>
+      <div className="mx-auto w-full max-w-[1680px] px-6 pb-8 pt-24 md:px-12 md:pb-12 md:pt-32">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[220px_1fr] lg:items-start lg:gap-16">
+          <CategoryNav items={NAV_ITEMS} />
 
-        <div className="mt-16 flex flex-col divide-y divide-border border-t border-border">
-          {LIVE_SERVICES.map((service, i) => {
-            const reverse = i % 2 === 1;
-            return (
-              <Reveal key={service.name} delay={i * 0.06}>
-                <div className="grid gap-8 py-14 md:grid-cols-2 md:items-center md:gap-16">
-                  <div className={reverse ? "md:order-2" : undefined}>
-                    {/* Design Correction treatment (D-013/D-014) — bigger
-                        hero-scale illustration in a nested dark, glow-lit,
-                        shadow-elevated panel, replacing D-012's flatter
-                        schematic-linework mark. */}
-                    <CapabilitySpotlightVisual n={service.n} icon={service.icon} />
-                    {/* size="lg" — hierarchy fix (D-015): clear dominance
-                        over the field labels beside it. */}
-                    <H3 size="lg" className="mt-6">
-                      {service.name}
-                    </H3>
-                    <ButtonLink href={service.cta.href} variant="secondary" size="md" className="mt-6">
-                      {service.cta.label}
-                    </ButtonLink>
-                  </div>
-                  <div className={reverse ? "md:order-1" : undefined}>
-                    <div className="grid gap-6 sm:grid-cols-2">
-                      <ServiceField label="The Challenge">{service.problem}</ServiceField>
-                      <ServiceField label="What Oragrol Does">{service.whatWeDo}</ServiceField>
-                      <ServiceField label="What You Get">{service.whatYouGet}</ServiceField>
-                      <ServiceField label="The Outcome">{service.outcome}</ServiceField>
+          <div>
+            <Reveal>
+              <Caption tone="accent">Live capabilities</Caption>
+            </Reveal>
+            <Reveal delay={0.05}>
+              <H2 className="mt-4 max-w-xl">Available today.</H2>
+            </Reveal>
+
+            <div className="mt-16 flex flex-col divide-y divide-border border-t border-border">
+              {LIVE_SERVICES.map((service, i) => {
+                const reverse = i % 2 === 1;
+                return (
+                  <Reveal key={service.name} delay={i * 0.06}>
+                    <div
+                      id={`capability-${service.n}`}
+                      className="grid scroll-mt-28 gap-8 py-14 md:grid-cols-2 md:items-center md:gap-16"
+                    >
+                      <div className={reverse ? "md:order-2" : undefined}>
+                        {/* Design Correction treatment (D-013/D-014) —
+                            hero-scale illustration in a nested dark,
+                            glow-lit, shadow-elevated panel; hover motion
+                            (D-016). */}
+                        <CapabilitySpotlightVisual n={service.n} icon={service.icon} />
+                        {/* Accent eyebrow + size="lg" H3 — D-016: a real
+                            color + scale jump ahead of the headline, not
+                            just a size bump (D-015 alone wasn't enough). */}
+                        <Caption tone="accent" className="mt-6">
+                          Capability {service.n}
+                        </Caption>
+                        <H3 size="lg" className="mt-2">
+                          {service.name}
+                        </H3>
+                        <ButtonLink href={service.cta.href} variant="secondary" size="md" className="mt-6">
+                          {service.cta.label}
+                        </ButtonLink>
+                      </div>
+                      <div className={reverse ? "md:order-1" : undefined}>
+                        <div className="grid gap-6 sm:grid-cols-2">
+                          <ServiceField label="The Challenge">{service.problem}</ServiceField>
+                          <ServiceField label="What Oragrol Does">{service.whatWeDo}</ServiceField>
+                          <ServiceField label="What You Get">{service.whatYouGet}</ServiceField>
+                          <ServiceField label="The Outcome">{service.outcome}</ServiceField>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </Reveal>
-            );
-          })}
+                  </Reveal>
+                );
+              })}
+            </div>
+          </div>
         </div>
-      </Container>
+      </div>
     </Section>
   );
 }

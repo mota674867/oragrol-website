@@ -8,14 +8,15 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Awaiting Mohammad's final review of Services after the D-015 fixes (container width, typography hierarchy, real hero) — screenshots sent at 1920px + mobile, not yet explicitly approved.
-2. Item 5 from the D-015 instruction (regrouping the 8 capabilities into categories, structure/copy pattern only, benchmarked against a Bell Business reference page — not its visual style) is explicitly held pending a separate scope confirmation from Mohammad. Propose a grouping and confirm before implementing.
-3. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully approved.
-4. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating.
-5. A third-party site, `ui-ux-pro-max-skill.nextlevelbuilder.io`, was raised mid-D-013-rollout, hung the browser, and was skipped per Mohammad's call — see D-014's session log. If revisited later, verify the setup command's actual behavior before running it.
-6. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in the Services visual components — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
-7. Hero (Home): current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
-8. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
+1. Awaiting Mohammad's review of D-016 (container/sidebar-nav fix, stronger typography, hover motion) — screenshots sent, item 1 proven with DOM measurements + screenshots at 1440/1920/2560px per his explicit requirement.
+2. Item 5 (footer overhaul, site-wide, separate commit) still to build — needs project-docs investigation first (Blog/Resources page existence, real social URLs, real emergency-contact route) before writing any code; flag gaps rather than invent, per Mohammad's own instruction.
+3. Item 5 from the D-015/D-016 instruction chain (regrouping the 8 capabilities into categories, structure/copy pattern only, benchmarked against a Bell Business reference page — not its visual style) is STILL explicitly held pending a separate scope confirmation from Mohammad. (Note: this is a different "item 5" than the footer — D-015's round had 5 items ending in capability-regrouping; D-016's round had 5 items ending in the footer. Both are still open, unrelated to each other.)
+4. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully approved.
+5. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating.
+6. Known Tailwind v4 gotcha worth remembering: arbitrary-value utilities with `color-mix()` (or similar multi-comma CSS functions) nested inside bracket syntax can silently generate no CSS at all — confirmed with `shadow-[...color-mix(in_srgb,...)]`. Prefer Tailwind's built-in `{utility}-{registered-color}/{opacity}` mechanic (e.g. `shadow-accent/30`) over hand-rolled arbitrary values when a registered theme color is involved. Also: Tailwind v4 uses standalone `translate`/`scale`/`rotate` CSS properties, not the composed `transform` — don't debug hover/motion utilities by checking `getComputedStyle(el).transform`.
+7. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in the Services visual components — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
+8. Hero (Home): current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
+9. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
 
 ---
 
@@ -127,7 +128,20 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **Decisions:** D-015 logged.
 
-**Next:** Awaiting Mohammad's approval of the D-015 fixes. Item 5 (capability regrouping) held for separate confirmation.
+---
+
+### 2026-08-13 (continued 7) — Round 2: sidebar nav resolves container issue, stronger typography, hover motion (D-016)
+**Completed:**
+- Mohammad reported D-015's container fix "did not actually resolve" the gutter complaint, with an explicit instruction not to claim success from code inspection alone. Re-investigated on a fresh production build (not dev server): the fix was genuinely applied and computing correctly (`max-width: 1280px` confirmed via DOM measurement at all 3 widths) — the real issue was mathematical, not a bug: a 1280px cap on a 2560px screen always leaves 640px margin per side. Presented this with screenshots + exact measurements, then asked Mohammad how to resolve it rather than guessing further. He chose to use item 3's new sidebar nav to occupy the gutter space instead of widening the cap further.
+- Built `CategoryNav` (new) — sticky, all 8 real capabilities, `IntersectionObserver`-driven active state, real DOM-id jump-scrolling. Widened `LiveServices`' wrapper to a `[220px_1fr]` grid so the nav has real space. Added matching ids to `AdditionalCapabilities`' cards.
+- Strengthened typography further (D-015's first pass judged insufficient): H3 `lg` tier bumped again, Caption `sm` tracking widened again, body copy bumped a full tier, added a small accent eyebrow above each headline (color contrast, staying within the site's existing "accent = eyebrow only" rule rather than recoloring full headlines).
+- Added hover motion to capability panels (border/shadow lift, icon scale+brightness) — found and fixed a real bug in the process: a Tailwind arbitrary-value shadow class using `color-mix()` generated no CSS at all (confirmed via computed-style inspection, not just a screenshot glance) — the base shadow was invisible too, not just hover. Fixed with Tailwind's built-in `shadow-accent/opacity` mechanic instead. Also ruled out a false alarm: Tailwind v4 uses standalone `translate`/`scale` CSS properties, not `transform` — a naive check reads hover motion as broken when it isn't.
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run build` succeeded, fresh production server. Zero horizontal overflow at 1440/1920/2560/768/375px. Zero non-pre-existing console errors (23 pre-existing nav-prefetch 404s for not-yet-built pages, confirmed unrelated to this round via isolated check). Real click-scroll test confirmed correct target + active-state update. Screenshots sent per Mohammad's explicit item-1 proof requirement.
+- Logged as D-016.
+
+**Decisions:** D-016 logged.
+
+**Next:** Awaiting Mohammad's review of D-016. Item 5 (footer overhaul) still to build — needs a project-docs investigation pass first (see Next Steps above).
 
 ---
 

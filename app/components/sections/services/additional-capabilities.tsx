@@ -10,9 +10,14 @@ import { CapabilitySpotlightMark } from "./capability-spotlight";
  * Live Services, no CTA to a specific service (none are operational yet,
  * per PROJECT_MASTER.md status language). The section-level CTA below
  * points to Contact for a general inquiry instead.
+ *
+ * `n`/card `id` added D-016: LiveServices' CategoryNav (items 05-08) jump-
+ * scrolls here — names must stay in sync with that nav's hardcoded list
+ * if either changes.
  */
 
 interface FinalizingService {
+  n: string;
   name: string;
   copy: string;
   icon: ComponentType<SVGProps<SVGSVGElement>>;
@@ -20,21 +25,25 @@ interface FinalizingService {
 
 const FINALIZING_SERVICES: FinalizingService[] = [
   {
+    n: "05",
     name: "Managed Security Services / 24/7 MDR",
     copy: "Ongoing monitoring and rapid response to catch threats as they happen.",
     icon: Radar,
   },
   {
+    n: "06",
     name: "Penetration Testing",
     copy: "Simulated attacks that reveal exactly where you're exposed.",
     icon: Target,
   },
   {
+    n: "07",
     name: "Endpoint Protection / EDR",
     copy: "Protection and visibility across every device on your network.",
     icon: Laptop,
   },
   {
+    n: "08",
     name: "Incident Response",
     copy: "A clear, practiced plan for when something goes wrong.",
     icon: Siren,
@@ -55,7 +64,11 @@ export function AdditionalCapabilities() {
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {FINALIZING_SERVICES.map((service, i) => (
             <Reveal key={service.name} delay={i * 0.06}>
-              <Card variant="surface" className="flex h-full flex-col gap-3">
+              <Card
+                id={`capability-${service.n}`}
+                variant="surface"
+                className="flex h-full scroll-mt-28 flex-col gap-3"
+              >
                 {/* Compact Design Correction mark (D-013/D-014) — same
                     dark glow-lit visual language as LiveServices' full
                     CapabilitySpotlightVisual, scaled down and simplified

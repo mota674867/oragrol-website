@@ -29,6 +29,15 @@ import { HeroSchematicVisual } from "./hero-schematic-visual";
  * Color note: every gradient/glow uses only the locked accent family.
  * white/black appear ONLY as tonal shading mixed into the accent for the
  * icon badge's highlight/shadow — flagged, not a new decorative hue.
+ *
+ * Hover motion (D-016, item 4): the outer panel's border/shadow lift a
+ * touch and the icon badge brightens/scales slightly on hover — the only
+ * hover treatment on the page beyond existing button/link states, kept
+ * to a single subtle `duration-200` transition per the "restrained,
+ * nothing bouncy" instruction. Not applied to CapabilitySpotlightMark
+ * (AdditionalCapabilities' cards) — those aren't interactive targets (no
+ * href/onClick), so a hover affordance there would misleadingly imply
+ * they are.
  */
 
 type LucideIconComponent = ComponentType<SVGProps<SVGSVGElement>>;
@@ -51,8 +60,26 @@ export function CapabilitySpotlightVisual({
 }) {
   return (
     <div
-      className={cn("env-dark relative overflow-hidden rounded-3xl border border-border bg-background", className)}
-      style={{ boxShadow: "0 30px 80px -24px color-mix(in srgb, var(--color-accent) 45%, transparent)" }}
+      className={cn(
+        // Shadow via Tailwind's built-in shadow-{color}/{opacity} modifier
+        // (same mechanic bg-accent/text-accent/border-accent already use
+        // for the registered `accent` theme color), not a hand-rolled
+        // `shadow-[...color-mix(...)...]` arbitrary value — confirmed via
+        // computed-style inspection that Tailwind v4's arbitrary-value
+        // parser doesn't reliably handle a `color-mix()` with its own
+        // internal commas nested inside a shadow utility's brackets; it
+        // silently generated no CSS at all for the whole utility instead
+        // of erroring, which is a real, worth-noting gotcha, not a
+        // one-off mistake — the *base* shadow was invisible, not just the
+        // hover state. Also inline `style` isn't an option here: an
+        // inline box-shadow always beats any `hover:shadow-*` class
+        // (inline styles win over any class regardless of specificity).
+        "group relative overflow-hidden rounded-3xl border border-border bg-background",
+        "env-dark shadow-2xl shadow-accent/30",
+        "transition-[box-shadow,border-color,transform] duration-200",
+        "hover:-translate-y-1 hover:border-accent/40 hover:shadow-accent/50",
+        className,
+      )}
     >
       <GlowEffect blur="strong" className="opacity-50" />
       <div className="relative px-6 pb-2 pt-8 sm:px-10 sm:pt-10">
@@ -66,7 +93,7 @@ export function CapabilitySpotlightVisual({
           <HeroSchematicVisual className="w-full" />
           <span
             aria-hidden="true"
-            className="absolute left-1/2 top-[51.5%] flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full"
+            className="absolute left-1/2 top-[51.5%] flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-[filter,transform] duration-200 group-hover:scale-110 group-hover:brightness-110"
             style={ICON_BADGE_STYLE}
           >
             <Icon icon={icon} size="lg" className="text-white" />

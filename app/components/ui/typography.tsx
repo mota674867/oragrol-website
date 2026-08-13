@@ -53,14 +53,15 @@ export type H3Size = "default" | "lg";
 const h3SizeClasses: Record<H3Size, string> = {
   default: "text-2xl font-semibold md:text-3xl",
   // Dominant-headline variant — added for the Services capability-row
-  // hierarchy fix (headline vs. field-label weight, D-015): bigger and
-  // bolder than the default ladder step, for contexts where a headline
-  // sits close to several small uppercase labels and needs unambiguous
-  // visual dominance over them. Weight lives entirely in this table (not
-  // the shared base string below) so default/lg never emit two
-  // conflicting font-weight utility classes at once — see cn.ts's own
+  // hierarchy fix (headline vs. field-label weight, D-015; strengthened
+  // D-016 after the first pass was confirmed still not enough contrast):
+  // bigger and bolder than the default ladder step, for contexts where a
+  // headline sits close to several small uppercase labels and needs
+  // unambiguous visual dominance over them. Weight lives entirely in this
+  // table (not the shared base string below) so default/lg never emit
+  // two conflicting font-weight utility classes at once — see cn.ts's own
   // documented plain-concatenation gotcha.
-  lg: "text-3xl font-bold md:text-4xl",
+  lg: "text-4xl font-bold md:text-5xl",
 };
 
 export interface H3Props extends ComponentPropsWithoutRef<"h3"> {
@@ -138,11 +139,12 @@ export type CaptionSize = "default" | "sm";
 const captionSizeClasses: Record<CaptionSize, string> = {
   default: "text-xs tracking-widest",
   // Quieter variant — added for the Services capability-row hierarchy fix
-  // (D-015): smaller and more letter-spaced than the default, so a
-  // repeated field label (e.g. four per row — "THE CHALLENGE", "WHAT
-  // ORAGROL DOES"...) reads as a quiet category tag rather than
-  // repeatedly competing with the row's own headline for attention.
-  sm: "text-[10px] tracking-[0.18em]",
+  // (D-015, tracking widened further in D-016): smaller and more
+  // letter-spaced than the default, so a repeated field label (e.g. four
+  // per row — "THE CHALLENGE", "WHAT ORAGROL DOES"...) reads as a quiet
+  // category tag rather than repeatedly competing with the row's own
+  // headline for attention.
+  sm: "text-[10px] tracking-[0.22em]",
 };
 
 export interface CaptionProps extends ComponentPropsWithoutRef<"p"> {
