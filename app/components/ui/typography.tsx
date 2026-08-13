@@ -48,11 +48,31 @@ export function H2({ className, ...props }: ComponentPropsWithoutRef<"h2">) {
   );
 }
 
-export function H3({ className, ...props }: ComponentPropsWithoutRef<"h3">) {
+export type H3Size = "default" | "lg";
+
+const h3SizeClasses: Record<H3Size, string> = {
+  default: "text-2xl font-semibold md:text-3xl",
+  // Dominant-headline variant — added for the Services capability-row
+  // hierarchy fix (headline vs. field-label weight, D-015): bigger and
+  // bolder than the default ladder step, for contexts where a headline
+  // sits close to several small uppercase labels and needs unambiguous
+  // visual dominance over them. Weight lives entirely in this table (not
+  // the shared base string below) so default/lg never emit two
+  // conflicting font-weight utility classes at once — see cn.ts's own
+  // documented plain-concatenation gotcha.
+  lg: "text-3xl font-bold md:text-4xl",
+};
+
+export interface H3Props extends ComponentPropsWithoutRef<"h3"> {
+  size?: H3Size;
+}
+
+export function H3({ size = "default", className, ...props }: H3Props) {
   return (
     <h3
       className={cn(
-        "font-heading text-2xl font-semibold leading-snug tracking-tight text-text-primary md:text-3xl",
+        "font-heading leading-snug tracking-tight text-text-primary",
+        h3SizeClasses[size],
         className,
       )}
       {...props}
@@ -113,20 +133,35 @@ export function Text({
   );
 }
 
+export type CaptionSize = "default" | "sm";
+
+const captionSizeClasses: Record<CaptionSize, string> = {
+  default: "text-xs tracking-widest",
+  // Quieter variant — added for the Services capability-row hierarchy fix
+  // (D-015): smaller and more letter-spaced than the default, so a
+  // repeated field label (e.g. four per row — "THE CHALLENGE", "WHAT
+  // ORAGROL DOES"...) reads as a quiet category tag rather than
+  // repeatedly competing with the row's own headline for attention.
+  sm: "text-[10px] tracking-[0.18em]",
+};
+
 export interface CaptionProps extends ComponentPropsWithoutRef<"p"> {
   tone?: TextTone;
+  size?: CaptionSize;
 }
 
 /** Small uppercase label — eyebrow text, section labels, metadata lines. */
 export function Caption({
   tone = "secondary",
+  size = "default",
   className,
   ...props
 }: CaptionProps) {
   return (
     <p
       className={cn(
-        "font-body text-xs font-medium uppercase tracking-widest",
+        "font-body font-medium uppercase",
+        captionSizeClasses[size],
         toneClasses[tone],
         className,
       )}

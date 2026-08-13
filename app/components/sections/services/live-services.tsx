@@ -88,7 +88,11 @@ const LIVE_SERVICES: LiveService[] = [
 function ServiceField({ label, children }: { label: string; children: string }) {
   return (
     <div>
-      <Caption tone="muted">{label}</Caption>
+      {/* size="sm" — hierarchy fix (D-015): quieter than the headline
+          below, not competing with it. */}
+      <Caption tone="muted" size="sm">
+        {label}
+      </Caption>
       <Text size="sm" tone="secondary" className="mt-1.5">
         {children}
       </Text>
@@ -131,7 +135,11 @@ export function LiveServices() {
                         shadow-elevated panel, replacing D-012's flatter
                         schematic-linework mark. */}
                     <CapabilitySpotlightVisual n={service.n} icon={service.icon} />
-                    <H3 className="mt-6">{service.name}</H3>
+                    {/* size="lg" — hierarchy fix (D-015): clear dominance
+                        over the field labels beside it. */}
+                    <H3 size="lg" className="mt-6">
+                      {service.name}
+                    </H3>
                     <ButtonLink href={service.cta.href} variant="secondary" size="md" className="mt-6">
                       {service.cta.label}
                     </ButtonLink>

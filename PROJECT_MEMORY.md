@@ -8,13 +8,14 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Services Design Correction is COMPLETE (D-014) — all 8 capabilities now use the CapabilitySpotlight visual language (full treatment on the 4 live rows, compact on the 4 finalizing cards). Mohammad has not yet done a final in-browser pass over the fully rolled-out page (screenshots sent, not yet explicitly confirmed).
-2. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully approved.
-3. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating.
-4. A third-party site, `ui-ux-pro-max-skill.nextlevelbuilder.io` (design-reference database, Claude-Code-integrated, `uip`/`uipro init` setup command), was raised mid-D-013-rollout as a possible improvement source. Its "How it Works" page hung the browser tab twice — never got to see the actual setup command. No install/init command was run. Mohammad chose to skip it for this round; if revisited later, verify the setup command's actual behavior before running it, same standing rule as any third-party install.
-5. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in the Services visual components — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
-6. Hero: current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
-7. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
+1. Awaiting Mohammad's final review of Services after the D-015 fixes (container width, typography hierarchy, real hero) — screenshots sent at 1920px + mobile, not yet explicitly approved.
+2. Item 5 from the D-015 instruction (regrouping the 8 capabilities into categories, structure/copy pattern only, benchmarked against a Bell Business reference page — not its visual style) is explicitly held pending a separate scope confirmation from Mohammad. Propose a grouping and confirm before implementing.
+3. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully approved.
+4. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating.
+5. A third-party site, `ui-ux-pro-max-skill.nextlevelbuilder.io`, was raised mid-D-013-rollout, hung the browser, and was skipped per Mohammad's call — see D-014's session log. If revisited later, verify the setup command's actual behavior before running it.
+6. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in the Services visual components — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
+7. Hero (Home): current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
+8. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
 
 ---
 
@@ -112,7 +113,21 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **Decisions:** D-014 logged.
 
-**Next:** Awaiting Mohammad's final review of the fully rolled-out `/services` page; per the blueprint's Rollout section, no other page gets touched until that's confirmed.
+---
+
+### 2026-08-13 (continued 6) — Container fix, typography hierarchy, real hero (D-015)
+**Completed:**
+- New 4-item instruction (Services-scoped except item 1, explicit): container/dead-gutter bug, typography hierarchy, audit for rejected-motif drift, and a real hero illustration. A 5th item (regroup the 8 capabilities structurally, referencing a Bell Business page for information architecture only, not visual style) was included but explicitly held — "don't block the visual fixes on it."
+- Item 1: investigated empirically first rather than assuming — every section already used a capped `Container`; the actual defect was the mismatch between the deliberately full-bleed header (D-001) and body content capped at 1024px. Fixed `container.tsx`'s `lg`/`xl` tiers to 1280px/1440px (inside the requested range, two tiers preserved). Verified zero horizontal overflow and no visual regression on Home/Solutions/Cyber Health at 1440/1920/2560/768/375px — the one Home@2560px Playwright timeout during verification was a script wait-strategy issue (network-heavy 16-frame hero), not a real page hang, confirmed by retrying with `domcontentloaded`.
+- Item 2: added non-breaking opt-in `size` variants to `H3`/`Caption` (same pattern as `H1`'s existing `size` prop), applied only in Services' capability rows.
+- Item 3: audited and found the connector-circle elements in every panel are `HeroSchematicVisual`, built as part of D-013 and visible in both of D-013's approvals — not drift, no record of a separate rejected motif. Flagged the discrepancy to Mohammad rather than silently changing anything; he confirmed after seeing the finding: keep as-is.
+- Item 4: built `ServicesNetworkVisual` — 8 nodes (real count, from the H1) converging to one hub, in a `GlowEffect`-lit panel; `ServicesHero` rebuilt to the 2-column text|visual layout Solutions/Cyber Health already use. Deliberately a different composition from the row panels' diagram.
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run build` succeeded. Screenshots sent mid-task for the item-3 audit before any panel change was made (none was needed in the end).
+- Logged as D-015.
+
+**Decisions:** D-015 logged.
+
+**Next:** Awaiting Mohammad's approval of the D-015 fixes. Item 5 (capability regrouping) held for separate confirmation.
 
 ---
 
