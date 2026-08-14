@@ -2,6 +2,7 @@ import { Container, H2, Section, ButtonLink } from "../../ui";
 import { OragrolRing } from "../../brand/oragrol-ring";
 import { Reveal } from "../../motion/reveal";
 import { TALLY_ASSESSMENT_URL } from "./hero";
+import { AssessmentCta } from "./assessment-cta";
 
 /**
  * Closing CTA — Step 7. Deliberately NOT the reused FinalCta component:
@@ -29,15 +30,11 @@ export function ClosingCta() {
         </Reveal>
         <Reveal delay={0.1}>
           <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <ButtonLink
-              href={TALLY_ASSESSMENT_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              variant="primary"
-              size="lg"
-            >
+            {/* D-042: same AssessmentCta as the hero — see that
+                component's own comment. */}
+            <AssessmentCta href={TALLY_ASSESSMENT_URL} variant="primary" size="lg">
               Get Your Cyber Health Score
-            </ButtonLink>
+            </AssessmentCta>
             <ButtonLink href="/contact" variant="secondary" size="lg">
               Talk to Oragrol
             </ButtonLink>

@@ -1,6 +1,7 @@
 import { ButtonLink, Caption, Container, H1, Section, Text } from "../../ui";
 import { Reveal } from "../../motion/reveal";
 import { GaugeVisual } from "./gauge-visual";
+import { AssessmentCta } from "./assessment-cta";
 
 /** The real, live assessment — confirmed by Mohammad, currently receiving
  * real submissions. Every "Get Your Cyber Health Score" CTA on this page
@@ -36,15 +37,14 @@ export function CyberHealthHero() {
             </Reveal>
             <Reveal delay={0.15}>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <ButtonLink
-                  href={TALLY_ASSESSMENT_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  variant="primary"
-                  size="lg"
-                >
+                {/* D-042: AssessmentCta wraps the same real target="_blank"
+                    link with a brief on-page loading transition — see
+                    that component's own comment for why this isn't a
+                    JS-triggered window.open() (popup-blocker risk on a
+                    real, live lead-generation path). */}
+                <AssessmentCta href={TALLY_ASSESSMENT_URL} variant="primary" size="lg">
                   Get Your Cyber Health Score
-                </ButtonLink>
+                </AssessmentCta>
                 <ButtonLink href="/contact" variant="secondary" size="lg">
                   Talk to Oragrol
                 </ButtonLink>
