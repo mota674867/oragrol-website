@@ -106,6 +106,8 @@ Services = individual capabilities. Solutions = packaged protection levels — k
 
 Built at `/solutions`: Hero (with `StrataVisual`, D-008's "ascending stacked planes" page-specific motif — 3 plates sharing a baseline, increasing height/accent intensity, first use of the `--color-accent-light` token) → 3 generic Level 01/02/03 tier cards (no branded names — still unconfirmed, see pricing table below) → Pentest add-on (visually a "satellite," dashed border + a `+` badge, not a 4th rung in the stack) + status disclaimer → shared `FinalCta`. Verified: typecheck/lint/build clean, scroll-verified screenshots desktop+mobile, zero console errors.
 
+**D-039 (2026-08-14) — hero visual reopened, prototyped:** Mohammad explicitly reopened the already-approved `StrataVisual` hero and requested a "Kinetic Grid" canvas background (sourced via `21st.dev`, found and fetched directly after the instruction's own code block came through empty). All 5 required modifications (hero-scoped not viewport-fixed, locked-palette color remap, `prefers-reduced-motion` support, verified performance, preserved copy) built and verified with direct evidence — canvas measured, background pixel sampled, reduced-motion frame proven static via byte-identical sampling, FPS measured at 1920px and under 4x CPU throttle. Prototyped at `/solutions/prototype`; `hero.tsx`/`StrataVisual` untouched. Awaiting approval before shipping live.
+
 Pricing — UNCONFIRMED, internal reference only, do not publish:
 | Tier | Includes | 12-mo | Month-to-month |
 |---|---|---|---|
@@ -223,7 +225,8 @@ Also active (D-032/D-033): Capability 02's dashboard mockup shipped live; a flag
 **D-034 — SERVICES SIGNED OFF, COMPLETE (2026-08-14):** Mohammad reviewed the final full-page screenshot and confirmed: "Services is approved and complete." This closes the entire visual-redesign thread (D-011 through D-034). No further Services visual/structural work without a new explicit instruction; the D-015 "item 5" capability-regrouping question remains separately held.
 Also active (D-035/D-036/D-037): Step 8 (How We Work) — CONTENT COMPLETE, connector-line bug fixed. Hero visual researched/built (D-035), full page copy supplied and built (D-036), Stage Sequence connector-line bug found-and-fixed with a real structural fix, not a reference-matching patch — the cited reference (`home/how-we-work.tsx`) was found to have the identical bug and is flagged, not fixed (out of scope for this instruction) (D-037).
 **D-038 (2026-08-14):** Mohammad confirmed — fixed `home/how-we-work.tsx`'s matching connector-line bug with the identical real fix (Grid-centered circle). Verified 0px delta at both 1920px and 390px on a fresh production server. Both instances of the bug are now resolved.
-Next: Awaiting Mohammad's review of the How We Work page build overall.
+**D-039 (2026-08-14):** Solutions' D-008 hero visual explicitly reopened per Mohammad's instruction — `StrataVisual` prototyped for replacement with a Kinetic Grid canvas background (sourced via `21st.dev`, id 18254, found directly after the instruction's own code block came through empty). All 5 required modifications built and verified with direct evidence (see Step 6 above and DECISIONS.md D-039 for full detail). Prototyped at `/solutions/prototype`, live page untouched, awaiting approval.
+Next: Awaiting Mohammad's review of the How We Work page build (D-036/D-037/D-038) and the Solutions Kinetic Grid prototype (D-039).
 
 ---
 

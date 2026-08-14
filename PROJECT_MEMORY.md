@@ -12,7 +12,8 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 **STEP 8 CONTENT-COMPLETE, CONNECTOR BUG FIXED (D-035/D-036/D-037, 2026-08-14).** Hero visual researched and built (D-035). Full page copy supplied and built (D-036), byte-for-byte verified. Connector-line bug reported and fixed (D-037) — investigated the cited reference component first and found it has the identical bug (flagged, not silently copied or silently ignored); real fix uses CSS Grid to structurally guarantee the circle sits on the spine. `/how-we-work` is live, `noindex` removed. Awaiting Mohammad's review.
 
 ## Next Steps
-1. Awaiting Mohammad's review of Step 8 (How We Work) — full page built, content-complete, connector-line bug fixed (D-037), and the same bug fixed on Home's own teaser too (D-038, confirmed). One thing still flagged, not silently resolved: the hero visual's own short stage one-liners sit directly above the Stage Sequence's full-paragraph versions of the same 4 stages — some content echo, left as-is per "build around the hero visual already built."
+1. Awaiting Mohammad's review of the Solutions Kinetic Grid prototype (D-039, `/solutions/prototype`) — all 5 required modifications built and verified with direct evidence (canvas scoping measured, background pixel sampled exactly `#0a0a0a`, reduced-motion frame proven static via byte-identical pixel sampling, FPS measured 60fps/1920px and 56fps/390px-4x-throttle). Live `/solutions` untouched (confirmed via DOM query, no `<canvas>` present). If approved: ship, remove `/solutions/prototype`, same discipline as every Services round.
+2. Awaiting Mohammad's review of Step 8 (How We Work) — full page built, content-complete, connector-line bug fixed (D-037), and the same bug fixed on Home's own teaser too (D-038, confirmed). One thing still flagged, not silently resolved: the hero visual's own short stage one-liners sit directly above the Stage Sequence's full-paragraph versions of the same 4 stages — some content echo, left as-is per "build around the hero visual already built."
 2. **SERVICES SIGNED OFF (D-034, 2026-08-14):** Mohammad confirmed "Services is approved and complete." No further Services visual/structural work without a new explicit instruction. The D-015 "item 5" capability-regrouping question remains separately held, not reopened by this sign-off. Two explicit flags carried forward from D-017, still open: Instagram has no real URL (`href="#"` placeholder); the emergency-CTA phone number is a TEMPORARY placeholder pending a real Canadian line before public launch.
 3. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating. `ui-ux-pro-max` skill is installed (Python 3.12 dependency) and usable the same way.
 4. Known Tailwind v4 gotcha worth remembering: arbitrary-value utilities with `color-mix()` (or similar multi-comma CSS functions) nested inside bracket syntax can silently generate no CSS at all. Prefer Tailwind's built-in `{utility}-{registered-color}/{opacity}` mechanic over hand-rolled arbitrary values when a registered theme color is involved. Also: Tailwind v4 uses standalone `translate`/`scale`/`rotate` CSS properties, not the composed `transform` — don't debug hover/motion utilities by checking `getComputedStyle(el).transform`.
@@ -24,6 +25,32 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-14 (continued 20) — Solutions hero reopened: Kinetic Grid prototype, all 5 required modifications verified with direct evidence (D-039)
+**Completed:**
+- Mohammad explicitly reopened Solutions' already-approved D-008 hero visual, requesting a specific "Kinetic Grid" component (sourced via 21st.dev) as the new background. The instruction's own code block came through empty. Rather than block a second time on a missing-content issue, searched `21st.dev` directly and found an exact match ("Kinetic Grid," satoriui, id 18254) — confirmed via `get_component` that its name, description, and exact technical details (theme prop shape, `fixed inset-0`/`min-h-screen`) matched the instruction's own description before treating it as the real source.
+- Built all 5 required modifications: (1) scoped to the hero via `ResizeObserver` + wrapper-relative coordinates, not `window`; (2) color remapped to `tokens.css`'s own raw hex values (`#0a0a0a` background, `#018abe` accent), monochrome variant removed entirely; (3) reduced-motion support via the existing `usePrefersReducedMotion` hook, one static frame instead of the rAF loop; (4) performance measured, not assumed; (5) existing Solutions hero copy preserved verbatim.
+- Initially edited the LIVE `hero.tsx` directly — caught this immediately (the instruction explicitly said prototype at `/solutions/prototype` first) and reverted via `git checkout` before building the actual prototype route correctly.
+- Caught and fixed a real lint error (not just a functional bug): the sourced component's own recursive `requestAnimationFrame(animate)` inside a `const animate = useCallback(...)` tripped a `react-hooks` self-reference rule. Fixed with a hoisted local `function` declaration instead.
+- Caught two screenshot-timing false alarms (both normal and reduced-motion captures initially appeared to show the prototype's headline missing) — same category this project has now hit multiple times. Confirmed via computed-style query before re-capturing with proper scroll-through, which showed correct rendering in both cases.
+- Verified with direct evidence, not assumption, for every one of the 5 required items: canvas bounding box measured (520px tall on a 2380px page, not viewport-fixed); background pixel sampled via `getImageData` (exactly `rgb(10,10,10)`); reduced-motion frame sampled twice 600ms apart and found byte-identical (proves no animation running); FPS measured via a real rAF-sampling script (60fps at 1920px, 56fps at 390px under a CDP 4x CPU throttle); live `/solutions` confirmed to have zero `<canvas>` elements (untouched).
+- Full verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (10 routes); fresh clean rebuild; zero overflow at 1920/390px.
+
+**Files changed:**
+- New: `app/components/sections/solutions/kinetic-grid.tsx`, `hero-kinetic-prototype.tsx`, `app/solutions/prototype/page.tsx`
+- `app/components/sections/solutions/hero.tsx` — reverted to original after an accidental direct edit, confirmed unchanged
+- `DECISIONS.md` (D-039), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- Missing source code in the instruction (resolved via direct 21st.dev search, not blocking).
+- A real lint error in the sourced component's own recursive rAF pattern.
+- Two screenshot-timing false alarms — both correctly diagnosed before being reported as real.
+- My own process slip (editing the live file before the prototype) — caught and reverted within the same turn.
+
+**Still open:**
+- Mohammad's review and approval before shipping to the live `/solutions` page.
+
+---
 
 ### 2026-08-14 (continued 19) — Home teaser's matching connector-line bug fixed (D-038)
 **Completed:**
