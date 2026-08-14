@@ -301,3 +301,12 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Build:** `/services/prototype-v5` (noindex, not linked from nav) — shows the whole 4-card row twice, Capability 05 already reflecting its shipped D-025 treatment in both so only Capability 06 differs between them. Does not modify or import from `additional-capabilities.tsx`.
 - **Verified:** `npx tsc --noEmit`, `npm run lint`, `npm run build` all clean (10 routes); fully clean rebuild after each fix (stray node processes killed, `.next` cleared, fresh `npm run start`); zero horizontal overflow on `/services/prototype-v5` at 390px; zero non-pre-existing console errors; confirmed via DOM query that live `/services` Capability 06 card is unaffected; final screenshot reviewed directly confirming legible text on all 4 example findings.
 - **Status:** Awaiting Mohammad's review. Capabilities 07-08 remain, each needing their own individually-researched treatment.
+
+---
+
+### D-027 — Capability 06 approved and shipped; /services/prototype-v5 removed
+- **Date:** 2026-08-14
+- **Context:** Mohammad reviewed D-026's `/services/prototype-v5` prototype live and approved it: "Approve Capability 06's new visual (severity-tagged ranked findings list) and ship it."
+- **Decision:** `additional-capabilities.tsx` refactored its per-capability mark rendering from a single `n === "05"` ternary into a small `CapabilityMark({ service })` selector (same pattern as `LiveServices`' own `CapabilityVisual`) — Capability 05 renders `CapabilityMonitorMark`, Capability 06 renders `CapabilityFindingsMark`, 07-08 fall through to the default `CapabilitySpotlightMark` orb, pending their own treatments. `/services/prototype-v5` deleted, same lifecycle as every prior prototype route.
+- **Verified:** `npx tsc --noEmit`, `npm run lint`, `npm run build` all clean (9 routes, `/services/prototype-v5` confirmed 404); fully clean rebuild (stray node processes killed, `.next` cleared, fresh `npm run start`); DOM measurement of all 4 finalizing cards' own height confirms 07/08 stay at 252px (their natural, unstretched height) while 05/06 are 450/456px respectively — the shared `items-start` grid fix from D-025 continues to hold for a second taller mark without any further change; zero horizontal overflow at 1440/390px; zero non-pre-existing console errors; screenshot of the live grid reviewed directly.
+- **Status:** Active. Capabilities 07-08 remain — see [[D-028]] for Capability 07 (Endpoint Protection / EDR).

@@ -8,7 +8,7 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Awaiting Mohammad's review of D-026: Capability 06's `/services/prototype-v5` (ranked findings list with `RiskBadge` severity tags). A truncation bug was found and fixed (via screenshot review, not assumed) before presenting — labels now wrap instead of clipping. If approved, ship + confirm live `/services` unaffected before/after, same discipline as D-023/D-025. 07-08 still need their OWN individually-researched treatments after that — do not reuse the ranked-list or activity-feed formulas.
+1. Capability 06 (D-026) approved and shipped live (D-027) — verified 07/08 stay at their own 252px height post-ship. `/services/prototype-v5` removed. Capability 07 (Endpoint Protection/EDR) research/prototype in progress — see next session-log entry. 08 still needs its OWN individually-researched treatment after that — do not reuse the ranked-list or activity-feed formulas.
 2. Capability 05 (D-024) approved and shipped live (D-025), including the `items-start` grid fix — verified via DOM measurement that 06-08 stay at their own 252px height, not stretched to match 05's 450px. `/services/prototype-v4` removed.
 3. Capability 04 (D-022) approved and shipped live (D-023) — `/services/prototype-v3` removed.
 4. Awaiting Mohammad's review of D-021: the row top-alignment fix (verified across rows 01/02/03, unaffected by D-022), and his decision on the `/services/prototype-v2` dashboard-mockup direction for Capability 02 (approve for rollout / keep the current orb treatment / different direction). If approved, decide how far it rolls out — Capability 02 only, or other data/assessment-shaped capabilities — not assumed, ask.
@@ -30,6 +30,21 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-14 (continued 8) — Capability 06 shipped live, verified; refactored per-capability mark selector (D-027)
+**Completed:**
+- Mohammad approved D-026's prototype. Refactored `additional-capabilities.tsx`'s per-capability mark rendering from a growing `n === "05"` ternary into a small `CapabilityMark({ service })` selector — cleaner than stacking a second ternary branch, and matches the pattern `LiveServices` already uses for its own per-row visual. Capability 06 now renders `CapabilityFindingsMark`; 07-08 still fall through to the default orb. Deleted `app/services/prototype-v5/`.
+- Verified: killed stray node processes, cleared `.next`, `npm run build`/`tsc`/`lint` all clean (9 routes, `prototype-v5` confirmed 404); DOM measurement of all 4 finalizing cards confirms 07/08 stay at 252px (unaffected) while 05/06 are 450/456px — the D-025 `items-start` grid fix continues to hold for a second taller mark automatically; zero overflow at 1440/390px; zero non-pre-existing console errors; screenshot reviewed directly.
+
+**Files changed:**
+- `app/components/sections/services/additional-capabilities.tsx` (Capability 06 mark swap + `CapabilityMark` selector refactor)
+- Deleted: `app/services/prototype-v5/page.tsx`
+- `DECISIONS.md` (D-027), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Next recommended step:**
+- Research and prototype Capability 07 (Endpoint Protection/EDR) next, same process.
+
+---
 
 ### 2026-08-14 (continued 7) — Round 9: Capability 06 (Penetration Testing) shell prototype, truncation bug caught and fixed (D-026)
 **Completed:**

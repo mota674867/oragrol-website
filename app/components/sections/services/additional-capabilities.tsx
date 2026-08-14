@@ -4,6 +4,7 @@ import { Badge, Card, Caption, Container, H2, Section, Text } from "../../ui";
 import { Reveal } from "../../motion/reveal";
 import { CapabilitySpotlightMark } from "./capability-spotlight";
 import { CapabilityMonitorMark } from "./capability-monitor-mark";
+import { CapabilityFindingsMark } from "./capability-findings-mark";
 
 /**
  * Additional Capabilities (5-8) — Step 5. Same one-liners as the Home
@@ -19,14 +20,19 @@ import { CapabilityMonitorMark } from "./capability-monitor-mark";
  * D-024/D-025: Capability 05's mark is now `CapabilityMonitorMark` (a
  * live-pulse/activity-feed treatment) in place of the plain
  * `CapabilitySpotlightMark` orb — approved after review at
- * `/services/prototype-v4` (now removed). 06-08 are unaffected, still
- * `CapabilitySpotlightMark`, pending their own individually-researched
- * treatments. The grid below gained `items-start` at the same time: the
- * new mark is taller than the plain orb mark, and without `items-start`
- * CSS Grid's default row-stretch behavior would force 06-08's still-short
- * cards to match Capability 05's height, leaving large empty space in
- * each — confirmed this doesn't happen post-fix via DOM measurement
- * before shipping (see D-025).
+ * `/services/prototype-v4` (now removed). The grid below gained
+ * `items-start` at the same time: the new mark is taller than the plain
+ * orb mark, and without `items-start` CSS Grid's default row-stretch
+ * behavior would force still-short cards to match the taller one, leaving
+ * large empty space — confirmed this doesn't happen post-fix via DOM
+ * measurement before shipping (see D-025). That fix covers every
+ * capability in this grid, not just 05 — no further grid change needed
+ * as more marks are replaced.
+ *
+ * D-026: Capability 06's mark is now `CapabilityFindingsMark` (a ranked,
+ * severity-tagged example-findings treatment) — approved after review at
+ * `/services/prototype-v5` (now removed). 07-08 still pending their own
+ * individually-researched treatments.
  */
 
 interface FinalizingService {
@@ -63,6 +69,20 @@ const FINALIZING_SERVICES: FinalizingService[] = [
   },
 ];
 
+/** Per-capability mark selector — same pattern as LiveServices' own
+ * `CapabilityVisual`. Falls back to the plain `CapabilitySpotlightMark`
+ * orb for any capability that hasn't gotten its own researched treatment
+ * yet (07/08, for now). */
+function CapabilityMark({ service }: { service: FinalizingService }) {
+  if (service.n === "05") {
+    return <CapabilityMonitorMark />;
+  }
+  if (service.n === "06") {
+    return <CapabilityFindingsMark />;
+  }
+  return <CapabilitySpotlightMark icon={service.icon} className="h-14 w-14" />;
+}
+
 export function AdditionalCapabilities() {
   return (
     <Section environment="light-blue">
@@ -82,23 +102,7 @@ export function AdditionalCapabilities() {
                 variant="surface"
                 className="flex h-full scroll-mt-28 flex-col gap-3"
               >
-                {service.n === "05" ? (
-                  // CapabilityMonitorMark (D-024/D-025) — live-pulse
-                  // indicator + illustrative alert feed, replacing the
-                  // orb mark for this capability only. See file header
-                  // comment for why the grid above now has `items-start`.
-                  <CapabilityMonitorMark />
-                ) : (
-                  // Compact Design Correction mark (D-013/D-014) — same
-                  // dark glow-lit visual language as LiveServices' full
-                  // CapabilitySpotlightVisual, scaled down and simplified
-                  // (no schematic diagram, no numeral) for this card. Kept
-                  // visually lighter than the live rows — these 4 aren't
-                  // live yet, and that distinction is deliberate (D-007),
-                  // not an oversight. Still used for 06-08, pending their
-                  // own individually-researched treatments.
-                  <CapabilitySpotlightMark icon={service.icon} className="h-14 w-14" />
-                )}
+                <CapabilityMark service={service} />
                 <h3 className="font-heading text-base font-semibold text-text-primary">
                   {service.name}
                 </h3>
