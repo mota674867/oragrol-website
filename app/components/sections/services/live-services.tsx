@@ -169,7 +169,23 @@ export function LiveServices() {
                   <Reveal key={service.name} delay={i * 0.06}>
                     <div
                       id={`capability-${service.n}`}
-                      className="grid scroll-mt-28 gap-8 py-14 md:grid-cols-[0.9fr_1.1fr] md:items-center md:gap-16"
+                      // Top-alignment fix (Round 6, item 1): was
+                      // `md:items-center`, which vertically CENTERS the two
+                      // columns relative to each other rather than aligning
+                      // their top edges. Harmless on row 01 ("Virtual CISO"
+                      // — short enough to stay on one H3 line, so both
+                      // columns happen to be nearly the same height and
+                      // centering looks like alignment by coincidence), but
+                      // visibly wrong on rows 02/03 whose longer capability
+                      // names wrap the H3 to two lines, making the content
+                      // column taller than the graphic column — `items-center`
+                      // then shifts the shorter column down to split the
+                      // difference instead of keeping both starting at the
+                      // same top edge. `items-start` makes both columns
+                      // begin flush at the row's own top edge regardless of
+                      // either column's height — a real shared-baseline fix
+                      // on the row's own grid, not a per-row margin patch.
+                      className="grid scroll-mt-28 gap-8 py-14 md:grid-cols-[0.9fr_1.1fr] md:items-start md:gap-16"
                     >
                       <div className={reverse ? "md:order-2" : undefined}>
                         {/* Design Correction treatment (D-013/D-014) —

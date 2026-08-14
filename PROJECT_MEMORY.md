@@ -8,9 +8,9 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Awaiting Mohammad's review of D-020 (CTA-alignment structural fix, sidebar active/inactive weight split — both verified via Playwright at real widths/computed styles).
+1. Awaiting Mohammad's review of D-021: the row top-alignment fix (verified across rows 01/02/03), and his decision on the new `/services/prototype-v2` dashboard-mockup direction for Capability 02 (approve for rollout / keep the current orb treatment / different direction). If approved, decide how far it rolls out — Capability 02 only, or the other data/assessment-shaped capabilities too (e.g. 03 Vulnerability Assessment) — not assumed, ask.
 2. D-019's headline-font-family non-finding and D-018's footer non-finding both still stand (re-checked, not re-litigated) — if either still looks wrong to Mohammad after a fresh rebuild, the recommended step remains asking him to hard-refresh/open a fresh tab rather than re-investigating the same code a third/fourth time.
-3. The `ui-ux-pro-max` skill review of Capability 02 (installed 2026-08-14) found no genuinely superior treatment vs. the current build — stands unchanged, `/services/prototype` was not recreated.
+3. The `ui-ux-pro-max` skill review of Capability 02's ORB treatment (installed 2026-08-14) found no genuinely superior treatment vs. the orb build at the time — that finding predates D-021's dashboard-mockup direction change and is about a different question (is the orb well-executed, not is the orb the right motif); doesn't contradict D-021.
 4. Two explicit flags still open from D-017, not resolved: Instagram has no real URL yet (`href="#"` placeholder); the emergency-CTA phone number (`+60 18-377-2761`) is a TEMPORARY placeholder pending a real Canadian contact line before public launch — both flagged with code comments, don't remove without confirming real values first.
 5. A different, still-open "item 5" from the D-015 instruction chain (regrouping the 8 capabilities into categories, structure/copy pattern only) remains explicitly held pending a separate scope confirmation from Mohammad.
 6. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully approved.
@@ -24,6 +24,32 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-14 (continued 2) — Round 6: row top-alignment fix; Capability 02 dashboard-mockup prototype (D-021)
+**Completed:**
+- Item 1 (top alignment): found the row grid used `md:items-center` (vertically centers two columns of possibly-unequal height) instead of `md:items-start`. Row 01's short one-line headline made both columns nearly equal height by coincidence, masking the bug; rows 02/03's longer names wrap to two H3 lines, so `items-center` visibly shifted the graphic column down. One-line fix (`items-center` → `items-start`). Verified with Playwright `getBoundingClientRect()` on rows 01/02/03: `delta: 0` on all three, not just the one reported.
+- Item 2 (visual variety prototype): researched via `mcp__21st__search` (found "Financial Score Cards," pulled its real code, but it's built on an unrelated "liquid glass" component system not present in this codebase — and this session's own earlier `ui-ux-pro-max` search had already flagged that exact style as a weaker choice) and `ui-ux-pro-max`'s chart domain (confirmed a score/gauge treatment with numeric value + tier label is the right chart type for this kind of data). Rather than import an unrelated dependency tree, reused a pattern already built and approved in this codebase — Cyber Health's `OutputShape` illustrative score/risk-breakdown card — re-themed into Services' own dark panel shell as a new `CapabilityDashboardVisual` component. Exact same illustrative numbers (78/100, Medium, same 4 categories) as the already-approved source, not invented. Built `/services/prototype-v2` (noindex) showing both treatments side by side with identical Capability 02 copy. Did not touch `live-services.tsx`'s data, `capability-spotlight.tsx`, or rows 3-8.
+- Full verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (9 routes); killed stray node processes, cleared `.next`, fresh `npm run start`; zero horizontal overflow at 390px on both `/services` and `/services/prototype-v2`; zero non-pre-existing console errors; screenshots of rows 01/02/03 and the full prototype-v2 comparison reviewed directly.
+
+**Files changed:**
+- `app/components/sections/services/live-services.tsx` (`items-center` → `items-start`)
+- New: `app/components/sections/services/capability-dashboard-visual.tsx`, `app/services/prototype-v2/page.tsx`
+- `DECISIONS.md` (D-021), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- None beyond the two reported.
+
+**Problems solved:**
+- Alignment bug traced to the specific CSS property responsible (`items-center` vs. `items-start`), not patched with per-row margins that would drift again.
+- Delivered a genuinely different, non-generic visual direction for review by reusing this project's own already-approved data-viz pattern instead of introducing a new external dependency tree or inventing new illustrative numbers.
+
+**Still open / needs verification:**
+- Mohammad's review of D-021, both parts.
+
+**Next recommended step:**
+- Await his decision on the prototype-v2 direction before touching any other row.
+
+---
 
 ### 2026-08-14 (continued) — Round 5: CTA-alignment structural fix, sidebar weight genuinely split by state (D-020)
 **Completed:**
