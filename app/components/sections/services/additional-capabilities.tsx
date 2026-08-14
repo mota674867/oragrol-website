@@ -6,6 +6,7 @@ import { CapabilitySpotlightMark } from "./capability-spotlight";
 import { CapabilityMonitorMark } from "./capability-monitor-mark";
 import { CapabilityFindingsMark } from "./capability-findings-mark";
 import { CapabilityFleetMark } from "./capability-fleet-mark";
+import { CapabilityPlaybookMark } from "./capability-playbook-mark";
 
 /**
  * Additional Capabilities (5-8) — Step 5. Same one-liners as the Home
@@ -36,8 +37,12 @@ import { CapabilityFleetMark } from "./capability-fleet-mark";
  *
  * D-028/D-029: Capability 07's mark is now `CapabilityFleetMark` (a
  * device-coverage pictogram) — approved after review at
- * `/services/prototype-v6` (now removed). Capability 08 still pending its
- * own individually-researched treatment.
+ * `/services/prototype-v6` (now removed).
+ *
+ * D-030/D-031: Capability 08's mark is now `CapabilityPlaybookMark` (a
+ * connected 4-phase response sequence) — approved after review at
+ * `/services/prototype-v7` (now removed). All 8 capabilities now have
+ * their own individually-researched visual treatment.
  */
 
 interface FinalizingService {
@@ -75,9 +80,10 @@ const FINALIZING_SERVICES: FinalizingService[] = [
 ];
 
 /** Per-capability mark selector — same pattern as LiveServices' own
- * `CapabilityVisual`. Falls back to the plain `CapabilitySpotlightMark`
- * orb for any capability that hasn't gotten its own researched treatment
- * yet (08, for now — the last of the 8). */
+ * `CapabilityVisual`. All 4 finalizing capabilities now have their own
+ * researched mark (D-024 through D-030) — the `CapabilitySpotlightMark`
+ * orb fallback below is unreachable today, kept only in case a future
+ * capability is added to this section before it gets its own treatment. */
 function CapabilityMark({ service }: { service: FinalizingService }) {
   if (service.n === "05") {
     return <CapabilityMonitorMark />;
@@ -87,6 +93,9 @@ function CapabilityMark({ service }: { service: FinalizingService }) {
   }
   if (service.n === "07") {
     return <CapabilityFleetMark />;
+  }
+  if (service.n === "08") {
+    return <CapabilityPlaybookMark />;
   }
   return <CapabilitySpotlightMark icon={service.icon} className="h-14 w-14" />;
 }

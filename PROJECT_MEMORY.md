@@ -8,7 +8,7 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Awaiting Mohammad's review of D-030: Capability 08's `/services/prototype-v7` (connected 4-phase response sequence — Detect/Contain/Recover/Review, numbered dots + spine). This is the LAST of the 8 — if approved, all 8 capabilities have their own researched treatment and Services' shell-redesign thread (D-013 onward) may be complete pending final sign-off. Ship the same way as D-023/D-025/D-027/D-029 if approved.
+1. Capability 08 (D-030) approved and shipped live (D-031) — all 8 capabilities now have individually-researched treatments (01/03 orb, 02 pending its own separate decision, 04-08 each distinct). `/services/prototype-v7` removed. Full-page 1920px screenshot sent to Mohammad for whole-page sign-off review. Only remaining open item on Services: D-021 (Capability 02's dashboard-mockup prototype) — still awaiting his decision.
 2. Capability 07 (D-028) approved and shipped live (D-029) — verified Capability 08 stays at its own 252px height post-ship. `/services/prototype-v6` removed.
 3. Capability 06 (D-026) approved and shipped live (D-027) — verified 07/08 stay at their own 252px height post-ship. `/services/prototype-v5` removed.
 4. Capability 05 (D-024) approved and shipped live (D-025), including the `items-start` grid fix — verified via DOM measurement that 06-08 stay at their own 252px height, not stretched to match 05's 450px. `/services/prototype-v4` removed.
@@ -34,6 +34,26 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-14 (continued 12) — Capability 08 shipped live, verified; all 8 capabilities now individually treated; full-page 1920px screenshot for sign-off (D-031)
+**Completed:**
+- Mohammad approved D-030's prototype. `additional-capabilities.tsx`'s `CapabilityMark` selector gained a fourth branch — Capability 08 now renders `CapabilityPlaybookMark`. Deleted `app/services/prototype-v7/`. This closes the "Capabilities 04-08 shell rethink" thread opened by Mohammad's Round 7 instruction.
+- Verified: killed stray node processes, cleared `.next`, `npm run build`/`tsc`/`lint` all clean (9 routes, `prototype-v7` confirmed 404); DOM measurement shows all 4 finalizing cards at their own distinct natural heights (05: 450px, 06: 456px, 07: 370px, 08: 424px) — no stretching, the D-025 `items-start` fix held across all 4 replacements; zero overflow at 1440/1920/390px; zero non-pre-existing console errors.
+- Captured the full-page 1920px screenshot Mohammad requested for whole-page review (fresh production server, incremental scroll to trigger all `Reveal` on-scroll animations before capture, zero overflow confirmed at 1920px specifically) and sent it to him.
+
+**Files changed:**
+- `app/components/sections/services/additional-capabilities.tsx` (Capability 08 mark swap)
+- Deleted: `app/services/prototype-v7/page.tsx`
+- `DECISIONS.md` (D-031), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Still open / needs verification:**
+- Mohammad's whole-page review of the 1920px screenshot.
+- D-021 (Capability 02's dashboard-mockup prototype) remains the only open visual-treatment decision on Services.
+
+**Next recommended step:**
+- Await his full-page sign-off or further feedback.
+
+---
 
 ### 2026-08-14 (continued 11) — Round 11: Capability 08 (Incident Response) shell prototype — LAST of the 8, self-verified (D-030)
 **Completed:**
