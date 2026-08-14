@@ -325,3 +325,12 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Build:** `/services/prototype-v6` (noindex, not linked from nav) — whole 4-card row shown twice, Capabilities 05/06 already reflecting their shipped D-025/D-027 treatments in both so only Capability 07 differs. Does not modify or import from `additional-capabilities.tsx`.
 - **Self-verified before reporting (per instruction):** `npx tsc --noEmit`, `npm run lint`, `npm run build` all clean (10 routes); fully clean rebuild (stray node processes killed, `.next` cleared, fresh `npm run start`); zero horizontal overflow on `/services/prototype-v6` at 390px; zero non-pre-existing console errors; confirmed via DOM query that live `/services` Capability 07 card is unaffected; final full-page screenshot reviewed directly — pictogram legible, no truncation, no layout defects, confirming the fix pattern established in D-026 didn't need to be reapplied here.
 - **Status:** Awaiting Mohammad's review. Capability 08 (Incident Response) remains, needing its own individually-researched treatment.
+
+---
+
+### D-029 — Capability 07 approved and shipped; /services/prototype-v6 removed
+- **Date:** 2026-08-14
+- **Context:** Mohammad reviewed D-028's `/services/prototype-v6` prototype live and approved it: "Approve Capability 07's device-grid visual as confirmed."
+- **Decision:** `additional-capabilities.tsx`'s `CapabilityMark` selector gained a third branch — Capability 07 now renders `CapabilityFleetMark`. 08 still falls through to the default orb. `/services/prototype-v6` deleted, same lifecycle as every prior prototype route.
+- **Verified:** `npx tsc --noEmit`, `npm run lint`, `npm run build` all clean (9 routes, `/services/prototype-v6` confirmed 404); fully clean rebuild (stray node processes killed, `.next` cleared, fresh `npm run start`); DOM measurement of all 4 finalizing cards confirms Capability 08 stays at 252px (unaffected) while 05/06/07 are 450/456/370px respectively — the shared `items-start` grid fix (D-025) continues to hold; zero horizontal overflow at 1440/390px; zero non-pre-existing console errors; screenshot of the live grid reviewed directly.
+- **Status:** Active. Capability 08 (Incident Response) is the last of the 8 — see [[D-030]].

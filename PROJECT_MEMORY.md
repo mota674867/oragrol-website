@@ -8,7 +8,7 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Awaiting Mohammad's review of D-028: Capability 07's `/services/prototype-v6` (device-coverage pictogram — grid of device icons, "9/10 protected"). Self-verified against screenshots before reporting (per instruction) — no truncation, no layout defects, no shared-height risk (pictogram isn't taller than the orb it replaces). If approved, ship + confirm live `/services` unaffected before/after, same discipline as D-023/D-025/D-027. Capability 08 (Incident Response) is the LAST of the 8 — still needs its own individually-researched treatment, not a reuse of any prior formula.
+1. Capability 07 (D-028) approved and shipped live (D-029) — verified Capability 08 stays at its own 252px height post-ship. `/services/prototype-v6` removed. Capability 08 (Incident Response) research/prototype in progress, the LAST of the 8 — see next session-log entry. Needs a genuinely distinct mechanic, not reused from any of 02/04/05/06/07.
 2. Capability 06 (D-026) approved and shipped live (D-027) — verified 07/08 stay at their own 252px height post-ship. `/services/prototype-v5` removed.
 3. Capability 05 (D-024) approved and shipped live (D-025), including the `items-start` grid fix — verified via DOM measurement that 06-08 stay at their own 252px height, not stretched to match 05's 450px. `/services/prototype-v4` removed.
 4. Capability 04 (D-022) approved and shipped live (D-023) — `/services/prototype-v3` removed.
@@ -32,6 +32,21 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-14 (continued 10) — Capability 07 shipped live, verified (D-029)
+**Completed:**
+- Mohammad approved D-028's prototype. `additional-capabilities.tsx`'s `CapabilityMark` selector gained a third branch — Capability 07 now renders `CapabilityFleetMark`. Deleted `app/services/prototype-v6/`.
+- Verified: killed stray node processes, cleared `.next`, `npm run build`/`tsc`/`lint` all clean (9 routes, `prototype-v6` confirmed 404); DOM measurement of all 4 finalizing cards confirms Capability 08 stays at 252px (unaffected) while 05/06/07 are 450/456/370px; zero overflow at 1440/390px; zero non-pre-existing console errors; screenshot reviewed directly.
+
+**Files changed:**
+- `app/components/sections/services/additional-capabilities.tsx` (Capability 07 mark swap)
+- Deleted: `app/services/prototype-v6/page.tsx`
+- `DECISIONS.md` (D-029), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Next recommended step:**
+- Research and prototype Capability 08 (Incident Response) next — the LAST of the 8, same process.
+
+---
 
 ### 2026-08-14 (continued 9) — Round 10: Capability 07 (Endpoint Protection/EDR) shell prototype, self-verified before reporting (D-028)
 **Completed:**

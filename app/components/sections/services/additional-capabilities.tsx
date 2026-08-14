@@ -5,6 +5,7 @@ import { Reveal } from "../../motion/reveal";
 import { CapabilitySpotlightMark } from "./capability-spotlight";
 import { CapabilityMonitorMark } from "./capability-monitor-mark";
 import { CapabilityFindingsMark } from "./capability-findings-mark";
+import { CapabilityFleetMark } from "./capability-fleet-mark";
 
 /**
  * Additional Capabilities (5-8) — Step 5. Same one-liners as the Home
@@ -29,10 +30,14 @@ import { CapabilityFindingsMark } from "./capability-findings-mark";
  * capability in this grid, not just 05 — no further grid change needed
  * as more marks are replaced.
  *
- * D-026: Capability 06's mark is now `CapabilityFindingsMark` (a ranked,
- * severity-tagged example-findings treatment) — approved after review at
- * `/services/prototype-v5` (now removed). 07-08 still pending their own
- * individually-researched treatments.
+ * D-026/D-027: Capability 06's mark is now `CapabilityFindingsMark` (a
+ * ranked, severity-tagged example-findings treatment) — approved after
+ * review at `/services/prototype-v5` (now removed).
+ *
+ * D-028/D-029: Capability 07's mark is now `CapabilityFleetMark` (a
+ * device-coverage pictogram) — approved after review at
+ * `/services/prototype-v6` (now removed). Capability 08 still pending its
+ * own individually-researched treatment.
  */
 
 interface FinalizingService {
@@ -72,13 +77,16 @@ const FINALIZING_SERVICES: FinalizingService[] = [
 /** Per-capability mark selector — same pattern as LiveServices' own
  * `CapabilityVisual`. Falls back to the plain `CapabilitySpotlightMark`
  * orb for any capability that hasn't gotten its own researched treatment
- * yet (07/08, for now). */
+ * yet (08, for now — the last of the 8). */
 function CapabilityMark({ service }: { service: FinalizingService }) {
   if (service.n === "05") {
     return <CapabilityMonitorMark />;
   }
   if (service.n === "06") {
     return <CapabilityFindingsMark />;
+  }
+  if (service.n === "07") {
+    return <CapabilityFleetMark />;
   }
   return <CapabilitySpotlightMark icon={service.icon} className="h-14 w-14" />;
 }
