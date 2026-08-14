@@ -1,52 +1,31 @@
 import type { Metadata } from "next";
-import { ButtonLink, Caption, Section } from "../components/ui";
-import { HowWeWorkCycleVisual } from "../components/sections/how-we-work/cycle-visual";
+import { HowWeWorkHero } from "../components/sections/how-we-work/hero";
+import { StageSequence } from "../components/sections/how-we-work/stage-sequence";
+import { HowWeWorkClosingCta } from "../components/sections/how-we-work/closing-cta";
 
-// noindex while this is a visual-only prototype — same convention as
-// every Services prototype route this project has used, though this one
-// sits at the page's real eventual URL (Step 8 has no separate "current
-// live" version to prototype next to, unlike Services' capability
-// rounds) — see the file-level comment below for why.
+// Full page copy supplied and built — no longer a visual-only prototype
+// (see DECISIONS.md D-035 for the hero-visual round, D-036 for this one)
+// — noindex removed, matching every other built page (Home/Services/
+// Solutions/Cyber Health carry no robots restriction).
 export const metadata: Metadata = {
   title: "How We Work | Oragrol Global",
-  robots: { index: false, follow: false },
+  description:
+    "Security work fails when it stays vague. Here is exactly how we work with you, stage by stage, from the first conversation onward.",
 };
 
 /**
- * /how-we-work — Step 8, VISUAL PROTOTYPE ONLY, per Mohammad's explicit
- * instruction: "Prototype the visual at /how-we-work before touching any
- * live route." Deliberately minimal beyond the primary hero visual —
- * the instruction's own copy block did not come through (the message
- * contained the literal placeholder "[PASTE THE FULL COPY ABOVE HERE]",
- * not real text), and the project's own content-governance rule is
- * explicit: never invent claims/copy. Rather than guess a headline, body
- * copy, or page structure, this route currently contains ONLY:
- *  - the "How We Work" page label (the confirmed sitemap name, not new
- *    copy)
- *  - `HowWeWorkCycleVisual`, the requested primary hero visual — see
- *    that file's own reasoning-trail comment
- *  - the CTA button, exactly as instructed ("Talk to Oragrol", to stay
- *    consistent with Services), pointed at /contact per the same
- *    label/href pairing used everywhere else on the site
- *
- * Not yet built: headline, body copy, page structure beyond the hero
- * visual, and any section following it — all pending the actual copy
- * block. `noindex`'d until real content lands and this is reviewed.
+ * How We Work — Step 8. All copy LOCKED verbatim, supplied by Mohammad
+ * — see each section component's own comment for exact sourcing. Flow:
+ * Hero (headline/subhead + the connected-loop visual, D-035) -> Stage
+ * Sequence (Understand/Prioritize/Protect/Improve, full paragraph copy
+ * each) -> Closing CTA (single "Talk to Oragrol" button).
  */
 export default function HowWeWorkPage() {
   return (
-    <Section environment="white">
-      <div className="mx-auto w-full max-w-4xl px-6 py-24 text-center md:px-12 md:py-32">
-        <Caption tone="accent">How We Work</Caption>
-
-        <div className="mt-10">
-          <HowWeWorkCycleVisual />
-        </div>
-
-        <ButtonLink href="/contact" variant="primary" size="lg" className="mt-10">
-          Talk to Oragrol
-        </ButtonLink>
-      </div>
-    </Section>
+    <>
+      <HowWeWorkHero />
+      <StageSequence />
+      <HowWeWorkClosingCta />
+    </>
   );
 }

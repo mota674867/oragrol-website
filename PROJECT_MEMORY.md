@@ -9,10 +9,10 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **SERVICES SIGNED OFF, COMPLETE (D-034, 2026-08-14).** The full multi-round visual-redesign thread (D-011 through D-034) is closed — Mohammad reviewed the final `/services` full-page screenshot and confirmed approval. Per the page-by-page rollout rule (D-009), this unblocked the next page: **Step 8 — How We Work**.
 
-**STEP 8 STARTED, BLOCKED ON COPY (D-035, 2026-08-14).** The requested primary hero visual (`HowWeWorkCycleVisual`, a closed directional loop) is built and self-verified at `/how-we-work` (noindex). The instruction's page-copy block never actually arrived — the message contained the literal placeholder `[PASTE THE FULL COPY ABOVE HERE]`. Flagged directly, nothing invented. Waiting on the real copy before building the rest of the page.
+**STEP 8 CONTENT-COMPLETE (D-035/D-036, 2026-08-14).** Hero visual (`HowWeWorkCycleVisual`) researched and built first (D-035, after the supplied copy block turned out to be a literal placeholder, not real text — flagged, nothing invented). Mohammad then supplied the real copy; full page built around the existing visual (D-036) — Hero, 4-stage Sequence, Closing CTA — verified byte-for-byte against the supplied text. `/how-we-work` is live, `noindex` removed. Awaiting Mohammad's review.
 
 ## Next Steps
-1. **BLOCKING: Step 8 (How We Work) needs its real copy block.** Mohammad's build instruction was meant to include the full page copy but the message contained the literal placeholder text `[PASTE THE FULL COPY ABOVE HERE]` instead. The primary hero visual (`HowWeWorkCycleVisual`) is already built and self-verified at `/how-we-work` (noindex) using only already-locked stage one-liners — do NOT build headline/body/page structure until the actual copy arrives; do not invent it either.
+1. Awaiting Mohammad's review of Step 8 (How We Work) — full page built and content-complete (D-036), byte-for-byte copy-verified. One judgment call flagged, not silently resolved: the hero visual's own short stage one-liners now sit directly above the Stage Sequence's full-paragraph versions of the same 4 stages — some content echo. Left as-is per "build around the hero visual already built," flagged for his read on whether it's intentional reinforcement or redundant.
 2. **SERVICES SIGNED OFF (D-034, 2026-08-14):** Mohammad confirmed "Services is approved and complete." No further Services visual/structural work without a new explicit instruction. The D-015 "item 5" capability-regrouping question remains separately held, not reopened by this sign-off. Two explicit flags carried forward from D-017, still open: Instagram has no real URL (`href="#"` placeholder); the emergency-CTA phone number is a TEMPORARY placeholder pending a real Canadian line before public launch.
 3. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating. `ui-ux-pro-max` skill is installed (Python 3.12 dependency) and usable the same way.
 4. Known Tailwind v4 gotcha worth remembering: arbitrary-value utilities with `color-mix()` (or similar multi-comma CSS functions) nested inside bracket syntax can silently generate no CSS at all. Prefer Tailwind's built-in `{utility}-{registered-color}/{opacity}` mechanic over hand-rolled arbitrary values when a registered theme color is involved. Also: Tailwind v4 uses standalone `translate`/`scale`/`rotate` CSS properties, not the composed `transform` — don't debug hover/motion utilities by checking `getComputedStyle(el).transform`.
@@ -24,6 +24,31 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-14 (continued 17) — Step 8 (How We Work) content-complete: full page built from supplied copy, byte-for-byte verified (D-036)
+**Completed:**
+- Mohammad supplied the real page copy (hero headline/subhead, 4 full stage paragraphs, closing band). Built the full page around the already-approved-pending hero visual: `HowWeWorkHero` (headline/subhead + the D-035 visual, White environment — kept deliberately, since the visual is a nested dark panel that needs a lighter surrounding environment to read as elevated, explained in the component's own comment), `StageSequence` (4 full-paragraph stages, a page-level scale-up of `home/how-we-work.tsx`'s own vertical spine+circle teaser pattern — the same "reuse the technique, scale it up" move Cyber Health's `Flow` already made from `Approach.tsx`), `HowWeWorkClosingCta` (page-specific, single button, same ring/dark visual family as `FinalCta`/Cyber Health's `ClosingCta` but its own component since the given copy doesn't match either).
+- Verified copy fidelity with actual evidence, not a glance: wrote a Playwright script asserting byte-for-byte string equality between the supplied text and the rendered DOM for all 12 content pieces (headline, subhead, 4 stage titles, 4 stage paragraphs, closing headline, closing button). All 12 passed exactly.
+- Caught and correctly diagnosed a screenshot false alarm: the first mobile full-page screenshot appeared to show the Stage Sequence section completely blank. Investigated via computed-style query before concluding anything — confirmed `opacity: 1`, correct position, fully visible; root cause was the screenshot script's 400ms per-scroll wait being too short for the section's staggered `Reveal` animations, the same category of false alarm this project's own history already has a precedent for (Cyber Health's `Flow`). Re-captured with a longer wait and confirmed all 4 stages render correctly.
+- Flagged one judgment call rather than silently resolving it: the hero visual's own short stage one-liners now sit directly above the Stage Sequence's full-paragraph versions of the same 4 stages. Left unchanged (wasn't asked to revise the hero visual), flagged for Mohammad's read on whether the repetition is intentional or redundant.
+- Full verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (9 routes); fresh clean rebuild; zero overflow at 1440/390px; `noindex` removed now that real content exists.
+
+**Files changed:**
+- New: `app/components/sections/how-we-work/hero.tsx`, `stage-sequence.tsx`, `closing-cta.tsx`
+- `app/how-we-work/page.tsx` (rebuilt to compose the 3 new sections, `noindex` removed)
+- `DECISIONS.md` (D-036), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The mobile screenshot false alarm — caught and correctly diagnosed within this same round, not left for Mohammad to discover.
+
+**Still open / needs verification:**
+- Mohammad's review of the finished page.
+- His read on the hero-visual/Stage-Sequence content echo, flagged above.
+
+**Next recommended step:**
+- Await review. If approved, ask whether to continue to Step 9 (Industries) or handle further How We Work feedback first.
+
+---
 
 ### 2026-08-14 (continued 16) — Step 8 (How We Work) started: hero visual built and self-verified; page copy flagged as missing, not invented (D-035)
 **Completed:**
