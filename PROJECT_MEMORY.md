@@ -12,8 +12,9 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 **STEP 8 CONTENT-COMPLETE, CONNECTOR BUG FIXED (D-035/D-036/D-037, 2026-08-14).** Hero visual researched and built (D-035). Full page copy supplied and built (D-036), byte-for-byte verified. Connector-line bug reported and fixed (D-037) — investigated the cited reference component first and found it has the identical bug (flagged, not silently copied or silently ignored); real fix uses CSS Grid to structurally guarantee the circle sits on the spine. `/how-we-work` is live, `noindex` removed. Awaiting Mohammad's review.
 
 ## Next Steps
-1. Solutions' Kinetic Grid hero (D-039) approved and shipped live (D-040) — all 5 required modifications re-verified against the live page (canvas scoping, background pixel, reduced-motion staticness), not assumed to still hold from the prototype. `/solutions/prototype` removed. `StrataVisual`'s file kept unused, available for revert.
-2. Next unbuilt page in the Build Sequence: **Step 9 — Industries**, confirmed with Mohammad. Needs a full per-industry content brief (risk/priorities/approach/next-step for each of the 9 named industries) before real copy can be built — same "ask before inventing" discipline as How We Work.
+1. **BLOCKING/NEEDS INPUT: Cyber Health processing-screen loader (D-041).** Built and verified at `/cyber-health/prototype-loader`, all 5 required fixes confirmed. NOT wired into the live page — two real findings surfaced first: (a) no "Processing Screen" spec section exists anywhere in this repo's docs; (b) this codebase has no in-app processing pipeline at all — the real Assessment/Score/AI-Analysis/CRM pipeline runs entirely on the external Tally MVP (Step 7's own established architecture). Need Mohammad's answer on whether/where this should attach to the live page before proceeding — do not wire it in based on an assumption.
+2. Solutions' Kinetic Grid hero (D-039) approved and shipped live (D-040) — all 5 required modifications re-verified against the live page (canvas scoping, background pixel, reduced-motion staticness), not assumed to still hold from the prototype. `/solutions/prototype` removed. `StrataVisual`'s file kept unused, available for revert.
+3. Next unbuilt page in the Build Sequence: **Step 9 — Industries**, confirmed with Mohammad. Needs a full per-industry content brief (risk/priorities/approach/next-step for each of the 9 named industries) before real copy can be built — same "ask before inventing" discipline as How We Work.
 2. Awaiting Mohammad's review of Step 8 (How We Work) — full page built, content-complete, connector-line bug fixed (D-037), and the same bug fixed on Home's own teaser too (D-038, confirmed). One thing still flagged, not silently resolved: the hero visual's own short stage one-liners sit directly above the Stage Sequence's full-paragraph versions of the same 4 stages — some content echo, left as-is per "build around the hero visual already built."
 2. **SERVICES SIGNED OFF (D-034, 2026-08-14):** Mohammad confirmed "Services is approved and complete." No further Services visual/structural work without a new explicit instruction. The D-015 "item 5" capability-regrouping question remains separately held, not reopened by this sign-off. Two explicit flags carried forward from D-017, still open: Instagram has no real URL (`href="#"` placeholder); the emergency-CTA phone number is a TEMPORARY placeholder pending a real Canadian line before public launch.
 3. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating. `ui-ux-pro-max` skill is installed (Python 3.12 dependency) and usable the same way.
@@ -26,6 +27,30 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-14 (continued 22) — Cyber Health processing-screen loader prototyped natively; two premise checks surfaced (D-041)
+**Completed:**
+- Mohammad requested an "ai-loader" processing animation for Cyber Health, framed as filling an already-documented "Processing Screen" spec gap, with a source code block that came through empty. Searched `21st.dev` first (same recovery approach that worked for Kinetic Grid) — no confident match this time; the described bugs (raw `class` attributes, missing base CSS, a specific purple/pink palette, dead `useState`) read as a non-21st.dev HTML/CSS snippet this project has no search access to. Built a native implementation of the described EFFECT instead — flagged explicitly as such, not presented as literally sourced code.
+- Checked the instruction's stated premise before building further, per this project's own discipline: grepped all project docs for "Processing Screen" and the 5 named steps — zero hits, no such spec section exists in this repo. More significantly, confirmed via `PROJECT_MASTER.md` Step 7 (an existing, already-documented architectural decision) that this codebase has NO in-app processing pipeline at all — the real Assessment/Score/AI-Analysis/CRM flow runs entirely on the external, already-live Tally MVP. Displaying a fake "Calculate Score → ... → Update HubSpot" progress animation as if this app performs those steps would misrepresent the product — a real Honesty Rule concern surfaced and reported, not silently built around.
+- Proceeded with the requested prototype anyway (the instruction itself already scoped "wiring into live" as a separate, later step) — built `AiLoader`: a rotating conic-gradient ring with a layered inset-shadow core (reusing the `color-mix()`-via-inline-style technique already established for `capability-spotlight.tsx`'s icon badge), letter-by-letter fade-up text cycling through the exact 5 given step names, and `usePrefersReducedMotion`-gated fallback (plain static label, no ring at all, when reduced motion is on).
+- Verified all 5 required fixes with direct evidence: each of the 5 step states individually screenshotted and confirmed via exact DOM text match (not timing alone); reduced-motion state confirmed to contain zero ring/animation elements via a precisely-scoped query (an initial broader check gave a false positive from an unrelated `aria-hidden` element elsewhere on the page — caught and corrected before concluding anything); confirmed text still advances through all 5 steps under reduced motion (only the visual animation is gated, not the underlying progress info); confirmed live `/cyber-health` has zero loader-related content — nothing wired in.
+- Full verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (10 routes); fresh clean rebuild; zero overflow.
+
+**Files changed:**
+- New: `app/components/sections/cyber-health/ai-loader.tsx`, `app/cyber-health/prototype-loader/page.tsx`
+- `app/globals.css` (one new `@keyframes` for the letter-fade effect — first custom keyframe in the file)
+- `DECISIONS.md` (D-041), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- Missing source code (resolved via native rebuild, flagged).
+- The "Processing Screen" spec claim doesn't match this repo's record.
+- A real architectural mismatch: this codebase has no in-app pipeline for a processing screen to represent honestly.
+- A false-positive in my own first verification check (too-broad selector) — caught and corrected within the same round.
+
+**Still open — needs Mohammad's input, not resolved unilaterally:**
+- Whether/where this loader should attach to the live Cyber Health page, given it has no real in-app process to represent.
+
+---
 
 ### 2026-08-14 (continued 21) — Kinetic Grid shipped to live Solutions hero, re-verified; /solutions/prototype removed (D-040)
 **Completed:**

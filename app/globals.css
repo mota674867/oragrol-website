@@ -6,3 +6,18 @@ body {
   color: var(--color-text-primary);
   font-family: var(--font-body);
 }
+
+/* AiLoader (Cyber Health processing screen prototype) — per-letter fade-up,
+   referenced via Tailwind's arbitrary animate-[...] syntax. First custom
+   keyframe in this file; everything else so far has used Tailwind's
+   built-in animate-spin/animate-ping. */
+@keyframes ai-loader-letter-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
