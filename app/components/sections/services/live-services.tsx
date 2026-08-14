@@ -132,16 +132,19 @@ const NAV_ITEMS: CategoryNavItem[] = [
  * Health's already-approved illustrative example) at
  * `/services/prototype-v2` and approved after review (now removed).
  *
- * Row 03 is unaffected by either decision — still
- * `CapabilitySpotlightVisual`. No project record (`DECISIONS.md`,
- * `PROJECT_MEMORY.md`) shows Capability 03 ever being included in the
- * D-021 prototype or approval; D-021's own scope was explicitly "ONE new
- * treatment for Capability 02," not 02+03. Flagged to Mohammad rather
- * than silently extended or silently left as-is — see the chat response
- * for this round.
+ * D-033: no project record showed Capability 03 ever being included in
+ * D-021's original prototype/approval (that was explicitly scoped to
+ * "ONE new treatment for Capability 02" only) — flagged to Mohammad
+ * rather than silently extended or silently left as-is. He confirmed:
+ * extend it to 03 as a new decision. `CapabilityDashboardVisual` doesn't
+ * take per-capability content props (its illustrative score/category
+ * copy is hardcoded, shared with Capability 02) — reused as-is rather
+ * than forked into a near-duplicate component, since both rows are
+ * risk/vulnerability-assessment-shaped content and the brief was to
+ * extend the SAME treatment, not build a variant.
  */
 function CapabilityVisual({ service }: { service: LiveService }) {
-  if (service.n === "02") {
+  if (service.n === "02" || service.n === "03") {
     return <CapabilityDashboardVisual />;
   }
   if (service.n === "04") {

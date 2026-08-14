@@ -8,7 +8,7 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. BLOCKING: Capability 02 shipped (D-032), but Mohammad's same message claimed Capability 03 "was approved as an extension of 02 earlier" — checked directly, found no such record anywhere in DECISIONS.md/PROJECT_MEMORY.md (D-021 was explicitly scoped to Capability 02 only), and confirmed via DOM/screenshot that Capability 03 still renders the original orb. Flagged this to Mohammad rather than guessing which way to resolve it. Do NOT generate the "final all 8 distinct" full-page screenshot he requested until he answers — his premise assumed 03 already matches 02, which isn't true, so the screenshot would either misrepresent the page or require guessing his intent.
+1. Services' visual-treatment work is COMPLETE — Mohammad confirmed extending the dashboard treatment to Capability 03 (D-033) after the flagged discrepancy was raised. Ground-truth-verified all 8 rows individually on a fresh server: 01→orb, 02→score card, 03→score card, 04→ring, 05→feed, 06→findings, 07→fleet, 08→playbook — no overlaps, zero overflow/console errors. Final 1920px screenshot sent for sign-off. Awaiting Mohammad's actual sign-off response — do not assume approval from silence.
 2. Capability 07 (D-028) approved and shipped live (D-029) — verified Capability 08 stays at its own 252px height post-ship. `/services/prototype-v6` removed.
 3. Capability 06 (D-026) approved and shipped live (D-027) — verified 07/08 stay at their own 252px height post-ship. `/services/prototype-v5` removed.
 4. Capability 05 (D-024) approved and shipped live (D-025), including the `items-start` grid fix — verified via DOM measurement that 06-08 stay at their own 252px height, not stretched to match 05's 450px. `/services/prototype-v4` removed.
@@ -34,6 +34,28 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-14 (continued 14) — Capability 03 extended per Mohammad's confirmation; all 8 capabilities ground-truth-verified; final 1920px sign-off screenshot sent (D-033)
+**Completed:**
+- Asked Mohammad directly (AskUserQuestion) rather than guessing how to resolve the D-032 discrepancy. He chose: extend the dashboard treatment to Capability 03 now, as a new decision.
+- `live-services.tsx`'s `CapabilityVisual` selector now matches both `n === "02"` and `n === "03"` for `CapabilityDashboardVisual`. Component takes no per-capability props (shared illustrative content) — reused as-is, not forked.
+- Full verification: killed stray node processes, cleared `.next`, `npm run build`/`tsc`/`lint` all clean (8 routes, no prototype routes remain anywhere); Playwright DOM/text-content check on all 8 rows individually confirms exactly one treatment each, no overlaps, no gaps: 01→orb only, 02→score card, 03→score card, 04→ring, 05→feed, 06→findings, 07→fleet, 08→playbook; zero overflow at 1440/1920/390px; zero non-pre-existing console errors.
+- Captured and sent the final full-page 1920px screenshot Mohammad requested, now that Capability 03's state is actually resolved and verified rather than assumed.
+
+**Files changed:**
+- `app/components/sections/services/live-services.tsx` (Capability 03 mark extension)
+- `DECISIONS.md` (D-033), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems solved:**
+- Resolved the D-032 discrepancy correctly — asked rather than guessed, then verified the actual result rather than trusting the instruction alone.
+
+**Still open / needs verification:**
+- Mohammad's actual sign-off on the final screenshot — not to be assumed from silence.
+
+**Next recommended step:**
+- Await his review. If approved, Services' visual-treatment work is done; ask what's next (another page's visual system, or further Services feedback).
+
+---
 
 ### 2026-08-14 (continued 13) — Capability 02 shipped, verified; Capability 03 factual discrepancy found and flagged, not resolved either way (D-032)
 **Completed:**
