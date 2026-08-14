@@ -9,10 +9,10 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **SERVICES SIGNED OFF, COMPLETE (D-034, 2026-08-14).** The full multi-round visual-redesign thread (D-011 through D-034) is closed — Mohammad reviewed the final `/services` full-page screenshot and confirmed approval. Per the page-by-page rollout rule (D-009), this unblocked the next page: **Step 8 — How We Work**.
 
-**STEP 8 CONTENT-COMPLETE (D-035/D-036, 2026-08-14).** Hero visual (`HowWeWorkCycleVisual`) researched and built first (D-035, after the supplied copy block turned out to be a literal placeholder, not real text — flagged, nothing invented). Mohammad then supplied the real copy; full page built around the existing visual (D-036) — Hero, 4-stage Sequence, Closing CTA — verified byte-for-byte against the supplied text. `/how-we-work` is live, `noindex` removed. Awaiting Mohammad's review.
+**STEP 8 CONTENT-COMPLETE, CONNECTOR BUG FIXED (D-035/D-036/D-037, 2026-08-14).** Hero visual researched and built (D-035). Full page copy supplied and built (D-036), byte-for-byte verified. Connector-line bug reported and fixed (D-037) — investigated the cited reference component first and found it has the identical bug (flagged, not silently copied or silently ignored); real fix uses CSS Grid to structurally guarantee the circle sits on the spine. `/how-we-work` is live, `noindex` removed. Awaiting Mohammad's review.
 
 ## Next Steps
-1. Awaiting Mohammad's review of Step 8 (How We Work) — full page built and content-complete (D-036), byte-for-byte copy-verified. One judgment call flagged, not silently resolved: the hero visual's own short stage one-liners now sit directly above the Stage Sequence's full-paragraph versions of the same 4 stages — some content echo. Left as-is per "build around the hero visual already built," flagged for his read on whether it's intentional reinforcement or redundant.
+1. Awaiting Mohammad's review of Step 8 (How We Work) — full page built, content-complete, connector-line bug fixed (D-037). Two things flagged, not silently resolved: (a) the hero visual's own short stage one-liners sit directly above the Stage Sequence's full-paragraph versions of the same 4 stages — some content echo, left as-is per "build around the hero visual already built"; (b) `home/how-we-work.tsx` (the Home page teaser) has the SAME connector-line bug this round fixed here — confirmed via direct measurement, not touched since it's a different page/out of scope for this instruction, but worth a decision on whether to fix it too.
 2. **SERVICES SIGNED OFF (D-034, 2026-08-14):** Mohammad confirmed "Services is approved and complete." No further Services visual/structural work without a new explicit instruction. The D-015 "item 5" capability-regrouping question remains separately held, not reopened by this sign-off. Two explicit flags carried forward from D-017, still open: Instagram has no real URL (`href="#"` placeholder); the emergency-CTA phone number is a TEMPORARY placeholder pending a real Canadian line before public launch.
 3. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating. `ui-ux-pro-max` skill is installed (Python 3.12 dependency) and usable the same way.
 4. Known Tailwind v4 gotcha worth remembering: arbitrary-value utilities with `color-mix()` (or similar multi-comma CSS functions) nested inside bracket syntax can silently generate no CSS at all. Prefer Tailwind's built-in `{utility}-{registered-color}/{opacity}` mechanic over hand-rolled arbitrary values when a registered theme color is involved. Also: Tailwind v4 uses standalone `translate`/`scale`/`rotate` CSS properties, not the composed `transform` — don't debug hover/motion utilities by checking `getComputedStyle(el).transform`.
@@ -24,6 +24,29 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-14 (continued 18) — Stage Sequence connector-line bug fixed; cited reference component found to have the identical bug (D-037)
+**Completed:**
+- Mohammad reported the connector line doesn't pass through the alternating stage circles, and named `home/how-we-work.tsx`'s own teaser as a working reference to check against. Investigated the reference directly before assuming it was correct — measured its actual live circle and spine positions (not read from source alone): circles at x=340/1100, spine at x=720, at 1440px. The reference has the exact same disconnect, confirmed via both DOM measurement and a direct screenshot of that section. Reported this rather than either silently copying a broken pattern or silently staying quiet about the reference also being wrong.
+- Root cause identified in both components: a fixed-position spine (`left-1/2 -translate-x-1/2`) combined with `flex-row-reverse` alternation, which packs each row's circle+content toward that row's own flex-start edge (alternating left/right) — never toward the actual center where the spine sits.
+- Real fix, not a reference-matching patch: restructured the `sm:`+ layout as CSS Grid with the circle always explicitly in the center column (`sm:col-start-2`, the same column the spine targets) — guaranteed by construction, not incidental row width. Content alternates into the left or right column depending on stage, text-aligned toward the spine. Mobile (already correct, single left-aligned column) untouched.
+- Verified the specific requirement (screenshots at 1920px and 390px showing the line passing through each circle) with actual measurement, not just a screenshot glance: at 1920px, all 4 circles' center-x exactly matches the spine's center-x (0px delta). At 390px, 1px delta (sub-pixel rounding). Screenshots at both widths confirm this visually.
+- Full verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (9 routes); fresh clean rebuild; zero overflow at 1920/390px.
+- Flagged, not actioned: `home/how-we-work.tsx` still has the same bug — out of scope for this instruction (different page), left for Mohammad's decision.
+
+**Files changed:**
+- `app/components/sections/how-we-work/stage-sequence.tsx` (Grid-based circle-centering fix)
+- `DECISIONS.md` (D-037), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The reported bug (real, confirmed).
+- The cited reference component has the identical bug — a real finding surfaced during investigation, not something Mohammad had asked to be checked, reported anyway per this project's own "don't stay quiet about it" discipline.
+
+**Still open:**
+- Mohammad's review of the fix.
+- Whether to also fix `home/how-we-work.tsx`'s matching bug.
+
+---
 
 ### 2026-08-14 (continued 17) — Step 8 (How We Work) content-complete: full page built from supplied copy, byte-for-byte verified (D-036)
 **Completed:**
