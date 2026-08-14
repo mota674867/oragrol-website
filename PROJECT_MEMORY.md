@@ -12,7 +12,8 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 **STEP 8 CONTENT-COMPLETE, CONNECTOR BUG FIXED (D-035/D-036/D-037, 2026-08-14).** Hero visual researched and built (D-035). Full page copy supplied and built (D-036), byte-for-byte verified. Connector-line bug reported and fixed (D-037) — investigated the cited reference component first and found it has the identical bug (flagged, not silently copied or silently ignored); real fix uses CSS Grid to structurally guarantee the circle sits on the spine. `/how-we-work` is live, `noindex` removed. Awaiting Mohammad's review.
 
 ## Next Steps
-1. Awaiting Mohammad's review of the Solutions Kinetic Grid prototype (D-039, `/solutions/prototype`) — all 5 required modifications built and verified with direct evidence (canvas scoping measured, background pixel sampled exactly `#0a0a0a`, reduced-motion frame proven static via byte-identical pixel sampling, FPS measured 60fps/1920px and 56fps/390px-4x-throttle). Live `/solutions` untouched (confirmed via DOM query, no `<canvas>` present). If approved: ship, remove `/solutions/prototype`, same discipline as every Services round.
+1. Solutions' Kinetic Grid hero (D-039) approved and shipped live (D-040) — all 5 required modifications re-verified against the live page (canvas scoping, background pixel, reduced-motion staticness), not assumed to still hold from the prototype. `/solutions/prototype` removed. `StrataVisual`'s file kept unused, available for revert.
+2. Next unbuilt page in the Build Sequence: **Step 9 — Industries**, confirmed with Mohammad. Needs a full per-industry content brief (risk/priorities/approach/next-step for each of the 9 named industries) before real copy can be built — same "ask before inventing" discipline as How We Work.
 2. Awaiting Mohammad's review of Step 8 (How We Work) — full page built, content-complete, connector-line bug fixed (D-037), and the same bug fixed on Home's own teaser too (D-038, confirmed). One thing still flagged, not silently resolved: the hero visual's own short stage one-liners sit directly above the Stage Sequence's full-paragraph versions of the same 4 stages — some content echo, left as-is per "build around the hero visual already built."
 2. **SERVICES SIGNED OFF (D-034, 2026-08-14):** Mohammad confirmed "Services is approved and complete." No further Services visual/structural work without a new explicit instruction. The D-015 "item 5" capability-regrouping question remains separately held, not reopened by this sign-off. Two explicit flags carried forward from D-017, still open: Instagram has no real URL (`href="#"` placeholder); the emergency-CTA phone number is a TEMPORARY placeholder pending a real Canadian line before public launch.
 3. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating. `ui-ux-pro-max` skill is installed (Python 3.12 dependency) and usable the same way.
@@ -25,6 +26,26 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-14 (continued 21) — Kinetic Grid shipped to live Solutions hero, re-verified; /solutions/prototype removed (D-040)
+**Completed:**
+- Mohammad approved D-039's prototype: "Approve the Kinetic Grid hero for Solutions. Ship it... Update DECISIONS.md to log this as an intentional replacement of D-008's original hero." Applied the exact same change from the prototype to the live `hero.tsx` — `KineticGrid` replacing `StrataVisual`, copy unchanged. Deleted `app/solutions/prototype/` and the prototype-only `hero-kinetic-prototype.tsx` component.
+- Re-ran the full verification suite against the LIVE page, not assumed to still hold from the prototype: fresh clean rebuild, `tsc`/`lint`/`build` clean (9 routes, `prototype` confirmed 404); canvas scoping re-measured (1920×520px on a 2530px page); background pixel re-sampled (exactly `rgb(10,10,10)`); reduced-motion frame re-sampled twice 600ms apart (byte-identical, confirms no animation); zero overflow at 1920/390px; confirmed via DOM query the hero section has a `<canvas>` and no `<svg>` (no `StrataVisual` remnant); full-page screenshot reviewed directly.
+- Logged D-040 per Mohammad's explicit instruction, framed as an intentional replacement of D-008's decision, not a defect fix — D-008 itself stays in the record unchanged as history.
+
+**Files changed:**
+- `app/components/sections/solutions/hero.tsx` (live: `KineticGrid` replaces `StrataVisual`)
+- Deleted: `app/solutions/prototype/page.tsx`, `app/components/sections/solutions/hero-kinetic-prototype.tsx`
+- `DECISIONS.md` (D-040), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Still open, unrelated to this change:**
+- `StrataVisual`'s file remains unused in the codebase, kept for a possible revert.
+- SiteHeader's dark-environment-on-entry assumption — long-standing, not newly introduced.
+
+**Next recommended step:**
+- Confirmed with Mohammad: next unbuilt page is Step 9 (Industries) — needs its own per-industry content brief before building, not started yet.
+
+---
 
 ### 2026-08-14 (continued 20) — Solutions hero reopened: Kinetic Grid prototype, all 5 required modifications verified with direct evidence (D-039)
 **Completed:**
