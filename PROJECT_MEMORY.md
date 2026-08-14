@@ -8,22 +8,50 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Awaiting Mohammad's review of D-021: the row top-alignment fix (verified across rows 01/02/03), and his decision on the new `/services/prototype-v2` dashboard-mockup direction for Capability 02 (approve for rollout / keep the current orb treatment / different direction). If approved, decide how far it rolls out — Capability 02 only, or the other data/assessment-shaped capabilities too (e.g. 03 Vulnerability Assessment) — not assumed, ask.
-2. D-019's headline-font-family non-finding and D-018's footer non-finding both still stand (re-checked, not re-litigated) — if either still looks wrong to Mohammad after a fresh rebuild, the recommended step remains asking him to hard-refresh/open a fresh tab rather than re-investigating the same code a third/fourth time.
-3. The `ui-ux-pro-max` skill review of Capability 02's ORB treatment (installed 2026-08-14) found no genuinely superior treatment vs. the orb build at the time — that finding predates D-021's dashboard-mockup direction change and is about a different question (is the orb well-executed, not is the orb the right motif); doesn't contradict D-021.
-4. Two explicit flags still open from D-017, not resolved: Instagram has no real URL yet (`href="#"` placeholder); the emergency-CTA phone number (`+60 18-377-2761`) is a TEMPORARY placeholder pending a real Canadian contact line before public launch — both flagged with code comments, don't remove without confirming real values first.
-5. A different, still-open "item 5" from the D-015 instruction chain (regrouping the 8 capabilities into categories, structure/copy pattern only) remains explicitly held pending a separate scope confirmation from Mohammad.
-6. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully approved.
-7. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating.
-8. Known Tailwind v4 gotcha worth remembering: arbitrary-value utilities with `color-mix()` (or similar multi-comma CSS functions) nested inside bracket syntax can silently generate no CSS at all — confirmed with `shadow-[...color-mix(in_srgb,...)]`. Prefer Tailwind's built-in `{utility}-{registered-color}/{opacity}` mechanic (e.g. `shadow-accent/30`) over hand-rolled arbitrary values when a registered theme color is involved. Also: Tailwind v4 uses standalone `translate`/`scale`/`rotate` CSS properties, not the composed `transform` — don't debug hover/motion utilities by checking `getComputedStyle(el).transform`.
-9. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in the Services visual components — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
-10. Hero (Home): current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
-11. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
-12. Reusable pattern worth remembering for future rows: two visually-adjacent elements that must share exact width/position should share one physical wrapper with the constraint declared once, not carry matching classes independently on each element — that's exactly how the D-020 CTA-alignment bug happened (visual had `mx-auto max-w-md`, CTA didn't).
+1. Awaiting Mohammad's review of D-022: the Capability 04 shell-rethink prototype at `/services/prototype-v2`-style route `/services/prototype-v3` (module checklist + completion ring). If approved, 05-08 each still need their OWN suited treatment researched/decided individually — do not just reuse the checklist-ring formula for all four, that recreates the exact repetition problem this round exists to fix.
+2. Awaiting Mohammad's review of D-021: the row top-alignment fix (verified across rows 01/02/03, unaffected by D-022), and his decision on the `/services/prototype-v2` dashboard-mockup direction for Capability 02 (approve for rollout / keep the current orb treatment / different direction). If approved, decide how far it rolls out — Capability 02 only, or other data/assessment-shaped capabilities — not assumed, ask.
+3. D-019's headline-font-family non-finding and D-018's footer non-finding both still stand (re-checked, not re-litigated) — if either still looks wrong to Mohammad after a fresh rebuild, the recommended step remains asking him to hard-refresh/open a fresh tab rather than re-investigating the same code a third/fourth time.
+4. The `ui-ux-pro-max` skill review of Capability 02's ORB treatment (installed 2026-08-14) found no genuinely superior treatment vs. the orb build at the time — that finding predates D-021's dashboard-mockup direction change and is about a different question (is the orb well-executed, not is the orb the right motif); doesn't contradict D-021.
+5. Two explicit flags still open from D-017, not resolved: Instagram has no real URL yet (`href="#"` placeholder); the emergency-CTA phone number (`+60 18-377-2761`) is a TEMPORARY placeholder pending a real Canadian contact line before public launch — both flagged with code comments, don't remove without confirming real values first.
+6. A different, still-open "item 5" from the D-015 instruction chain (regrouping the 8 capabilities into categories, structure/copy pattern only) remains explicitly held pending a separate scope confirmation from Mohammad.
+7. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully approved.
+8. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating.
+9. Known Tailwind v4 gotcha worth remembering: arbitrary-value utilities with `color-mix()` (or similar multi-comma CSS functions) nested inside bracket syntax can silently generate no CSS at all — confirmed with `shadow-[...color-mix(in_srgb,...)]`. Prefer Tailwind's built-in `{utility}-{registered-color}/{opacity}` mechanic (e.g. `shadow-accent/30`) over hand-rolled arbitrary values when a registered theme color is involved. Also: Tailwind v4 uses standalone `translate`/`scale`/`rotate` CSS properties, not the composed `transform` — don't debug hover/motion utilities by checking `getComputedStyle(el).transform`.
+10. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in the Services visual components — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
+11. Hero (Home): current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
+12. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
+13. Reusable pattern worth remembering for future rows: two visually-adjacent elements that must share exact width/position should share one physical wrapper with the constraint declared once, not carry matching classes independently on each element — that's exactly how the D-020 CTA-alignment bug happened (visual had `mx-auto max-w-md`, CTA didn't).
+14. D-022 established that any future capability's illustrative numeric figure (completion %, score, etc.) needs its own explicit "not a real result" flag if it's a NEW invented value rather than reused from an already-approved example elsewhere in the project — don't assume the Cyber Health 78/100 precedent covers every metric type.
 
 ---
 
 ## Session Log
+
+### 2026-08-14 (continued 3) — Round 7: Capabilities 04-08 shell rethink, prototyped on Capability 04 (D-022)
+**Completed:**
+- Researched before building, per explicit instruction: `ui-ux-pro-max --domain style` for current B2B SaaS/security panel guidance (surfaced Bento Grids/Dimensional Layering as current well-supported patterns; explicitly ruled out Glassmorphism and Cyberpunk UI as not fitting "premium, restrained"); `mcp__21st__search` for real training/progress components (ProjectProgressCard, Onboarding Checklist, Skills Progress Dashboard — confirmed the pattern, not imported wholesale due to unrelated dependency trees, same reasoning as D-021); re-fetched Bell Business's service-panel page specifically for this round and found it's actually flat (title+description only, no visual variety) — confirmed Bell isn't the source for "vary the visual," only for spacing/hierarchy discipline, same as before.
+- Built `CapabilityTrainingVisual` for Capability 04 (Security Awareness Training): module checklist (4 generic topics, complete/in-progress/pending status icons) + a single accent-colored completion ring with a centered percentage, replacing the orb's node-diagram/icon-badge/ghost-numeral formula. Kept the outer dark elevated-card container as a through-line device across rows — flagged explicitly as a judgment call for Mohammad to confirm or override, not asserted as settled.
+- Content governance: the 84% figure and 4 module names are NEW illustrative values (no existing training-completion precedent to reuse, unlike Capability 02's reused 78/100) — explicitly flagged as such in both the component comment and the on-page label.
+- Built `/services/prototype-v3` (noindex) showing current vs. new treatment with identical Capability 04 copy. Confirmed via DOM query that live `/services` row 04 still renders its original `.env-dark` orb panel — nothing live touched.
+- Full verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (10 routes); killed stray node processes, cleared `.next`, fresh `npm run start`; zero horizontal overflow at 390px; zero non-pre-existing console errors; screenshot reviewed directly.
+
+**Files changed:**
+- New: `app/components/sections/services/capability-training-visual.tsx`, `app/services/prototype-v3/page.tsx`
+- `DECISIONS.md` (D-022), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- None. Confirmed no dependency-tree drift by hand-rebuilding with existing primitives instead of importing 21st code directly.
+
+**Problems solved:**
+- Delivered a genuinely distinct third visual formula (checklist+ring, vs. gauge card vs. orb) with a stated, traceable research trail rather than an asserted design choice.
+
+**Still open / needs verification:**
+- Mohammad's review of D-022. If approved, capabilities 05-08 each need their own individually-researched treatment — not a reuse of this same checklist/ring formula, which was scoped to training content specifically.
+
+**Next recommended step:**
+- Await his decision before touching 05-08 or any other capability.
+
+---
 
 ### 2026-08-14 (continued 2) — Round 6: row top-alignment fix; Capability 02 dashboard-mockup prototype (D-021)
 **Completed:**
