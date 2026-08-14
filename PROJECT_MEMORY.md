@@ -8,7 +8,7 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Awaiting Mohammad's review of D-024: Capability 05's `/services/prototype-v4` (live-pulse + illustrative alert feed). If approved: (a) apply the flagged `items-start` fix to `additional-capabilities.tsx`'s grid on ship — required, not optional, or 06-08's still-plain cards will stretch to match 05's taller new mark; (b) 06-08 each still need their OWN individually-researched treatment, not a reuse of this monitor-feed formula.
+1. Capability 05 (D-024) approved and shipped live (D-025), including the `items-start` grid fix — verified via DOM measurement that 06-08 stay at their own 252px height, not stretched to match 05's 450px. `/services/prototype-v4` removed. Capability 06 (Penetration Testing) research/prototype in progress — see next session-log entry. 07-08 still need their OWN individually-researched treatments after that.
 2. Capability 04 (D-022) approved and shipped live (D-023) — `/services/prototype-v3` removed.
 3. Awaiting Mohammad's review of D-021: the row top-alignment fix (verified across rows 01/02/03, unaffected by D-022), and his decision on the `/services/prototype-v2` dashboard-mockup direction for Capability 02 (approve for rollout / keep the current orb treatment / different direction). If approved, decide how far it rolls out — Capability 02 only, or other data/assessment-shaped capabilities — not assumed, ask.
 4. D-019's headline-font-family non-finding and D-018's footer non-finding both still stand (re-checked, not re-litigated) — if either still looks wrong to Mohammad after a fresh rebuild, the recommended step remains asking him to hard-refresh/open a fresh tab rather than re-investigating the same code a third/fourth time.
@@ -28,6 +28,22 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-14 (continued 6) — Capability 05 shipped live with items-start grid fix, verified (D-025)
+**Completed:**
+- Mohammad approved D-024's prototype with an explicit requirement: verify the `items-start` grid fix doesn't break 06-08 before confirming. Added `CapabilityMonitorMark` for Capability 05 in `additional-capabilities.tsx`, added `lg:items-start` to the grid. Deleted `app/services/prototype-v4/`.
+- Verified the specific requirement via Playwright `getBoundingClientRect()` on a fresh production server: Capability 05's card is 450px tall (the new mark); Capabilities 06/07/08 are each 252px — their own natural unstretched height, confirming the grid no longer forces them to match 05's height.
+- Full verification: killed stray node processes, cleared `.next`, `npm run build`/`tsc`/`lint` all clean (9 routes, `prototype-v4` confirmed 404); zero overflow at 1440/390px; zero non-pre-existing console errors; screenshot reviewed directly.
+
+**Files changed:**
+- `app/components/sections/services/additional-capabilities.tsx` (Capability 05 mark swap + grid `items-start`)
+- Deleted: `app/services/prototype-v4/page.tsx`
+- `DECISIONS.md` (D-025), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Next recommended step:**
+- Research and prototype Capability 06 (Penetration Testing) next, same process.
+
+---
 
 ### 2026-08-14 (continued 5) — Round 8: Capability 05 (MDR) shell prototype (D-024)
 **Completed:**
