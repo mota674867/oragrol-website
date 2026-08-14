@@ -8,7 +8,7 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Capability 08 (D-030) approved and shipped live (D-031) — all 8 capabilities now have individually-researched treatments (01/03 orb, 02 pending its own separate decision, 04-08 each distinct). `/services/prototype-v7` removed. Full-page 1920px screenshot sent to Mohammad for whole-page sign-off review. Only remaining open item on Services: D-021 (Capability 02's dashboard-mockup prototype) — still awaiting his decision.
+1. BLOCKING: Capability 02 shipped (D-032), but Mohammad's same message claimed Capability 03 "was approved as an extension of 02 earlier" — checked directly, found no such record anywhere in DECISIONS.md/PROJECT_MEMORY.md (D-021 was explicitly scoped to Capability 02 only), and confirmed via DOM/screenshot that Capability 03 still renders the original orb. Flagged this to Mohammad rather than guessing which way to resolve it. Do NOT generate the "final all 8 distinct" full-page screenshot he requested until he answers — his premise assumed 03 already matches 02, which isn't true, so the screenshot would either misrepresent the page or require guessing his intent.
 2. Capability 07 (D-028) approved and shipped live (D-029) — verified Capability 08 stays at its own 252px height post-ship. `/services/prototype-v6` removed.
 3. Capability 06 (D-026) approved and shipped live (D-027) — verified 07/08 stay at their own 252px height post-ship. `/services/prototype-v5` removed.
 4. Capability 05 (D-024) approved and shipped live (D-025), including the `items-start` grid fix — verified via DOM measurement that 06-08 stay at their own 252px height, not stretched to match 05's 450px. `/services/prototype-v4` removed.
@@ -34,6 +34,31 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-14 (continued 13) — Capability 02 shipped, verified; Capability 03 factual discrepancy found and flagged, not resolved either way (D-032)
+**Completed:**
+- Mohammad approved D-021's prototype. `live-services.tsx`'s `CapabilityVisual` selector gained a second branch — Capability 02 now renders `CapabilityDashboardVisual`. Deleted `app/services/prototype-v2/` — no prototype routes remain anywhere in the project.
+- The same message asked to "confirm Capability 03 still correctly shows the same dashboard treatment (it was approved as an extension of 02 earlier)." Checked this claim directly before doing anything with it: grepped `DECISIONS.md`/`PROJECT_MEMORY.md`/`PROJECT_MASTER.md` for any Capability 03 + dashboard reference — none exists. Re-read D-021's own text: explicitly "prototype ONE new treatment for Capability 02," never mentions 03. Checked the actual current code (`live-services.tsx`'s pre-edit `CapabilityVisual`) — only ever special-cased `n === "04"`, row 03 always fell through to the orb. Confirmed on a fresh production server via DOM/text-content query and a direct screenshot: Capability 03 renders the orb (ghost-numeral marker present), not the score card. The premise in Mohammad's message doesn't match any part of the project record.
+- Did not act on the unconfirmed premise either direction — did not silently extend the dashboard treatment to Capability 03 (would be inventing a decision that was never made, un-researched, no prototype/review step), and did not falsely report it as "confirmed correct" (would violate the Honesty Rule — it demonstrably isn't what he described). Flagged the discrepancy directly instead, per this project's own explicit rule for disagreeing with a stated premise.
+- Held the "final all 8 distinct" full-page screenshot Mohammad separately requested — generating it now would either misrepresent Capability 03's actual state or require guessing which way he wants it resolved.
+- Verified the Capability 02 ship itself thoroughly regardless: `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (8 routes); fresh clean rebuild; zero overflow at 1440/390px; zero non-pre-existing console errors; screenshot of rows 02/03 reviewed side by side.
+
+**Files changed:**
+- `app/components/sections/services/live-services.tsx` (Capability 02 mark swap)
+- Deleted: `app/services/prototype-v2/page.tsx`
+- `DECISIONS.md` (D-032), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The Capability 03 discrepancy — a false premise in the user's own instruction, caught by checking the record before acting rather than trusting the stated premise.
+
+**Still open / needs verification:**
+- Mohammad's answer on Capability 03 (misremembered, or does he want it extended now as a fresh decision).
+- The final 1920px sign-off screenshot, blocked on the above.
+
+**Next recommended step:**
+- Await his clarification before generating the requested final screenshot.
+
+---
 
 ### 2026-08-14 (continued 12) — Capability 08 shipped live, verified; all 8 capabilities now individually treated; full-page 1920px screenshot for sign-off (D-031)
 **Completed:**

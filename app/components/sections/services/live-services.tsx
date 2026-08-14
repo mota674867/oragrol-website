@@ -3,6 +3,7 @@ import { Bug, ClipboardCheck, GraduationCap, UserRound } from "lucide-react";
 import { ButtonLink, Caption, H2, H3, Section, Text } from "../../ui";
 import { Reveal } from "../../motion/reveal";
 import { CapabilitySpotlightVisual } from "./capability-spotlight";
+import { CapabilityDashboardVisual } from "./capability-dashboard-visual";
 import { CapabilityTrainingVisual } from "./capability-training-visual";
 import { CategoryNav, type CategoryNavItem } from "./category-nav";
 
@@ -124,14 +125,25 @@ const NAV_ITEMS: CategoryNavItem[] = [
  * shell was disapproved and replaced with `CapabilityTrainingVisual`
  * (module checklist + completion ring), approved live after review at
  * `/services/prototype-v3` (now removed — same lifecycle as every other
- * prototype route this project has used). Rows 01-03 are unaffected —
- * still `CapabilitySpotlightVisual`, not touched by this decision. Future
- * rounds may add further per-`n` overrides here as 05-08 get their own
- * researched treatments (those currently live in
- * `additional-capabilities.tsx`, a separate "finalizing" tier — see D-007
- * — so any change there happens in that file, not this one).
+ * prototype route this project has used).
+ *
+ * D-021/D-032: Capability 02's shell was separately prototyped as
+ * `CapabilityDashboardVisual` (score + risk-tier breakdown, reusing Cyber
+ * Health's already-approved illustrative example) at
+ * `/services/prototype-v2` and approved after review (now removed).
+ *
+ * Row 03 is unaffected by either decision — still
+ * `CapabilitySpotlightVisual`. No project record (`DECISIONS.md`,
+ * `PROJECT_MEMORY.md`) shows Capability 03 ever being included in the
+ * D-021 prototype or approval; D-021's own scope was explicitly "ONE new
+ * treatment for Capability 02," not 02+03. Flagged to Mohammad rather
+ * than silently extended or silently left as-is — see the chat response
+ * for this round.
  */
 function CapabilityVisual({ service }: { service: LiveService }) {
+  if (service.n === "02") {
+    return <CapabilityDashboardVisual />;
+  }
   if (service.n === "04") {
     return <CapabilityTrainingVisual />;
   }
