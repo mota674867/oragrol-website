@@ -8,7 +8,7 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Awaiting Mohammad's review of D-019 (sidebar/label weight, CTA consistency, headline font-family investigated — no bug found).
+1. Awaiting Mohammad's review of D-019 (sidebar/label weight, CTA consistency, headline font-family investigated — no bug found). `ui-ux-pro-max` skill (installed 2026-08-14) reviewed Capability 02 against its style/typography/UX database and found no genuinely superior treatment — see Session Log entry below; `/services/prototype` was NOT recreated since there was nothing different to compare.
 2. If the headline still visually reads as "not Space Grotesk" for Mohammad after this round's fresh rebuild, the computed value has now been checked twice (D-019) and genuinely is Space Grotesk both times — next step is asking him to hard-refresh/open a fresh tab rather than re-investigating the same code again, same pattern as D-018's footer discrepancy.
 3. If Instagram/emergency-CTA still don't appear for Mohammad, same advice — four independent methods in D-018 already ruled out a code-side cause.
 4. Two explicit flags still open from D-017, not resolved: Instagram has no real URL yet (`href="#"` placeholder); the emergency-CTA phone number (`+60 18-377-2761`) is a TEMPORARY placeholder pending a real Canadian contact line before public launch — both flagged with code comments, don't remove without confirming real values first.
@@ -23,6 +23,34 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-14 — ui-ux-pro-max skill installed; Capability 02 reviewed, no change made
+**Completed:**
+- Installed the `ui-ux-pro-max` Claude Code plugin at Mohammad's request (marketplace `nextlevelbuilder/ui-ux-pro-max-skill`) to check whether it suggests a genuinely better treatment for the already-approved Capability 02 row (Risk Assessment & Compliance) before it's considered final. This is a different tool from the earlier `ui-ux-pro-max-skill.nextlevelbuilder.io` reference site that hung the browser during D-014's rollout (that was a hosted web page; this is a proper Claude Code plugin with a local Python search script) — no conflict with that earlier "skip it" decision.
+- The skill's search tool needed Python; none was installed. Asked Mohammad, who chose to install it — installed Python 3.12.10 via `winget` (`Python.Python.3.12`).
+- Ran the skill's local design-system/style/typography/ux database searches against Capability 02's actual built treatment (nested dark glow-lit panel, ghost numeral, soft-3D icon badge, schematic node diagram, content column with accent eyebrow/bold headline/4-field grid/CTA):
+  - `--design-system "cybersecurity MSSP B2B enterprise SaaS professional trust"` → recommended a "Trust & Authority" pattern (certification badges, case-study metrics, before/after comparisons) with a different palette (navy/slate) and font (Plus Jakarta Sans). Not applicable: this is a page/site-level trust-signal pattern, not a per-capability-row pattern; the palette/fonts are Oragrol's own locked brand tokens from earlier steps, not up for reinvention here; and the suggested content (certs, case-study metrics) isn't confirmed real data — inventing it would violate this project's own Honesty Rule (CLAUDE.md §8).
+  - `--domain style "dark glass glow panel enterprise security dashboard"` → closest match was "Dark Mode (OLED)" with minimal-glow effects (WCAG AAA), which is what's already built. Genuinely fancier alternatives in the same result set (Liquid Glass, Spatial UI/VisionOS glass) are explicitly flagged in the skill's own data as moderate-poor performance and/or contrast-risk — worse choices for this context, not better.
+  - `--domain typography "Space Grotesk geometric heading professional"` → the closest professional-SaaS match is "Tech Startup" (Space Grotesk heading + DM Sans body), confirming Space Grotesk is a sound, on-category heading choice for this product type. No pairing in the results scored Inter (the current body font) as a weaker choice, or proposed a pairing that would outperform the current Space Grotesk/Inter combination for this stack.
+  - `--domain ux "feature row hierarchy visual weight numeral icon"` → returned general checklist items (hover-state feedback, sequential heading hierarchy, consistent type scale). Cross-checked against the actual code: `H2` ("Available today.") → `H3` (capability name) is sequential, no skipped heading level; hover states exist via `group-hover` with 150-300ms transitions (the `shadow-accent`/`translate`/`scale` fix from D-016); focus-visible rings present on interactive elements (`NavLink`, `ButtonLink`); `prefers-reduced-motion` is respected via a dedicated hook (`use-reduced-motion.ts`) that `Reveal` already checks. `Caption tone="muted"` contrast on the White environment was already explicitly audited in D-010 (computes ~4.84:1, passing) — re-confirmed by reading `tokens.css` directly, not re-tested.
+- **Verdict reported to Mohammad:** the skill's own database doesn't surface a genuinely better treatment for this row — it's consistent with, not different from, what D-013 through D-019 already converged on (which was itself benchmarked against real B2B security-SaaS references: QClay, Cybershield, Tokenex). Did **not** recreate `/services/prototype`, since there's no different treatment to put side-by-side. Live `/services` was not touched.
+
+**Files changed:**
+- `PROJECT_MEMORY.md` (this entry). No component/route files changed — review-only, no code change.
+
+**Problems found:**
+- None in the built row. The skill's generic B2B "Trust & Authority" recommendation doesn't fit a single capability row's scope and would require unconfirmed content (certifications, case-study metrics) to execute honestly — flagged, not pursued.
+
+**Problems solved:**
+- Answered Mohammad's actual question (does a genuinely better treatment exist) with real search evidence rather than a guess, and avoided an unnecessary rebuild cycle by reporting "no" clearly instead of manufacturing a difference to justify the tool.
+
+**Still open / needs verification:**
+- Mohammad's review of D-019 (see Next Steps #1) — unaffected by this session, still pending.
+
+**Next recommended step:**
+- Await Mohammad's decision on whether Services is now fully approved, or whether another round of feedback is coming.
+
+---
 
 ### 2026-08-13
 **Completed:**
