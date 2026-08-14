@@ -8,7 +8,7 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Awaiting Mohammad's review of D-022: the Capability 04 shell-rethink prototype at `/services/prototype-v2`-style route `/services/prototype-v3` (module checklist + completion ring). If approved, 05-08 each still need their OWN suited treatment researched/decided individually — do not just reuse the checklist-ring formula for all four, that recreates the exact repetition problem this round exists to fix.
+1. Capability 04 (D-022) approved and shipped live (D-023) — `/services/prototype-v3` removed. Capabilities 05-08 each still need their OWN individually-researched treatment — do not reuse the checklist-ring formula, that recreates the exact repetition problem this round exists to fix. Capability 05 (Managed Security Services / 24/7 MDR) research/prototype in progress — see next session-log entry.
 2. Awaiting Mohammad's review of D-021: the row top-alignment fix (verified across rows 01/02/03, unaffected by D-022), and his decision on the `/services/prototype-v2` dashboard-mockup direction for Capability 02 (approve for rollout / keep the current orb treatment / different direction). If approved, decide how far it rolls out — Capability 02 only, or other data/assessment-shaped capabilities — not assumed, ask.
 3. D-019's headline-font-family non-finding and D-018's footer non-finding both still stand (re-checked, not re-litigated) — if either still looks wrong to Mohammad after a fresh rebuild, the recommended step remains asking him to hard-refresh/open a fresh tab rather than re-investigating the same code a third/fourth time.
 4. The `ui-ux-pro-max` skill review of Capability 02's ORB treatment (installed 2026-08-14) found no genuinely superior treatment vs. the orb build at the time — that finding predates D-021's dashboard-mockup direction change and is about a different question (is the orb well-executed, not is the orb the right motif); doesn't contradict D-021.
@@ -26,6 +26,21 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-14 (continued 4) — Capability 04 shipped live; /services/prototype-v3 removed (D-023)
+**Completed:**
+- Mohammad approved D-022's prototype. Added a small `CapabilityVisual({ service })` selector in `live-services.tsx` — Capability 04 now renders `CapabilityTrainingVisual` in place of the orb; rows 01-03 unaffected. Deleted `app/services/prototype-v3/`.
+- Full verification: killed stray node processes, cleared `.next`, `npm run build` clean (regenerated Next's route-type-validator, which had gone stale after the route deletion and caused a transient standalone-`tsc` error — resolved once `.next` was rebuilt, not a real code issue), `npx tsc --noEmit`/`npm run lint` both clean after; 9 routes (`prototype-v3` confirmed 404, `prototype-v2` still present/unaffected); DOM query confirmed rows 01-03 still show the orb's ghost-numeral marker and row 04 now shows the completion-ring SVG; zero overflow at 390px; zero non-pre-existing console errors; screenshot reviewed directly.
+
+**Files changed:**
+- `app/components/sections/services/live-services.tsx` (per-row visual selector)
+- Deleted: `app/services/prototype-v3/page.tsx`
+- `DECISIONS.md` (D-023), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Next recommended step:**
+- Research and prototype Capability 05 (Managed Security Services / 24/7 MDR) next, same process.
+
+---
 
 ### 2026-08-14 (continued 3) — Round 7: Capabilities 04-08 shell rethink, prototyped on Capability 04 (D-022)
 **Completed:**

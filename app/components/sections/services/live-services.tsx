@@ -3,6 +3,7 @@ import { Bug, ClipboardCheck, GraduationCap, UserRound } from "lucide-react";
 import { ButtonLink, Caption, H2, H3, Section, Text } from "../../ui";
 import { Reveal } from "../../motion/reveal";
 import { CapabilitySpotlightVisual } from "./capability-spotlight";
+import { CapabilityTrainingVisual } from "./capability-training-visual";
 import { CategoryNav, type CategoryNavItem } from "./category-nav";
 
 /**
@@ -118,6 +119,25 @@ const NAV_ITEMS: CategoryNavItem[] = [
   { id: "capability-08", n: "08", label: "Incident Response" },
 ];
 
+/**
+ * Per-row visual (D-022): Capability 04's dark-panel/dot-grid/glow-orb
+ * shell was disapproved and replaced with `CapabilityTrainingVisual`
+ * (module checklist + completion ring), approved live after review at
+ * `/services/prototype-v3` (now removed — same lifecycle as every other
+ * prototype route this project has used). Rows 01-03 are unaffected —
+ * still `CapabilitySpotlightVisual`, not touched by this decision. Future
+ * rounds may add further per-`n` overrides here as 05-08 get their own
+ * researched treatments (those currently live in
+ * `additional-capabilities.tsx`, a separate "finalizing" tier — see D-007
+ * — so any change there happens in that file, not this one).
+ */
+function CapabilityVisual({ service }: { service: LiveService }) {
+  if (service.n === "04") {
+    return <CapabilityTrainingVisual />;
+  }
+  return <CapabilitySpotlightVisual n={service.n} icon={service.icon} />;
+}
+
 function ServiceField({ label, children }: { label: string; children: string }) {
   return (
     <div>
@@ -216,7 +236,7 @@ export function LiveServices() {
                             drifted apart the first time). No
                             viewport-relative margin involved. */}
                         <div className="mx-auto max-w-md">
-                          <CapabilitySpotlightVisual n={service.n} icon={service.icon} />
+                          <CapabilityVisual service={service} />
                           <ButtonLink href={service.cta.href} variant="secondary" size="md" className="mt-6">
                             {service.cta.label}
                           </ButtonLink>
