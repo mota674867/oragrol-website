@@ -7,11 +7,13 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 ## Current Status
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
-**SERVICES SIGNED OFF, COMPLETE (D-034, 2026-08-14).** The full multi-round visual-redesign thread (D-011 through D-034) is closed — Mohammad reviewed the final `/services` full-page screenshot and confirmed approval. Per the page-by-page rollout rule (D-009), this unblocks the next page in the Build Sequence: **Step 8 — How We Work**, confirmed as the correct next step per `PROJECT_MASTER.md`.
+**SERVICES SIGNED OFF, COMPLETE (D-034, 2026-08-14).** The full multi-round visual-redesign thread (D-011 through D-034) is closed — Mohammad reviewed the final `/services` full-page screenshot and confirmed approval. Per the page-by-page rollout rule (D-009), this unblocked the next page: **Step 8 — How We Work**.
+
+**STEP 8 STARTED, BLOCKED ON COPY (D-035, 2026-08-14).** The requested primary hero visual (`HowWeWorkCycleVisual`, a closed directional loop) is built and self-verified at `/how-we-work` (noindex). The instruction's page-copy block never actually arrived — the message contained the literal placeholder `[PASTE THE FULL COPY ABOVE HERE]`. Flagged directly, nothing invented. Waiting on the real copy before building the rest of the page.
 
 ## Next Steps
-1. **SERVICES SIGNED OFF (D-034, 2026-08-14):** Mohammad confirmed "Services is approved and complete." No further Services visual/structural work without a new explicit instruction. The D-015 "item 5" capability-regrouping question remains separately held, not reopened by this sign-off. Two explicit flags carried forward from D-017, still open: Instagram has no real URL (`href="#"` placeholder); the emergency-CTA phone number is a TEMPORARY placeholder pending a real Canadian line before public launch.
-2. **NEXT PAGE: Step 8 — How We Work** (per `PROJECT_MASTER.md`'s Build Sequence, Section 3 — the next PENDING step; Solutions/Cyber Health were already IMPLEMENTED before the page-by-page rollout rule existed). Confirmed with Mohammad before starting, per his explicit instruction. Only a one-line design brief exists so far ("4-stage methodology as an evolving visual system, not 4 generic cards: 01 Understand, 02 Prioritize, 03 Protect, 04 Improve") — no detailed content brief like Services had; check with Mohammad on content/copy readiness before building, same "inspect and report before coding" discipline every prior step used.
+1. **BLOCKING: Step 8 (How We Work) needs its real copy block.** Mohammad's build instruction was meant to include the full page copy but the message contained the literal placeholder text `[PASTE THE FULL COPY ABOVE HERE]` instead. The primary hero visual (`HowWeWorkCycleVisual`) is already built and self-verified at `/how-we-work` (noindex) using only already-locked stage one-liners — do NOT build headline/body/page structure until the actual copy arrives; do not invent it either.
+2. **SERVICES SIGNED OFF (D-034, 2026-08-14):** Mohammad confirmed "Services is approved and complete." No further Services visual/structural work without a new explicit instruction. The D-015 "item 5" capability-regrouping question remains separately held, not reopened by this sign-off. Two explicit flags carried forward from D-017, still open: Instagram has no real URL (`href="#"` placeholder); the emergency-CTA phone number is a TEMPORARY placeholder pending a real Canadian line before public launch.
 3. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating. `ui-ux-pro-max` skill is installed (Python 3.12 dependency) and usable the same way.
 4. Known Tailwind v4 gotcha worth remembering: arbitrary-value utilities with `color-mix()` (or similar multi-comma CSS functions) nested inside bracket syntax can silently generate no CSS at all. Prefer Tailwind's built-in `{utility}-{registered-color}/{opacity}` mechanic over hand-rolled arbitrary values when a registered theme color is involved. Also: Tailwind v4 uses standalone `translate`/`scale`/`rotate` CSS properties, not the composed `transform` — don't debug hover/motion utilities by checking `getComputedStyle(el).transform`.
 5. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in the Services visual components — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
@@ -22,6 +24,32 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-14 (continued 16) — Step 8 (How We Work) started: hero visual built and self-verified; page copy flagged as missing, not invented (D-035)
+**Completed:**
+- Mohammad's build instruction for Step 8 was meant to include the full page copy, prefixed with clear instructions not to invent/add/reword anything. The message's copy section contained only the literal placeholder text `[PASTE THE FULL COPY ABOVE HERE]` — no real content. Flagged this immediately rather than guessing what the copy might have said or building placeholder-quality text to fill the gap.
+- Did the requested research anyway, since it didn't depend on the missing copy: `ui-ux-pro-max --domain chart` for cyclical/loop process data (Sankey/Process Mining both flagged with real accessibility caveats, rejected — same category of mismatch as Capability 08's earlier research); `mcp__21st__search` for a circular/looping component (nothing literally cyclical surfaced — "Animated Roadmap" is a path, not a closed loop). Built `HowWeWorkCycleVisual` natively instead, reusing this codebase's own proven techniques (`GaugeVisual`'s polar-coordinate math, `HeroSchematicVisual`'s node/connector language) rather than forcing a mismatched import.
+- The visual: 4 numbered nodes at compass positions, connected by directional accent arcs with arrowhead markers forming a closed loop — including the literal Improve→Understand closing segment Mohammad specifically asked for. A single slow flowing-dash animation reinforces the cycle, respecting `prefers-reduced-motion` (verified in a dedicated reduced-motion browser context, not just assumed).
+- Caught a real bug before build: an early draft applied `font-heading` via className to the shared `Text` component, which already carries `font-body` in its base string — the same `cn()` conflict pattern documented in D-016/D-019. Fixed with a plain `<p>` instead of fighting the shared component.
+- Caught and corrected a verification miss within the same round: the first computed-style check used a generic `document.querySelector('svg')`, which grabbed the site header's logo SVG (first in DOM order) instead of the diagram, and appeared to show 0 paths / no marker — looked like a real bug. Re-ran the check scoped specifically to the diagram's own `viewBox` and confirmed the arcs/marker/animation are all genuinely present and correctly computed. Logged the near-miss in `DECISIONS.md` rather than silently correcting it and moving on.
+- Built `/how-we-work` (noindex) containing only the confirmed-safe page label, the hero visual, and the instructed CTA text ("Talk to Oragrol" → `/contact`) — no invented headline/body copy. Full verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (9 routes); fresh clean rebuild; zero overflow at 1440/390px; zero non-pre-existing console errors; screenshots at both widths plus a reduced-motion context reviewed directly.
+
+**Files changed:**
+- New: `app/components/sections/how-we-work/cycle-visual.tsx`, `app/how-we-work/page.tsx`
+- `DECISIONS.md` (D-035), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The missing copy block (user-message issue, not a code defect) — caught before any content was invented.
+- The `font-heading`/`Text` conflict and the wrong-SVG verification miss — both caught and fixed within this same round, not left for a later round to discover.
+
+**Still open / needs verification:**
+- The actual "How We Work" page copy, from Mohammad.
+- Mohammad's review of the hero-visual prototype itself.
+
+**Next recommended step:**
+- Await the real copy block, then build the rest of Step 8 around the now-approved-pending hero visual.
+
+---
 
 ### 2026-08-14 (continued 15) — Services signed off complete; docs updated; next page confirmed as Step 8 (D-034)
 **Completed:**
