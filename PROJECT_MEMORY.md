@@ -8,9 +8,9 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — superseded going forward by "Aperture O", not yet prototyped. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking.
 
 ## Next Steps
-1. Awaiting Mohammad's review of D-019 (sidebar/label weight, CTA consistency, headline font-family investigated — no bug found). `ui-ux-pro-max` skill (installed 2026-08-14) reviewed Capability 02 against its style/typography/UX database and found no genuinely superior treatment — see Session Log entry below; `/services/prototype` was NOT recreated since there was nothing different to compare.
-2. If the headline still visually reads as "not Space Grotesk" for Mohammad after this round's fresh rebuild, the computed value has now been checked twice (D-019) and genuinely is Space Grotesk both times — next step is asking him to hard-refresh/open a fresh tab rather than re-investigating the same code again, same pattern as D-018's footer discrepancy.
-3. If Instagram/emergency-CTA still don't appear for Mohammad, same advice — four independent methods in D-018 already ruled out a code-side cause.
+1. Awaiting Mohammad's review of D-020 (CTA-alignment structural fix, sidebar active/inactive weight split — both verified via Playwright at real widths/computed styles).
+2. D-019's headline-font-family non-finding and D-018's footer non-finding both still stand (re-checked, not re-litigated) — if either still looks wrong to Mohammad after a fresh rebuild, the recommended step remains asking him to hard-refresh/open a fresh tab rather than re-investigating the same code a third/fourth time.
+3. The `ui-ux-pro-max` skill review of Capability 02 (installed 2026-08-14) found no genuinely superior treatment vs. the current build — stands unchanged, `/services/prototype` was not recreated.
 4. Two explicit flags still open from D-017, not resolved: Instagram has no real URL yet (`href="#"` placeholder); the emergency-CTA phone number (`+60 18-377-2761`) is a TEMPORARY placeholder pending a real Canadian contact line before public launch — both flagged with code comments, don't remove without confirming real values first.
 5. A different, still-open "item 5" from the D-015 instruction chain (regrouping the 8 capabilities into categories, structure/copy pattern only) remains explicitly held pending a separate scope confirmation from Mohammad.
 6. Do not touch Home, Solutions, Cyber Health, or any unbuilt page until Services is fully approved.
@@ -19,10 +19,36 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 9. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in the Services visual components — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
 10. Hero (Home): current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
 11. Pricing/package names/inclusions remain UNCONFIRMED site-wide — keep "currently being finalized" language.
+12. Reusable pattern worth remembering for future rows: two visually-adjacent elements that must share exact width/position should share one physical wrapper with the constraint declared once, not carry matching classes independently on each element — that's exactly how the D-020 CTA-alignment bug happened (visual had `mx-auto max-w-md`, CTA didn't).
 
 ---
 
 ## Session Log
+
+### 2026-08-14 (continued) — Round 5: CTA-alignment structural fix, sidebar weight genuinely split by state (D-020)
+**Completed:**
+- Item 1 (CTA offset on 24" monitors): read the code first per instruction rather than assuming a fix — Mohammad's specific hypothesis (button not nested in the graphic's container) wasn't quite right, the button *was* a sibling inside the same wrapping div, but the real bug was one level down: `mx-auto max-w-md` lived only on `CapabilitySpotlightVisual` itself (self-centers the 448px panel inside a much wider grid column on large screens), while the `ButtonLink` sibling below had no matching width constraint and rendered from the column's own left edge instead. Fixed by making a single shared `<div className="mx-auto max-w-md">` the true parent of both elements, removing the duplicate constraint from the visual's own className. Verified with Playwright at real 1440/1920/2560px viewports via `getBoundingClientRect()` — `leftDelta: 0` at every width, not just one — plus screenshots reviewed directly.
+- Item 2 (sidebar weight): D-019's fix had applied one uniform `font-medium` to every sidebar item regardless of state, which is why it still read as "all bold" — a uniformly-medium list is still uniformly heavier than the page's body text. Replaced with a genuine active/inactive split on `NavLink`'s `lg` tier only (the site header/footer's `default` tier untouched): active → `font-semibold` (600) + existing `text-accent`, unchanged; inactive → `font-normal` (400) + `text-text-muted` (switched off `text-text-secondary`, which is near-black on White, not actually gray). Verified computed styles directly in a fresh Playwright browser context: active item reads `font-weight: 600`, all 7 inactive items read `font-weight: 400` / `color: rgb(107, 114, 128)` — not just the source checked.
+- Full verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean; killed stray node processes, cleared `.next`, fresh `npm run start` before any measurement, per the stale-cache lesson from D-018/D-019.
+
+**Files changed:**
+- `app/components/sections/services/live-services.tsx` (shared width wrapper for visual + CTA)
+- `app/components/ui/link.tsx` (`NavLink`'s `lg` tier: active/inactive weight + color split)
+- `DECISIONS.md` (D-020), `PROJECT_MASTER.md` (Current Position), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- None beyond the two reported. Confirmed the `default` NavLink tier (header/footer) is unaffected by the `lg`-only change.
+
+**Problems solved:**
+- Both items verified with real measurements/computed styles at the specific conditions Mohammad reported (24" width; active vs. inactive state), not just re-reading source.
+
+**Still open / needs verification:**
+- Mohammad's direct review of D-020.
+
+**Next recommended step:**
+- Await review; if approved, Services may be fully signed off — check whether Mohammad wants to move to Step 8 or extend the visual system to another page next.
+
+---
 
 ### 2026-08-14 — ui-ux-pro-max skill installed; Capability 02 reviewed, no change made
 **Completed:**

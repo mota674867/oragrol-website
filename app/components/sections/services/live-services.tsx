@@ -180,11 +180,31 @@ export function LiveServices() {
                             content column more room, per Mohammad's
                             explicit "scale down a bit, don't redesign"
                             instruction (all internal elements/proportions
-                            untouched, just a max-width cap). */}
-                        <CapabilitySpotlightVisual n={service.n} icon={service.icon} className="mx-auto max-w-md" />
-                        <ButtonLink href={service.cta.href} variant="secondary" size="md" className="mt-6">
-                          {service.cta.label}
-                        </ButtonLink>
+                            untouched, just a max-width cap).
+
+                            CTA alignment fix (Round 5): `mx-auto max-w-md`
+                            used to live only on CapabilitySpotlightVisual
+                            itself, with the CTA as an unconstrained sibling
+                            below it. The panel self-centered at 448px
+                            inside this grid column, but the button — no
+                            width cap of its own — started at the column's
+                            own left edge instead, which is only ~448px
+                            wide on a laptop (no visible gap) but far wider
+                            on a 24" monitor (visible left offset vs. the
+                            centered panel above it). Fix: one shared
+                            `max-w-md mx-auto` wrapper is now the actual
+                            parent of both the visual and the CTA, so they
+                            share one width/position box by construction —
+                            not two elements independently trusted to carry
+                            matching classes (which is exactly how they
+                            drifted apart the first time). No
+                            viewport-relative margin involved. */}
+                        <div className="mx-auto max-w-md">
+                          <CapabilitySpotlightVisual n={service.n} icon={service.icon} />
+                          <ButtonLink href={service.cta.href} variant="secondary" size="md" className="mt-6">
+                            {service.cta.label}
+                          </ButtonLink>
+                        </div>
                       </div>
                       <div className={reverse ? "md:order-1" : undefined}>
                         {/* Large content-area headline (D-018, item 1):

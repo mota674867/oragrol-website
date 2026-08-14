@@ -32,16 +32,14 @@ const navLinkSizeClasses: Record<NavLinkSize, string> = {
   default: "text-sm font-medium",
   // Added for Services' CategoryNav (D-018, item 2): the sidebar was
   // judged too quiet to read as a primary nav element next to Bell's
-  // reference. Weight lives entirely in this table (not the shared base
-  // string below) so default/lg never emit two conflicting font-weight
-  // utility classes at once — see cn.ts's own documented plain-
-  // concatenation gotcha (the same reason H3/Caption's size variants do
-  // this too).
-  // font-semibold → font-medium (D-019, item 1): semibold read as bold
-  // next to the page's other type — size increase alone was the actual
-  // fix needed; the active state still carries the accent color + left
-  // border, unaffected by this.
-  lg: "text-base font-medium",
+  // reference. Size only here — weight moved out (Round 5, below): D-019
+  // dropped a single uniform weight (font-semibold → font-medium) applied
+  // to every item regardless of state, which is what actually kept
+  // reading as "all bold" — a uniformly-medium list is still uniformly
+  // heavier than body text. Round 5 replaces that with a real per-state
+  // split (active vs. inactive), so `lg` itself no longer carries a
+  // weight class — see the active/inactive ternary below instead.
+  lg: "text-base",
 };
 
 export interface NavLinkProps extends LinkComponentProps {
@@ -57,7 +55,22 @@ export function NavLink({ active = false, size = "default", className, ...props 
       className={cn(
         "rounded-sm font-body transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
         navLinkSizeClasses[size],
-        active ? "text-accent" : "text-text-secondary hover:text-text-primary",
+        // `default` tier (site header/footer nav, unrelated to this round's
+        // instruction) keeps its original always-font-medium behavior
+        // untouched. `lg` (CategoryNav only) now genuinely differentiates
+        // by state, per Round 5: active gets weight + the existing accent
+        // color (left-border indicator lives in CategoryNav itself,
+        // untouched); every inactive item drops to regular weight and a
+        // muted-gray tone instead of the near-black `text-secondary` it
+        // used before, so the resting list reads visibly quieter than the
+        // one active item, not just a shade of the same weight.
+        size === "lg"
+          ? active
+            ? "font-semibold text-accent"
+            : "font-normal text-text-muted hover:text-text-primary"
+          : active
+            ? "text-accent"
+            : "text-text-secondary hover:text-text-primary",
         className,
       )}
       {...props}
