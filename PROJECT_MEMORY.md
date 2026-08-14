@@ -12,7 +12,7 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 **STEP 8 CONTENT-COMPLETE, CONNECTOR BUG FIXED (D-035/D-036/D-037, 2026-08-14).** Hero visual researched and built (D-035). Full page copy supplied and built (D-036), byte-for-byte verified. Connector-line bug reported and fixed (D-037) — investigated the cited reference component first and found it has the identical bug (flagged, not silently copied or silently ignored); real fix uses CSS Grid to structurally guarantee the circle sits on the spine. `/how-we-work` is live, `noindex` removed. Awaiting Mohammad's review.
 
 ## Next Steps
-1. Awaiting Mohammad's review of Step 8 (How We Work) — full page built, content-complete, connector-line bug fixed (D-037). Two things flagged, not silently resolved: (a) the hero visual's own short stage one-liners sit directly above the Stage Sequence's full-paragraph versions of the same 4 stages — some content echo, left as-is per "build around the hero visual already built"; (b) `home/how-we-work.tsx` (the Home page teaser) has the SAME connector-line bug this round fixed here — confirmed via direct measurement, not touched since it's a different page/out of scope for this instruction, but worth a decision on whether to fix it too.
+1. Awaiting Mohammad's review of Step 8 (How We Work) — full page built, content-complete, connector-line bug fixed (D-037), and the same bug fixed on Home's own teaser too (D-038, confirmed). One thing still flagged, not silently resolved: the hero visual's own short stage one-liners sit directly above the Stage Sequence's full-paragraph versions of the same 4 stages — some content echo, left as-is per "build around the hero visual already built."
 2. **SERVICES SIGNED OFF (D-034, 2026-08-14):** Mohammad confirmed "Services is approved and complete." No further Services visual/structural work without a new explicit instruction. The D-015 "item 5" capability-regrouping question remains separately held, not reopened by this sign-off. Two explicit flags carried forward from D-017, still open: Instagram has no real URL (`href="#"` placeholder); the emergency-CTA phone number is a TEMPORARY placeholder pending a real Canadian line before public launch.
 3. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating. `ui-ux-pro-max` skill is installed (Python 3.12 dependency) and usable the same way.
 4. Known Tailwind v4 gotcha worth remembering: arbitrary-value utilities with `color-mix()` (or similar multi-comma CSS functions) nested inside bracket syntax can silently generate no CSS at all. Prefer Tailwind's built-in `{utility}-{registered-color}/{opacity}` mechanic over hand-rolled arbitrary values when a registered theme color is involved. Also: Tailwind v4 uses standalone `translate`/`scale`/`rotate` CSS properties, not the composed `transform` — don't debug hover/motion utilities by checking `getComputedStyle(el).transform`.
@@ -24,6 +24,20 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-14 (continued 19) — Home teaser's matching connector-line bug fixed (D-038)
+**Completed:**
+- Mohammad confirmed fixing `home/how-we-work.tsx`'s matching bug (flagged during D-037's investigation). Applied the identical Grid-based fix — circle in `sm:col-start-2`, content alternating left/right, text-aligned toward the spine. Mobile untouched.
+- Verified: fresh clean rebuild, `tsc`/`lint`/`build` clean (9 routes); Playwright measurement at both 1920px and 390px confirms 0px delta between every circle's center and the spine's center (even tighter than the new page's 1px sub-pixel gap); zero overflow at both widths; screenshots reviewed directly at both widths, confirming the fix visually; confirmed Approach's separate horizontal 4-stage section (same labels, unrelated layout) is unaffected.
+
+**Files changed:**
+- `app/components/sections/home/how-we-work.tsx` (Grid-based circle-centering fix, same technique as D-037)
+- `DECISIONS.md` (D-038), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Still open:**
+- Mohammad's review of the overall How We Work page build (D-036/D-037) and this Home fix.
+
+---
 
 ### 2026-08-14 (continued 18) — Stage Sequence connector-line bug fixed; cited reference component found to have the identical bug (D-037)
 **Completed:**

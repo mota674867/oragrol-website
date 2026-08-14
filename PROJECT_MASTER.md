@@ -222,7 +222,8 @@ Also active (D-030/D-031): Capability 08 (Incident Response) — `CapabilityPlay
 Also active (D-032/D-033): Capability 02's dashboard mockup shipped live; a flagged discrepancy (no record of Capability 03 ever being approved for the same treatment, contrary to Mohammad's stated premise) was resolved by his explicit confirmation to extend it now, as a new decision — Capability 03 also renders `CapabilityDashboardVisual`. `/services/prototype-v2` removed — no prototype routes remain anywhere in the project. Ground-truth-verified all 8 capabilities individually (one treatment each, no overlaps) on a fresh production server before the final screenshot.
 **D-034 — SERVICES SIGNED OFF, COMPLETE (2026-08-14):** Mohammad reviewed the final full-page screenshot and confirmed: "Services is approved and complete." This closes the entire visual-redesign thread (D-011 through D-034). No further Services visual/structural work without a new explicit instruction; the D-015 "item 5" capability-regrouping question remains separately held.
 Also active (D-035/D-036/D-037): Step 8 (How We Work) — CONTENT COMPLETE, connector-line bug fixed. Hero visual researched/built (D-035), full page copy supplied and built (D-036), Stage Sequence connector-line bug found-and-fixed with a real structural fix, not a reference-matching patch — the cited reference (`home/how-we-work.tsx`) was found to have the identical bug and is flagged, not fixed (out of scope for this instruction) (D-037).
-Next: Awaiting Mohammad's review of the built page, and his call on whether to also fix `home/how-we-work.tsx`'s matching bug.
+**D-038 (2026-08-14):** Mohammad confirmed — fixed `home/how-we-work.tsx`'s matching connector-line bug with the identical real fix (Grid-centered circle). Verified 0px delta at both 1920px and 390px on a fresh production server. Both instances of the bug are now resolved.
+Next: Awaiting Mohammad's review of the How We Work page build overall.
 
 ---
 

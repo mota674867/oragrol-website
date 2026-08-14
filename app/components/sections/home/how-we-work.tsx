@@ -1,4 +1,4 @@
-import { Caption, Container, H2, Section, Text } from "../../ui";
+import { Caption, cn, Container, H2, Section, Text } from "../../ui";
 import { Reveal } from "../../motion/reveal";
 
 /**
@@ -7,6 +7,20 @@ import { Reveal } from "../../motion/reveal";
  * continuous visual progression") — a connected vertical stepper with
  * alternating alignment, rather than Approach's compact horizontal build.
  * Not four generic cards in either place.
+ *
+ * Connector-line fix: this component was found (2026-08-14, while fixing
+ * the same bug on the new How We Work page, D-037) to have the identical
+ * defect Mohammad reported there — the spine sat at a fixed x-position
+ * (`left-1/2 -translate-x-1/2`) while `sm:flex-row-reverse` alternation
+ * packed each row's circle toward that row's own flex-start edge
+ * (alternating left/right), never toward the spine's actual center.
+ * Confirmed via direct measurement before this fix: circles at x=340/1100
+ * at 1440px, spine at x=720 — never aligned. Same real fix applied here
+ * as the How We Work page: circle is now explicitly placed in a CSS Grid
+ * center column (`sm:col-start-2`) that the spine's own `left-1/2`
+ * already targets, guaranteed by construction rather than incidental row
+ * width. Mobile (below `sm`) unaffected — that layout was already
+ * correct (single left-aligned column, no reversal applies there).
  */
 
 const STAGES = [
@@ -37,17 +51,16 @@ export function HowWeWork() {
               const alignRight = i % 2 === 1;
               return (
                 <Reveal key={stage.n} delay={i * 0.1}>
-                  <div
-                    className={
-                      alignRight
-                        ? "relative flex items-start gap-6 sm:flex-row-reverse sm:text-right"
-                        : "relative flex items-start gap-6"
-                    }
-                  >
-                    <span className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent bg-background font-data text-sm text-accent">
+                  <div className="relative flex items-start gap-6 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-x-10">
+                    <span className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent bg-background font-data text-sm text-accent sm:col-start-2 sm:row-start-1">
                       {stage.n}
                     </span>
-                    <div className="pt-1.5">
+                    <div
+                      className={cn(
+                        "pt-1.5 sm:row-start-1 sm:pt-0",
+                        alignRight ? "sm:col-start-3 sm:text-left" : "sm:col-start-1 sm:text-right",
+                      )}
+                    >
                       <h3 className="font-heading text-xl font-semibold text-text-primary">
                         {stage.label}
                       </h3>
