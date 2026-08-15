@@ -139,9 +139,10 @@ Built at `/cyber-health` as the "product-facing experience" (Landing) layer desc
 
 **D-037 (2026-08-14) — CONNECTOR-LINE BUG FIXED:** Mohammad reported the spine doesn't pass through the alternating circles, citing `home/how-we-work.tsx`'s teaser as a correct reference. Measured the reference directly before assuming it was right — it has the identical bug (circles at x=340/1100, spine at x=720, confirmed via DOM + screenshot). Root cause: a fixed-position spine plus `flex-row-reverse` alternation never actually centers the circle on the spine. Real fix: circle now explicitly placed in a CSS Grid center column the spine targets, guaranteed by construction rather than incidental row sizing. Verified exact alignment (0px delta) at 1920px and (1px, sub-pixel) at 390px via direct measurement, not a visual glance. `home/how-we-work.tsx` itself still has the same unfixed bug — flagged, not touched (out of scope for this instruction).
 
-### Step 9 — Industries Page — PENDING
+### Step 9 — Industries Page — IMPLEMENTED (D-044, 2026-08-15)
 Industries: Professional Services, Healthcare, Financial Services, Retail & E-commerce, Manufacturing, Technology, Construction & Real Estate, Education, Other SMBs.
 One elegant interactive/expandable experience, not 9 separate pages. Pattern per industry: risk, security priorities, Oragrol approach, recommended next step. No invented certifications/customer numbers/case studies.
+Built at `/industries`: desktop sticky sidebar / mobile horizontal scrollable tabs (real ARIA `tablist`/`tab`/`tabpanel`, keyboard-navigable) driving an instant-swap detail panel — all 9 industries, content copied verbatim from the supplied brief and verified byte-for-byte against it. Full details: D-044. Awaiting Mohammad's review.
 
 ### Step 10 — Resources / Insights Page — PENDING
 Hero, Featured Insight, Latest Insights, Article Cards, Newsletter/LinkedIn, CTA. Editorial, spacious, custom visuals — no generic hacker imagery, no fake authors/stats/stories.
@@ -233,7 +234,9 @@ Also active (D-035/D-036/D-037): Step 8 (How We Work) — CONTENT COMPLETE, conn
 **D-038 (2026-08-14):** Mohammad confirmed — fixed `home/how-we-work.tsx`'s matching connector-line bug with the identical real fix (Grid-centered circle). Verified 0px delta at both 1920px and 390px on a fresh production server. Both instances of the bug are now resolved.
 **D-039/D-040 (2026-08-14):** Solutions' D-008 hero visual explicitly reopened and replaced per Mohammad's instruction — `KineticGrid` canvas background (sourced via `21st.dev`, id 18254) is now the live Solutions hero, `StrataVisual` retired (file kept, unused). All 5 required modifications verified twice — at prototype stage and again against the live page post-ship. `/solutions/prototype` removed.
 **D-041 (2026-08-14):** A Cyber Health "processing screen" loader (`AiLoader`) was requested and prototyped at `/cyber-health/prototype-loader` — but flagged two real findings before building further: no "Processing Screen" spec section exists in this repo's docs, and this codebase has no in-app processing pipeline for such a screen to attach to (the real Assessment/Score/AI-Analysis/CRM pipeline runs entirely on the external Tally MVP, per Step 7 above). Built the component regardless (useful, self-contained, all 5 required fixes verified), deliberately NOT wired into the live page — awaiting Mohammad's input on where it should attach, if anywhere.
-Next: Awaiting Mohammad's review of the How We Work page build (D-036/D-037/D-038). Cyber Health loader is resolved, live, and Mohammad-confirmed (D-042). **BLOCKING: Cyber Health ambient hero (D-043)** — prototyped at `/cyber-health/prototype-hero`, awaiting Mohammad's approval and his wording decision before shipping. Step 9 (Industries) is separately active — Mohammad is sending the per-industry content brief; do not build real copy before it arrives.
+**D-043 (2026-08-15) — SHIPPED LIVE:** Cyber Health hero's `GaugeVisual` replaced with the ambient `HeroAmbientLoader`, wording locked to "Assess."/"Prioritize."/"Protect." as originally given. Prototype route removed. Full details: D-043.
+**D-044 (2026-08-15):** Step 9 (Industries) built — see Step 9 above.
+Next: Awaiting Mohammad's review of the How We Work page build (D-036/D-037/D-038), the Cyber Health ambient hero (D-043), and the new Industries page (D-044). Step 10 (Resources/Insights) is the next unbuilt step once these are reviewed.
 
 ---
 

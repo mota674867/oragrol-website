@@ -17,9 +17,11 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **CYBER HEALTH AMBIENT HERO SHIPPED LIVE (D-043, 2026-08-15).** Mohammad approved and re-specified the exact wording ("Assess."/"Prioritize."/"Protect.") — resolves the wording flag by keeping his original words. `hero.tsx` now renders `HeroAmbientLoader` in place of `GaugeVisual`; prototype route/component removed. Re-verified live (not just re-assumed from the prototype): clean typecheck/lint/build, and Playwright-captured proof screenshots (the Chrome-extension tab in this environment runs with `document.hidden === true` regardless of focus, throttling/freezing the CSS fade — Playwright was used instead, per CLAUDE.md §7's documented method) of the mid-cycle "PRIORITIZE." state, the reduced-motion static state, and the IntersectionObserver pause/resume on scroll.
 
+**STEP 9 — INDUSTRIES BUILT (D-044, 2026-08-15).** Mohammad supplied the real, fact-checked content brief (`ORAGROL_INDUSTRIES_CONTENT_CANADA.md`) plus an explicit structure spec. Built `/industries`: desktop sticky sidebar / mobile horizontal scrollable tabs (real ARIA `tablist`/`tab`/`tabpanel`, keyboard-navigable), an instant-swap detail panel (Risk/Priorities/Approach/Next Step), all 9 industries, active/inactive styling reusing Services' locked weight-600/weight-400-muted convention. Content verified byte-for-byte against the source `.md` via a Node diff script (not a visual read-through). Awaiting Mohammad's review.
+
 ## Next Steps
 1. ~~BLOCKING: Cyber Health ambient hero (D-043)~~ — **SHIPPED LIVE 2026-08-15**, see Current Status. No longer blocking.
-2. **ACTIVE: Step 9 — Industries.** Mohammad said he's sending the per-industry content brief next (risk/priorities/approach/next-step for each of the 9 named industries — Professional Services, Healthcare, Financial Services, Retail & E-commerce, Manufacturing, Technology, Construction & Real Estate, Education, Other SMBs). Do not build real copy before it arrives — same "ask before inventing" discipline as How We Work (D-035).
+2. ~~ACTIVE: Step 9 — Industries~~ — **BUILT 2026-08-15 (D-044)**, see Current Status. Awaiting Mohammad's review. A pre-existing, out-of-scope issue was surfaced (not fixed) while building this: the sitewide floating "Under attack?" widget can visually overlap the panel's Next-Step CTA button at some scroll positions — flag for a future pass.
 3. Solutions' Kinetic Grid hero (D-039) approved and shipped live (D-040) — all 5 required modifications re-verified against the live page (canvas scoping, background pixel, reduced-motion staticness), not assumed to still hold from the prototype. `/solutions/prototype` removed. `StrataVisual`'s file kept unused, available for revert.
 4. Awaiting Mohammad's review of Step 8 (How We Work) — full page built, content-complete, connector-line bug fixed (D-037), and the same bug fixed on Home's own teaser too (D-038, confirmed). One thing still flagged, not silently resolved: the hero visual's own short stage one-liners sit directly above the Stage Sequence's full-paragraph versions of the same 4 stages — some content echo, left as-is per "build around the hero visual already built."
 5. **SERVICES SIGNED OFF (D-034, 2026-08-14):** Mohammad confirmed "Services is approved and complete." No further Services visual/structural work without a new explicit instruction. The D-015 "item 5" capability-regrouping question remains separately held, not reopened by this sign-off. Two explicit flags carried forward from D-017, still open: Instagram has no real URL (`href="#"` placeholder); the emergency-CTA phone number is a TEMPORARY placeholder pending a real Canadian line before public launch.
@@ -33,6 +35,37 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-15 (continued) — Industries page built (Step 9, D-044)
+**Completed:**
+- User supplied `ORAGROL_INDUSTRIES_CONTENT_CANADA.md` (Mohammad's real, fact-checked-against-Canadian-Centre-for-Cyber-Security/OSFI content brief) plus an explicit structure spec: desktop left sidebar / mobile horizontal scrollable tabs, a right detail panel with 4 fields (Risk/Priorities/Approach/Next Step), instant swap on click (no reload, no accordion), active/inactive styling reusing Services' existing weight-600/weight-400-muted convention, and a typed content array separate from component logic.
+- Researched the interaction pattern first, same discipline as Services/How We Work: `ui-ux-pro-max`'s `ux` domain (keyboard-nav/focus-state/tab-order guidance) and a `21st.dev` component search for "sidebar tabs detail panel selector," both confirming this is the WAI-ARIA "Tabs" pattern — a `tablist` of `tab`s driving one `tabpanel` via state — not a same-page anchor-nav list like Services' `CategoryNav` (that one scroll-spies real hrefs to always-rendered sections; here only one panel is ever on screen).
+- Built `IndustriesExplorer`: real `role="tablist"`/`tab`/`tabpanel` semantics on `<button>`s (not `NavLink`, which is a real page-navigating `<Link>`) with full keyboard support (Arrow/Home/End, roving `tabIndex`). Active/inactive styling reimplements `NavLink`'s locked `size="lg"` split (D-019) rather than inventing a new rule. Desktop: sticky vertical tablist. Mobile: the identical tab set rendered horizontally with `overflow-x-auto`/`whitespace-nowrap` — verified zero horizontal overflow at 390px.
+- Built `industries-data.ts` — all 9 industries as a typed array, content copied verbatim. **Verified byte-for-byte via a Node script** that parses the source `.md` and diffs every field against the built array programmatically (not a visual read-through) — all 9 industries × 4 fields matched exactly on the first pass.
+- `nextStep.kind` routes each CTA to the correct real existing target (not new content): "Get Your Cyber Health Score" → the live Tally assessment via the existing `AssessmentCta`; every "Talk to Oragrol About X" variant → `/contact`, same as every other "Talk to Oragrol" CTA site-wide.
+- Flagged rather than silently decided: no separate abstract-line-motif hero visual was built (D-008's original direction) — the structure spec given this round didn't call for one, and the interactive explorer itself is the "revealed via interaction" element; a future round could still add one. Also reused `FinalCta` at the page bottom (consistency with every other shipped page, not explicitly requested — flagged as a choice, not invented content).
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean (`/industries` now a static route, 11 total). Playwright clicked through 3 industries confirming the panel swaps to the correct real content every time (checked via `innerText`, not a glance); keyboard `ArrowDown` correctly moved tab selection; zero horizontal overflow at 390px. Screenshots sent to the user showing two different industries selected plus the mobile tab bar.
+- Surfaced, not fixed (out of scope): the sitewide floating "Under attack?" widget can visually overlap the panel's Next-Step CTA button at some scroll positions on this page — a pre-existing floating-element layout issue, not specific to Industries.
+
+**Files changed:**
+- New: `app/industries/page.tsx`, `app/components/sections/industries/{hero,industries-explorer,industries-data}.tsx/.ts`
+- `DECISIONS.md` (D-044), `PROJECT_MASTER.md` (Step 9 → IMPLEMENTED, Current Position), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The pre-existing "Under attack?" widget overlap noted above — real, but out of scope for this instruction.
+
+**Problems solved:**
+- Step 9 fully built from a real, sourced content brief with byte-for-byte verification, not a paraphrase — matching this project's content-accuracy discipline (CLAUDE.md §8) for client-facing MSSP copy.
+
+**Still open / needs verification:**
+- Mohammad's review of `/industries`.
+- Awaiting Mohammad's review of Step 8 (How We Work) and the Cyber Health ambient hero (D-043) — both still open from prior sessions.
+- Nav contrast (visual check only, carried over) — still the only long-standing open item.
+
+**Next recommended step:**
+- Get Industries reviewed; Step 10 (Resources/Insights) is next once outstanding reviews clear.
+
+---
 
 ### 2026-08-15 — Cyber Health ambient hero shipped live (D-043)
 **Completed:**
