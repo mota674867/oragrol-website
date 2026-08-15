@@ -1,4 +1,5 @@
 import { PhoneCall } from "lucide-react";
+import Link from "next/link";
 import { Icon } from "../ui";
 
 /**
@@ -8,26 +9,24 @@ import { Icon } from "../ui";
  * Stays inside the locked cyan/navy palette — no red/urgency color
  * introduced, matching the instruction not to add a new decorative hue.
  *
- * PLACEHOLDER NUMBER — +60 18-377-2761, supplied by Mohammad in-session
- * as temporary, explicitly flagged as needing replacement with a real
- * Canadian contact line before public launch. Do not remove this comment
- * or the number without confirming the real line first.
+ * Previously a `tel:` link to a placeholder Malaysian mobile number
+ * (supplied by Mohammad in-session as temporary — see DECISIONS.md D-017
+ * for the number itself, kept out of source now that it's retired). No
+ * real Canadian line exists yet, so this now routes to `/contact`
+ * instead of showing any phone number — text-only CTA, same pill
+ * styling/icon/position, per explicit instruction. Re-add a real `tel:`
+ * link here once a real Canadian emergency line is confirmed.
  */
-const EMERGENCY_PHONE_DISPLAY = "+60 18-377-2761";
-const EMERGENCY_PHONE_TEL = "+60183772761";
-
 export function EmergencyCta() {
   return (
     <div className="env-dark fixed bottom-6 right-6 z-40">
-      <a
-        href={`tel:${EMERGENCY_PHONE_TEL}`}
+      <Link
+        href="/contact"
         className="flex items-center gap-2 rounded-full border border-accent/40 bg-background px-4 py-3 font-body text-sm font-medium text-text-primary shadow-lg shadow-accent/20 transition-colors duration-150 hover:border-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
         <Icon icon={PhoneCall} size="sm" className="text-accent" />
-        <span>
-          Under attack? <span className="text-text-secondary">{EMERGENCY_PHONE_DISPLAY}</span>
-        </span>
-      </a>
+        <span>Under attack? Contact us now</span>
+      </Link>
     </div>
   );
 }

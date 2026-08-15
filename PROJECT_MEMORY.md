@@ -19,12 +19,14 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **STEP 9 — INDUSTRIES BUILT (D-044, 2026-08-15).** Mohammad supplied the real, fact-checked content brief (`ORAGROL_INDUSTRIES_CONTENT_CANADA.md`) plus an explicit structure spec. Built `/industries`: desktop sticky sidebar / mobile horizontal scrollable tabs (real ARIA `tablist`/`tab`/`tabpanel`, keyboard-navigable), an instant-swap detail panel (Risk/Priorities/Approach/Next Step), all 9 industries, active/inactive styling reusing Services' locked weight-600/weight-400-muted convention. Content verified byte-for-byte against the source `.md` via a Node diff script (not a visual read-through). Awaiting Mohammad's review.
 
+**EMERGENCY CTA PLACEHOLDER NUMBER REMOVED (D-045, 2026-08-15).** The temporary Malaysian number in the site-wide floating "Under attack?" pill (D-017) is gone — the pill is now text-only ("Under attack? Contact us now"), links to `/contact` instead of `tel:`, same styling/icon/position. Single global component (`EmergencyCta`, rendered once from `RootLayout`), no separate footer instance existed. Confirmed via grep: the number no longer appears anywhere in source, only in this file and `DECISIONS.md`'s historical record.
+
 ## Next Steps
 1. ~~BLOCKING: Cyber Health ambient hero (D-043)~~ — **SHIPPED LIVE 2026-08-15**, see Current Status. No longer blocking.
 2. ~~ACTIVE: Step 9 — Industries~~ — **BUILT 2026-08-15 (D-044)**, see Current Status. Awaiting Mohammad's review. A pre-existing, out-of-scope issue was surfaced (not fixed) while building this: the sitewide floating "Under attack?" widget can visually overlap the panel's Next-Step CTA button at some scroll positions — flag for a future pass.
 3. Solutions' Kinetic Grid hero (D-039) approved and shipped live (D-040) — all 5 required modifications re-verified against the live page (canvas scoping, background pixel, reduced-motion staticness), not assumed to still hold from the prototype. `/solutions/prototype` removed. `StrataVisual`'s file kept unused, available for revert.
 4. Awaiting Mohammad's review of Step 8 (How We Work) — full page built, content-complete, connector-line bug fixed (D-037), and the same bug fixed on Home's own teaser too (D-038, confirmed). One thing still flagged, not silently resolved: the hero visual's own short stage one-liners sit directly above the Stage Sequence's full-paragraph versions of the same 4 stages — some content echo, left as-is per "build around the hero visual already built."
-5. **SERVICES SIGNED OFF (D-034, 2026-08-14):** Mohammad confirmed "Services is approved and complete." No further Services visual/structural work without a new explicit instruction. The D-015 "item 5" capability-regrouping question remains separately held, not reopened by this sign-off. Two explicit flags carried forward from D-017, still open: Instagram has no real URL (`href="#"` placeholder); the emergency-CTA phone number is a TEMPORARY placeholder pending a real Canadian line before public launch.
+5. **SERVICES SIGNED OFF (D-034, 2026-08-14):** Mohammad confirmed "Services is approved and complete." No further Services visual/structural work without a new explicit instruction. The D-015 "item 5" capability-regrouping question remains separately held, not reopened by this sign-off. One explicit flag carried forward from D-017, still open: Instagram has no real URL (`href="#"` placeholder). The other (emergency-CTA phone number) is resolved — see D-045 below, the pill no longer shows any number.
 6. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating. `ui-ux-pro-max` skill is installed (Python 3.12 dependency) and usable the same way.
 7. Known Tailwind v4 gotcha worth remembering: arbitrary-value utilities with `color-mix()` (or similar multi-comma CSS functions) nested inside bracket syntax can silently generate no CSS at all. Prefer Tailwind's built-in `{utility}-{registered-color}/{opacity}` mechanic over hand-rolled arbitrary values when a registered theme color is involved. Also: Tailwind v4 uses standalone `translate`/`scale`/`rotate` CSS properties, not the composed `transform` — don't debug hover/motion utilities by checking `getComputedStyle(el).transform`.
 8. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in the Services visual components — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
@@ -35,6 +37,32 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-15 (continued 2) — Emergency CTA placeholder number removed (D-045)
+**Completed:**
+- User instructed removing D-017's temporary Malaysian emergency number from the "Under attack?" floating pill site-wide, replacing it with a text-only CTA linking to `/contact` — "Under attack? Contact us now," same pill styling/icon/position.
+- Grepped the whole repo for the number and its `tel:` variant first, per this project's "investigate before editing" discipline: found exactly one component, `EmergencyCta`, rendered once from `RootLayout` (already site-wide, including behind the footer) — no separate hardcoded footer instance existed to find.
+- Edited `EmergencyCta`: `<a href="tel:...">` → `next/link` `<Link href="/contact">`; deleted the phone-number constants entirely (not just hidden/commented out); kept `PhoneCall` icon, pill classes, and fixed bottom-right position untouched, per explicit instruction. Also stripped the literal digits out of the component's own code comment — the requirement was "no longer appears anywhere," which a comment would have violated even though it doesn't render.
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean. Post-edit grep for the exact digit sequence across the repo: zero hits outside `DECISIONS.md`/`PROJECT_MEMORY.md` (the permanent historical record, correctly left alone). Playwright-confirmed on 3 different pages (`/`, `/cyber-health`, `/industries`) that the pill's text and `href` are both correct — not assumed from editing one call site, since the component is global.
+
+**Files changed:**
+- `app/components/site/emergency-cta.tsx`
+- `DECISIONS.md` (D-045, D-017 cross-reference update), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- None — straightforward single-component change, no surprises.
+
+**Problems solved:**
+- D-017's "temporary placeholder, replace before launch" flag is now moot for the phone number specifically (no number shown at all). Instagram's separate placeholder from the same D-017 round is untouched, still open.
+
+**Still open / needs verification:**
+- Instagram `href="#"` placeholder (D-017, unrelated to this change).
+- Mohammad's review of `/industries` (D-044), the Cyber Health ambient hero (D-043), and How We Work (D-036/D-037/D-038) — all still pending from prior sessions.
+
+**Next recommended step:**
+- Awaiting Mohammad's review of the several items above; Step 10 (Resources/Insights) once those clear.
+
+---
 
 ### 2026-08-15 (continued) — Industries page built (Step 9, D-044)
 **Completed:**
