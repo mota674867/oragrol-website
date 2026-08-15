@@ -22,13 +22,14 @@ import { LinkedInIcon, InstagramIcon } from "./social-icons";
  * OragrolLogo is the single source of truth for the full lockup; every
  * place the logo appears should import it, never re-approximate it.
  *
- * Social icons: LinkedIn now has a real URL (supplied by Mohammad,
- * 2026-08-13: https://www.linkedin.com/company/oragrol-global/).
- * Instagram has NO real page yet — explicit "#" placeholder per
- * Mohammad's own instruction not to invent one; flagged below. X/Twitter
- * intentionally not added — "near future" only, per instruction. Icons
- * are small hand-drawn outline glyphs (social-icons.tsx) since
- * lucide-react 1.31.0 has no brand/social icon exports.
+ * Social icons: LinkedIn (supplied by Mohammad, 2026-08-13:
+ * https://www.linkedin.com/company/oragrol-global/) and Instagram
+ * (supplied 2026-08-15: https://www.instagram.com/oragrolglobal, D-046 —
+ * replaces the earlier explicit "#" placeholder) both now have real
+ * URLs. X/Twitter intentionally not added — "near future" only, per
+ * instruction. Icons are small hand-drawn outline glyphs
+ * (social-icons.tsx) since lucide-react 1.31.0 has no brand/social icon
+ * exports.
  */
 
 const COMPANY_LINKS = [
@@ -91,14 +92,11 @@ export function SiteFooter() {
               >
                 <LinkedInIcon className="h-5 w-5" />
               </a>
-              {/* Instagram — TODO: no real Oragrol Instagram page exists
-                  yet. Explicit "#" placeholder per Mohammad's instruction
-                  not to invent a URL; replace href once a real page
-                  exists. X/Twitter intentionally not added — "near
-                  future" only. */}
               <a
-                href="#"
-                aria-label="Oragrol Global on Instagram (coming soon)"
+                href="https://www.instagram.com/oragrolglobal"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Oragrol Global on Instagram"
                 className="text-text-secondary transition-colors duration-150 hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent rounded-sm"
               >
                 <InstagramIcon className="h-5 w-5" />

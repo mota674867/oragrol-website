@@ -150,12 +150,16 @@ Hero, Featured Insight, Latest Insights, Article Cards, Newsletter/LinkedIn, CTA
 ### Step 11 — Company / About Page — PENDING
 Primarily light section. Hero, Who Oragrol Is, Company Story, Philosophy, Experience & Expertise, Partners & Ecosystem, Approach, CTA. Do not fabricate history/achievements — final story remains OPEN.
 
-### Step 12 — Contact Page — PENDING (restored)
-Primarily light, spacious, conversion-focused.
-Hero: "Let's make security clearer."
-CTAs: Talk to Oragrol / Get Your Cyber Health Score / Book a consultation.
-Form fields: Name, Business email, Company, Company size, What can we help with, Message.
-Include contact details, location, LinkedIn, EN/FR.
+### Step 12 — Contact Page — IMPLEMENTED (D-046, 2026-08-15)
+Original outline above (generic form + "Book a consultation") superseded by a more specific
+later instruction: two-path structure, kept visually/functionally separate, not a merged
+generic form. Path 1 "New to Oragrol" → Cyber Health assessment (self-serve). Path 2
+"Existing client / urgent" → direct phone + email + "Under attack?" CTA. Two labeled
+locations (Toronto primary/Operations, Thunder Bay secondary/Registered Office); Toronto's
+fields are all `[pending]` in the source, rendered as "Coming soon," not blank or invented.
+Hero headline ("Let's make security clearer.") reused from the original outline — still the
+same locked line. "Book a consultation" dropped — no real booking destination exists anywhere
+in the project. Full details: D-046. Awaiting Mohammad's review.
 
 ### Step 13 — FAQ / Supporting Content — PENDING
 Contextual sections across relevant pages, supported by AI Chat. Categories: Cyber Health Assessment, Services, Security & Compliance, How Oragrol Works, Pricing & Packages, Partners & Technology, Getting Started. Don't finalize answers dependent on unresolved pricing.
@@ -236,7 +240,9 @@ Also active (D-035/D-036/D-037): Step 8 (How We Work) — CONTENT COMPLETE, conn
 **D-041 (2026-08-14):** A Cyber Health "processing screen" loader (`AiLoader`) was requested and prototyped at `/cyber-health/prototype-loader` — but flagged two real findings before building further: no "Processing Screen" spec section exists in this repo's docs, and this codebase has no in-app processing pipeline for such a screen to attach to (the real Assessment/Score/AI-Analysis/CRM pipeline runs entirely on the external Tally MVP, per Step 7 above). Built the component regardless (useful, self-contained, all 5 required fixes verified), deliberately NOT wired into the live page — awaiting Mohammad's input on where it should attach, if anywhere.
 **D-043 (2026-08-15) — SHIPPED LIVE:** Cyber Health hero's `GaugeVisual` replaced with the ambient `HeroAmbientLoader`, wording locked to "Assess."/"Prioritize."/"Protect." as originally given. Prototype route removed. Full details: D-043.
 **D-044 (2026-08-15):** Step 9 (Industries) built — see Step 9 above.
-Next: Awaiting Mohammad's review of the How We Work page build (D-036/D-037/D-038), the Cyber Health ambient hero (D-043), and the new Industries page (D-044). Step 10 (Resources/Insights) is the next unbuilt step once these are reviewed.
+**D-045 (2026-08-15):** Emergency CTA's placeholder Malaysian number removed site-wide; pill is now text-only, links to `/contact`.
+**D-046 (2026-08-15):** Step 12 (Contact) built — see Step 12 above. Instagram's placeholder footer link also replaced with the real URL in the same session.
+Next: Awaiting Mohammad's review of the How We Work page build (D-036/D-037/D-038), the Cyber Health ambient hero (D-043), Industries (D-044), and Contact (D-046). Step 10 (Resources/Insights) is the next unbuilt step once these are reviewed.
 
 ---
 

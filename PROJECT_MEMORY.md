@@ -21,12 +21,15 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **EMERGENCY CTA PLACEHOLDER NUMBER REMOVED (D-045, 2026-08-15).** The temporary Malaysian number in the site-wide floating "Under attack?" pill (D-017) is gone — the pill is now text-only ("Under attack? Contact us now"), links to `/contact` instead of `tel:`, same styling/icon/position. Single global component (`EmergencyCta`, rendered once from `RootLayout`), no separate footer instance existed. Confirmed via grep: the number no longer appears anywhere in source, only in this file and `DECISIONS.md`'s historical record.
 
+**STEP 12 — CONTACT BUILT (D-046, 2026-08-15).** Mohammad supplied `Oragrol_Contact_Page_Content.md` with a two-path structure superseding the original generic-form outline. Built `/contact`: Path 1 "New to Oragrol" → the real Cyber Health assessment; Path 2 "Existing client / urgent" → direct `tel:`/`mailto:` to the real Thunder Bay number/email plus "Under attack?" framing. Two location cards — Toronto primary/Operations (all fields `[pending]` in the source, rendered as "Coming soon" badges, not blank/invented), Thunder Bay secondary/Registered Office (real details). Same session: footer's Instagram `href="#"` placeholder replaced with the real URL (`https://www.instagram.com/oragrolglobal`) — confirmed via grep to be the only instance site-wide. Awaiting Mohammad's review.
+
 ## Next Steps
 1. ~~BLOCKING: Cyber Health ambient hero (D-043)~~ — **SHIPPED LIVE 2026-08-15**, see Current Status. No longer blocking.
 2. ~~ACTIVE: Step 9 — Industries~~ — **BUILT 2026-08-15 (D-044)**, see Current Status. Awaiting Mohammad's review. A pre-existing, out-of-scope issue was surfaced (not fixed) while building this: the sitewide floating "Under attack?" widget can visually overlap the panel's Next-Step CTA button at some scroll positions — flag for a future pass.
 3. Solutions' Kinetic Grid hero (D-039) approved and shipped live (D-040) — all 5 required modifications re-verified against the live page (canvas scoping, background pixel, reduced-motion staticness), not assumed to still hold from the prototype. `/solutions/prototype` removed. `StrataVisual`'s file kept unused, available for revert.
 4. Awaiting Mohammad's review of Step 8 (How We Work) — full page built, content-complete, connector-line bug fixed (D-037), and the same bug fixed on Home's own teaser too (D-038, confirmed). One thing still flagged, not silently resolved: the hero visual's own short stage one-liners sit directly above the Stage Sequence's full-paragraph versions of the same 4 stages — some content echo, left as-is per "build around the hero visual already built."
-5. **SERVICES SIGNED OFF (D-034, 2026-08-14):** Mohammad confirmed "Services is approved and complete." No further Services visual/structural work without a new explicit instruction. The D-015 "item 5" capability-regrouping question remains separately held, not reopened by this sign-off. One explicit flag carried forward from D-017, still open: Instagram has no real URL (`href="#"` placeholder). The other (emergency-CTA phone number) is resolved — see D-045 below, the pill no longer shows any number.
+5. **SERVICES SIGNED OFF (D-034, 2026-08-14):** Mohammad confirmed "Services is approved and complete." No further Services visual/structural work without a new explicit instruction. The D-015 "item 5" capability-regrouping question remains separately held, not reopened by this sign-off. Both flags carried forward from D-017 are now resolved: Instagram has a real URL (D-046); the emergency-CTA phone number is gone entirely (D-045).
+12. Awaiting Mohammad's review of Contact (D-046). Toronto's address/phone/email/hours are all still genuinely `[pending]` — do not fill any of them in without a real supplied value, even once the page is reviewed.
 6. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating. `ui-ux-pro-max` skill is installed (Python 3.12 dependency) and usable the same way.
 7. Known Tailwind v4 gotcha worth remembering: arbitrary-value utilities with `color-mix()` (or similar multi-comma CSS functions) nested inside bracket syntax can silently generate no CSS at all. Prefer Tailwind's built-in `{utility}-{registered-color}/{opacity}` mechanic over hand-rolled arbitrary values when a registered theme color is involved. Also: Tailwind v4 uses standalone `translate`/`scale`/`rotate` CSS properties, not the composed `transform` — don't debug hover/motion utilities by checking `getComputedStyle(el).transform`.
 8. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in the Services visual components — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
@@ -37,6 +40,37 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-15 (continued 3) — Contact page built (Step 12, D-046) + Instagram link fixed
+**Completed:**
+- User supplied `Oragrol_Contact_Page_Content.md` with an explicit two-path structure superseding Step 12's original generic-form outline: Path 1 "New to Oragrol" → the Cyber Health assessment; Path 2 "Existing client / urgent" → direct phone/email + "Under attack?" — kept visually/functionally separate, not merged into one form. Reused the hero headline ("Let's make security clearer.") from the original outline since it's still the same locked line; dropped "Book a consultation" since no real booking destination exists anywhere in the project (flagged, not invented).
+- Built `locations-data.ts` — a typed `Location[]` array. Thunder Bay's fields copied verbatim (real address/phone/email/hours). Every Toronto field is the literal `[pending]` marker from the source, rendered per-field as a "Coming soon" `Badge` — not blank, not backfilled with Thunder Bay's values. Toronto renders as the visually primary card (larger, accent border/tint, "Operations" label); Thunder Bay renders smaller/secondary, explicitly "Registered Office."
+- Caught and avoided a real pitfall before it shipped: the location cards needed a heading size between `H3`'s two existing tiers. Overriding `H3`'s size via `className` would have emitted two conflicting `text-*` utilities for the same element — the exact plain-`cn()`-concatenation gotcha `cn.ts`/`typography.tsx` already document. Used a plain `<h3>` with one complete class string instead of fighting the shared component's own size table.
+- Path 2's "Under attack?" CTA is a real `tel:` link to Thunder Bay's confirmed number, not a link back to `/contact` — that would be circular now that this page IS `/contact` and the sitewide pill (D-045) already points here. Path 1 reuses the exact same `AssessmentCta`/Tally destination used everywhere else. Deliberately no closing `FinalCta` on this page (every other page has one) — `FinalCta` itself points at `/contact`, so it would point the page at itself.
+- Instagram fix (separate item, same session): grepped the whole repo for `instagram` first — confirmed exactly one live `href` existed (`SiteFooter`'s `href="#"` placeholder, D-017); no separate hardcoded instance anywhere else, including the new Contact page (which doesn't render social icons). Updated to `https://www.instagram.com/oragrolglobal`, added `target="_blank"`/`rel="noopener noreferrer"` to match the LinkedIn icon's existing pattern, removed the now-inaccurate "(coming soon)" `aria-label`.
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean (`/contact` now static, 12 total routes). Playwright confirmed — scoped to `<main>`, since the header nav has its own same-text CTA that a naive query would wrongly match — Path 1's CTA resolves to the real Tally URL; Path 2's CTA resolves to `tel:+16133150328`; the email link resolves to `mailto:info@oragrolglobal.com`; exactly 4 "Coming soon" badges render; both "Registered Office"/"Operations" labels are present. Post-edit grep: zero remaining `href="#"` in any `.tsx` file; exactly one hit for the real Instagram URL. Screenshots sent to the user showing both location cards (pending-state styling included) and the footer.
+
+**Files changed:**
+- New: `app/contact/page.tsx`, `app/components/sections/contact/{hero,two-path,locations,locations-data}.tsx/.ts`
+- `app/components/site/site-footer.tsx` (Instagram href + comment)
+- `DECISIONS.md` (D-046), `PROJECT_MASTER.md` (Step 12 → IMPLEMENTED, Current Position), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The `H3` size-conflict pitfall above — caught and avoided before it shipped, not a real bug in the final code.
+
+**Problems solved:**
+- Step 12 built from a real content brief with a genuinely different (better-specified) structure than the original placeholder outline, without silently dropping the "Book a consultation" CTA's absence — flagged instead.
+- Instagram's last remaining dead link on the site replaced with the real URL.
+
+**Still open / needs verification:**
+- Mohammad's review of `/contact`, `/industries` (D-044), the Cyber Health ambient hero (D-043), and How We Work (D-036/D-037/D-038) — all pending.
+- Toronto's address/phone/email/hours remain genuinely unconfirmed — do not fill in without a real supplied value.
+- Nav contrast (visual check only, carried over) — still the only long-standing open item.
+
+**Next recommended step:**
+- Awaiting Mohammad's review of the several items above; Step 10 (Resources/Insights) once those clear.
+
+---
 
 ### 2026-08-15 (continued 2) — Emergency CTA placeholder number removed (D-045)
 **Completed:**
