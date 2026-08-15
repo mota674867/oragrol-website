@@ -15,8 +15,10 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **CYBER HEALTH HERO GAUGE REOPENED, AMBIENT LOADER PROTOTYPED, NOT WIRED IN (D-043, 2026-08-14).** Mohammad reopened D-008's `GaugeVisual` hero, requesting a persistent ambient visual built on D-042's `AiLoader` ring (extracted into shared `RotatingRing`/`FadeText`, not duplicated), cycling short brand words instead of action language, reduced-motion holding for the full page lifetime, and offscreen pausing for performance. Prototyped at `/cyber-health/prototype-hero`, all 5 required changes verified with direct evidence. `hero.tsx`/`GaugeVisual` untouched — awaiting Mohammad's review and his call on a wording flag (see Next Steps #1).
 
+**CYBER HEALTH AMBIENT HERO SHIPPED LIVE (D-043, 2026-08-15).** Mohammad approved and re-specified the exact wording ("Assess."/"Prioritize."/"Protect.") — resolves the wording flag by keeping his original words. `hero.tsx` now renders `HeroAmbientLoader` in place of `GaugeVisual`; prototype route/component removed. Re-verified live (not just re-assumed from the prototype): clean typecheck/lint/build, and Playwright-captured proof screenshots (the Chrome-extension tab in this environment runs with `document.hidden === true` regardless of focus, throttling/freezing the CSS fade — Playwright was used instead, per CLAUDE.md §7's documented method) of the mid-cycle "PRIORITIZE." state, the reduced-motion static state, and the IntersectionObserver pause/resume on scroll.
+
 ## Next Steps
-1. **BLOCKING: Cyber Health ambient hero (D-043).** Prototyped at `/cyber-health/prototype-hero`, all 5 required changes verified (reduced-motion persistence, offscreen-pause, fps sampling, color, copy preservation). Two things need Mohammad's decision before shipping: (a) approve/reject the visual itself; (b) a wording flag — his example words ("Assess."/"Prioritize."/"Protect.") only partially match the already-locked How We Work stage vocabulary ("Understand/Prioritize/Protect/Improve," D-035/D-036) — "Assess" isn't one of the four locked names. Built exactly as given per his own "confirm with me if you want different wording" — not silently changed either way.
+1. ~~BLOCKING: Cyber Health ambient hero (D-043)~~ — **SHIPPED LIVE 2026-08-15**, see Current Status. No longer blocking.
 2. **ACTIVE: Step 9 — Industries.** Mohammad said he's sending the per-industry content brief next (risk/priorities/approach/next-step for each of the 9 named industries — Professional Services, Healthcare, Financial Services, Retail & E-commerce, Manufacturing, Technology, Construction & Real Estate, Education, Other SMBs). Do not build real copy before it arrives — same "ask before inventing" discipline as How We Work (D-035).
 3. Solutions' Kinetic Grid hero (D-039) approved and shipped live (D-040) — all 5 required modifications re-verified against the live page (canvas scoping, background pixel, reduced-motion staticness), not assumed to still hold from the prototype. `/solutions/prototype` removed. `StrataVisual`'s file kept unused, available for revert.
 4. Awaiting Mohammad's review of Step 8 (How We Work) — full page built, content-complete, connector-line bug fixed (D-037), and the same bug fixed on Home's own teaser too (D-038, confirmed). One thing still flagged, not silently resolved: the hero visual's own short stage one-liners sit directly above the Stage Sequence's full-paragraph versions of the same 4 stages — some content echo, left as-is per "build around the hero visual already built."
@@ -31,6 +33,36 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-15 — Cyber Health ambient hero shipped live (D-043)
+**Completed:**
+- User (in-session, standing in for Mohammad's sign-off) gave the final go-ahead on D-043's prototype: replace `GaugeVisual` with `HeroAmbientLoader` in the live hero, and explicitly re-specified the wording — "Assess." → "Prioritize." → "Protect." every ~2.2s — resolving last session's flagged wording note in favor of keeping the original words as given rather than reconciling with the locked How We Work vocabulary.
+- Confirmed nothing needed building from scratch: the D-043 prototype (`hero-ambient-loader.tsx`, `RotatingRing`/`FadeText` extracted into `ai-loader.tsx`) already satisfied every requirement (persistent/no isLoading flag, reduced-motion, IntersectionObserver offscreen-pause, `--color-accent`/`--color-background` tokens only, headline/subhead/CTAs untouched) — wired it in rather than re-deriving it.
+- `hero.tsx`: swapped the `GaugeVisual` import/usage for `HeroAmbientLoader`, added an inline comment pointing to D-043. Removed `/cyber-health/prototype-hero` and the prototype-only `CyberHealthHeroAmbientPrototype` component, per the same prototype-lifecycle convention as D-039/D-040 and D-041/D-042 (noindex prototype routes get deleted once the real decision is made). Updated `cyber-health/page.tsx`'s own doc comment (still referenced `GaugeVisual`). Left `gauge-visual.tsx` itself in place, unused, available for revert — same convention as `StrataVisual` after D-039/D-040.
+- Verification: `.next` cleared (stale route-manifest reference to the deleted prototype route caused a transient `tsc` error, resolved by clearing the cache — not a real code problem), then `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean. Dev server restarted clean to clear stale HMR state from the deleted route.
+- **Screenshot-methodology finding, surfaced rather than worked around silently:** the Chrome-extension automation tab in this environment reports `document.hidden === true` / `document.hasFocus() === false` even immediately after an explicit click on the page, regardless of `tabs_create_mcp`d fresh tabs — Chrome throttles/freezes CSS animations and `setInterval` timers on such tabs, which produced a string of misleading screenshots (the fade-in stuck at "P", then "PR", advancing by roughly one letter per screenshot call — consistent with Chrome forcing exactly one paint per `captureScreenshot` call and otherwise freezing the compositor). Diagnosed via direct DOM query (`getComputedStyle(letterSpan).opacity` reading `0` for every letter of "Prioritize." while screenshots showed partial glyphs) before concluding it was a capture artifact, not a real animation bug. Switched to the project's own documented method (CLAUDE.md §7: Playwright via `playwright-core`, scripted from the scratchpad) instead of fighting the extension — Playwright's headless page has no such hidden-tab throttling, and correctly captured all three required states on the first pass: (a) live proof screenshot with "PRIORITIZE." fully opaque and the ring mid-spin, sent to the user; (b) reduced-motion context — 0 `.animate-spin` elements, static "Assess. Prioritize. Protect." label; (c) scroll-based IntersectionObserver check — `.animate-spin` count 1 in view → 0 scrolled to page bottom → 1 back in view.
+
+**Files changed:**
+- `app/components/sections/cyber-health/hero.tsx` (`GaugeVisual` → `HeroAmbientLoader`)
+- `app/cyber-health/page.tsx` (doc comment only)
+- Deleted: `app/cyber-health/prototype-hero/page.tsx`, `app/components/sections/cyber-health/hero-ambient-prototype.tsx`
+- `DECISIONS.md` (D-043 status → shipped)
+- `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The Chrome-extension screenshot-throttling issue above — real, but a tooling/environment artifact, not a defect in the shipped code (confirmed by the DOM-level opacity check and by the clean Playwright capture of the same page).
+
+**Problems solved:**
+- D-043 fully closed: prototype → live, with direct-evidence proof (not code-level claims) for every one of the 7 stated requirements.
+
+**Still open / needs verification:**
+- Step 9 — Industries content brief, not yet received.
+- Nav contrast (visual check only, carried over) — still the only long-standing open item.
+
+**Next recommended step:**
+- Step 9 — Industries, once Mohammad sends the per-industry content brief.
+
+---
 
 ### 2026-08-14 (continued 24) — Cyber Health hero gauge reopened, ambient rotating-ring loader prototyped; wording flag surfaced (D-043)
 **Completed:**

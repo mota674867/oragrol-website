@@ -1,6 +1,6 @@
 import { ButtonLink, Caption, Container, H1, Section, Text } from "../../ui";
 import { Reveal } from "../../motion/reveal";
-import { GaugeVisual } from "./gauge-visual";
+import { HeroAmbientLoader } from "./hero-ambient-loader";
 import { AssessmentCta } from "./assessment-cta";
 
 /** The real, live assessment — confirmed by Mohammad, currently receiving
@@ -53,7 +53,14 @@ export function CyberHealthHero() {
           </div>
 
           <Reveal delay={0.15}>
-            <GaugeVisual className="mx-auto w-full max-w-md" />
+            {/* D-043: GaugeVisual (static instrument-panel gauge, D-008)
+                replaced with HeroAmbientLoader — a persistent, ambient
+                animated visual built on AiLoader's RotatingRing/FadeText
+                (D-042), reused rather than duplicated. Not a one-time
+                loading state: runs for the visitor's entire time on the
+                page, respects reduced-motion, pauses via IntersectionObserver
+                when scrolled out of view. See DECISIONS.md D-043. */}
+            <HeroAmbientLoader className="mx-auto w-full max-w-md" />
           </Reveal>
         </div>
       </Container>

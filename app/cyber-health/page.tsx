@@ -13,7 +13,9 @@ export const metadata: Metadata = {
 
 /**
  * Cyber Health — Website Implementation Brief, Step 7.
- * Flow: Hero (GaugeVisual, D-008's "instrument-panel" motif; CTA to the
+ * Flow: Hero (HeroAmbientLoader, D-043's persistent ambient rotating-ring
+ * visual, replacing D-008's static GaugeVisual instrument-panel gauge —
+ * see DECISIONS.md D-043; CTA to the
  * real live assessment) -> Flow (the locked 7-step sequence, page-level
  * weight) -> OutputShape (the locked output list + an illustrative report
  * preview) -> Reassurance (facts confirmed from the live form) ->
