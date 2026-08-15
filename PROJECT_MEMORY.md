@@ -23,8 +23,11 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **STEP 12 — CONTACT BUILT (D-046, 2026-08-15).** Mohammad supplied `Oragrol_Contact_Page_Content.md` with a two-path structure superseding the original generic-form outline. Built `/contact`: Path 1 "New to Oragrol" → the real Cyber Health assessment; Path 2 "Existing client / urgent" → direct `tel:`/`mailto:` to the real Thunder Bay number/email plus "Under attack?" framing. Two location cards — Toronto primary/Operations (all fields `[pending]` in the source, rendered as "Coming soon" badges, not blank/invented), Thunder Bay secondary/Registered Office (real details). Same session: footer's Instagram `href="#"` placeholder replaced with the real URL (`https://www.instagram.com/oragrolglobal`) — confirmed via grep to be the only instance site-wide. Awaiting Mohammad's review.
 
+**GENERAL INQUIRY FORM ADDED, BLOCKING ON A REAL API KEY (D-047, 2026-08-15).** Third entry point added to `/contact` above Locations: Name/Email/Company(optional)/Message, real email send via Resend at `POST /api/contact` (`resend`/`@hookform/resolvers` added; `react-hook-form`/`zod` were already installed, unused until now — one shared schema validates both client and server). No fake success path — verified directly: with `RESEND_API_KEY` unset in this environment, a real test submission correctly surfaces "Email sending isn't configured yet..." as an error, logged server-side with the exact fix needed. **BLOCKING — needs from Mohammad:** a real Resend API key (free tier is enough — https://resend.com/api-keys, no domain verification required to send via Resend's own `onboarding@resend.dev` sandbox sender). Once supplied, set it as `RESEND_API_KEY` in `.env.local` (gitignored, never committed — `.env.local.example` in the repo root documents this and two optional overrides) and restart the dev server; then a real test send still needs to be run and proven (screenshot of the received email, or a server log showing success) before this is fully closed.
+
 ## Next Steps
-1. ~~BLOCKING: Cyber Health ambient hero (D-043)~~ — **SHIPPED LIVE 2026-08-15**, see Current Status. No longer blocking.
+1. **BLOCKING: General Inquiry real email send (D-047).** Needs a real `RESEND_API_KEY` from Mohammad before the required real-send proof can be completed — see Current Status above for exactly what to supply and where it goes. Do not fabricate a "success" screenshot/log without an actual send.
+2. ~~BLOCKING: Cyber Health ambient hero (D-043)~~ — **SHIPPED LIVE 2026-08-15**, see Current Status. No longer blocking.
 2. ~~ACTIVE: Step 9 — Industries~~ — **BUILT 2026-08-15 (D-044)**, see Current Status. Awaiting Mohammad's review. A pre-existing, out-of-scope issue was surfaced (not fixed) while building this: the sitewide floating "Under attack?" widget can visually overlap the panel's Next-Step CTA button at some scroll positions — flag for a future pass.
 3. Solutions' Kinetic Grid hero (D-039) approved and shipped live (D-040) — all 5 required modifications re-verified against the live page (canvas scoping, background pixel, reduced-motion staticness), not assumed to still hold from the prototype. `/solutions/prototype` removed. `StrataVisual`'s file kept unused, available for revert.
 4. Awaiting Mohammad's review of Step 8 (How We Work) — full page built, content-complete, connector-line bug fixed (D-037), and the same bug fixed on Home's own teaser too (D-038, confirmed). One thing still flagged, not silently resolved: the hero visual's own short stage one-liners sit directly above the Stage Sequence's full-paragraph versions of the same 4 stages — some content echo, left as-is per "build around the hero visual already built."
@@ -40,6 +43,38 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-15 (continued 4) — General Inquiry form added to Contact (D-047), blocking on a real API key
+**Completed:**
+- User instructed a third Contact-page entry point, above Locations: "General Inquiry" (headline/subtext + Name/Email/Company-optional/Message form, "Send Message" button), with an explicit real-email requirement — no n8n/HubSpot, must actually send via Resend or SendGrid (whichever's simpler), a real success/error state (no faked success), and an explicit instruction to say exactly what API key setup is needed rather than hardcoding anything.
+- Chose Resend over SendGrid: one API key, one `emails.send()` call, and its own `onboarding@resend.dev` sandbox sender can send a real test email immediately with just the key — no mandatory sender-verification step first, unlike SendGrid. Installed `resend` + `@hookform/resolvers`; `react-hook-form`/`zod` were already project dependencies, unused anywhere until now — reused rather than hand-rolling form state or a different library.
+- Built one shared `zod` schema (`app/lib/contact-schema.ts`), validating both client (`GeneralInquiry`, via `zodResolver`) and server (`/api/contact`'s authoritative re-check). Hit and fixed a real zod+RHF typing pitfall before shipping: an initial `.transform()` on the optional `company` field made zod's input/output types diverge, which broke `useForm`'s single generic — removed the transform, handled blank-vs-provided at render time instead (`company || "—"` in the email body).
+- Built `POST /api/contact` — the only place the real send happens (client never touches Resend directly, no key in the browser bundle). `RESEND_API_KEY` read via `process.env` only; a missing key is a real, logged, reportable failure (never a faked success) — returns a real error pointing the visitor to the direct email address. Added `.env.local.example` (had to also fix `.gitignore`: the existing blanket `.env*` rule was silently swallowing example files too — added `!.env*.example`) documenting `RESEND_API_KEY` (required) plus `CONTACT_TO_EMAIL`/`CONTACT_FROM_EMAIL` (optional overrides).
+- Verified the "no fake success" behavior directly rather than just claiming it: submitted the live form with no `RESEND_API_KEY` set (this environment has none) — Playwright and the dev-server log both confirm it surfaces the real "Email sending isn't configured yet..." error, with the exact diagnostic logged server-side.
+- Visual consistency: the form sits in the same `Card` treatment as `TwoPath`'s two path-cards (bordered, same Caption/H2 pattern) — reads as a third option in the same family, not a bolted-on generic form. Error text reuses the site's existing `text-risk-critical` form-error convention (already used by `FieldChrome`), not a new color.
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean (`/api/contact` now a dynamic route, `/contact` still static — 13 routes total). Screenshots sent showing the idle form (styled consistent with the two path-cards) and the real error state after a live test submission.
+- **Still blocking, surfaced explicitly rather than worked around:** a real `RESEND_API_KEY` is needed from Mohammad before the required real-send proof (screenshot of a received email, or a server log showing success) can be completed. Did not fabricate either.
+
+**Files changed:**
+- New: `app/api/contact/route.ts`, `app/lib/contact-schema.ts`, `app/components/sections/contact/general-inquiry.tsx`, `.env.local.example`
+- `app/contact/page.tsx` (wired in above LocationsSection), `.gitignore` (`!.env*.example` exception), `package.json`/`package-lock.json` (`resend`, `@hookform/resolvers`)
+- `DECISIONS.md` (D-047), `PROJECT_MASTER.md` (Step 12 update, Current Position), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The zod `.transform()`/RHF generic-type mismatch above — caught by `tsc`, fixed before shipping, not a runtime bug.
+
+**Problems solved:**
+- A real, working (pending only a real API key) email-send integration built from already-installed dependencies, with the "don't fake success" requirement verified by actually triggering the failure path live, not just written into the code and assumed correct.
+
+**Still open / needs verification:**
+- **BLOCKING:** a real `RESEND_API_KEY` from Mohammad (see Current Status/Next Steps #1 for exactly what to supply and where it goes) — required before the real-send proof this task explicitly asked for can be completed.
+- Mohammad's review of `/contact` (D-046/D-047), `/industries` (D-044), the Cyber Health ambient hero (D-043), and How We Work (D-036/D-037/D-038) — all pending.
+- Nav contrast (visual check only, carried over) — still the only long-standing open item.
+
+**Next recommended step:**
+- Get the real `RESEND_API_KEY` from Mohammad, wire it into `.env.local`, run and prove a real test send. Otherwise: awaiting review of the several items above; Step 10 (Resources/Insights) once those clear.
+
+---
 
 ### 2026-08-15 (continued 3) — Contact page built (Step 12, D-046) + Instagram link fixed
 **Completed:**

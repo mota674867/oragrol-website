@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...except example files with no real values — meant to be committed
+# so the required env vars are discoverable (app/api/contact/route.ts).
+!.env*.example
 
 # vercel
 .vercel

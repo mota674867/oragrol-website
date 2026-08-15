@@ -160,6 +160,11 @@ fields are all `[pending]` in the source, rendered as "Coming soon," not blank o
 Hero headline ("Let's make security clearer.") reused from the original outline — still the
 same locked line. "Book a consultation" dropped — no real booking destination exists anywhere
 in the project. Full details: D-046. Awaiting Mohammad's review.
+A third "General Inquiry" entry point (D-047, 2026-08-15) was added above the Locations
+section — a real form (Name/Email/Company optional/Message) that sends an actual email via
+Resend (`/api/contact`), not a fake success state. **BLOCKING on a real `RESEND_API_KEY`** —
+see PROJECT_MEMORY.md for exactly what's needed from Mohammad before the real-send proof can
+be completed.
 
 ### Step 13 — FAQ / Supporting Content — PENDING
 Contextual sections across relevant pages, supported by AI Chat. Categories: Cyber Health Assessment, Services, Security & Compliance, How Oragrol Works, Pricing & Packages, Partners & Technology, Getting Started. Don't finalize answers dependent on unresolved pricing.
@@ -242,7 +247,8 @@ Also active (D-035/D-036/D-037): Step 8 (How We Work) — CONTENT COMPLETE, conn
 **D-044 (2026-08-15):** Step 9 (Industries) built — see Step 9 above.
 **D-045 (2026-08-15):** Emergency CTA's placeholder Malaysian number removed site-wide; pill is now text-only, links to `/contact`.
 **D-046 (2026-08-15):** Step 12 (Contact) built — see Step 12 above. Instagram's placeholder footer link also replaced with the real URL in the same session.
-Next: Awaiting Mohammad's review of the How We Work page build (D-036/D-037/D-038), the Cyber Health ambient hero (D-043), Industries (D-044), and Contact (D-046). Step 10 (Resources/Insights) is the next unbuilt step once these are reviewed.
+**D-047 (2026-08-15):** General Inquiry form added to Contact — code complete, verified end-to-end except the real outbound send. **BLOCKING:** needs a real `RESEND_API_KEY` from Mohammad — see Step 12 above / PROJECT_MEMORY.md.
+Next: **BLOCKING — a real `RESEND_API_KEY` for D-047** (General Inquiry email). Otherwise: awaiting Mohammad's review of How We Work (D-036/D-037/D-038), the Cyber Health ambient hero (D-043), Industries (D-044), and Contact (D-046). Step 10 (Resources/Insights) is the next unbuilt step once these are reviewed.
 
 ---
 
