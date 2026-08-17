@@ -55,6 +55,35 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 ## Session Log
 
+### 2026-08-17 (continued 5) — Services nav mega-menu added (D-053)
+**Completed:**
+- Built `app/components/site/services-nav-dropdown.tsx` (`ServicesNavDropdown`) and wired it into `SiteHeader` — the "Services" item only (desktop nav row + mobile nav panel); the other 6 nav items (Home logo aside — Solutions/Cyber Health/Industries/Resources/Company/Contact-via-CTA) are byte-for-byte untouched, confirmed via Playwright (`aria-haspopup` absent on Cyber Health's link, no chevron sibling on Company's mobile row).
+- **Content-source gap found and reported, not silently substituted:** the instruction named `oragrol_services_page_content.md` as the section-header source; a full repo search (glob + `git log --all --full-history`) found no such file, ever, in this repo. Used the actual confirmed, already-shipped source instead — `/services`' own locked capability data (`LiveServices.LIVE_SERVICES` 01-04 + `AdditionalCapabilities.FINALIZING_SERVICES` 05-08, and their real `capability-0N` DOM ids that `CategoryNav` already jump-scrolls to) — rather than inventing names to match a file that doesn't exist. Flagged to Mohammad in the same-turn report.
+- The 8 links: Virtual CISO, Risk Assessment & Compliance, Vulnerability Assessment & Management, Security Awareness Training, Managed Security Services / 24/7 MDR, Penetration Testing, Endpoint Protection / EDR, Incident Response — each `/services#capability-0N`. The instruction's own example anchor format (`#capability-name`, i.e. a slugified name) doesn't match the real anchors already live on the page (`#capability-01`...`#capability-08`, numbered) — used the real ones (a slug anchor would silently 404-scroll, matching nothing), flagged as a mismatch rather than silently deviating from the instruction's example unremarked.
+- Two variants, one component (`variant: "desktop" | "mobile"`): desktop is a hover/focus-opened absolute panel below the existing `NavLink` trigger (same component every other item uses, so it's pixel-identical at rest); mobile is an inline disclosure inside the existing full-viewport mobile panel — a chevron button toggles an indented sub-list, the "Services" label itself stays a plain link to `/services`.
+- Styling: reused tokens only — `bg-surface`/`border-border`/`shadow-xl` (same recipe as `HeaderSearch`'s existing floating panel), `font-heading` (Space Grotesk) on the small "Capabilities" panel label, `font-body` (Inter) on every link, `text-accent` (#018ABE, verified via computed style: `rgb(1, 138, 190)`) on hover/focus. No new colors, no promo cards/images — a plain link list, per the explicit "not Bell-style" instruction.
+- Behavior, each verified live via Playwright (not just asserted): Tab onto the trigger opens the panel (`onFocus`) and Tab continues naturally into its links (real DOM order); ArrowDown/ArrowUp move focus between the 8 items; Escape closes AND returns focus to the trigger; outside click closes it; closes on route change (`usePathname`, render-time reset — same pattern `SiteHeader` already uses for `mobileOpen`, not an effect, so it doesn't trip the "no setState in an effect" lint rule) and explicitly on every item click (covers same-page anchor navigation, where pathname alone doesn't change); `prefers-reduced-motion` swaps the open/close transition for an instant `hidden`/`block` toggle (verified under `reducedMotion: "reduce"` emulation).
+- **One real bug caught by the verification script and fixed before shipping:** Escape's `.focus()` call on the trigger re-triggered the same `onFocus` handler that opens the panel on a real Tab-in, silently reopening it on the same keypress — `aria-expanded` stayed `"true"` after Escape instead of flipping to `"false"`. Fixed with a one-shot `suppressNextFocusOpenRef` flag set right before the programmatic refocus and consumed by the very next `onFocus`. Re-verified clean after the fix.
+- Desktop hover-close is debounced ~150ms (`setTimeout`, cleared on re-entry): the panel is a DOM descendant of the hover container but the visual gap between trigger and panel isn't covered by either element, so an undebounced `mouseleave` fired mid-transit on a diagonal mouse move — caught by reasoning through the geometry before shipping, not discovered as a live bug.
+- **Verified:** `npx tsc --noEmit` / `npm run lint` / `npm run build` all clean (no new routes, same 20 pages). Full Playwright pass against the running dev server (not just component-level assumptions): desktop hover open/close, full keyboard flow (Tab → ArrowDown/ArrowUp → Escape), outside-click close, reduced-motion instant toggle, mobile chevron expand/collapse, click-through navigation to `/services#capability-01` (URL and panel-closed state both confirmed), hover-state accent color computed exactly `#018ABE`, panel heading computed font-family `"Space Grotesk"`, link computed font-family `Inter`. Screenshots reviewed directly (desktop panel open, mobile panel expanded) before reporting anything as done.
+
+**Files changed:**
+- New: `app/components/site/services-nav-dropdown.tsx`
+- `app/components/site/site-header.tsx` (conditional render: "Services" → `ServicesNavDropdown`, all 5 other links untouched)
+
+**Problems found:**
+- The named content file doesn't exist (see above) — reported, not guessed around.
+- The Escape/re-focus/re-open loop bug (see above) — caught by the verification script itself, fixed same session.
+
+**Still open / needs verification:**
+- Mohammad's in-browser review of the new dropdown — not yet done.
+- All previously-carried-forward open items (Home `insights.tsx` stale teaser, sitewide `EmergencyCta` overlap-at-some-scroll-positions) are unrelated to this session and remain open.
+
+**Next recommended step:**
+- Get the Services dropdown reviewed live; otherwise continue with whatever page/step Mohammad prioritizes next.
+
+---
+
 ### 2026-08-17 (continued 4) — Resources page built (Step 10, D-052)
 **Completed:**
 - User instructed building `/resources` with a mandatory research step first, content read verbatim from `ORAGROL_RESOURCES_ALL_ARTICLES_FINAL.md` (6 articles, Article 1 featured), a content grid with faceted filters (Industry/Topic/Content Type, hiding zero-match options), and an article detail template with an exact per-article CTA from the source's mapping table.

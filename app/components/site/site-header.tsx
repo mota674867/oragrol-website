@@ -8,6 +8,7 @@ import { ButtonLink, MobileMenuTrigger, NavBar, NavLink } from "../ui";
 import { cn } from "../ui/cn";
 import { OragrolLogo } from "../brand/oragrol-logo";
 import { HeaderSearch } from "./header-search";
+import { ServicesNavDropdown } from "./services-nav-dropdown";
 
 /**
  * SiteHeader — Step 4, refined in Header Refinement Pass 1, fixed in
@@ -51,6 +52,10 @@ import { HeaderSearch } from "./header-search";
  * doesn't render a non-functional placeholder for it. EN | FR stays a
  * static label (info-architecture presence per the brief) since full
  * locale routing isn't built yet.
+ *
+ * "Services" mega-menu: the only nav item that gets special treatment —
+ * see services-nav-dropdown.tsx. Every other NAV_LINKS entry still renders
+ * as a plain NavLink, both here and in the mobile panel below.
  */
 
 const NAV_LINKS = [
@@ -128,11 +133,19 @@ export function SiteHeader() {
               <OragrolLogo height={36} />
             </Link>
           }
-          links={NAV_LINKS.map((link) => (
-            <NavLink key={link.href} href={link.href} active={pathname === link.href}>
-              {link.label}
-            </NavLink>
-          ))}
+          links={NAV_LINKS.map((link) =>
+            link.label === "Services" ? (
+              <ServicesNavDropdown
+                key={link.href}
+                variant="desktop"
+                active={pathname === link.href}
+              />
+            ) : (
+              <NavLink key={link.href} href={link.href} active={pathname === link.href}>
+                {link.label}
+              </NavLink>
+            ),
+          )}
           actions={
             <>
               <HeaderSearch />
@@ -189,16 +202,24 @@ export function SiteHeader() {
         inert={!mobileOpen}
       >
         <nav className="flex flex-col gap-1 px-6 py-6" aria-label="Mobile">
-          {NAV_LINKS.map((link) => (
-            <NavLink
-              key={link.href}
-              href={link.href}
-              active={pathname === link.href}
-              className="py-2 text-base"
-            >
-              {link.label}
-            </NavLink>
-          ))}
+          {NAV_LINKS.map((link) =>
+            link.label === "Services" ? (
+              <ServicesNavDropdown
+                key={link.href}
+                variant="mobile"
+                active={pathname === link.href}
+              />
+            ) : (
+              <NavLink
+                key={link.href}
+                href={link.href}
+                active={pathname === link.href}
+                className="py-2 text-base"
+              >
+                {link.label}
+              </NavLink>
+            ),
+          )}
           <ButtonLink variant="primary" size="md" href="/cyber-health" className="mt-3 w-full">
             Get Your Cyber Health Score
           </ButtonLink>
