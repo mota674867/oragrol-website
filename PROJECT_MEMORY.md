@@ -27,9 +27,11 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **STEP 11 — COMPANY / ABOUT BUILT (D-048, 2026-08-17).** Built `/company` from Mohammad's real, final content brief (`ORAGROL_ABOUT_PAGE_CONTENT_FINAL.md`, 4 sections: Founder Bio/Mission-Story/Team/Values) plus his real founder photo (arrived mis-saved to the repo root with a mangled filename — moved to the correct `public/images/founder-mohammad.jpg` after verifying it was a real, valid 3024×4032 photo). Researched via `ui-ux-pro-max` + `21st.dev` first per instruction; no strong pre-built "premium founder bio" match surfaced, so all 4 sections were built natively with distinct treatments (Dark 2-col editorial photo+bio / Light-blue single-column manifesto / minimal white band / icon grid + dark closing panel) — flagged as native-build rather than falsely claimed as sourced. No separate hero was built (none was supplied — Founder Bio doubles as the opening). Deliberately opens Dark rather than the brief's "primarily light" framing, to avoid a real pre-existing SiteHeader defect (illegible white nav text over a light entry section before ~140px of scroll) — flagged, not silently worked around. Caught and fixed two real issues before shipping: a mobile horizontal-overflow bug (a `GlowEffect` halo's negative inset bled past the viewport) and a heading-hierarchy gap (Values' card titles were `H4` under an `H2`, skipping a level — fixed to `H3`, matching this project's own established convention). Correctly diagnosed a screenshot false alarm (Playwright's `fullPage` mode mis-composites `position: fixed` elements) rather than reporting it as a bug. Full details: D-048. `tsc`/lint/build all clean, `/company` static. Awaiting Mohammad's review.
 
+**FOUNDER BIO RESTRUCTURED (D-049, 2026-08-17).** Mohammad requested a layout-only restructure of Company's Founder Bio (D-048): small circular headshot (new file, `founder-mohammad-headshot.jpg` — arrived with the same mis-saved-filename pattern as the first photo, renamed to the correct path) + name + title at top, the same 3 bio paragraphs (byte-identical) reading through as a narrative middle column, then the original large photo reappearing as a widened (`max-w-2xl`) closing visual at the end. Text content unchanged, verified. A real (not a screenshot artifact this time — checked both ways) mobile-only issue found: the wider closing photo now visibly overlaps the sitewide `EmergencyCta` pill at real scroll positions, obscuring the founder's face — the same standing D-044 pill-overlap issue, now landing on the actual deliverable of this task rather than incidental text. Flagged with evidence, not fixed (pill is a single global `RootLayout` instance; desktop unaffected). Full details: D-049. `tsc`/lint/build clean.
+
 ## Next Steps
 1. **BLOCKING: General Inquiry real email send (D-047).** Needs a real `RESEND_API_KEY` from Mohammad before the required real-send proof can be completed — see Current Status above for exactly what to supply and where it goes. Do not fabricate a "success" screenshot/log without an actual send.
-2. Awaiting Mohammad's review of Company (D-048) — see Current Status. Same standing flags as every other recent page: the sitewide `EmergencyCta` pill can overlap page content at some scroll positions (D-044, out of scope); SiteHeader's Dark-entry-section assumption remains open for whenever a genuinely light-first page is wanted.
+2. Awaiting Mohammad's review of Company (D-048/D-049) — see Current Status. His call needed specifically on the mobile `EmergencyCta`/closing-photo overlap flagged in D-049 (a global-component fix, not scoped to this page, if he wants it addressed). Same other standing flags: SiteHeader's Dark-entry-section assumption remains open for whenever a genuinely light-first page is wanted.
 2. ~~BLOCKING: Cyber Health ambient hero (D-043)~~ — **SHIPPED LIVE 2026-08-15**, see Current Status. No longer blocking.
 2. ~~ACTIVE: Step 9 — Industries~~ — **BUILT 2026-08-15 (D-044)**, see Current Status. Awaiting Mohammad's review. A pre-existing, out-of-scope issue was surfaced (not fixed) while building this: the sitewide floating "Under attack?" widget can visually overlap the panel's Next-Step CTA button at some scroll positions — flag for a future pass.
 3. Solutions' Kinetic Grid hero (D-039) approved and shipped live (D-040) — all 5 required modifications re-verified against the live page (canvas scoping, background pixel, reduced-motion staticness), not assumed to still hold from the prototype. `/solutions/prototype` removed. `StrataVisual`'s file kept unused, available for revert.
@@ -46,6 +48,32 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-17 (continued) — Founder Bio restructured: small top identifier → narrative bio → large closing photo (D-049)
+**Completed:**
+- Restructured `FounderBio` (`app/components/sections/company/founder-bio.tsx`) per instruction: small circular headshot + name + "Founder & CEO" at top, the same 3 bio paragraphs (verified byte-identical, not touched) reading through as a narrative middle column, then the large-format photo reappearing as a widened closing visual at the end. Text-only-unchanged confirmed by direct comparison against the pre-edit file.
+- New headshot (`public/images/founder-mohammad-headshot.jpg`) arrived saved as `founder-mohammad-headshot.jpg.png` — same mis-saved-filename pattern as the original founder photo — verified it was a real, valid headshot before renaming to the correct path.
+- Moved `priority` from the large closing photo to the small top headshot (now the actual above-the-fold/LCP image) — a correctness fix that falls naturally out of the restructure, not a separate ask.
+- Found and verified a real (not a screenshot-stitching artifact — checked both ways, learned from the prior round's false alarm) mobile-only issue: the widened closing photo now visibly overlaps the sitewide `EmergencyCta` pill at real scroll positions, landing on the founder's face — the same standing D-044 pill-overlap issue, now hitting the actual deliverable this task asked for rather than incidental text. Flagged with evidence (real per-frame screenshots at fixed scroll offsets on both widths), not fixed — `EmergencyCta` is one global `RootLayout` instance; desktop confirmed unaffected at the same scroll positions.
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean; 0px horizontal overflow at 1440/390px; both images confirmed correctly wired via DOM query (correct `src`, correct alt-text split between decorative top photo and descriptive closing photo).
+
+**Files changed:**
+- `app/components/sections/company/founder-bio.tsx` (restructured)
+- New: `public/images/founder-mohammad-headshot.jpg` (moved/renamed from a mis-saved upload)
+- `DECISIONS.md` (D-049), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The mis-saved headshot filename (caught before use).
+- The real mobile pill/photo overlap — a genuine, new-severity instance of the already-standing D-044 issue, correctly distinguished from a screenshot artifact this time via real per-frame captures.
+
+**Still open / needs verification:**
+- Mohammad's review of the restructure, specifically his call on the mobile pill/photo overlap (a global-component question, not scoped to this page).
+- Every other still-open item carried forward unchanged (see Next Steps).
+
+**Next recommended step:**
+- Get this restructure reviewed alongside the rest of Company. If Mohammad wants the `EmergencyCta` overlap addressed, that's a separate, sitewide-scoped task (touches `RootLayout`/`emergency-cta.tsx`, not just this page).
+
+---
 
 ### 2026-08-17 — Company / About page built (Step 11, D-048)
 **Completed:**
