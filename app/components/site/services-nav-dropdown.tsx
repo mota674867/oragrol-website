@@ -178,7 +178,7 @@ export function ServicesNavDropdown({
       className={
         variant === "desktop"
           ? cn(
-              "absolute left-0 top-full z-10 mt-2 w-72 rounded-xl border border-border bg-surface p-2 shadow-xl",
+              "absolute left-0 top-full z-10 mt-2 w-72 rounded-xl border border-border bg-background p-2 shadow-xl",
               reduceMotion
                 ? open
                   ? "block"
