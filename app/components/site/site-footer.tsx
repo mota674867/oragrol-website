@@ -10,10 +10,9 @@ import { LinkedInIcon, InstagramIcon } from "./social-icons";
  * stays inside this project's own locked palette/typography throughout.
  *
  * Three real nav columns grouped from existing site nav (nothing
- * invented): Company (the site's core pages), Resources (currently just
- * the one real planned page — Resources/Insights, Step 10, still
- * PENDING/not built; deliberately not padded with invented links to
- * look fuller), Legal (unchanged from before).
+ * invented): Company (the site's core pages), Resources (just the one
+ * real page — /resources, Step 10, built D-052; deliberately not padded
+ * with invented links to look fuller), Legal (unchanged from before).
  *
  * Logo: reuses OragrolLogo (the same component SiteHeader uses), not a
  * hand-typed "ORAGROL" span + bare OragrolRing — a prior version of this
@@ -40,9 +39,9 @@ const COMPANY_LINKS = [
   { label: "Contact", href: "/contact" },
 ];
 
-/** Just the one real planned page (Step 10, PENDING) — not padded with
+/** Just the one real page (Step 10, built — D-052) — not padded with
  * invented links to fill out the column. */
-const RESOURCES_LINKS = [{ label: "Resources", href: "/insights" }];
+const RESOURCES_LINKS = [{ label: "Resources", href: "/resources" }];
 
 const LEGAL_LINKS = [
   { label: "Privacy Policy", href: "/legal/privacy" },

@@ -33,9 +33,11 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **TOP HEADSHOT REMOVED (D-051, 2026-08-17).** Mohammad instructed removing D-050's small circular headshot from the top of Founder Bio entirely — name + "Founder & CEO" only, no photo there. The founder's photo now appears exactly once on the page: the closing placement established by D-050 (`founder-mohammad.jpg`, ~224px, beside the pull-quote), unchanged. `founder-mohammad-headshot.png` is no longer referenced anywhere (grepped repo-wide) — left on disk unused, same convention as other superseded visual assets. Verified via DOM query: exactly one `<img>` in the Founder Bio section, resolving to the closing photo. `tsc`/lint/build clean, 0px overflow both widths.
 
+**STEP 10 — RESOURCES BUILT (D-052, 2026-08-17).** Built `/resources` from the real content brief (`ORAGROL_RESOURCES_ALL_ARTICLES_FINAL.md`, 6 full articles + a CTA-mapping table). Found and fixed a real route mismatch: nav's existing "Resources" link pointed to `/insights` (an unbuilt D-017 placeholder), but the brief's own slugs are all `/resources/<slug>` — re-pointed `SiteHeader`/`SiteFooter` to `/resources`; `home/insights.tsx`'s "coming soon" teaser deliberately left untouched (out of scope, flagged, now slightly stale). Researched per instruction (`ui-ux-pro-max`: 0 landing-domain matches, flagged; real `ux`-domain chip-reflow guidance applied; `21st.dev`: "Blog Posts" and "Link Breadcrumb" retrieved and used, "Filter Grid" hit the session's retrieval limit so its *pattern* — not code — was rebuilt natively, flagged as such). All 6 articles transcribed verbatim then verified byte-for-byte via 3 separate Node diff scripts (body text, metadata, heading levels) — the heading-level script caught a real transcription mistake (Article 1's headings typed as `h2` while 2-6 were `h3`) before shipping, resolved by making all 6 uniformly `h2` (the correct page-level hierarchy: H1 title → H2 subsections, no skip — not a literal mirror of the source file's own internal markdown levels). Built faceted filters (Content Type/Topic/Industry) that hide zero-match options dynamically — verified live, not just asserted. CTA text/hrefs verified live against the source's mapping table via Playwright. Caught and fixed 2 more instances of the project's own documented `cn()` size-override conflict (`ArticleCard`'s `H3`, `ArticleDetail`'s `H2`) before shipping. Reading time computed from real word count. `tsc`/lint/build all clean, zero console errors, zero horizontal overflow both widths, unknown slug confirmed 404. Full details: D-052.
+
 ## Next Steps
 1. **BLOCKING: General Inquiry real email send (D-047).** Needs a real `RESEND_API_KEY` from Mohammad before the required real-send proof can be completed — see Current Status above for exactly what to supply and where it goes. Do not fabricate a "success" screenshot/log without an actual send.
-2. Awaiting Mohammad's review of Company (D-048/D-049/D-050/D-051) — see Current Status. Same standing flag: the sitewide `EmergencyCta` pill can still lightly overlap page content at some scroll positions (D-044-class, out of scope for a page-level task); SiteHeader's Dark-entry-section assumption remains open for whenever a genuinely light-first page is wanted.
+2. Awaiting Mohammad's review of Company (D-048/D-049/D-050/D-051) and Resources (D-052) — see Current Status. All page-build Steps (1-12) are now done; Steps 13-23 (cross-cutting QA/polish) are next once reviews clear, not a new page. Same standing flag: the sitewide `EmergencyCta` pill can still lightly overlap page content at some scroll positions (D-044-class, out of scope for a page-level task); SiteHeader's Dark-entry-section assumption remains open for whenever a genuinely light-first page is wanted; `home/insights.tsx`'s "coming soon" teaser is now stale next to a live `/resources` page (D-052, flagged, not fixed).
 2. ~~BLOCKING: Cyber Health ambient hero (D-043)~~ — **SHIPPED LIVE 2026-08-15**, see Current Status. No longer blocking.
 2. ~~ACTIVE: Step 9 — Industries~~ — **BUILT 2026-08-15 (D-044)**, see Current Status. Awaiting Mohammad's review. A pre-existing, out-of-scope issue was surfaced (not fixed) while building this: the sitewide floating "Under attack?" widget can visually overlap the panel's Next-Step CTA button at some scroll positions — flag for a future pass.
 3. Solutions' Kinetic Grid hero (D-039) approved and shipped live (D-040) — all 5 required modifications re-verified against the live page (canvas scoping, background pixel, reduced-motion staticness), not assumed to still hold from the prototype. `/solutions/prototype` removed. `StrataVisual`'s file kept unused, available for revert.
@@ -52,6 +54,44 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-17 (continued 4) — Resources page built (Step 10, D-052)
+**Completed:**
+- User instructed building `/resources` with a mandatory research step first, content read verbatim from `ORAGROL_RESOURCES_ALL_ARTICLES_FINAL.md` (6 articles, Article 1 featured), a content grid with faceted filters (Industry/Topic/Content Type, hiding zero-match options), and an article detail template with an exact per-article CTA from the source's mapping table.
+- Found the nav's existing "Resources" link pointed to `/insights` (D-017's unbuilt placeholder), inconsistent with the brief's own `/resources/<slug>` slugs. Re-pointed `SiteHeader`/`SiteFooter` to `/resources` rather than building at the stale target. `home/insights.tsx`'s Home-page "coming soon" teaser was left untouched — out of scope for this instruction, flagged as now slightly stale rather than silently updated.
+- Research: `ui-ux-pro-max` (`--domain landing` — 0 matches, flagged; `--domain ux` — real chip-reflow/lazy-load findings, applied). `21st.dev search` surfaced 3 real matches; successfully retrieved and used "Blog Posts" (asymmetric featured-card grid) and "Link Breadcrumb"; "Filter Grid" (segmented chips with live counts) hit this session's daily retrieval-limit mid-task — its pattern was rebuilt natively instead of literal code, flagged as such in the component's own comment rather than presented as sourced.
+- Transcribed all 6 articles' full bodies + every metadata field into `articles-data.ts` by hand, then verified byte-for-byte via 3 separate Node scripts (body text, metadata fields, heading levels) run against the actual source file — not re-read by eye a second time. The heading-level script caught a real mistake: Article 1's subheadings had been typed `h2` while Articles 2-6 were `h3` (the source itself is uniform `###` throughout — this was my own inconsistent transcription, not a source variation). Fixed by making all 6 articles' subheadings `h2` uniformly, the correct choice for the rendered page's own hierarchy (H1 title → H2 subsections, no skip) rather than a literal mirror of the source file's internal markdown structure. All 3 scripts passed clean after the fix.
+- Built genuinely faceted filtering (not independent per-dimension filters): each filter group computes its visible options from the OTHER two active filters, so a combination with zero matches is never rendered as a choice — verified live (selecting Industry: Professional Services immediately hid "Article" from Content Type and every topic but one, since the sole Professional-Services piece is the one Guide), not just asserted from the code.
+- Verified CTA text/href live via Playwright against the source's own mapping table (not just copied into the data file and assumed correct) — confirmed exact text and correct `/contact` vs `/cyber-health` destination.
+- Caught and fixed 2 more instances of this project's own documented `cn()` conflict (component base classes + a conflicting `className` size override) before shipping: `ArticleCard`'s title against `H3`, `ArticleDetail`'s body headings against `H2` — same fix D-018/D-048 already established for the identical mistake.
+- Reading time computed from real word count (`app/lib/reading-time.ts`, 200 wpm, minimum 1 min), not hardcoded per article.
+- No `FinalCta` added to either page — each article already has its own specific mapped CTA, and the grid's whole purpose is surfacing a next step; stacking a generic CTA on top would compete with the specific one (same reasoning Contact used, D-046).
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean (`/resources` static, all 6 `/resources/<slug>` pages statically generated, unknown slug confirmed 404). Server HTML fetched via `curl` confirms all 6 titles present verbatim. Playwright: 0px horizontal overflow at 1440/390px; 0 console errors on both the grid and an article page; correct heading order (H1 then H2s, no skips); reduced-motion renders content at final `opacity: 1`. Full-page and filtered-state screenshots at both widths reviewed directly.
+
+**Files changed:**
+- New: `app/resources/page.tsx`, `app/resources/[slug]/page.tsx`, `app/lib/reading-time.ts`, `app/components/sections/resources/{hero,article-card,resources-explorer,breadcrumb,article-detail,articles-data,inline-markdown}.tsx/.ts`
+- `app/components/site/site-header.tsx`, `app/components/site/site-footer.tsx` (Resources nav link `/insights` → `/resources`)
+- `DECISIONS.md` (D-052), `PROJECT_MASTER.md` (Step 10 → IMPLEMENTED, Current Position), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The stale `/insights` nav target (caught and fixed before shipping).
+- The heading-level transcription mistake (caught via the verification script, fixed before shipping).
+- Two `cn()` size-override conflicts (caught before shipping, same known project gotcha).
+- `21st.dev`'s daily retrieval limit hit mid-research (worked around by rebuilding the pattern natively, flagged honestly rather than claimed as sourced).
+
+**Problems solved:**
+- All 6 articles built from a real, final content brief, verified byte-for-byte accurate — matching this project's content-accuracy discipline (CLAUDE.md §8) for client-facing MSSP copy, at real scale (6 full long-form articles, not a handful of short fields like prior pages).
+- A genuinely faceted (not merely independent) filter system, verified interactively.
+
+**Still open / needs verification:**
+- Mohammad's review of `/resources` (D-052).
+- `home/insights.tsx`'s now-stale "coming soon" teaser (flagged, not fixed — out of scope for this instruction).
+- Same standing flags carried forward: `EmergencyCta` overlap (D-044-class), SiteHeader Dark-entry assumption, the blocking `RESEND_API_KEY` (D-047).
+
+**Next recommended step:**
+- Get Resources reviewed alongside the rest of the recently-built pages. All page-build Steps (1-12) are now done — next real work is Steps 13-23 (cross-cutting QA/polish), not a new page.
+
+---
 
 ### 2026-08-17 (continued 3) — Top headshot removed from Founder Bio (D-051)
 **Completed:**

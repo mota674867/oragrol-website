@@ -58,7 +58,7 @@ const NAV_LINKS = [
   { label: "Solutions", href: "/solutions" },
   { label: "Cyber Health", href: "/cyber-health" },
   { label: "Industries", href: "/industries" },
-  { label: "Resources", href: "/insights" },
+  { label: "Resources", href: "/resources" },
   { label: "Company", href: "/company" },
 ];
 

@@ -144,8 +144,13 @@ Industries: Professional Services, Healthcare, Financial Services, Retail & E-co
 One elegant interactive/expandable experience, not 9 separate pages. Pattern per industry: risk, security priorities, Oragrol approach, recommended next step. No invented certifications/customer numbers/case studies.
 Built at `/industries`: desktop sticky sidebar / mobile horizontal scrollable tabs (real ARIA `tablist`/`tab`/`tabpanel`, keyboard-navigable) driving an instant-swap detail panel — all 9 industries, content copied verbatim from the supplied brief and verified byte-for-byte against it. Full details: D-044. Awaiting Mohammad's review.
 
-### Step 10 — Resources / Insights Page — PENDING
-Hero, Featured Insight, Latest Insights, Article Cards, Newsletter/LinkedIn, CTA. Editorial, spacious, custom visuals — no generic hacker imagery, no fake authors/stats/stories.
+### Step 10 — Resources Page — IMPLEMENTED (D-052, 2026-08-17)
+Original outline above (Hero / Featured Insight / Latest Insights / Article Cards / Newsletter-LinkedIn /
+CTA) superseded by the real, final content brief (`ORAGROL_RESOURCES_ALL_ARTICLES_FINAL.md`, 6 full
+articles + an Article-to-Oragrol CTA mapping table) — same "real brief supersedes placeholder outline"
+pattern D-046/D-048 set for Contact/Company. Built at `/resources` (not `/insights` — the nav's prior
+placeholder target; both `SiteHeader`/`SiteFooter` re-pointed, see D-052). Full details: D-052. Awaiting
+Mohammad's review.
 
 ### Step 11 — Company / About Page — IMPLEMENTED (D-048, 2026-08-17)
 Original outline above (Hero / Who Oragrol Is / Company Story / Philosophy / Experience & Expertise /
@@ -256,7 +261,8 @@ Also active (D-035/D-036/D-037): Step 8 (How We Work) — CONTENT COMPLETE, conn
 **D-049 (2026-08-17):** Founder Bio restructured (layout only, text unchanged) — small headshot + name/title at top, bio paragraphs as a narrative middle column, the large photo as a widened closing visual at the end. Found and flagged (not fixed) a real mobile-only issue: the wider closing photo now overlaps the sitewide `EmergencyCta` pill at real scroll positions, obscuring the photo — the same standing D-044 pill-overlap issue, now on the page's own showcase photo. See D-049.
 **D-050 (2026-08-17):** Founder Bio's two real design problems fixed — the top headshot's crop (the file was actually a 3/4-body shot, not a tight face crop; also mis-extensioned .jpg over real PNG bytes, both fixed) and the closing photo's size (shrunk from a 672px stacked block to 224px, exactly one-third, redesigned photo-beside-pull-quote per `21st.dev`'s "Editorial Testimonial" pattern, id 9637). D-049's flagged pill/photo overlap improved as a byproduct (no longer covers the face) though not fully eliminated. See D-050.
 **D-051 (2026-08-17):** Top headshot removed entirely per instruction — name/title only at top, no photo. Founder's photo now appears exactly once, at the D-050 closing placement. `founder-mohammad-headshot.png` unreferenced, left unused on disk. See D-051.
-Next: **BLOCKING — a real `RESEND_API_KEY` for D-047** (General Inquiry email). Otherwise: awaiting Mohammad's review of How We Work (D-036/D-037/D-038), the Cyber Health ambient hero (D-043), Industries (D-044), Contact (D-046), and Company (D-048 through D-051). Step 10 (Resources/Insights) is the next unbuilt step once these are reviewed.
+**D-052 (2026-08-17):** Step 10 (Resources) built — see Step 10 above. All page-build Steps (1-12) are now IMPLEMENTED or better — every core page in the original Build Sequence exists. Steps 13-23 (FAQ, Live AI Chat, EN/FR, Responsive/Accessibility/SEO review, Final QA, etc.) remain genuinely PENDING — this does not mean the project is finished, just that no page is left unbuilt.
+Next: **BLOCKING — a real `RESEND_API_KEY` for D-047** (General Inquiry email). Otherwise: awaiting Mohammad's review of How We Work (D-036/D-037/D-038), the Cyber Health ambient hero (D-043), Industries (D-044), Contact (D-046), Company (D-048 through D-051), and Resources (D-052). Once those clear, the next real work is Steps 13-23 (cross-cutting polish/QA), not a new page.
 
 ---
 
