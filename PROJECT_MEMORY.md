@@ -31,9 +31,11 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **FOUNDER BIO REAL DESIGN FIXES (D-050, 2026-08-17).** Mohammad reviewed D-049 and reported two real problems, not a quick tweak: the top circular headshot cropped awkwardly (face off-center), and the closing photo was still far too large. Root cause of the crop bug: `founder-mohammad-headshot.jpg` (from D-049) turned out to actually be a 3/4-body composition, not a tight face crop — confirmed by direct pixel inspection — plus it was genuinely PNG bytes wrongly named `.jpg` (renamed to `.png`, D-049's own mistake, fixed here). Fixed the crop by decoupling `object-position` (top-anchored) from an explicit `transform-origin` placed at the face's real position + `scale(2)` — tuned empirically against a standalone comparison harness, then re-verified at the real rendered pixel size. Researched per instruction (`ui-ux-pro-max`: 0 matches, flagged; `21st.dev`: found "Editorial Testimonial," id 9637 — small photo beside a bold pull-quote) and redesigned the closing beat around that pattern: photo shrunk from a 672px stacked block to 224px (exactly one-third), placed beside a pull-quote (a verbatim excerpt of the bio's own first sentence, not new copy). Genuine side-effect: the mobile `EmergencyCta`/photo overlap D-049 flagged (pill covering the face) is now much smaller — the pill barely brushes the photo's corner at one scroll position instead of covering the subject, though not fully eliminated (same standing global-component issue). Full details: D-050. `tsc`/lint/build clean, 0px overflow both widths.
 
+**TOP HEADSHOT REMOVED (D-051, 2026-08-17).** Mohammad instructed removing D-050's small circular headshot from the top of Founder Bio entirely — name + "Founder & CEO" only, no photo there. The founder's photo now appears exactly once on the page: the closing placement established by D-050 (`founder-mohammad.jpg`, ~224px, beside the pull-quote), unchanged. `founder-mohammad-headshot.png` is no longer referenced anywhere (grepped repo-wide) — left on disk unused, same convention as other superseded visual assets. Verified via DOM query: exactly one `<img>` in the Founder Bio section, resolving to the closing photo. `tsc`/lint/build clean, 0px overflow both widths.
+
 ## Next Steps
 1. **BLOCKING: General Inquiry real email send (D-047).** Needs a real `RESEND_API_KEY` from Mohammad before the required real-send proof can be completed — see Current Status above for exactly what to supply and where it goes. Do not fabricate a "success" screenshot/log without an actual send.
-2. Awaiting Mohammad's review of Company (D-048/D-049/D-050) — see Current Status. Same standing flag: the sitewide `EmergencyCta` pill can still lightly overlap page content at some scroll positions (D-044-class, out of scope for a page-level task); SiteHeader's Dark-entry-section assumption remains open for whenever a genuinely light-first page is wanted.
+2. Awaiting Mohammad's review of Company (D-048/D-049/D-050/D-051) — see Current Status. Same standing flag: the sitewide `EmergencyCta` pill can still lightly overlap page content at some scroll positions (D-044-class, out of scope for a page-level task); SiteHeader's Dark-entry-section assumption remains open for whenever a genuinely light-first page is wanted.
 2. ~~BLOCKING: Cyber Health ambient hero (D-043)~~ — **SHIPPED LIVE 2026-08-15**, see Current Status. No longer blocking.
 2. ~~ACTIVE: Step 9 — Industries~~ — **BUILT 2026-08-15 (D-044)**, see Current Status. Awaiting Mohammad's review. A pre-existing, out-of-scope issue was surfaced (not fixed) while building this: the sitewide floating "Under attack?" widget can visually overlap the panel's Next-Step CTA button at some scroll positions — flag for a future pass.
 3. Solutions' Kinetic Grid hero (D-039) approved and shipped live (D-040) — all 5 required modifications re-verified against the live page (canvas scoping, background pixel, reduced-motion staticness), not assumed to still hold from the prototype. `/solutions/prototype` removed. `StrataVisual`'s file kept unused, available for revert.
@@ -50,6 +52,28 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-17 (continued 3) — Top headshot removed from Founder Bio (D-051)
+**Completed:**
+- Mohammad instructed removing D-050's small circular headshot from the top of Founder Bio entirely — name + "Founder & CEO" only there. Removed the photo `<div>` (circle frame, `Image`, crop styling) from `founder-bio.tsx` outright, not hidden/commented out; the top block is now just centered `H1` name + `Caption` title.
+- Confirmed via repo-wide grep that `founder-mohammad-headshot.png` (D-050's corrected asset) is no longer referenced anywhere — left in place on disk, unused, same "kept for a possible revert" convention already used for other superseded visual assets (`StrataVisual`, `SchematicVisual`).
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean; 0px horizontal overflow at 1440/390px; DOM query confirms exactly one `<img>` inside the Founder Bio `<section>`, resolving to `founder-mohammad.jpg` (the closing photo, unchanged from D-050) — not the removed headshot. Screenshots at both widths reviewed directly.
+
+**Files changed:**
+- `app/components/sections/company/founder-bio.tsx` (top photo removed, doc comment updated)
+- `DECISIONS.md` (D-051, D-050 status marked superseded), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- None — straightforward removal, no surprises.
+
+**Still open / needs verification:**
+- Mohammad's review of the full Company page (D-048 through D-051).
+- Same standing flags carried forward unchanged (Resend API key, `EmergencyCta` overlap, SiteHeader Dark-entry assumption).
+
+**Next recommended step:**
+- Get this reviewed alongside the rest of Company.
+
+---
 
 ### 2026-08-17 (continued 2) — Founder Bio real design fixes: headshot crop + closing photo redesign (D-050)
 **Completed:**

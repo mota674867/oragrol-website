@@ -10,45 +10,27 @@ import { GlowEffect } from "../services/glow-effect";
  * this project's own "don't invent copy" discipline (CLAUDE.md §8),
  * nothing is added above it.
  *
- * Redesigned (2026-08-17, on request — D-050) after the first restructure
- * (D-049) shipped with two real problems: the top headshot cropped
- * awkwardly inside its circle, and the closing photo read as an oversized
- * stacked block. Fixes below; overall flow (identifier -> bio -> closing
- * beat) unchanged from D-049, text unchanged from D-048/D-049.
+ * Flow, current state (2026-08-17, D-051): name + title only at top (no
+ * photo) -> bio paragraphs as a narrative middle column -> a single photo
+ * (public/images/founder-mohammad.jpg) beside a pull-quote as the closing
+ * beat — the founder's photo now appears exactly once on the page, at the
+ * close, not twice. Text unchanged from D-048/D-049.
  *
- * TOP PHOTO FIX: public/images/founder-mohammad-headshot.png (renamed
- * from a mis-extensioned .jpg during D-049 — it was always real PNG
- * bytes, `xxd` confirms the PNG magic number; extension now matches
- * content) turned out, on close inspection, to be a 3/4-body composition
- * (1086x1448, same framing family as the main photo) rather than a tight
- * face crop — that mismatch, not a CSS bug, is why `object-cover`'s
- * default center-center crop put the face off-center. Fixed with
- * `object-position` biased toward the top of the frame (where the face
- * actually sits) plus a `scale` transform to zoom past what plain `cover`
- * can do on its own — `cover` alone can only choose WHICH slice of the
- * image is visible, not magnify past the image's natural cover-fit scale,
- * so positioning alone couldn't make the face fill the circle the way a
- * true tight headshot would. Verified visually against the live circle at
- * its real rendered size, not just computed from source coordinates.
- *
- * CLOSING PHOTO FIX + GENERAL REDESIGN: researched via `ui-ux-pro-max`
- * (`--domain landing`, `--domain ux`) and `21st.dev` (`search` for
- * "quote section small photo side text testimonial editorial") per
- * instruction. `ui-ux-pro-max` had no direct pattern match (0 results,
- * flagged rather than silently forced); `21st.dev` surfaced "Editorial
- * Testimonial" (jatin-yadav05, id 9637) — a small ringed circular photo
- * paired beside a bold pull-quote line, oversized faint index numeral,
- * generous whitespace. Its carousel/navigation machinery doesn't apply
- * (one founder, not a rotating list) but its core pairing — small photo
- * beside a pull-quote, not a giant stacked photo block — is exactly the
- * "smaller photo aligned to one side with a pull-quote... beside it"
- * pattern asked for, so that's the DNA reused here, adapted to a static
- * single closing beat. The photo shrinks from the prior max-w-2xl
- * (672px) stacked block to a ~224px (max-w-56, exactly one-third of
- * 672px) portrait thumbnail, paired beside a pull-quote — the section's
- * own first sentence, quoted verbatim (not new copy; a pull-quote by
- * definition re-displays existing text, the same "excerpt, don't
- * reword" principle Mission's display-scale statement already uses).
+ * History: D-049 first restructured this section (2-column top-loaded
+ * portrait -> identifier/bio/closing-photo flow) and added a second,
+ * small circular headshot photo at the top. D-050 fixed that headshot's
+ * crop (it was actually a 3/4-body composition mis-cropped into a
+ * circle, plus a mis-extensioned PNG-as-.jpg) and redesigned the closing
+ * photo — shrunk to ~224px (exactly one-third of its prior 672px stacked
+ * width) beside a pull-quote (the bio's own first sentence, quoted
+ * verbatim), reusing 21st.dev's "Editorial Testimonial" (id 9637)
+ * small-photo-beside-pull-quote pairing per that round's research. D-051
+ * (this pass) removes the top headshot entirely per explicit instruction
+ * — `founder-mohammad-headshot.png` (D-050's corrected asset) is no
+ * longer referenced anywhere in the codebase; left in place, unused,
+ * same "kept for a possible revert" convention this project already uses
+ * for StrataVisual/SchematicVisual after their own supersessions, rather
+ * than deleted.
  *
  * Dark environment, container width, and every other structural decision
  * from D-048/D-049 (why Founder Bio opens Dark, not the brief's
@@ -58,25 +40,13 @@ export function FounderBio() {
   return (
     <Section environment="dark" className="relative overflow-hidden pt-28 pb-20 md:pt-36 md:pb-28">
       <Container size="lg">
-        {/* Top identifier — small photo + name + title only. */}
+        {/* Top identifier — name + title only, no photo (D-051). */}
         <Reveal>
-          <div className="flex flex-col items-center gap-4 text-center">
-            <div className="relative h-20 w-20 overflow-hidden rounded-full border border-border shadow-lg shadow-accent/20 sm:h-24 sm:w-24">
-              <Image
-                src="/images/founder-mohammad-headshot.png"
-                alt=""
-                fill
-                sizes="96px"
-                priority
-                className="origin-[50%_25%] scale-[2] object-cover object-[50%_0%]"
-              />
-            </div>
-            <div>
-              <H1>Mohammad Chelouy Tabrizi</H1>
-              <Caption tone="accent" className="mt-3">
-                Founder &amp; CEO
-              </Caption>
-            </div>
+          <div className="text-center">
+            <H1>Mohammad Chelouy Tabrizi</H1>
+            <Caption tone="accent" className="mt-3">
+              Founder &amp; CEO
+            </Caption>
           </div>
         </Reveal>
 
