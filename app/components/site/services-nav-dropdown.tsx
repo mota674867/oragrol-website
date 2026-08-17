@@ -9,39 +9,65 @@ import { cn } from "../ui/cn";
 import { usePrefersReducedMotion } from "../motion/use-reduced-motion";
 
 /**
- * ServicesNavDropdown — Services nav-item mega-menu (minimal variant).
+ * ServicesNavDropdown — Services nav-item mega-menu (grouped-column variant).
  *
  * Scope: ONLY the "Services" item in SiteHeader gets this treatment — every
  * other nav item (Home/Cyber Health/Industries/Company/Resources/Contact)
  * stays a plain `NavLink`, untouched.
  *
- * Content source: the 8 capability names below are copied verbatim from the
- * already-locked, already-shipped /services page data (`LiveServices.
+ * Content source: the 8 capability names/anchors are copied verbatim from
+ * the already-locked, already-shipped /services page data (`LiveServices.
  * LIVE_SERVICES` for 01-04, `AdditionalCapabilities.FINALIZING_SERVICES` for
  * 05-08) and their real `capability-0N` DOM ids / CategoryNav entries —
  * nothing invented here, just re-pointed at anchors on the real page. No
  * file named `oragrol_services_page_content.md` exists anywhere in this repo
- * (checked via a full-repo search before building this) — flagged to
- * Mohammad rather than guessing at a source; this list is the actual
- * confirmed content instead. Keep in sync with those two files if either
- * capability list ever changes.
+ * (checked twice, via full-repo search + full git history, across two
+ * separate build sessions) — flagged to Mohammad both times rather than
+ * guessing at a source.
+ *
+ * Grouping (added on top of the flat v1 list, per Mohammad's explicit
+ * request for Bell.ca-style grouped columns — structure only, NOT Bell's
+ * promo-card/image visual treatment): since no source file groups the 8
+ * capabilities, 3 candidate groupings were built from the real per-
+ * capability copy already on /services (problem/what-we-do/what-you-get/
+ * outcome text in `live-services.tsx` + the one-line copy in
+ * `additional-capabilities.tsx`) and shown to Mohammad before anything was
+ * finalized. He picked the 4-column "paired by stage" option:
+ *   Advisory — Virtual CISO, Risk Assessment & Compliance
+ *   Assessment & Testing — Vulnerability Assessment & Management, Penetration Testing
+ *   Protection & Monitoring — Managed Security Services / 24/7 MDR, Endpoint Protection / EDR
+ *   Response & Training — Incident Response, Security Awareness Training
+ * These 4 category names are new (not present verbatim anywhere in the
+ * source content) — they're Claude's synthesis of the real per-capability
+ * copy into a theme label, approved by Mohammad, not independently
+ * confirmed marketing copy. Flag this if it needs sign-off as customer-
+ * facing language beyond nav-menu use.
+ *
+ * There's no category-level anchor on /services itself (only the 8 per-
+ * capability `capability-0N` ids) — each category TITLE links to the first
+ * capability listed under it (in this component's own display order), not
+ * a separate section anchor that doesn't exist on the page.
  *
  * Two render variants sharing one set of interaction logic:
  *  - "desktop": hover/focus-opened dropdown panel, absolutely positioned
  *    below the existing `NavLink` trigger (same component every other nav
- *    item uses, so it's pixel-identical at rest).
+ *    item uses, so it's pixel-identical at rest) — a 4-column grid, one
+ *    category per column.
  *  - "mobile": inline disclosure inside the existing full-viewport mobile
- *    nav panel — a chevron button toggles an indented sub-list; the
+ *    nav panel — a chevron button toggles an indented list of the 4
+ *    categories stacked vertically (single column, no room for 4 physical
+ *    columns at mobile widths), each with its own items below it; the
  *    "Services" label itself stays a normal link to /services.
  *
  * Behavior (shared across both variants):
  *  - Tab onto the trigger opens the panel (`onFocus` bubbles from the
  *    trigger); Tab then continues naturally into the panel's own links
- *    (real DOM order, no manual tabindex juggling).
+ *    (real DOM order — category title, its items, next category title...).
  *  - Escape closes and returns focus to the trigger (window-level listener,
  *    matches HeaderSearch's own existing Escape pattern).
- *  - ArrowDown/ArrowUp move focus between the 8 panel links (and from the
- *    trigger into the first/last item).
+ *  - ArrowDown/ArrowUp move a roving focus across all 8 capability links (in
+ *    display order, column-by-column) — category titles aren't part of this
+ *    roving set, only reachable via Tab, same as before grouping.
  *  - Outside click closes it (desktop hover-opened case doesn't always fire
  *    mouseleave/blur first, e.g. a click that lands without prior pointer
  *    movement over the panel).
@@ -63,18 +89,58 @@ export interface ServicesMenuItem {
   href: string;
 }
 
-const SERVICES_MENU_ITEMS: ServicesMenuItem[] = [
-  { label: "Virtual CISO", href: "/services#capability-01" },
-  { label: "Risk Assessment & Compliance", href: "/services#capability-02" },
-  { label: "Vulnerability Assessment & Management", href: "/services#capability-03" },
-  { label: "Security Awareness Training", href: "/services#capability-04" },
-  { label: "Managed Security Services / 24/7 MDR", href: "/services#capability-05" },
-  { label: "Penetration Testing", href: "/services#capability-06" },
-  { label: "Endpoint Protection / EDR", href: "/services#capability-07" },
-  { label: "Incident Response", href: "/services#capability-08" },
+export interface ServicesCategory {
+  label: string;
+  /** Links to the first item's anchor — see file header note: no separate
+   *  category-level anchor exists on /services. */
+  href: string;
+  items: ServicesMenuItem[];
+}
+
+const SERVICES_CATEGORIES: ServicesCategory[] = [
+  {
+    label: "Advisory",
+    href: "/services#capability-01",
+    items: [
+      { label: "Virtual CISO", href: "/services#capability-01" },
+      { label: "Risk Assessment & Compliance", href: "/services#capability-02" },
+    ],
+  },
+  {
+    label: "Assessment & Testing",
+    href: "/services#capability-03",
+    items: [
+      { label: "Vulnerability Assessment & Management", href: "/services#capability-03" },
+      { label: "Penetration Testing", href: "/services#capability-06" },
+    ],
+  },
+  {
+    label: "Protection & Monitoring",
+    href: "/services#capability-05",
+    items: [
+      { label: "Managed Security Services / 24/7 MDR", href: "/services#capability-05" },
+      { label: "Endpoint Protection / EDR", href: "/services#capability-07" },
+    ],
+  },
+  {
+    label: "Response & Training",
+    href: "/services#capability-08",
+    items: [
+      { label: "Incident Response", href: "/services#capability-08" },
+      { label: "Security Awareness Training", href: "/services#capability-04" },
+    ],
+  },
 ];
 
+// Flattened, display-order list of just the 8 capability links — drives the
+// ArrowUp/ArrowDown roving focus regardless of which column/group an item
+// sits in.
+const FLAT_ITEMS: ServicesMenuItem[] = SERVICES_CATEGORIES.flatMap((category) => category.items);
+
 const CLOSE_DELAY_MS = 150;
+
+const categoryTitleClasses =
+  "block rounded-sm font-heading text-xs font-semibold uppercase tracking-wider text-text-muted transition-colors duration-150 hover:text-accent focus-visible:text-accent focus-visible:outline-none";
 
 export function ServicesNavDropdown({
   variant,
@@ -153,7 +219,7 @@ export function ServicesNavDropdown({
   }, [open]);
 
   const focusItem = (index: number) => {
-    const count = SERVICES_MENU_ITEMS.length;
+    const count = FLAT_ITEMS.length;
     const clamped = ((index % count) + count) % count;
     itemRefs.current[clamped]?.focus();
   };
@@ -166,63 +232,107 @@ export function ServicesNavDropdown({
     if (event.key === "ArrowDown") {
       focusItem(currentIndex === -1 ? 0 : currentIndex + 1);
     } else {
-      focusItem(currentIndex === -1 ? SERVICES_MENU_ITEMS.length - 1 : currentIndex - 1);
+      focusItem(currentIndex === -1 ? FLAT_ITEMS.length - 1 : currentIndex - 1);
     }
   };
 
   const closePanel = () => setOpen(false);
 
-  const panel = (
-    <div
-      id={panelId}
-      className={
-        variant === "desktop"
-          ? cn(
-              "absolute left-0 top-full z-10 mt-2 w-72 rounded-xl border border-border bg-background p-2 shadow-xl",
-              reduceMotion
-                ? open
-                  ? "block"
-                  : "hidden"
-                : cn(
-                    "origin-top transition-[opacity,transform] duration-150 ease-out",
-                    open ? "visible scale-100 opacity-100" : "invisible scale-95 opacity-0",
-                  ),
-            )
-          : cn("overflow-hidden", open ? "block" : "hidden")
-      }
-    >
-      {variant === "desktop" && (
-        <p className="px-3 pb-1.5 pt-1 font-heading text-xs font-semibold uppercase tracking-wider text-text-muted">
-          Capabilities
-        </p>
-      )}
-      <ul
+  // Shared across both variants: assigns each item link a stable index into
+  // the flattened list (for itemRefs / roving arrow-key focus) as the
+  // grouped categories render, without a separate lookup pass.
+  let flatIndex = 0;
+  const nextIndex = () => flatIndex++;
+
+  const panelVisibilityClasses =
+    variant === "desktop"
+      ? reduceMotion
+        ? open
+          ? "block"
+          : "hidden"
+        : cn(
+            "origin-top transition-[opacity,transform] duration-150 ease-out",
+            open ? "visible scale-100 opacity-100" : "invisible scale-95 opacity-0",
+          )
+      : open
+        ? "block"
+        : "hidden";
+
+  const itemLinkClasses =
+    variant === "desktop"
+      ? "block rounded-lg px-2 py-2 font-body text-sm text-text-secondary transition-colors duration-150 hover:bg-text-primary/5 hover:text-accent focus-visible:bg-text-primary/5 focus-visible:text-accent focus-visible:outline-none"
+      : "block rounded-sm py-1.5 font-body text-sm text-text-secondary transition-colors duration-150 hover:text-accent focus-visible:text-accent focus-visible:outline-none";
+
+  const panel =
+    variant === "desktop" ? (
+      <div
+        id={panelId}
         className={cn(
-          "flex flex-col",
-          variant === "mobile" && "gap-1 border-l border-border py-1 pl-3",
+          "absolute left-0 top-full z-10 mt-2 w-[820px] rounded-xl border border-border bg-background p-5 shadow-xl",
+          panelVisibilityClasses,
         )}
       >
-        {SERVICES_MENU_ITEMS.map((item, index) => (
-          <li key={item.href}>
-            <Link
-              ref={(el) => {
-                itemRefs.current[index] = el;
-              }}
-              href={item.href}
-              onClick={closePanel}
-              className={
-                variant === "desktop"
-                  ? "block rounded-lg px-3 py-2 font-body text-sm text-text-secondary transition-colors duration-150 hover:bg-text-primary/5 hover:text-accent focus-visible:bg-text-primary/5 focus-visible:text-accent focus-visible:outline-none"
-                  : "block rounded-sm py-1.5 font-body text-sm text-text-secondary transition-colors duration-150 hover:text-accent focus-visible:text-accent focus-visible:outline-none"
-              }
-            >
-              {item.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+        <div className="grid grid-cols-4 gap-x-6">
+          {SERVICES_CATEGORIES.map((category) => (
+            <div key={category.label}>
+              <Link href={category.href} onClick={closePanel} className={cn(categoryTitleClasses, "px-2 pb-2")}>
+                {category.label}
+              </Link>
+              <ul className="flex flex-col">
+                {category.items.map((item) => {
+                  const index = nextIndex();
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        ref={(el) => {
+                          itemRefs.current[index] = el;
+                        }}
+                        href={item.href}
+                        onClick={closePanel}
+                        className={itemLinkClasses}
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    ) : (
+      <div id={panelId} className={panelVisibilityClasses}>
+        <ul className="flex flex-col gap-1 border-l border-border py-1 pl-3">
+          {SERVICES_CATEGORIES.map((category) => (
+            <li key={category.label} className="pt-3 first:pt-0">
+              <Link href={category.href} onClick={closePanel} className={cn(categoryTitleClasses, "pb-1")}>
+                {category.label}
+              </Link>
+              <ul className="flex flex-col">
+                {category.items.map((item) => {
+                  const index = nextIndex();
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        ref={(el) => {
+                          itemRefs.current[index] = el;
+                        }}
+                        href={item.href}
+                        onClick={closePanel}
+                        className={itemLinkClasses}
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
 
   if (variant === "mobile") {
     return (
@@ -246,7 +356,7 @@ export function ServicesNavDropdown({
             />
           </button>
         </div>
-        <div className="pl-4">{panel}</div>
+        <div className="overflow-hidden pl-4">{panel}</div>
       </div>
     );
   }

@@ -55,6 +55,39 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 ## Session Log
 
+### 2026-08-17 (continued 6) — Services dropdown: bg-token fix + restructured into grouped columns (D-054)
+**Completed:**
+- **Bg-token fix (reported by Mohammad live in-browser):** the dropdown panel looked semi-transparent, hero text bleeding through. Checked computed style directly via Playwright at scroll 0 and scrolled past the header's own fade — `backgroundColor` was already opaque (`rgb(20,20,20)`, `opacity:1`, no `backdrop-filter`) in both states; couldn't reproduce real alpha transparency. Made the fix anyway, per the explicit instruction to match the nav bar's own token rather than guess a new value: the panel was using `--surface` (#141414, the `HeaderSearch`-style "floating card" token) instead of the nav bar's own real background token, `--background` (#0a0a0a — confirmed by reading `SiteHeader`'s own gradient layers, which are built from `from-background/90...`, not `--surface`). Swapped `bg-surface` → `bg-background`; re-verified computed style now `rgb(10,10,10)`.
+- **Restructured from a flat 8-item list into Bell.ca-style grouped columns** (structure only — explicitly NOT Bell's promo-card/image treatment; kept the plain dark panel, no photography). Re-confirmed `oragrol_services_page_content.md` still doesn't exist anywhere in the repo (second check, same method as the first). Read the real per-capability copy already on `/services` (problem/what-we-do/what-you-get/outcome text) and built 3 candidate groupings from it, shown to Mohammad via `AskUserQuestion` before building anything — he picked **4 columns, paired by stage**:
+  - Advisory — Virtual CISO, Risk Assessment & Compliance
+  - Assessment & Testing — Vulnerability Assessment & Management, Penetration Testing
+  - Protection & Monitoring — Managed Security Services / 24/7 MDR, Endpoint Protection / EDR
+  - Response & Training — Incident Response, Security Awareness Training
+- **These 4 category names are new** — Claude's synthesis of the real per-capability copy into a theme label, not text present verbatim anywhere in existing content, and not independently confirmed as customer-facing marketing copy. Approved by Mohammad for this nav menu specifically; flagged in the component's own header comment as needing separate sign-off if used as marketing copy elsewhere.
+- No category-level anchor exists on `/services` itself (only the 8 `capability-0N` ids) — each category title links to the first capability listed under it in this component's own display order, not a fabricated section anchor.
+- Desktop: `grid-cols-4` panel, widened `w-72` → `w-[820px]`, still `left-0`-anchored (not centered — centering was considered and rejected: the trigger sits near the nav's left edge, right after the logo, so centering an 820px panel on it would push the panel's left edge off-screen). Verified via Playwright at 1024/1280/1440/1920px: zero horizontal page overflow at any width, panel's own right edge stays well inside the viewport at all four (max 1345px at 1920px viewport). Mobile: the single chevron-toggle disclosure now expands into 4 stacked category groups (each with its own heading + indented items) instead of one flat list — still one control, still inside the existing full-viewport mobile panel.
+- ArrowUp/ArrowDown roving focus now moves across all 8 capability links in column-then-row display order (category titles aren't part of the roving set, same as v1 — only reachable via Tab); re-verified the full 9-press wrap-around sequence lands back on item 1.
+- **Verified:** `npx tsc --noEmit` / `npm run lint` / `npm run build` all clean. Fresh Playwright pass: category titles + hrefs, all 8 item labels + hrefs, ArrowDown roving order (9 presses, correct wrap), Escape closes (`aria-expanded` → `false`), category-title font-family `"Space Grotesk"`, item font-family `Inter`, category-title hover color confirmed exactly `rgb(1, 138, 190)` (#018ABE) via a real `:hover`-pseudo-class match (isolated, single-purpose script — the first combined script's own hover read was a flake from a rapid keyboard→mouse sequence on one page instance, diagnosed and confirmed not a product bug before being dismissed), mobile expand shows all 4 category headings + 8 items in the right grouping, zero horizontal overflow on mobile. Screenshots reviewed directly at 1024/1440 desktop and 390 mobile before reporting anything as done.
+- **Noted, not fixed (pre-existing, unrelated to this task):** at exactly the 1024px `lg` breakpoint where the desktop nav switches on, the nav row itself is already cramped pre-existing this change — "Cyber Health" wraps to two lines, the primary CTA button wraps, "EN | FR" wraps. Visible in the 1024px screenshot taken for this verification; not introduced by the Services dropdown (confirmed by reading `NavBar`/`SiteHeader` — none of `NAV_LINKS`' other items were touched) and out of scope for this task. Flagging for a future pass.
+
+**Files changed:**
+- `app/components/site/services-nav-dropdown.tsx` (bg-token swap, then full restructure into `SERVICES_CATEGORIES`/grouped rendering — same file from D-053, no new files)
+
+**Problems found:**
+- None that were real product bugs. The reported bg-transparency issue couldn't be reproduced in automated testing at any state tested, before or after the fix — reported honestly rather than claiming to have found+fixed a bug that wasn't observed. The fix (matching the literal nav-bar token) was made regardless, per the explicit instruction, and is a real correctness improvement independent of whether the original bug reproduced.
+- One test-script flake (hover-color read returned the muted/default color once, in a script hammering keyboard+mouse interactions back-to-back on one page instance) — isolated and confirmed to be a script artifact, not a product bug, via a clean single-purpose repro.
+
+**Still open / needs verification:**
+- Mohammad's in-browser review of the grouped dropdown — not yet done (this entry covers Claude's own verification only).
+- The 4 new category names (Advisory / Assessment & Testing / Protection & Monitoring / Response & Training) may need separate sign-off if reused as customer-facing copy beyond this nav menu.
+- The pre-existing 1024px nav-cramping issue (noted above) — not addressed, flagged for a future pass.
+- All previously-carried-forward open items (Home `insights.tsx` stale teaser, sitewide `EmergencyCta` overlap-at-some-scroll-positions, D-053's own review) remain open.
+
+**Next recommended step:**
+- Get the grouped Services dropdown reviewed live; decide whether the 1024px nav-cramping issue gets its own pass.
+
+---
+
 ### 2026-08-17 (continued 5) — Services nav mega-menu added (D-053)
 **Completed:**
 - Built `app/components/site/services-nav-dropdown.tsx` (`ServicesNavDropdown`) and wired it into `SiteHeader` — the "Services" item only (desktop nav row + mobile nav panel); the other 6 nav items (Home logo aside — Solutions/Cyber Health/Industries/Resources/Company/Contact-via-CTA) are byte-for-byte untouched, confirmed via Playwright (`aria-haspopup` absent on Cyber Health's link, no chevron sibling on Company's mobile row).
