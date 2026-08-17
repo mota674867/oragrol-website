@@ -1,11 +1,12 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Check } from "lucide-react";
 import { ButtonLink, Caption, Container, Icon, Section, Text, cn } from "../../ui";
 import { AssessmentCta } from "../cyber-health/assessment-cta";
 import { TALLY_ASSESSMENT_URL } from "../cyber-health/hero";
-import { INDUSTRIES } from "./industries-data";
+import { usePrefersReducedMotion } from "../../motion/use-reduced-motion";
+import { INDUSTRIES, slugifyIndustryName } from "./industries-data";
 
 /**
  * IndustriesExplorer — Step 9's core interaction. Researched first
@@ -38,16 +39,59 @@ import { INDUSTRIES } from "./industries-data";
 export function IndustriesExplorer() {
   const [activeIndex, setActiveIndex] = useState(0);
   const tablistId = useId();
+  const reduceMotion = usePrefersReducedMotion();
   const active = INDUSTRIES[activeIndex];
 
-  function tabId(i: number) {
-    return `${tablistId}-tab-${i}`;
+  // Tab ids are deterministic slugs (`industry-<slug>`), not the opaque
+  // useId-prefixed form panelId still uses below — the DESKTOP (vertical)
+  // instance's id doubles as the real, stable deep-link anchor the nav
+  // dropdown's `INDUSTRIES_DROPDOWN` targets (`/industries#industry-<slug>`,
+  // see nav-dropdown.tsx). Both mobile and desktop tablists render
+  // simultaneously (CSS `hidden`/`lg:hidden` only hides one visually, both
+  // stay in the DOM) — reusing the same id on both would be a duplicate-id
+  // bug, and specifically the WRONG one: `document.getElementById` returns
+  // the first DOM match, which is the mobile row (rendered first in JSX),
+  // silently breaking both anchor-scroll and the existing
+  // Arrow-key-focus-follow behavior on desktop (a pre-existing bug, not
+  // introduced here — caught while adding the anchor requirement). Mobile
+  // gets a distinct `-mobile` suffix so both ids stay valid/unique; only the
+  // unsuffixed desktop id is ever linked to.
+  function tabId(i: number, orientation: "vertical" | "horizontal" = "vertical") {
+    const slug = `industry-${slugifyIndustryName(INDUSTRIES[i].name)}`;
+    return orientation === "vertical" ? slug : `${slug}-mobile`;
   }
   function panelId(i: number) {
     return `${tablistId}-panel-${i}`;
   }
 
-  function handleKeyDown(e: React.KeyboardEvent, i: number) {
+  // Deep-linking: read the URL hash into the initial tab selection (a
+  // direct `/industries#industry-healthcare` link), and again on any
+  // same-page hash change (clicking the same link, or a browser back/
+  // forward, while already on this page — the component doesn't remount
+  // just because the hash changed, so `hashchange` is the real signal).
+  // Also explicitly scrolls the matching tab into view: relying on the
+  // browser's own native hash-scroll isn't enough on its own once the
+  // *content* selection needs to change too, and `scrollIntoView` on the
+  // currently-hidden orientation's (display:none) element is a documented
+  // no-op — calling it on both ids is safe, only the one actually laid out
+  // at the current viewport width moves.
+  useEffect(() => {
+    function selectFromHash() {
+      const slug = window.location.hash.replace(/^#industry-/, "");
+      if (!slug) return;
+      const index = INDUSTRIES.findIndex((industry) => slugifyIndustryName(industry.name) === slug);
+      if (index === -1) return;
+      setActiveIndex(index);
+      const behavior = reduceMotion ? "auto" : "smooth";
+      document.getElementById(tabId(index, "vertical"))?.scrollIntoView({ behavior, block: "center" });
+      document.getElementById(tabId(index, "horizontal"))?.scrollIntoView({ behavior, block: "nearest", inline: "center" });
+    }
+    selectFromHash();
+    window.addEventListener("hashchange", selectFromHash);
+    return () => window.removeEventListener("hashchange", selectFromHash);
+  }, [reduceMotion]);
+
+  function handleKeyDown(e: React.KeyboardEvent, i: number, orientation: "vertical" | "horizontal") {
     // Standard ARIA Tabs keyboard behavior: Left/Right (or Up/Down, since
     // desktop is a vertical tablist) move focus+selection between tabs.
     const last = INDUSTRIES.length - 1;
@@ -59,7 +103,7 @@ export function IndustriesExplorer() {
     if (next !== null) {
       e.preventDefault();
       setActiveIndex(next);
-      document.getElementById(tabId(next))?.focus();
+      document.getElementById(tabId(next, orientation))?.focus();
     }
   }
 
@@ -69,12 +113,12 @@ export function IndustriesExplorer() {
       <button
         type="button"
         role="tab"
-        id={tabId(i)}
+        id={tabId(i, orientation)}
         aria-selected={isActive}
         aria-controls={panelId(i)}
         tabIndex={isActive ? 0 : -1}
         onClick={() => setActiveIndex(i)}
-        onKeyDown={(e) => handleKeyDown(e, i)}
+        onKeyDown={(e) => handleKeyDown(e, i, orientation)}
         className={cn(
           "shrink-0 rounded-sm text-left font-body text-base transition-colors duration-150",
           "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",

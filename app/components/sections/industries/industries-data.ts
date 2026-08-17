@@ -149,3 +149,18 @@ export const INDUSTRIES: Industry[] = [
     nextStep: { label: "Get Your Cyber Health Score", kind: "assessment" },
   },
 ];
+
+/**
+ * Deterministic slug for an industry name — the single source of truth for
+ * this page's per-industry deep-link anchors (`#industry-<slug>`). Used by
+ * both `IndustriesExplorer` (to give each tab a real, stable `id`, and to
+ * read the URL back into an initial/changed tab selection) and the nav
+ * dropdown's `INDUSTRIES_DROPDOWN` config — co-located with `INDUSTRIES`
+ * itself so the two call sites can't silently drift out of sync.
+ */
+export function slugifyIndustryName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}

@@ -16,6 +16,12 @@ import { Reveal } from "../../motion/reveal";
  * the hero graphic without repeating it.
  */
 interface Tier {
+  /** Real, stable anchor id — added for the nav dropdown's
+   *  `SOLUTIONS_DROPDOWN` (`/solutions#tier-0N`, see nav-dropdown.tsx). No
+   *  anchor existed on this page before; purely structural (id +
+   *  `scroll-mt-28`, the same header-offset convention Services' capability
+   *  rows already use), no visual/content change. */
+  id: string;
   n: string;
   copy: string;
   icon: ComponentType<SVGProps<SVGSVGElement>>;
@@ -25,6 +31,7 @@ interface Tier {
 
 const TIERS: Tier[] = [
   {
+    id: "tier-01",
     n: "Level 01",
     copy: "Foundational protection and visibility.",
     icon: Layers,
@@ -32,6 +39,7 @@ const TIERS: Tier[] = [
     accentOpacity: 40,
   },
   {
+    id: "tier-02",
     n: "Level 02",
     copy: "Expanded protection with active monitoring.",
     icon: Layers2,
@@ -39,6 +47,7 @@ const TIERS: Tier[] = [
     accentOpacity: 65,
   },
   {
+    id: "tier-03",
     n: "Level 03",
     copy: "Full strategic partnership and rapid response.",
     icon: Layers3,
@@ -61,7 +70,7 @@ export function TierCards() {
         <Grid cols={{ base: 1, md: 3 }} gap="md" className="mt-14">
           {TIERS.map((tier, i) => (
             <Reveal key={tier.n} delay={i * 0.08}>
-              <Card variant="bordered" className="flex h-full flex-col gap-4">
+              <Card id={tier.id} variant="bordered" className="flex h-full scroll-mt-28 flex-col gap-4">
                 <div
                   className={`h-1.5 ${tier.barWidthClass} rounded-full bg-accent`}
                   style={{ opacity: tier.accentOpacity / 100 }}

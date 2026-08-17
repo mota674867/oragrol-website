@@ -8,7 +8,7 @@ import { ButtonLink, MobileMenuTrigger, NavBar, NavLink } from "../ui";
 import { cn } from "../ui/cn";
 import { OragrolLogo } from "../brand/oragrol-logo";
 import { HeaderSearch } from "./header-search";
-import { ServicesNavDropdown } from "./services-nav-dropdown";
+import { NAV_DROPDOWNS, NavItemDropdown } from "./nav-dropdown";
 
 /**
  * SiteHeader — Step 4, refined in Header Refinement Pass 1, fixed in
@@ -53,9 +53,14 @@ import { ServicesNavDropdown } from "./services-nav-dropdown";
  * static label (info-architecture presence per the brief) since full
  * locale routing isn't built yet.
  *
- * "Services" mega-menu: the only nav item that gets special treatment —
- * see services-nav-dropdown.tsx. Every other NAV_LINKS entry still renders
- * as a plain NavLink, both here and in the mobile panel below.
+ * Nav dropdowns (D-053 Services, D-055 Solutions/Industries/Resources): a
+ * `NAV_LINKS` entry whose href has a matching `NAV_DROPDOWNS[href]` config
+ * renders as `NavItemDropdown` instead of a plain `NavLink`, both here and
+ * in the mobile panel below — see nav-dropdown.tsx for the shared
+ * component and each config's real-content provenance. Cyber Health and
+ * Company stay plain `NavLink`s: both are a single narrative flow with no
+ * independently navigable sub-content (confirmed by reading their section
+ * files — no ids anywhere), not an oversight.
  */
 
 const NAV_LINKS = [
@@ -133,10 +138,12 @@ export function SiteHeader() {
               <OragrolLogo height={36} />
             </Link>
           }
-          links={NAV_LINKS.map((link) =>
-            link.label === "Services" ? (
-              <ServicesNavDropdown
+          links={NAV_LINKS.map((link) => {
+            const dropdown = NAV_DROPDOWNS[link.href];
+            return dropdown ? (
+              <NavItemDropdown
                 key={link.href}
+                config={dropdown}
                 variant="desktop"
                 active={pathname === link.href}
               />
@@ -144,8 +151,8 @@ export function SiteHeader() {
               <NavLink key={link.href} href={link.href} active={pathname === link.href}>
                 {link.label}
               </NavLink>
-            ),
-          )}
+            );
+          })}
           actions={
             <>
               <HeaderSearch />
@@ -202,10 +209,12 @@ export function SiteHeader() {
         inert={!mobileOpen}
       >
         <nav className="flex flex-col gap-1 px-6 py-6" aria-label="Mobile">
-          {NAV_LINKS.map((link) =>
-            link.label === "Services" ? (
-              <ServicesNavDropdown
+          {NAV_LINKS.map((link) => {
+            const dropdown = NAV_DROPDOWNS[link.href];
+            return dropdown ? (
+              <NavItemDropdown
                 key={link.href}
+                config={dropdown}
                 variant="mobile"
                 active={pathname === link.href}
               />
@@ -218,8 +227,8 @@ export function SiteHeader() {
               >
                 {link.label}
               </NavLink>
-            ),
-          )}
+            );
+          })}
           <ButtonLink variant="primary" size="md" href="/cyber-health" className="mt-3 w-full">
             Get Your Cyber Health Score
           </ButtonLink>
