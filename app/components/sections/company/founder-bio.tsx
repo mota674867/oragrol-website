@@ -10,43 +10,49 @@ import { GlowEffect } from "../services/glow-effect";
  * this project's own "don't invent copy" discipline (CLAUDE.md §8),
  * nothing is added above it.
  *
- * Restructured (2026-08-17, on request) from the original 2-column
- * "large photo | name+bio" layout into a narrative flow: a small photo
- * identifier (headshot, public/images/founder-mohammad-headshot.jpg) up
- * top alongside the name/title only, the bio text reading through the
- * middle as a single narrative column, then the original large-format
- * photo (public/images/founder-mohammad.jpg) reappearing at the end as
- * a deliberate closing visual — not a top-loaded portrait anymore. Text
- * content is byte-identical to the prior version; only the structure
- * changed.
+ * Redesigned (2026-08-17, on request — D-050) after the first restructure
+ * (D-049) shipped with two real problems: the top headshot cropped
+ * awkwardly inside its circle, and the closing photo read as an oversized
+ * stacked block. Fixes below; overall flow (identifier -> bio -> closing
+ * beat) unchanged from D-049, text unchanged from D-048/D-049.
  *
- * Dark environment — unchanged from the prior version, still a deliberate
- * exception to PROJECT_MASTER.md's now-superseded Step 11 outline
- * ("primarily light section"), flagged rather than silent: SiteHeader is
- * hardcoded env-dark with only a 30%-opacity dark wash before ~140px of
- * scroll (its own comment: "Once light-first pages exist, this should
- * read the entry section's environment instead of assuming Dark" — not
- * done, out of scope here). Opening on White/Light-blue would put the
- * header's white nav text on a near-white page background at scroll
- * position 0 — every page built so far opens Dark for exactly this reason
- * (see services/hero.tsx's own comment, same reasoning). The remaining 3
- * of 4 sections below (Mission, Team, Values) are White/Light-blue,
- * honoring the "primarily light" spirit everywhere it's safe to.
+ * TOP PHOTO FIX: public/images/founder-mohammad-headshot.png (renamed
+ * from a mis-extensioned .jpg during D-049 — it was always real PNG
+ * bytes, `xxd` confirms the PNG magic number; extension now matches
+ * content) turned out, on close inspection, to be a 3/4-body composition
+ * (1086x1448, same framing family as the main photo) rather than a tight
+ * face crop — that mismatch, not a CSS bug, is why `object-cover`'s
+ * default center-center crop put the face off-center. Fixed with
+ * `object-position` biased toward the top of the frame (where the face
+ * actually sits) plus a `scale` transform to zoom past what plain `cover`
+ * can do on its own — `cover` alone can only choose WHICH slice of the
+ * image is visible, not magnify past the image's natural cover-fit scale,
+ * so positioning alone couldn't make the face fill the circle the way a
+ * true tight headshot would. Verified visually against the live circle at
+ * its real rendered size, not just computed from source coordinates.
  *
- * The closing photo keeps the same premium treatment as before (a soft
- * ambient GlowEffect behind the frame, reusing the same accent-family
- * "light-based depth" material as Services' CapabilitySpotlight, D-013)
- * — now given more width as the section's deliberate final beat rather
- * than splitting the layout with text. The origin-story paragraph still
- * renders at a larger "lede" size — unchanged from the prior version,
- * purely typographic, the text itself unreworded/verbatim.
+ * CLOSING PHOTO FIX + GENERAL REDESIGN: researched via `ui-ux-pro-max`
+ * (`--domain landing`, `--domain ux`) and `21st.dev` (`search` for
+ * "quote section small photo side text testimonial editorial") per
+ * instruction. `ui-ux-pro-max` had no direct pattern match (0 results,
+ * flagged rather than silently forced); `21st.dev` surfaced "Editorial
+ * Testimonial" (jatin-yadav05, id 9637) — a small ringed circular photo
+ * paired beside a bold pull-quote line, oversized faint index numeral,
+ * generous whitespace. Its carousel/navigation machinery doesn't apply
+ * (one founder, not a rotating list) but its core pairing — small photo
+ * beside a pull-quote, not a giant stacked photo block — is exactly the
+ * "smaller photo aligned to one side with a pull-quote... beside it"
+ * pattern asked for, so that's the DNA reused here, adapted to a static
+ * single closing beat. The photo shrinks from the prior max-w-2xl
+ * (672px) stacked block to a ~224px (max-w-56, exactly one-third of
+ * 672px) portrait thumbnail, paired beside a pull-quote — the section's
+ * own first sentence, quoted verbatim (not new copy; a pull-quote by
+ * definition re-displays existing text, the same "excerpt, don't
+ * reword" principle Mission's display-scale statement already uses).
  *
- * The small top headshot is `alt=""` (decorative) rather than repeating
- * the same descriptive text a second time — the adjacent H1 already
- * announces the name to screen readers, and doubling it up on both
- * images in the same section would be redundant, not more accessible.
- * The large closing photo keeps the full descriptive alt text, since by
- * that point in the page it's the only image announcing who this is.
+ * Dark environment, container width, and every other structural decision
+ * from D-048/D-049 (why Founder Bio opens Dark, not the brief's
+ * "primarily light" framing) are unchanged — out of scope for this round.
  */
 export function FounderBio() {
   return (
@@ -57,12 +63,12 @@ export function FounderBio() {
           <div className="flex flex-col items-center gap-4 text-center">
             <div className="relative h-20 w-20 overflow-hidden rounded-full border border-border shadow-lg shadow-accent/20 sm:h-24 sm:w-24">
               <Image
-                src="/images/founder-mohammad-headshot.jpg"
+                src="/images/founder-mohammad-headshot.png"
                 alt=""
                 fill
                 sizes="96px"
                 priority
-                className="object-cover"
+                className="origin-[50%_25%] scale-[2] object-cover object-[50%_0%]"
               />
             </div>
             <div>
@@ -74,7 +80,7 @@ export function FounderBio() {
           </div>
         </Reveal>
 
-        {/* Bio — narrative column, reads before the closing photo. */}
+        {/* Bio — narrative column, reads before the closing beat. */}
         <div className="mx-auto mt-14 max-w-2xl md:mt-20">
           <Reveal delay={0.05}>
             <Text size="lg" tone="primary">
@@ -100,23 +106,30 @@ export function FounderBio() {
           </Reveal>
         </div>
 
-        {/* Closing visual — the large-format photo, now the section's final beat. */}
+        {/* Closing beat — small photo beside a verbatim pull-quote, not a giant stacked block. */}
         <Reveal delay={0.2}>
-          <div className="relative mx-auto mt-16 aspect-[3/4] w-full max-w-2xl md:mt-24">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -inset-8 opacity-40"
-            >
-              <GlowEffect blur="strongest" />
-            </div>
-            <div className="relative h-full w-full overflow-hidden rounded-3xl border border-border shadow-2xl shadow-accent/20">
-              <Image
-                src="/images/founder-mohammad.jpg"
-                alt="Mohammad Chelouy Tabrizi, Founder & CEO of Oragrol Global"
-                fill
-                sizes="(min-width: 768px) 42rem, 90vw"
-                className="object-cover"
-              />
+          <div className="mx-auto mt-16 max-w-2xl border-t border-border pt-14 md:mt-20">
+            <div className="flex flex-col items-center gap-8 sm:flex-row sm:items-center sm:gap-10">
+              <div className="relative aspect-[3/4] w-40 shrink-0 sm:w-56">
+                <div aria-hidden="true" className="pointer-events-none absolute -inset-4 opacity-40">
+                  <GlowEffect blur="strong" />
+                </div>
+                <div className="relative h-full w-full overflow-hidden rounded-2xl border border-border shadow-xl shadow-accent/20">
+                  <Image
+                    src="/images/founder-mohammad.jpg"
+                    alt="Mohammad Chelouy Tabrizi, Founder & CEO of Oragrol Global"
+                    fill
+                    sizes="224px"
+                    className="object-cover"
+                  />
+                </div>
+              </div>
+              <blockquote className="flex-1 text-center sm:text-left">
+                <p className="font-heading text-xl font-medium leading-snug text-text-primary sm:text-2xl">
+                  &ldquo;Running that business, rather than just studying the industry, is where
+                  the practical, business first approach behind Oragrol actually comes from.&rdquo;
+                </p>
+              </blockquote>
             </div>
           </div>
         </Reveal>

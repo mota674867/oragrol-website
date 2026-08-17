@@ -29,9 +29,11 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 
 **FOUNDER BIO RESTRUCTURED (D-049, 2026-08-17).** Mohammad requested a layout-only restructure of Company's Founder Bio (D-048): small circular headshot (new file, `founder-mohammad-headshot.jpg` — arrived with the same mis-saved-filename pattern as the first photo, renamed to the correct path) + name + title at top, the same 3 bio paragraphs (byte-identical) reading through as a narrative middle column, then the original large photo reappearing as a widened (`max-w-2xl`) closing visual at the end. Text content unchanged, verified. A real (not a screenshot artifact this time — checked both ways) mobile-only issue found: the wider closing photo now visibly overlaps the sitewide `EmergencyCta` pill at real scroll positions, obscuring the founder's face — the same standing D-044 pill-overlap issue, now landing on the actual deliverable of this task rather than incidental text. Flagged with evidence, not fixed (pill is a single global `RootLayout` instance; desktop unaffected). Full details: D-049. `tsc`/lint/build clean.
 
+**FOUNDER BIO REAL DESIGN FIXES (D-050, 2026-08-17).** Mohammad reviewed D-049 and reported two real problems, not a quick tweak: the top circular headshot cropped awkwardly (face off-center), and the closing photo was still far too large. Root cause of the crop bug: `founder-mohammad-headshot.jpg` (from D-049) turned out to actually be a 3/4-body composition, not a tight face crop — confirmed by direct pixel inspection — plus it was genuinely PNG bytes wrongly named `.jpg` (renamed to `.png`, D-049's own mistake, fixed here). Fixed the crop by decoupling `object-position` (top-anchored) from an explicit `transform-origin` placed at the face's real position + `scale(2)` — tuned empirically against a standalone comparison harness, then re-verified at the real rendered pixel size. Researched per instruction (`ui-ux-pro-max`: 0 matches, flagged; `21st.dev`: found "Editorial Testimonial," id 9637 — small photo beside a bold pull-quote) and redesigned the closing beat around that pattern: photo shrunk from a 672px stacked block to 224px (exactly one-third), placed beside a pull-quote (a verbatim excerpt of the bio's own first sentence, not new copy). Genuine side-effect: the mobile `EmergencyCta`/photo overlap D-049 flagged (pill covering the face) is now much smaller — the pill barely brushes the photo's corner at one scroll position instead of covering the subject, though not fully eliminated (same standing global-component issue). Full details: D-050. `tsc`/lint/build clean, 0px overflow both widths.
+
 ## Next Steps
 1. **BLOCKING: General Inquiry real email send (D-047).** Needs a real `RESEND_API_KEY` from Mohammad before the required real-send proof can be completed — see Current Status above for exactly what to supply and where it goes. Do not fabricate a "success" screenshot/log without an actual send.
-2. Awaiting Mohammad's review of Company (D-048/D-049) — see Current Status. His call needed specifically on the mobile `EmergencyCta`/closing-photo overlap flagged in D-049 (a global-component fix, not scoped to this page, if he wants it addressed). Same other standing flags: SiteHeader's Dark-entry-section assumption remains open for whenever a genuinely light-first page is wanted.
+2. Awaiting Mohammad's review of Company (D-048/D-049/D-050) — see Current Status. Same standing flag: the sitewide `EmergencyCta` pill can still lightly overlap page content at some scroll positions (D-044-class, out of scope for a page-level task); SiteHeader's Dark-entry-section assumption remains open for whenever a genuinely light-first page is wanted.
 2. ~~BLOCKING: Cyber Health ambient hero (D-043)~~ — **SHIPPED LIVE 2026-08-15**, see Current Status. No longer blocking.
 2. ~~ACTIVE: Step 9 — Industries~~ — **BUILT 2026-08-15 (D-044)**, see Current Status. Awaiting Mohammad's review. A pre-existing, out-of-scope issue was surfaced (not fixed) while building this: the sitewide floating "Under attack?" widget can visually overlap the panel's Next-Step CTA button at some scroll positions — flag for a future pass.
 3. Solutions' Kinetic Grid hero (D-039) approved and shipped live (D-040) — all 5 required modifications re-verified against the live page (canvas scoping, background pixel, reduced-motion staticness), not assumed to still hold from the prototype. `/solutions/prototype` removed. `StrataVisual`'s file kept unused, available for revert.
@@ -48,6 +50,38 @@ Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step
 ---
 
 ## Session Log
+
+### 2026-08-17 (continued 2) — Founder Bio real design fixes: headshot crop + closing photo redesign (D-050)
+**Completed:**
+- Mohammad reported D-049's restructure had two real design problems (not a quick tweak): the top circular headshot's crop was awkward/off-center, and the closing photo was still far too large — plus an explicit instruction to research (`ui-ux-pro-max` + `21st.dev`) a real redesign of the closing beat, e.g. a smaller photo beside a pull-quote instead of a stacked block.
+- Investigated the crop bug before touching CSS: pixel-inspected `founder-mohammad-headshot.jpg` and found it's actually a 3/4-body composition (same "arms crossed" framing as the main photo), not a tight face crop, despite its name — confirmed via `xxd` that its real bytes are also PNG (magic number `89 50 4E 47`), mis-extensioned `.jpg` during D-049. Renamed to the correct `.png`.
+- Tuned the crop empirically: built a standalone 4-way comparison HTML harness (scratchpad only) to test `object-position`/`transform-origin`/`scale` combinations against the real source file, screenshotted via Playwright. First attempt (position bias + scale from default center) was visibly wrong — worked out why mathematically (a `scale()` from the box's own center can never land on the face when the cover-fit window's center, computed from the real image proportions, falls below the face no matter what position is chosen) — then fixed by explicitly decoupling `object-position` (top-anchored) from `transform-origin` (placed at the face's real position) before scaling. Verified against the real rendered 96px/80px circle on the live page, not just the larger test harness.
+- Researched the closing-photo redesign per instruction: `ui-ux-pro-max` returned 0 matches for the specific pattern (flagged, not silently defaulted); `21st.dev search` found "Editorial Testimonial" (id 9637) — small ringed photo beside a bold pull-quote, oversized faint numeral, generous whitespace. Adapted its core pairing (not its carousel machinery, which doesn't apply to one founder) into a static closing beat: photo shrunk from a 672px stacked block to 224px (exactly one-third on desktop), placed beside a pull-quote — the bio's own first sentence, quoted verbatim (a pull-quote by definition re-displays existing text; not new copy).
+- Added a `border-t` divider above the closing beat for clearer section rhythm — part of the "framing/text placement looks unpolished" complaint, not just the two explicit sizing/crop items.
+- Re-verified the D-049-flagged mobile `EmergencyCta`/photo overlap at the same real scroll positions with the new, smaller photo: no longer covers the subject's face (the severity D-049 flagged) — the pill now only lightly brushes the photo frame's corner at one scroll position, the same lower-severity, still-standing D-044-class sitewide issue as everywhere else. Verified this honestly rather than either claiming it's fully fixed or leaving the D-049 severity claim uncorrected.
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean; 0px horizontal overflow at 1440/390px; both images confirmed correctly wired via DOM query; full-section screenshots (element-scoped, not `fullPage`) reviewed directly at both widths.
+
+**Files changed:**
+- `app/components/sections/company/founder-bio.tsx` (crop fix + closing-beat redesign)
+- Renamed: `public/images/founder-mohammad-headshot.jpg` → `founder-mohammad-headshot.png` (asset-hygiene fix, corrects D-049's mistake)
+- `DECISIONS.md` (D-050), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The headshot's actual composition (3/4-body, not a tight face crop) and its PNG-named-.jpg mismatch — both from D-049, both caught and fixed here.
+- The math error in the first crop attempt — caught via the comparison harness before shipping, not left for a second round of feedback.
+
+**Problems solved:**
+- A real, empirically-tuned crop fix instead of a single guessed value.
+- A genuine redesign (not a resize alone) of the closing beat, grounded in real research per instruction, with a byproduct fix to the D-049-flagged pill/photo overlap.
+
+**Still open / needs verification:**
+- Mohammad's review of this round.
+- The lighter-severity `EmergencyCta` corner-brush overlap noted above (D-044-class, out of scope).
+
+**Next recommended step:**
+- Get this reviewed. Every other outstanding item (Resend API key, other pages' reviews) is unchanged from before this round.
+
+---
 
 ### 2026-08-17 (continued) — Founder Bio restructured: small top identifier → narrative bio → large closing photo (D-049)
 **Completed:**
