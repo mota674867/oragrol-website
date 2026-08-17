@@ -147,8 +147,12 @@ Built at `/industries`: desktop sticky sidebar / mobile horizontal scrollable ta
 ### Step 10 — Resources / Insights Page — PENDING
 Hero, Featured Insight, Latest Insights, Article Cards, Newsletter/LinkedIn, CTA. Editorial, spacious, custom visuals — no generic hacker imagery, no fake authors/stats/stories.
 
-### Step 11 — Company / About Page — PENDING
-Primarily light section. Hero, Who Oragrol Is, Company Story, Philosophy, Experience & Expertise, Partners & Ecosystem, Approach, CTA. Do not fabricate history/achievements — final story remains OPEN.
+### Step 11 — Company / About Page — IMPLEMENTED (D-048, 2026-08-17)
+Original outline above (Hero / Who Oragrol Is / Company Story / Philosophy / Experience & Expertise /
+Partners & Ecosystem / Approach / CTA) superseded by a real, final content brief
+(`ORAGROL_ABOUT_PAGE_CONTENT_FINAL.md`, 4 sections: Founder Bio / Company Mission-Story / Team /
+Values-Differentiators) plus a real founder photo — same "real brief supersedes placeholder outline"
+pattern D-046 set for Contact. Full details: D-048. Awaiting Mohammad's review.
 
 ### Step 12 — Contact Page — IMPLEMENTED (D-046, 2026-08-15)
 Original outline above (generic form + "Book a consultation") superseded by a more specific
@@ -248,7 +252,8 @@ Also active (D-035/D-036/D-037): Step 8 (How We Work) — CONTENT COMPLETE, conn
 **D-045 (2026-08-15):** Emergency CTA's placeholder Malaysian number removed site-wide; pill is now text-only, links to `/contact`.
 **D-046 (2026-08-15):** Step 12 (Contact) built — see Step 12 above. Instagram's placeholder footer link also replaced with the real URL in the same session.
 **D-047 (2026-08-15):** General Inquiry form added to Contact — code complete, verified end-to-end except the real outbound send. **BLOCKING:** needs a real `RESEND_API_KEY` from Mohammad — see Step 12 above / PROJECT_MEMORY.md.
-Next: **BLOCKING — a real `RESEND_API_KEY` for D-047** (General Inquiry email). Otherwise: awaiting Mohammad's review of How We Work (D-036/D-037/D-038), the Cyber Health ambient hero (D-043), Industries (D-044), and Contact (D-046). Step 10 (Resources/Insights) is the next unbuilt step once these are reviewed.
+**D-048 (2026-08-17):** Step 11 (Company) built — see Step 11 above. Researched via `ui-ux-pro-max` + `21st.dev` first per instruction; no strong pre-built "founder bio" match found (consistent with this project's own repeated precedent — D-035/D-041/D-043 — of building natively from researched principles when the catalog has nothing close), so all 4 sections were built natively, each with its own distinct treatment. Real founder photo now at `public/images/founder-mohammad.jpg` (moved from a mis-saved root-level file). Founder Bio deliberately opens Dark (not the "primarily light" framing of the now-superseded original outline) to avoid a real, pre-existing SiteHeader defect — flagged, not silently worked around or fixed out of scope, see D-048.
+Next: **BLOCKING — a real `RESEND_API_KEY` for D-047** (General Inquiry email). Otherwise: awaiting Mohammad's review of How We Work (D-036/D-037/D-038), the Cyber Health ambient hero (D-043), Industries (D-044), Contact (D-046), and Company (D-048). Step 10 (Resources/Insights) is the next unbuilt step once these are reviewed.
 
 ---
 
