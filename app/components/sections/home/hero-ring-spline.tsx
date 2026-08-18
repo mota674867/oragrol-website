@@ -54,6 +54,13 @@ export function HeroRingSpline({ className }: { className?: string }) {
     appRef.current = app;
     setLoaded(true);
     if (reduceMotion) app.stop();
+    // Belt-and-suspenders: force transparency from this side too, in
+    // case the scene's own background setting doesn't fully propagate.
+    // Tested live (see DECISIONS.md D-060) — made no visible difference
+    // against the actual issue found (an opaque object rendered by the
+    // scene itself, not a background-color setting), but it's a real,
+    // documented API for exactly this and costs nothing to keep.
+    app.setBackgroundColor("transparent");
   };
 
   useEffect(() => {
