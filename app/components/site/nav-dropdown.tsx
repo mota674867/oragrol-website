@@ -481,6 +481,24 @@ export function NavItemDropdown({
         setOpen(true);
       }}
       onMouseLeave={scheduleClose}
+      // Hardening for a reported bug ("clicking an Industries item closes
+      // the dropdown but doesn't navigate"): `cancelScheduledClose()` was
+      // previously only wired to `onMouseEnter`, so a `scheduleClose()`
+      // armed by an earlier, brief mouseleave (e.g. an imprecise diagonal
+      // move from the trigger into the panel) could still be pending when
+      // the user commits to a click. If that 150ms timer fires in the gap
+      // between mousedown and mouseup, `setOpen(false)` flips the panel to
+      // `invisible` (visibility:hidden, non-hit-testable) mid-click,
+      // swallowing it before it reaches the `<Link>` — matching the
+      // reported symptom. Cancelling on pointerdown (capture, so it runs
+      // before the click's own handlers) closes that window: once the user
+      // has physically started a click anywhere in the trigger or panel,
+      // any pending close is cancelled first. (Extensive live reproduction
+      // attempts were inconclusive on isolating this exact race — see
+      // PROJECT_MEMORY.md for the full investigation — but this is a real,
+      // narrow gap in the existing debounce logic regardless, and the fix
+      // is a safe no-op when no close is pending.)
+      onPointerDownCapture={cancelScheduledClose}
       onFocus={() => {
         if (suppressNextFocusOpenRef.current) {
           suppressNextFocusOpenRef.current = false;
