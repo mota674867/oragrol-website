@@ -1,16 +1,16 @@
 import { Caption, Container, H1, Text, ButtonLink } from "../../ui";
-import { PerimeterRing } from "./perimeter-ring";
+import { HeroRingSpline } from "./hero-ring-spline";
 
 /**
  * Hero — "The Perimeter Sweep" (replaces the 16-frame city-skyline photo
  * sequence — see DECISIONS.md D-057 for the full concept/approval trail).
  *
- * The signature visual is now `PerimeterRing`: the Oragrol brand ring,
- * mostly off-canvas behind the headline, with one continuous, slow
- * perimeter-scan sweep as its only motion. Grounded in the actual
- * business (an MSSP watching a boundary, continuously) rather than a
- * stock skyline or a node-graph — see perimeter-ring.tsx's own header
- * comment for the full rationale.
+ * The signature visual is now `HeroRingSpline`: a Spline-hosted 3D scene
+ * of the ring, replacing D-057's SVG `PerimeterRing` per an explicit,
+ * approved architecture change — see DECISIONS.md D-059. `PerimeterRing`
+ * (perimeter-ring.tsx) is intentionally left in the codebase, unedited
+ * and unreferenced, so this swap is a one-line revert if needed — not
+ * deleted, not folded into this change.
  *
  * Structural change from the old Hero, approved alongside the visual
  * swap: the previous 350vh scroll-pinned section existed only to stage
@@ -36,7 +36,7 @@ import { PerimeterRing } from "./perimeter-ring";
 export function Hero() {
   return (
     <div className="env-dark relative h-[100svh] w-full overflow-hidden bg-background">
-      <PerimeterRing />
+      <HeroRingSpline />
 
       {/* Foreground content — unchanged copy/CTAs */}
       <Container size="xl" className="relative z-10 flex h-full flex-col justify-center">
