@@ -21,3 +21,22 @@ body {
     transform: translateY(0);
   }
 }
+
+/* PerimeterRing (Home hero, D-057) — the perimeter-scan sweep's
+   continuous rotation. A plain CSS keyframe + Tailwind's arbitrary
+   animate-[...] syntax, same pattern as ai-loader-letter-fade above —
+   deliberately NOT framer-motion's `animate={{ rotate: 360 }}` +
+   `repeat: Infinity`: that combination, on a `motion.circle`, computed a
+   static end-state transform instead of an actual looping animation
+   (confirmed live via getComputedStyle — no framer-motion issue filed
+   against this, just not worth the extra investigation for a plain
+   rotation loop when this codebase already has a working, simpler
+   pattern for exactly this). */
+@keyframes perimeter-sweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
