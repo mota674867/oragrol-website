@@ -1,0 +1,541 @@
+{
+  "note": "Reference scale: Core / 50-employee company. Real client pricing may vary by size and scope. Tiers are cumulative: Growth includes everything in Essential, Enterprise includes everything in Growth.",
+  "tiers": [
+    {
+      "name": "Essential",
+      "tagline": "Foundational protection and visibility.",
+      "service_count": 7,
+      "monthly_price": "$2,756/mo",
+      "annual_price": "$33,066/yr",
+      "month_to_month_price": "$3,307/mo (month-to-month)",
+      "gross_margin_note": "~76% at reference scale",
+      "services": [
+        {
+          "code": "C01-S01",
+          "name": "Risk Check",
+          "blurb": "Know where your real risk is, prioritized and clear.",
+          "price": "$4,500",
+          "unit": "one-time"
+        },
+        {
+          "code": "C01-S03",
+          "name": "Policy Guard",
+          "blurb": "Security policies that are current, approved, and actually followed.",
+          "price": "$800",
+          "unit": "/mo"
+        },
+        {
+          "code": "C02-S01",
+          "name": "Vuln Watch",
+          "blurb": "Continuous scanning that finds and tracks weaknesses to closure.",
+          "price": "$15",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C04-S01",
+          "name": "Device Guard",
+          "blurb": "Endpoint protection that's managed, not just installed.",
+          "price": "$12",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C04-S02",
+          "name": "Mail Shield",
+          "blurb": "Email security that stops what filters miss.",
+          "price": "$6",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C04-S03",
+          "name": "Staff Security",
+          "blurb": "Training that turns your team into a defense.",
+          "price": "$40",
+          "unit": "/user/yr"
+        },
+        {
+          "code": "C05-S02",
+          "name": "Login Shield",
+          "blurb": "Multi-factor authentication, rolled out and managed.",
+          "price": "$4",
+          "unit": "/user/mo"
+        }
+      ]
+    },
+    {
+      "name": "Growth",
+      "tagline": "Expanded protection with active monitoring.",
+      "service_count": 23,
+      "monthly_price": "$11,706/mo",
+      "annual_price": "$140,471/yr",
+      "month_to_month_price": "$14,047/mo (month-to-month)",
+      "gross_margin_note": "~79% at reference scale",
+      "services": [
+        {
+          "code": "C01-S01",
+          "name": "Risk Check",
+          "blurb": "Know where your real risk is, prioritized and clear.",
+          "price": "$4,500",
+          "unit": "one-time"
+        },
+        {
+          "code": "C01-S03",
+          "name": "Policy Guard",
+          "blurb": "Security policies that are current, approved, and actually followed.",
+          "price": "$800",
+          "unit": "/mo"
+        },
+        {
+          "code": "C02-S01",
+          "name": "Vuln Watch",
+          "blurb": "Continuous scanning that finds and tracks weaknesses to closure.",
+          "price": "$15",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C04-S01",
+          "name": "Device Guard",
+          "blurb": "Endpoint protection that's managed, not just installed.",
+          "price": "$12",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C04-S02",
+          "name": "Mail Shield",
+          "blurb": "Email security that stops what filters miss.",
+          "price": "$6",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C04-S03",
+          "name": "Staff Security",
+          "blurb": "Training that turns your team into a defense.",
+          "price": "$40",
+          "unit": "/user/yr"
+        },
+        {
+          "code": "C05-S02",
+          "name": "Login Shield",
+          "blurb": "Multi-factor authentication, rolled out and managed.",
+          "price": "$4",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C01-S02",
+          "name": "Compliance Ready",
+          "blurb": "Know exactly what compliance requires, and how close you are.",
+          "price": "$5,000",
+          "unit": "+ $500/mo"
+        },
+        {
+          "code": "C02-S02",
+          "name": "Vendor Watch",
+          "blurb": "Know which vendors put your business at risk.",
+          "price": "$400",
+          "unit": "/mo"
+        },
+        {
+          "code": "C03-S01",
+          "name": "AI Security Monitoring",
+          "blurb": "Round-the-clock visibility across your environment.",
+          "price": "$20",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C03-S03",
+          "name": "Threat Watch",
+          "blurb": "Intelligence on the threats actually targeting your industry.",
+          "price": "$8",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C05-S01",
+          "name": "Access Manager",
+          "blurb": "The right people, the right access, nothing more.",
+          "price": "$8",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C05-S04",
+          "name": "Access Governance",
+          "blurb": "Regular reviews so access never quietly drifts.",
+          "price": "$6",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C06-S01",
+          "name": "Cloud Guard",
+          "blurb": "Cloud misconfigurations found before they're exploited.",
+          "price": "$400",
+          "unit": "/mo"
+        },
+        {
+          "code": "C06-S02",
+          "name": "Workload Shield",
+          "blurb": "Protection for what actually runs in your cloud.",
+          "price": "$500",
+          "unit": "/mo"
+        },
+        {
+          "code": "C06-S03",
+          "name": "Infra Guard",
+          "blurb": "Servers and infrastructure, hardened and watched.",
+          "price": "$450",
+          "unit": "/mo"
+        },
+        {
+          "code": "C06-S05",
+          "name": "Cloud Compliance",
+          "blurb": "Your cloud environment, provably compliant.",
+          "price": "$300",
+          "unit": "/mo"
+        },
+        {
+          "code": "C07-S01",
+          "name": "App Shield",
+          "blurb": "Application security woven into how you build.",
+          "price": "$300",
+          "unit": "/app/mo"
+        },
+        {
+          "code": "C07-S02",
+          "name": "Web Shield",
+          "blurb": "Your public-facing web apps, monitored and protected.",
+          "price": "$250",
+          "unit": "/app/mo"
+        },
+        {
+          "code": "C07-S03",
+          "name": "API Guard",
+          "blurb": "APIs are the new front door.",
+          "price": "$300",
+          "unit": "/API/mo"
+        },
+        {
+          "code": "C08-S01",
+          "name": "Data Shield",
+          "blurb": "Data protection built around what your business holds.",
+          "price": "$10",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C08-S02",
+          "name": "Data Guard",
+          "blurb": "Stop sensitive data from leaving when it shouldn't.",
+          "price": "$8",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C08-S04",
+          "name": "Data Classifier",
+          "blurb": "Know what data you have and how sensitive it is.",
+          "price": "$400",
+          "unit": "/mo"
+        }
+      ]
+    },
+    {
+      "name": "Enterprise",
+      "tagline": "Full strategic partnership and rapid response.",
+      "service_count": 26,
+      "monthly_price": "$13,133/mo",
+      "annual_price": "$157,600/yr",
+      "month_to_month_price": "$15,760/mo (month-to-month)",
+      "gross_margin_note": "~77% at reference scale",
+      "services": [
+        {
+          "code": "C01-S01",
+          "name": "Risk Check",
+          "blurb": "Know where your real risk is, prioritized and clear.",
+          "price": "$4,500",
+          "unit": "one-time"
+        },
+        {
+          "code": "C01-S03",
+          "name": "Policy Guard",
+          "blurb": "Security policies that are current, approved, and actually followed.",
+          "price": "$800",
+          "unit": "/mo"
+        },
+        {
+          "code": "C02-S01",
+          "name": "Vuln Watch",
+          "blurb": "Continuous scanning that finds and tracks weaknesses to closure.",
+          "price": "$15",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C04-S01",
+          "name": "Device Guard",
+          "blurb": "Endpoint protection that's managed, not just installed.",
+          "price": "$12",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C04-S02",
+          "name": "Mail Shield",
+          "blurb": "Email security that stops what filters miss.",
+          "price": "$6",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C04-S03",
+          "name": "Staff Security",
+          "blurb": "Training that turns your team into a defense.",
+          "price": "$40",
+          "unit": "/user/yr"
+        },
+        {
+          "code": "C05-S02",
+          "name": "Login Shield",
+          "blurb": "Multi-factor authentication, rolled out and managed.",
+          "price": "$4",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C01-S02",
+          "name": "Compliance Ready",
+          "blurb": "Know exactly what compliance requires, and how close you are.",
+          "price": "$5,000",
+          "unit": "+ $500/mo"
+        },
+        {
+          "code": "C02-S02",
+          "name": "Vendor Watch",
+          "blurb": "Know which vendors put your business at risk.",
+          "price": "$400",
+          "unit": "/mo"
+        },
+        {
+          "code": "C03-S01",
+          "name": "AI Security Monitoring",
+          "blurb": "Round-the-clock visibility across your environment.",
+          "price": "$20",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C03-S03",
+          "name": "Threat Watch",
+          "blurb": "Intelligence on the threats actually targeting your industry.",
+          "price": "$8",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C05-S01",
+          "name": "Access Manager",
+          "blurb": "The right people, the right access, nothing more.",
+          "price": "$8",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C05-S04",
+          "name": "Access Governance",
+          "blurb": "Regular reviews so access never quietly drifts.",
+          "price": "$6",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C06-S01",
+          "name": "Cloud Guard",
+          "blurb": "Cloud misconfigurations found before they're exploited.",
+          "price": "$400",
+          "unit": "/mo"
+        },
+        {
+          "code": "C06-S02",
+          "name": "Workload Shield",
+          "blurb": "Protection for what actually runs in your cloud.",
+          "price": "$500",
+          "unit": "/mo"
+        },
+        {
+          "code": "C06-S03",
+          "name": "Infra Guard",
+          "blurb": "Servers and infrastructure, hardened and watched.",
+          "price": "$450",
+          "unit": "/mo"
+        },
+        {
+          "code": "C06-S05",
+          "name": "Cloud Compliance",
+          "blurb": "Your cloud environment, provably compliant.",
+          "price": "$300",
+          "unit": "/mo"
+        },
+        {
+          "code": "C07-S01",
+          "name": "App Shield",
+          "blurb": "Application security woven into how you build.",
+          "price": "$300",
+          "unit": "/app/mo"
+        },
+        {
+          "code": "C07-S02",
+          "name": "Web Shield",
+          "blurb": "Your public-facing web apps, monitored and protected.",
+          "price": "$250",
+          "unit": "/app/mo"
+        },
+        {
+          "code": "C07-S03",
+          "name": "API Guard",
+          "blurb": "APIs are the new front door.",
+          "price": "$300",
+          "unit": "/API/mo"
+        },
+        {
+          "code": "C08-S01",
+          "name": "Data Shield",
+          "blurb": "Data protection built around what your business holds.",
+          "price": "$10",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C08-S02",
+          "name": "Data Guard",
+          "blurb": "Stop sensitive data from leaving when it shouldn't.",
+          "price": "$8",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C08-S04",
+          "name": "Data Classifier",
+          "blurb": "Know what data you have and how sensitive it is.",
+          "price": "$400",
+          "unit": "/mo"
+        },
+        {
+          "code": "C03-S02",
+          "name": "Managed Threat Response",
+          "blurb": "Real threats, triaged and stopped before they spread.",
+          "price": "$25",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C03-S04",
+          "name": "Security Response",
+          "blurb": "A coordinated response plan for when things go wrong.",
+          "price": "$600",
+          "unit": "/mo"
+        },
+        {
+          "code": "C08-S05",
+          "name": "Data Watch",
+          "blurb": "Ongoing eyes on how your data moves.",
+          "price": "$6",
+          "unit": "/user/mo"
+        }
+      ]
+    }
+  ],
+  "addon_menu": {
+    "description": "Specialist services available as add-ons to any Solutions level, not auto-included in any tier.",
+    "services": [
+      {
+        "code": "C01-S04",
+        "name": "Virtual CISO",
+        "blurb": "Strategic security leadership, without a full-time hire.",
+        "price": "$2,500-$4,500",
+        "unit": "/mo",
+        "reason": "High-value but not universal — sold as its own premium engagement"
+      },
+      {
+        "code": "C07-S04",
+        "name": "Code Shield",
+        "blurb": "Secure development practices your team can follow.",
+        "price": "$600",
+        "unit": "/mo",
+        "reason": "Only relevant to customers with an active dev team"
+      },
+      {
+        "code": "C08-S03",
+        "name": "Privacy Guard",
+        "blurb": "Privacy compliance without the guesswork.",
+        "price": "$700",
+        "unit": "/mo",
+        "reason": "Advisory add-on, situational demand"
+      },
+      {
+        "code": "C09-S01",
+        "name": "AI Check",
+        "blurb": "Find out if your AI systems are actually safe.",
+        "price": "$4,500",
+        "unit": "one-time",
+        "reason": "One-time; AI security still an emerging need"
+      },
+      {
+        "code": "C09-S02",
+        "name": "AI Governance",
+        "blurb": "Policy and oversight for how your business uses AI.",
+        "price": "$900",
+        "unit": "/mo",
+        "reason": "Emerging category, situational demand"
+      },
+      {
+        "code": "C05-S03",
+        "name": "Admin Shield",
+        "blurb": "Privileged accounts, watched closely.",
+        "price": "$30",
+        "unit": "/priv-user/mo",
+        "reason": "Only relevant where privileged/admin accounts exist as a distinct need"
+      },
+      {
+        "code": "C05-S05",
+        "name": "Trust Guard",
+        "blurb": "Never trust, always verify.",
+        "price": "$10",
+        "unit": "/user/mo",
+        "reason": "Architecture-heavy implementation project, own setup fee"
+      },
+      {
+        "code": "C06-S04",
+        "name": "Network Shield",
+        "blurb": "Network segmentation that actually contains a breach.",
+        "price": "$350",
+        "unit": "/mo",
+        "reason": "Specialist networking work, own setup fee"
+      },
+      {
+        "code": "C09-S03",
+        "name": "Model Shield",
+        "blurb": "Protection for the AI models running in production.",
+        "price": "$350",
+        "unit": "/model/mo",
+        "reason": "Only relevant if customer runs AI models in production"
+      },
+      {
+        "code": "C09-S04",
+        "name": "AI Data Guard",
+        "blurb": "Keep the data feeding your AI systems protected.",
+        "price": "$8",
+        "unit": "/user/mo",
+        "reason": "Only relevant if customer runs AI models in production"
+      },
+      {
+        "code": "C09-S05",
+        "name": "AI Threat Guard",
+        "blurb": "Threats built specifically for AI, detected and stopped.",
+        "price": "$400",
+        "unit": "/mo",
+        "reason": "Only relevant if customer runs AI models in production"
+      },
+      {
+        "code": "C07-S05",
+        "name": "App Test",
+        "blurb": "Real testing that proves an app is safe.",
+        "price": "$3,500",
+        "unit": "/app",
+        "reason": "Per-app project pricing, not a recurring fit"
+      }
+    ]
+  },
+  "penetration_testing_addon": {
+    "code": "C10-S01",
+    "name": "Real-World Test",
+    "official_name": "Penetration Testing",
+    "blurb": "Certified specialists try to break in, safely, so you know for sure.",
+    "price": "$7,500–$18,000",
+    "unit": "per engagement",
+    "note": "Human-delivered specialist service. Never bundled into a subscription tier — always scoped and billed as its own engagement, available as an add-on to any Solutions level."
+  },
+  "pricing_confidence_note": "Prices are provisional — based on internal reference pricing, not yet validated against real client quotes. Several individual services within these tiers are tagged 'Estimated' confidence in the source pricing model. Do not present these as final, locked prices without your own review."
+}
