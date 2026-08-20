@@ -4,7 +4,7 @@ import { Badge, ButtonLink, Caption, Container, DataText, H1, H2, Icon, Section,
 import { Reveal } from "../../motion/reveal";
 import { InlineMarkdown } from "../resources/inline-markdown";
 import { GlowEffect } from "./glow-effect";
-import { getCategoryIcon, type RawCategory, type RawService } from "./services-data";
+import { getCategoryIcon, getCategoryRootPath, isBusinessAutomationCategory, type RawCategory, type RawService } from "./services-data";
 
 /**
  * ServiceDetail — per-service page (2026-08-20 restructure), same
@@ -49,15 +49,25 @@ function BulletList({ items }: { items: string[] }) {
   );
 }
 
+/**
+ * Tier-aware (2026-08-20 nav split): a Business Automation category's
+ * root crumb reads "Business Automation" -> /business-automation, not
+ * "Services" -> /services — derived from the real category code
+ * (`getCategoryRootPath`), not passed in separately, so it can't drift
+ * out of sync with which page a given service actually lives under.
+ */
 function ServiceBreadcrumb({ category, serviceName }: { category: RawCategory; serviceName: string }) {
+  const rootPath = getCategoryRootPath(category.code);
+  const rootLabel = isBusinessAutomationCategory(category.code) ? "Business Automation" : "Services";
+
   return (
     <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 font-body text-sm text-text-muted">
-      <Link href="/services" className="transition-colors duration-150 hover:text-text-primary">
-        Services
+      <Link href={rootPath} className="transition-colors duration-150 hover:text-text-primary">
+        {rootLabel}
       </Link>
       <Icon icon={ChevronRight} size="sm" />
       <Link
-        href={`/services#category-${category.code.toLowerCase()}`}
+        href={`${rootPath}#category-${category.code.toLowerCase()}`}
         className="transition-colors duration-150 hover:text-text-primary"
       >
         {category.name}

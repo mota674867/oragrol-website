@@ -123,6 +123,16 @@ export function getAllServiceSlugs(): string[] {
   return getAllCategories().flatMap((category) => category.services.map((s) => serviceSlug(s.code)));
 }
 
+/** Service slugs for the 10 cybersecurity categories only — /services/[code]'s own generateStaticParams. */
+export function getServiceSlugsTier1(): string[] {
+  return getServicesTier1().flatMap((category) => category.services.map((s) => serviceSlug(s.code)));
+}
+
+/** Service slugs for the 5 Business Automation categories only — /business-automation/[code]'s own generateStaticParams. */
+export function getServiceSlugsTier2(): string[] {
+  return getBusinessAutomationTier2().flatMap((category) => category.services.map((s) => serviceSlug(s.code)));
+}
+
 export interface ServiceWithCategory {
   service: RawService;
   category: RawCategory;
@@ -134,4 +144,29 @@ export function getServiceBySlug(slug: string): ServiceWithCategory | undefined 
     if (service) return { service, category };
   }
   return undefined;
+}
+
+/**
+ * 2026-08-20 nav split — Business Automation became its own top-level page,
+ * no longer an anchor-scrolled tier of /services (see DECISIONS.md, this
+ * date). Real source `code`s (C11-C15, and service slugs like `c11-s01`)
+ * stay unchanged — only routing/display around them changes.
+ */
+export function isBusinessAutomationCategory(categoryCode: string): boolean {
+  return getBusinessAutomationTier2().some((c) => c.code === categoryCode);
+}
+
+export function getCategoryRootPath(categoryCode: string): "/services" | "/business-automation" {
+  return isBusinessAutomationCategory(categoryCode) ? "/business-automation" : "/services";
+}
+
+/**
+ * Display-only renumbering for /business-automation's own page: "Category
+ * 11" reads as an orphaned fragment once it's not nested under Services
+ * anymore. Position-based (1-5), NOT derived from the real code — the real
+ * code (C11-C15) stays the source of truth for slugs/lookups, unaffected.
+ * /services keeps its own categories' real 1-10 numbering unchanged.
+ */
+export function businessAutomationDisplayNumeral(index: number): string {
+  return String(index + 1).padStart(2, "0");
 }

@@ -16,15 +16,28 @@ import { serviceSlug } from "./services-data";
  * with "/" (e.g. "$500" + "/mo" -> "$500/mo"), space-joined otherwise
  * (e.g. "$4,500" + "one-time" -> "$4,500 one-time") — a formatting choice
  * only; both values are the source JSON's own, nothing invented.
+ *
+ * `basePath` (2026-08-20 nav split): Business Automation's 25 detail pages
+ * moved to `/business-automation/[code]`, so this card's link target now
+ * depends on which page it's rendered from, not a fixed `/services/`
+ * prefix — the caller (`category-section.tsx`) passes the right root.
  */
 function formatPrice(price: string, unit: string): string {
   return unit.startsWith("/") ? `${price}${unit}` : `${price} ${unit}`;
 }
 
-export function ServiceCard({ service, icon }: { service: RawService; icon: LucideIconComponent }) {
+export function ServiceCard({
+  service,
+  icon,
+  basePath,
+}: {
+  service: RawService;
+  icon: LucideIconComponent;
+  basePath: "/services" | "/business-automation";
+}) {
   return (
     <Card
-      href={`/services/${serviceSlug(service.code)}`}
+      href={`${basePath}/${serviceSlug(service.code)}`}
       variant="surface"
       interactive
       className="flex h-full flex-col gap-3 p-5"

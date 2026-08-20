@@ -63,8 +63,13 @@ import { NAV_DROPDOWNS, NavItemDropdown } from "./nav-dropdown";
  * files — no ids anywhere), not an oversight.
  */
 
+// "Business Automation" added 2026-08-20 (nav split — see DECISIONS.md):
+// a 7th top-level item makes D-054's already-flagged 1024px nav-cramping
+// (labels/CTA/EN|FR wrapping at that exact breakpoint) somewhat worse —
+// flagged, not fixed here; out of scope for this task.
 const NAV_LINKS = [
   { label: "Services", href: "/services" },
+  { label: "Business Automation", href: "/business-automation" },
   { label: "Solutions", href: "/solutions" },
   { label: "Cyber Health", href: "/cyber-health" },
   { label: "Industries", href: "/industries" },

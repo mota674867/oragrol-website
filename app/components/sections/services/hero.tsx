@@ -12,6 +12,12 @@ import { ServicesNetworkVisual } from "./network-visual";
  * component as the capability rows — D-013 material) as the page's own
  * hero-scale signature piece.
  *
+ * 2026-08-20 nav split: Business Automation moved out to its own
+ * top-level page (`/business-automation`) — this hero's copy/ghost
+ * numeral reverted from "Fifteen"/"15" (the brief 2026-08-20 restructure
+ * that combined both tiers on one page) back down to the 10 cybersecurity
+ * categories this page now covers alone.
+ *
  * Dark environment, matching Home's opening section — deliberate, not
  * arbitrary: SiteHeader (site-header.tsx) is currently scoped to assume a
  * Dark entry section for every page ("Once light-first pages exist, this
@@ -35,13 +41,13 @@ export function ServicesHero() {
             </Reveal>
             <Reveal delay={0.05}>
               <H1 className="mt-4 max-w-2xl">
-                Fifteen categories. One coordinated approach.
+                Ten categories. One coordinated approach.
               </H1>
             </Reveal>
             <Reveal delay={0.1}>
               <Text tone="secondary" size="lg" className="mt-6 max-w-xl">
                 Every service exists to answer one question: what does this business actually need
-                to protect or improve, and what&apos;s the most direct way to do it. Explore what each
+                to protect, and what&apos;s the most direct way to protect it. Explore what each
                 category covers below.
               </Text>
             </Reveal>
@@ -54,7 +60,7 @@ export function ServicesHero() {
                 aria-hidden="true"
                 className="pointer-events-none absolute -bottom-8 -right-2 select-none font-data text-[11rem] font-bold leading-none text-white/[0.04]"
               >
-                15
+                10
               </span>
               <ServicesNetworkVisual className="relative w-full" />
             </div>

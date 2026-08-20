@@ -26,15 +26,13 @@ import { getBusinessAutomationTier2, getServicesTier1 } from "../sections/servic
  *    stay plain `NavLink`s, untouched, per Mohammad's own stated examples.
  *
  * Per-item content/anchor provenance:
- *  - Services (2026-08-20 restructure, superseding D-053/D-054's original
- *    "8 capabilities, 4 groups"): the page's own 15-category/64-service
- *    taxonomy replaced the old 8-capability one entirely, so the old
- *    `#capability-0N` anchors this dropdown pointed to no longer exist —
- *    relinked to the new `#category-cNN` anchors, hrefs/labels sourced
- *    directly from the same `services-data.ts` module the page itself
- *    renders from (not re-typed, can't drift out of sync). 2 columns —
- *    the page's own real Tier 1/Tier 2 split (Cybersecurity: 10
- *    categories, Business Automation: 5), not an invented grouping.
+ *  - Services / Business Automation (2026-08-20 nav split, superseding
+ *    this same date's earlier "one combined 2-column dropdown" — see
+ *    DECISIONS.md): Business Automation became its own top-level nav item
+ *    and page, so these are now two separate single-column dropdowns
+ *    (10 cybersecurity categories under Services, 5 under Business
+ *    Automation), hrefs/labels still sourced directly from
+ *    `services-data.ts` (not re-typed, can't drift out of sync).
  *  - Solutions: 3 real tiers (`TierCards`) + 1 real add-on
  *    (`PentestAddon`) — real content, but NO anchor ids existed on
  *    /solutions before this change. Added `id="tier-0N"` /
@@ -125,27 +123,35 @@ export interface NavDropdownConfig {
 const SERVICES_TIER1_CATEGORIES = getServicesTier1();
 const SERVICES_TIER2_CATEGORIES = getBusinessAutomationTier2();
 
+// Single column, 10 items — same shape as Industries' existing 9-item
+// single-column dropdown (w-72), not a new pattern.
 const SERVICES_DROPDOWN: NavDropdownConfig = {
   label: "Services",
   href: "/services",
-  desktopPanelWidthClass: "w-[560px]",
-  desktopLayoutClassName: "grid grid-cols-2 gap-x-6",
+  desktopPanelWidthClass: "w-72",
+  desktopLayoutClassName: "flex flex-col",
   columns: [
     {
-      heading: { label: "Cybersecurity", href: `/services#category-${SERVICES_TIER1_CATEGORIES[0].code.toLowerCase()}` },
       items: SERVICES_TIER1_CATEGORIES.map((c) => ({
         label: c.name,
         href: `/services#category-${c.code.toLowerCase()}`,
       })),
     },
+  ],
+};
+
+// Single column, 5 items — same shape/size as the existing Solutions
+// dropdown (w-64), not a new pattern.
+const BUSINESS_AUTOMATION_DROPDOWN: NavDropdownConfig = {
+  label: "Business Automation",
+  href: "/business-automation",
+  desktopPanelWidthClass: "w-64",
+  desktopLayoutClassName: "flex flex-col",
+  columns: [
     {
-      heading: {
-        label: "Business Automation",
-        href: `/services#category-${SERVICES_TIER2_CATEGORIES[0].code.toLowerCase()}`,
-      },
       items: SERVICES_TIER2_CATEGORIES.map((c) => ({
         label: c.name,
-        href: `/services#category-${c.code.toLowerCase()}`,
+        href: `/business-automation#category-${c.code.toLowerCase()}`,
       })),
     },
   ],
@@ -208,6 +214,7 @@ const RESOURCES_DROPDOWN: NavDropdownConfig = {
  *  here; a miss means that item stays a plain `NavLink`. */
 export const NAV_DROPDOWNS: Record<string, NavDropdownConfig> = {
   "/services": SERVICES_DROPDOWN,
+  "/business-automation": BUSINESS_AUTOMATION_DROPDOWN,
   "/solutions": SOLUTIONS_DROPDOWN,
   "/industries": INDUSTRIES_DROPDOWN,
   "/resources": RESOURCES_DROPDOWN,
