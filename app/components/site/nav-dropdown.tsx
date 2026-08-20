@@ -9,6 +9,7 @@ import { cn } from "../ui/cn";
 import { usePrefersReducedMotion } from "../motion/use-reduced-motion";
 import { INDUSTRIES, slugifyIndustryName } from "../sections/industries/industries-data";
 import { ARTICLES } from "../sections/resources/articles-data";
+import { getBusinessAutomationTier2, getServicesTier1 } from "../sections/services/services-data";
 
 /**
  * NavItemDropdown — generalized nav mega-menu, extracted from the
@@ -25,9 +26,15 @@ import { ARTICLES } from "../sections/resources/articles-data";
  *    stay plain `NavLink`s, untouched, per Mohammad's own stated examples.
  *
  * Per-item content/anchor provenance:
- *  - Services (D-053/D-054): 8 capabilities, 4 groups — see that file's
- *    git history for the full record. Real `capability-0N` anchors already
- *    existed on /services before any of this nav work.
+ *  - Services (2026-08-20 restructure, superseding D-053/D-054's original
+ *    "8 capabilities, 4 groups"): the page's own 15-category/64-service
+ *    taxonomy replaced the old 8-capability one entirely, so the old
+ *    `#capability-0N` anchors this dropdown pointed to no longer exist —
+ *    relinked to the new `#category-cNN` anchors, hrefs/labels sourced
+ *    directly from the same `services-data.ts` module the page itself
+ *    renders from (not re-typed, can't drift out of sync). 2 columns —
+ *    the page's own real Tier 1/Tier 2 split (Cybersecurity: 10
+ *    categories, Business Automation: 5), not an invented grouping.
  *  - Solutions: 3 real tiers (`TierCards`) + 1 real add-on
  *    (`PentestAddon`) — real content, but NO anchor ids existed on
  *    /solutions before this change. Added `id="tier-0N"` /
@@ -115,39 +122,31 @@ export interface NavDropdownConfig {
   desktopLayoutClassName: string;
 }
 
+const SERVICES_TIER1_CATEGORIES = getServicesTier1();
+const SERVICES_TIER2_CATEGORIES = getBusinessAutomationTier2();
+
 const SERVICES_DROPDOWN: NavDropdownConfig = {
   label: "Services",
   href: "/services",
-  desktopPanelWidthClass: "w-[820px]",
-  desktopLayoutClassName: "grid grid-cols-4 gap-x-6",
+  desktopPanelWidthClass: "w-[560px]",
+  desktopLayoutClassName: "grid grid-cols-2 gap-x-6",
   columns: [
     {
-      heading: { label: "Advisory", href: "/services#capability-01" },
-      items: [
-        { label: "Virtual CISO", href: "/services#capability-01" },
-        { label: "Risk Assessment & Compliance", href: "/services#capability-02" },
-      ],
+      heading: { label: "Cybersecurity", href: `/services#category-${SERVICES_TIER1_CATEGORIES[0].code.toLowerCase()}` },
+      items: SERVICES_TIER1_CATEGORIES.map((c) => ({
+        label: c.name,
+        href: `/services#category-${c.code.toLowerCase()}`,
+      })),
     },
     {
-      heading: { label: "Assessment & Testing", href: "/services#capability-03" },
-      items: [
-        { label: "Vulnerability Assessment & Management", href: "/services#capability-03" },
-        { label: "Penetration Testing", href: "/services#capability-06" },
-      ],
-    },
-    {
-      heading: { label: "Protection & Monitoring", href: "/services#capability-05" },
-      items: [
-        { label: "Managed Security Services / 24/7 MDR", href: "/services#capability-05" },
-        { label: "Endpoint Protection / EDR", href: "/services#capability-07" },
-      ],
-    },
-    {
-      heading: { label: "Response & Training", href: "/services#capability-08" },
-      items: [
-        { label: "Incident Response", href: "/services#capability-08" },
-        { label: "Security Awareness Training", href: "/services#capability-04" },
-      ],
+      heading: {
+        label: "Business Automation",
+        href: `/services#category-${SERVICES_TIER2_CATEGORIES[0].code.toLowerCase()}`,
+      },
+      items: SERVICES_TIER2_CATEGORIES.map((c) => ({
+        label: c.name,
+        href: `/services#category-${c.code.toLowerCase()}`,
+      })),
     },
   ],
 };

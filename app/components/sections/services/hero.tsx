@@ -35,14 +35,14 @@ export function ServicesHero() {
             </Reveal>
             <Reveal delay={0.05}>
               <H1 className="mt-4 max-w-2xl">
-                Eight capabilities. One coordinated approach.
+                Fifteen categories. One coordinated approach.
               </H1>
             </Reveal>
             <Reveal delay={0.1}>
               <Text tone="secondary" size="lg" className="mt-6 max-w-xl">
                 Every service exists to answer one question: what does this business actually need
-                to protect, and what&apos;s the most direct way to protect it. Explore what each
-                capability covers below.
+                to protect or improve, and what&apos;s the most direct way to do it. Explore what each
+                category covers below.
               </Text>
             </Reveal>
           </div>
@@ -54,7 +54,7 @@ export function ServicesHero() {
                 aria-hidden="true"
                 className="pointer-events-none absolute -bottom-8 -right-2 select-none font-data text-[11rem] font-bold leading-none text-white/[0.04]"
               >
-                8
+                15
               </span>
               <ServicesNetworkVisual className="relative w-full" />
             </div>

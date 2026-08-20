@@ -1,0 +1,2052 @@
+{
+  "services_tier1": [
+    {
+      "code": "C01",
+      "name": "Know & manage your risk",
+      "tagline": "A clear, prioritized view of what's actually putting your business at risk.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C01-S01",
+          "name": "Risk Check",
+          "blurb": "Know where your real risk is, prioritized and clear.",
+          "price": "$4,500",
+          "unit": "one-time",
+          "problem": "You don't have a clear, consolidated view of where your cyber risk actually is, so you can't be confident your security spend and effort are going to the right places.",
+          "what_we_do": "ORAGROL reviews your environment using existing integrations and documents first, asks only the questions it genuinely needs answered, then scores and prioritizes every risk it finds.",
+          "deliverables": [
+            "An executive summary you can bring to leadership",
+            "A detailed risk register",
+            "A prioritized action plan"
+          ],
+          "benefits": [
+            "A clear starting point instead of guesswork",
+            "Confidence that spend and effort target the biggest risks first",
+            "A defensible record for insurance, lenders, or customer due diligence"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "You know exactly what your top risks are and what to do about them first."
+        },
+        {
+          "code": "C01-S02",
+          "name": "Compliance Ready",
+          "blurb": "Know exactly what compliance requires, and how close you are.",
+          "price": "$5,000",
+          "unit": "+ $500/mo",
+          "problem": "You're being asked to prove compliance — by a customer, insurer, or regulator — and you don't have a clear picture of where you actually stand.",
+          "what_we_do": "ORAGROL identifies which frameworks apply to you, compares your current state against them, and builds a prioritized plan to close every gap.",
+          "deliverables": [
+            "A gap report in plain language",
+            "A remediation roadmap with owners",
+            "Dates",
+            "An evidence package supporting your compliance status"
+          ],
+          "benefits": [
+            "Clear answer to \"are we compliant?\" instead of guessing",
+            "A realistic, prioritized path to close gaps",
+            "Evidence ready when a customer, insurer, or auditor asks"
+          ],
+          "process": "Identify frameworks → Compare current state → Report gaps → Build roadmap → Track closure.",
+          "outcome": "You know exactly what \"compliant\" requires and how close you are to it."
+        },
+        {
+          "code": "C01-S03",
+          "name": "Policy Guard",
+          "blurb": "Security policies that are current, approved, and actually followed.",
+          "price": "$800",
+          "unit": "/mo",
+          "problem": "You don't have formal, up-to-date security policies, and that's costing you at audit time, insurance renewal, or when a customer asks to see your governance program.",
+          "what_we_do": "ORAGROL identifies which policies you're missing or need to update, drafts them based on your real business context, and keeps them current going forward.",
+          "deliverables": [
+            "A complete policy set",
+            "A governance charter defining who owns what",
+            "A review calendar so nothing goes stale again"
+          ],
+          "benefits": [
+            "A defensible, current policy set ready for audit or insurance",
+            "Clear accountability for who owns security decisions",
+            "Policies that reflect how your business actually operates"
+          ],
+          "process": "Identify gaps → Draft policy → Review and approve → Publish → Maintain on schedule.",
+          "outcome": "Your governance program is written down, approved, and kept current."
+        },
+        {
+          "code": "C01-S04",
+          "name": "Virtual CISO",
+          "blurb": "Strategic security leadership, without a full-time hire.",
+          "price": "$2,500-$4,500",
+          "unit": "/mo",
+          "problem": "You don't have someone senior enough to set security strategy, prioritize the roadmap, and be accountable for the program — not a technician, a leader.",
+          "what_we_do": "A named cybersecurity director sets your strategic priorities, coordinates the rest of your ORAGROL services, reports to your leadership, and owns the roadmap.",
+          "deliverables": [
+            "Quarterly strategic review",
+            "Executive risk report",
+            "Prioritized security roadmap",
+            "Leadership-ready reporting"
+          ],
+          "benefits": [
+            "Senior security leadership without a full-time hire",
+            "One accountable owner for the whole program",
+            "Clear prioritization instead of scattered fixes"
+          ],
+          "process": "Understand your business → Set priorities → Direct the program → Report to leadership → Adjust",
+          "outcome": "You have one senior, accountable leader driving your security program forward."
+        }
+      ]
+    },
+    {
+      "code": "C02",
+      "name": "Find & fix weaknesses",
+      "tagline": "Exploitable gaps found and tracked to closure.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C02-S01",
+          "name": "Vuln Watch",
+          "blurb": "Continuous scanning that finds and tracks weaknesses to closure.",
+          "price": "$15",
+          "unit": "/user/mo",
+          "problem": "You don't have a systematic way to find and fix vulnerabilities before someone else finds them first.",
+          "what_we_do": "ORAGROL runs regular vulnerability scans, cuts through the noise to show you what's really exploitable, and tracks every finding until it's confirmed closed.",
+          "deliverables": [
+            "A prioritized vulnerability report",
+            "A remediation tracking dashboard",
+            "Verified closure confirmation"
+          ],
+          "benefits": [
+            "Fewer exploitable gaps left open",
+            "Clear priority so effort goes to what matters most",
+            "A verified record that issues were actually fixed"
+          ],
+          "process": "Scan → Filter noise → Prioritize → Route for fix → Verify closure → Repeat.",
+          "outcome": "Known vulnerabilities get found and closed on a predictable schedule, instead of piling up unmanaged."
+        },
+        {
+          "code": "C02-S02",
+          "name": "Vendor Watch",
+          "blurb": "Know which vendors put your business at risk.",
+          "price": "$400",
+          "unit": "/mo",
+          "problem": "You depend on dozens of outside vendors and have no real way to know which ones are a security risk to your business.",
+          "what_we_do": "ORAGROL builds a full picture of your vendors, figures out which ones matter most based on what data or access they have, checks their security evidence, and keeps monitoring for new risk after that.",
+          "deliverables": [
+            "A vendor risk report",
+            "A prioritized action list",
+            "Ongoing alerts when a vendor's risk changes"
+          ],
+          "benefits": [
+            "Visibility into risk you can't see from inside your own systems",
+            "A defensible answer when a customer, insurer, or auditor asks about vendor management",
+            "Early warning if a vendor you rely on gets breached"
+          ],
+          "process": "Discover vendors → Classify by criticality → Assess evidence → Report → Monitor continuously.",
+          "outcome": "You know which vendors are your biggest risk, and you find out fast if that changes."
+        }
+      ]
+    },
+    {
+      "code": "C03",
+      "name": "Detect & stop threats",
+      "tagline": "Round-the-clock eyes on your environment.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C03-S01",
+          "name": "AI Security Monitoring",
+          "blurb": "Round-the-clock visibility across your environment.",
+          "price": "$20",
+          "unit": "/user/mo",
+          "problem": "Most businesses generate more security alerts than anyone has time to review — real threats get buried in the noise.",
+          "what_we_do": "We continuously watch your environment, filter out the noise, and flag what actually matters to your security team.",
+          "deliverables": [
+            "Continuous monitoring coverage",
+            "Prioritized alert triage",
+            "Monthly security report"
+          ],
+          "benefits": [
+            "Continuous security visibility",
+            "Earlier detection of suspicious activity",
+            "Reduced alert noise",
+            "Faster response to real threats"
+          ],
+          "process": "Monitor continuously → Filter noise → Prioritize → Alert → Report",
+          "outcome": "Real threats get noticed and acted on, instead of buried in noise."
+        },
+        {
+          "code": "C03-S02",
+          "name": "Managed Threat Response",
+          "blurb": "Real threats, triaged and stopped before they spread.",
+          "price": "$25",
+          "unit": "/user/mo",
+          "problem": "Knowing about a threat isn't the same as stopping it — most businesses have no one who can actually respond in time.",
+          "what_we_do": "We detect, investigate, and respond to real threats directly, containing them before they spread.",
+          "deliverables": [
+            "24/7 threat monitoring",
+            "Investigation and triage",
+            "Active containment and response",
+            "Incident summary reports"
+          ],
+          "benefits": [
+            "Threats contained, not just detected",
+            "Faster response than an internal team could manage alone",
+            "Coverage outside business hours"
+          ],
+          "process": "Detect → Investigate → Contain → Respond → Report",
+          "outcome": "Threats get stopped, not just flagged."
+        },
+        {
+          "code": "C03-S03",
+          "name": "Threat Watch",
+          "blurb": "Intelligence on the threats actually targeting your industry.",
+          "price": "$8",
+          "unit": "/user/mo",
+          "problem": "Generic threat feeds don't tell you what's actually targeting businesses like yours.",
+          "what_we_do": "We track threats relevant to your industry and size, and turn that into intelligence you can actually use.",
+          "deliverables": [
+            "Monthly threat intelligence brief",
+            "Relevant alerts as they emerge",
+            "Targeted intelligence requests"
+          ],
+          "benefits": [
+            "Awareness of threats actually relevant to you",
+            "Fewer surprises from industry-specific attacks",
+            "Intelligence that informs your other defenses"
+          ],
+          "process": "Collect → Analyze → Filter for relevance → Brief → Alert",
+          "outcome": "You know what's coming before it targets you."
+        },
+        {
+          "code": "C03-S04",
+          "name": "Security Response",
+          "blurb": "A coordinated response plan for when things go wrong.",
+          "price": "$600",
+          "unit": "/mo",
+          "problem": "When something actually goes wrong, most businesses don't have a plan — or the people — to respond fast.",
+          "what_we_do": "We provide a ready incident response plan and team, so when something happens, you're not figuring it out from scratch.",
+          "deliverables": [
+            "Incident response retainer",
+            "Response playbook",
+            "Annual readiness review or tabletop exercise"
+          ],
+          "benefits": [
+            "A response plan ready before you need it",
+            "Faster, calmer incident handling",
+            "A coordinated team instead of a scramble"
+          ],
+          "process": "Prepare → Detect → Respond → Recover → Review",
+          "outcome": "When something happens, you have a plan and a team, not a scramble."
+        }
+      ]
+    },
+    {
+      "code": "C04",
+      "name": "Protect your people & devices",
+      "tagline": "The everyday surface every attacker tries first.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C04-S01",
+          "name": "Device Guard",
+          "blurb": "Endpoint protection that's managed, not just installed.",
+          "price": "$12",
+          "unit": "/user/mo",
+          "problem": "Your laptops and workstations are the easiest way in — unmanaged endpoints, missed updates, and malware that goes unnoticed.",
+          "what_we_do": "We deploy and manage endpoint protection across every device, watch for threats continuously, and respond when something's found.",
+          "deliverables": [
+            "Endpoint security baseline",
+            "Monthly coverage report",
+            "Findings and remediation plan",
+            "Incident and threat summaries"
+          ],
+          "benefits": [
+            "Fewer unmanaged, unprotected devices",
+            "Faster detection when something goes wrong",
+            "Clear reporting on your endpoint posture"
+          ],
+          "process": "Deploy protection → Monitor continuously → Detect and respond → Report monthly",
+          "outcome": "Every managed device is protected, monitored, and accounted for."
+        },
+        {
+          "code": "C04-S02",
+          "name": "Mail Shield",
+          "blurb": "Email security that stops what filters miss.",
+          "price": "$6",
+          "unit": "/user/mo",
+          "problem": "Email is still the number one way attackers get in — phishing, malicious attachments, and business email compromise.",
+          "what_we_do": "We monitor and filter your email traffic, block malicious content before it reaches your team, and manage the policies that keep phishing out.",
+          "deliverables": [
+            "Email security configuration",
+            "Phishing and malware blocking",
+            "Monthly security report"
+          ],
+          "benefits": [
+            "Fewer phishing emails reaching your team",
+            "Blocked malicious attachments and links",
+            "Ongoing tuning as threats evolve"
+          ],
+          "process": "Configure protection → Filter continuously → Block threats → Report monthly",
+          "outcome": "Malicious email gets stopped before your team ever sees it."
+        },
+        {
+          "code": "C04-S03",
+          "name": "Staff Security",
+          "blurb": "Training that turns your team into a defense.",
+          "price": "$40",
+          "unit": "/user/yr",
+          "problem": "Your team is often the weakest link — not because they're careless, but because no one's trained them to spot what's coming.",
+          "what_we_do": "We run ongoing security awareness training and simulated phishing tests, so your team learns to recognize real threats.",
+          "deliverables": [
+            "Baseline risk assessment",
+            "Ongoing training program",
+            "Phishing simulations",
+            "Annual risk summary"
+          ],
+          "benefits": [
+            "A team that spots phishing instead of falling for it",
+            "Measurable improvement in human risk over time",
+            "A defensible training record for audits and insurance"
+          ],
+          "process": "Assess baseline → Train → Simulate phishing → Measure → Repeat",
+          "outcome": "Your team becomes a defense, not your biggest risk."
+        }
+      ]
+    },
+    {
+      "code": "C05",
+      "name": "Control who gets in",
+      "tagline": "The right people, the right access.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C05-S01",
+          "name": "Access Manager",
+          "blurb": "The right people, the right access, nothing more.",
+          "price": "$8",
+          "unit": "/user/mo",
+          "problem": "**Access Manager provide the foundational identity and access layer that establishes digital identities, manages account lifecycle, assigns appropriate access, and enforces least-privilege access across customer systems.**\n\nIn practice, that means we maintain accurate identities and accounts; control access to systems and applications; apply least privilege.",
+          "what_we_do": "Provide the foundational identity and access layer that establishes digital identities, manages account lifecycle, assigns appropriate access, and enforces least-privilege access across customer systems.",
+          "deliverables": [
+            "Security assessment/baseline",
+            "Configuration and policy recommendations",
+            "Control implementation or management",
+            "Security posture reporting",
+            "Exception management",
+            "Remediation recommendations",
+            "Periodic review",
+            "Integration with related ORAGROL services"
+          ],
+          "benefits": [
+            "Reduced identity and access risk",
+            "Stronger security controls",
+            "Better visibility",
+            "Reduced excessive or inappropriate access",
+            "Improved policy enforcement",
+            "Better auditability",
+            "More consistent security operations"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains reduced identity and access risk."
+        },
+        {
+          "code": "C05-S02",
+          "name": "Login Shield",
+          "blurb": "Multi-factor authentication, rolled out and managed.",
+          "price": "$4",
+          "unit": "/user/mo",
+          "problem": "**Login Shield protect authentication by requiring appropriate additional verification and reducing the risk of stolen passwords becoming unauthorized access.**\n\nIn practice, that means we increase MFA coverage; protect high-risk authentication; support phishing-resistant authentication.",
+          "what_we_do": "Protect authentication by requiring appropriate additional verification and reducing the risk of stolen passwords becoming unauthorized access.",
+          "deliverables": [
+            "Security assessment/baseline",
+            "Configuration and policy recommendations",
+            "Control implementation or management",
+            "Security posture reporting",
+            "Exception management",
+            "Remediation recommendations",
+            "Periodic review",
+            "Integration with related ORAGROL services"
+          ],
+          "benefits": [
+            "Reduced identity and access risk",
+            "Stronger security controls",
+            "Better visibility",
+            "Reduced excessive or inappropriate access",
+            "Improved policy enforcement",
+            "Better auditability",
+            "More consistent security operations"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains reduced identity and access risk."
+        },
+        {
+          "code": "C05-S03",
+          "name": "Admin Shield",
+          "blurb": "Privileged accounts, watched closely.",
+          "price": "$30",
+          "unit": "/priv-user/mo",
+          "problem": "**Admin Shield protect administrator and other high-impact accounts by controlling privileged access, reducing standing privilege, securing credentials, and improving accountability for administrative activity.**\n\nIn practice, that means we reduce standing privileged access; protect privileged credentials; control administrative sessions.",
+          "what_we_do": "Protect administrator and other high-impact accounts by controlling privileged access, reducing standing privilege, securing credentials, and improving accountability for administrative activity.",
+          "deliverables": [
+            "Security assessment/baseline",
+            "Configuration and policy recommendations",
+            "Control implementation or management",
+            "Security posture reporting",
+            "Exception management",
+            "Remediation recommendations",
+            "Periodic review",
+            "Integration with related ORAGROL services"
+          ],
+          "benefits": [
+            "Reduced identity and access risk",
+            "Stronger security controls",
+            "Better visibility",
+            "Reduced excessive or inappropriate access",
+            "Improved policy enforcement",
+            "Better auditability",
+            "More consistent security operations"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains reduced identity and access risk."
+        },
+        {
+          "code": "C05-S04",
+          "name": "Access Governance",
+          "blurb": "Regular reviews so access never quietly drifts.",
+          "price": "$6",
+          "unit": "/user/mo",
+          "problem": "**Access Governance govern who should have access, why they have it, who approved it, how long it should remain, and whether access remains appropriate as people and business roles change.**\n\nIn practice, that means we establish access governance; automate identity lifecycle controls; support access requests and approvals.",
+          "what_we_do": "Govern who should have access, why they have it, who approved it, how long it should remain, and whether access remains appropriate as people and business roles change.",
+          "deliverables": [
+            "Security assessment/baseline",
+            "Configuration and policy recommendations",
+            "Control implementation or management",
+            "Security posture reporting",
+            "Exception management",
+            "Remediation recommendations",
+            "Periodic review",
+            "Integration with related ORAGROL services"
+          ],
+          "benefits": [
+            "Reduced identity and access risk",
+            "Stronger security controls",
+            "Better visibility",
+            "Reduced excessive or inappropriate access",
+            "Improved policy enforcement",
+            "Better auditability",
+            "More consistent security operations"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains reduced identity and access risk."
+        },
+        {
+          "code": "C05-S05",
+          "name": "Trust Guard",
+          "blurb": "Never trust, always verify.",
+          "price": "$10",
+          "unit": "/user/mo",
+          "problem": "**Trust Guard enforce access decisions based on identity, device, application, location, session context, and risk rather than assuming that a user or network is inherently trusted.**\n\nIn practice, that means we apply verify-before-trust principles; enforce least-privilege access; use contextual access decisions.",
+          "what_we_do": "Enforce access decisions based on identity, device, application, location, session context, and risk rather than assuming that a user or network is inherently trusted.",
+          "deliverables": [
+            "Security assessment/baseline",
+            "Configuration and policy recommendations",
+            "Control implementation or management",
+            "Security posture reporting",
+            "Exception management",
+            "Remediation recommendations",
+            "Periodic review",
+            "Integration with related ORAGROL services"
+          ],
+          "benefits": [
+            "Reduced identity and access risk",
+            "Stronger security controls",
+            "Better visibility",
+            "Reduced excessive or inappropriate access",
+            "Improved policy enforcement",
+            "Better auditability",
+            "More consistent security operations"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains reduced identity and access risk."
+        }
+      ]
+    },
+    {
+      "code": "C06",
+      "name": "Secure your cloud & systems",
+      "tagline": "Misconfigurations, workloads and infrastructure covered.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C06-S01",
+          "name": "Cloud Guard",
+          "blurb": "Cloud misconfigurations found before they're exploited.",
+          "price": "$400",
+          "unit": "/mo",
+          "problem": "**Cloud Guard continuously assess cloud environments against security best practices, identify misconfigurations, prioritize posture risks, and drive remediation across approved cloud accounts and resources.**\n\nIn practice, that means we discover cloud accounts, subscriptions, projects, and resources; assess cloud security posture; detect misconfigurations and policy violations.",
+          "what_we_do": "Continuously assess cloud environments against security best practices, identify misconfigurations, prioritize posture risks, and drive remediation across approved cloud accounts and resources.",
+          "deliverables": [
+            "Security baseline",
+            "Environment assessment",
+            "Security findings",
+            "Risk prioritization",
+            "Remediation recommendations",
+            "Configuration/policy recommendations",
+            "Exception records",
+            "Security posture reports",
+            "Remediation tracking",
+            "Periodic management reporting"
+          ],
+          "benefits": [
+            "Better cloud/infrastructure visibility",
+            "Reduced misconfiguration risk",
+            "Stronger security baselines",
+            "Improved remediation",
+            "Reduced exposed infrastructure",
+            "Better compliance posture",
+            "Better coordination with identity and threat services"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better cloud/infrastructure visibility."
+        },
+        {
+          "code": "C06-S02",
+          "name": "Workload Shield",
+          "blurb": "Protection for what actually runs in your cloud.",
+          "price": "$500",
+          "unit": "/mo",
+          "problem": "**Workload Shield protect cloud-hosted workloads such as virtual machines, containers, and cloud application workloads through security controls, workload visibility, and risk-based protection.**\n\nIn practice, that means we protect virtual machines; protect containers and container hosts; assess workload security posture.",
+          "what_we_do": "Protect cloud-hosted workloads such as virtual machines, containers, and cloud application workloads through security controls, workload visibility, and risk-based protection.",
+          "deliverables": [
+            "Security baseline",
+            "Environment assessment",
+            "Security findings",
+            "Risk prioritization",
+            "Remediation recommendations",
+            "Configuration/policy recommendations",
+            "Exception records",
+            "Security posture reports",
+            "Remediation tracking",
+            "Periodic management reporting"
+          ],
+          "benefits": [
+            "Better cloud/infrastructure visibility",
+            "Reduced misconfiguration risk",
+            "Stronger security baselines",
+            "Improved remediation",
+            "Reduced exposed infrastructure",
+            "Better compliance posture",
+            "Better coordination with identity and threat services"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better cloud/infrastructure visibility."
+        },
+        {
+          "code": "C06-S03",
+          "name": "Infra Guard",
+          "blurb": "Servers and infrastructure, hardened and watched.",
+          "price": "$450",
+          "unit": "/mo",
+          "problem": "**Infra Guard protect servers, infrastructure components, and foundational technology environments through secure configuration, hardening, control assessment, and remediation management.**\n\nIn practice, that means we infrastructure inventory; security hardening; server security baselines.",
+          "what_we_do": "Protect servers, infrastructure components, and foundational technology environments through secure configuration, hardening, control assessment, and remediation management.",
+          "deliverables": [
+            "Security baseline",
+            "Environment assessment",
+            "Security findings",
+            "Risk prioritization",
+            "Remediation recommendations",
+            "Configuration/policy recommendations",
+            "Exception records",
+            "Security posture reports",
+            "Remediation tracking",
+            "Periodic management reporting"
+          ],
+          "benefits": [
+            "Better cloud/infrastructure visibility",
+            "Reduced misconfiguration risk",
+            "Stronger security baselines",
+            "Improved remediation",
+            "Reduced exposed infrastructure",
+            "Better compliance posture",
+            "Better coordination with identity and threat services"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better cloud/infrastructure visibility."
+        },
+        {
+          "code": "C06-S04",
+          "name": "Network Shield",
+          "blurb": "Network segmentation that actually contains a breach.",
+          "price": "$350",
+          "unit": "/mo",
+          "problem": "**Network Shield secure cloud network architecture through segmentation, traffic controls, exposure reduction, secure connectivity, and network policy enforcement.**\n\nIn practice, that means we cloud network architecture review; network segmentation; security-group and firewall policy review.",
+          "what_we_do": "Secure cloud network architecture through segmentation, traffic controls, exposure reduction, secure connectivity, and network policy enforcement.",
+          "deliverables": [
+            "Security baseline",
+            "Environment assessment",
+            "Security findings",
+            "Risk prioritization",
+            "Remediation recommendations",
+            "Configuration/policy recommendations",
+            "Exception records",
+            "Security posture reports",
+            "Remediation tracking",
+            "Periodic management reporting"
+          ],
+          "benefits": [
+            "Better cloud/infrastructure visibility",
+            "Reduced misconfiguration risk",
+            "Stronger security baselines",
+            "Improved remediation",
+            "Reduced exposed infrastructure",
+            "Better compliance posture",
+            "Better coordination with identity and threat services"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better cloud/infrastructure visibility."
+        },
+        {
+          "code": "C06-S05",
+          "name": "Cloud Compliance",
+          "blurb": "Your cloud environment, provably compliant.",
+          "price": "$300",
+          "unit": "/mo",
+          "problem": "**Cloud Compliance establish and continuously assess cloud configuration against approved security standards, benchmarks, contractual requirements, and applicable compliance frameworks.**\n\nIn practice, that means we configuration standards; cloud security benchmarks; compliance mapping.",
+          "what_we_do": "Establish and continuously assess cloud configuration against approved security standards, benchmarks, contractual requirements, and applicable compliance frameworks.",
+          "deliverables": [
+            "Security baseline",
+            "Environment assessment",
+            "Security findings",
+            "Risk prioritization",
+            "Remediation recommendations",
+            "Configuration/policy recommendations",
+            "Exception records",
+            "Security posture reports",
+            "Remediation tracking",
+            "Periodic management reporting"
+          ],
+          "benefits": [
+            "Better cloud/infrastructure visibility",
+            "Reduced misconfiguration risk",
+            "Stronger security baselines",
+            "Improved remediation",
+            "Reduced exposed infrastructure",
+            "Better compliance posture",
+            "Better coordination with identity and threat services"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better cloud/infrastructure visibility."
+        }
+      ]
+    },
+    {
+      "code": "C07",
+      "name": "Secure your apps & websites",
+      "tagline": "From how you build to what customers touch.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C07-S01",
+          "name": "App Shield",
+          "blurb": "Application security woven into how you build.",
+          "price": "$300",
+          "unit": "/app/mo",
+          "problem": "**App Shield provide an integrated application-security layer that identifies and reduces security weaknesses across application architecture, code, dependencies, authentication flows, data handling, and runtime-facing controls.**\n\nIn practice, that means we establish application security baselines; assess application architecture and security controls; identify application security weaknesses.",
+          "what_we_do": "Provide an integrated application-security layer that identifies and reduces security weaknesses across application architecture, code, dependencies, authentication flows, data handling, and runtime-facing controls.",
+          "deliverables": [
+            "Application/web/API inventory where applicable",
+            "Security baseline",
+            "Security assessment",
+            "Testing results where applicable",
+            "Risk-prioritized findings",
+            "Remediation recommendations",
+            "Security-control recommendations",
+            "Evidence and reports",
+            "Remediation tracking",
+            "Periodic security posture reporting"
+          ],
+          "benefits": [
+            "Reduced application attack surface",
+            "Better application security posture",
+            "Reduced web and API exposure",
+            "Earlier detection of software weaknesses",
+            "Stronger secure-development practices",
+            "Better remediation visibility",
+            "Improved security before release"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains reduced application attack surface."
+        },
+        {
+          "code": "C07-S02",
+          "name": "Web Shield",
+          "blurb": "Your public-facing web apps, monitored and protected.",
+          "price": "$250",
+          "unit": "/app/mo",
+          "problem": "**Web Shield protect internet-facing and internal web applications against common web application threats through secure configuration, defensive controls, monitoring integrations, and risk-based remediation.**\n\nIn practice, that means we assess web application security posture; protect web-facing application entry points; review web security controls.",
+          "what_we_do": "Protect internet-facing and internal web applications against common web application threats through secure configuration, defensive controls, monitoring integrations, and risk-based remediation.",
+          "deliverables": [
+            "Application/web/API inventory where applicable",
+            "Security baseline",
+            "Security assessment",
+            "Testing results where applicable",
+            "Risk-prioritized findings",
+            "Remediation recommendations",
+            "Security-control recommendations",
+            "Evidence and reports",
+            "Remediation tracking",
+            "Periodic security posture reporting"
+          ],
+          "benefits": [
+            "Reduced application attack surface",
+            "Better application security posture",
+            "Reduced web and API exposure",
+            "Earlier detection of software weaknesses",
+            "Stronger secure-development practices",
+            "Better remediation visibility",
+            "Improved security before release"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains reduced application attack surface."
+        },
+        {
+          "code": "C07-S03",
+          "name": "API Guard",
+          "blurb": "APIs are the new front door.",
+          "price": "$300",
+          "unit": "/API/mo",
+          "problem": "**API Guard protect APIs by discovering API exposure, assessing authentication and authorization controls, identifying risky endpoints, and reducing abuse and data-exposure risks.**\n\nIn practice, that means we discover APIs and endpoints; assess API authentication; assess API authorization.",
+          "what_we_do": "Protect APIs by discovering API exposure, assessing authentication and authorization controls, identifying risky endpoints, and reducing abuse and data-exposure risks.",
+          "deliverables": [
+            "Application/web/API inventory where applicable",
+            "Security baseline",
+            "Security assessment",
+            "Testing results where applicable",
+            "Risk-prioritized findings",
+            "Remediation recommendations",
+            "Security-control recommendations",
+            "Evidence and reports",
+            "Remediation tracking",
+            "Periodic security posture reporting"
+          ],
+          "benefits": [
+            "Reduced application attack surface",
+            "Better application security posture",
+            "Reduced web and API exposure",
+            "Earlier detection of software weaknesses",
+            "Stronger secure-development practices",
+            "Better remediation visibility",
+            "Improved security before release"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains reduced application attack surface."
+        },
+        {
+          "code": "C07-S04",
+          "name": "Code Shield",
+          "blurb": "Secure development practices your team can follow.",
+          "price": "$600",
+          "unit": "/mo",
+          "problem": "**Code Shield integrate security into the software development lifecycle so security requirements, secure coding practices, dependency controls, and remediation become part of normal development processes.**\n\nIn practice, that means we define secure-development requirements; support secure coding practices; integrate security into CI/CD.",
+          "what_we_do": "Integrate security into the software development lifecycle so security requirements, secure coding practices, dependency controls, and remediation become part of normal development processes.",
+          "deliverables": [
+            "Application/web/API inventory where applicable",
+            "Security baseline",
+            "Security assessment",
+            "Testing results where applicable",
+            "Risk-prioritized findings",
+            "Remediation recommendations",
+            "Security-control recommendations",
+            "Evidence and reports",
+            "Remediation tracking",
+            "Periodic security posture reporting"
+          ],
+          "benefits": [
+            "Reduced application attack surface",
+            "Better application security posture",
+            "Reduced web and API exposure",
+            "Earlier detection of software weaknesses",
+            "Stronger secure-development practices",
+            "Better remediation visibility",
+            "Improved security before release"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains reduced application attack surface."
+        },
+        {
+          "code": "C07-S05",
+          "name": "App Test",
+          "blurb": "Real testing that proves an app is safe.",
+          "price": "$3,500",
+          "unit": "/app",
+          "problem": "**App Test test applications for security weaknesses through automated and authorized testing methods, validate findings, prioritize risk, and provide evidence for remediation.**\n\nIn practice, that means we perform authorized application security testing; support SAST; support DAST.",
+          "what_we_do": "Test applications for security weaknesses through automated and authorized testing methods, validate findings, prioritize risk, and provide evidence for remediation.",
+          "deliverables": [
+            "Application/web/API inventory where applicable",
+            "Security baseline",
+            "Security assessment",
+            "Testing results where applicable",
+            "Risk-prioritized findings",
+            "Remediation recommendations",
+            "Security-control recommendations",
+            "Evidence and reports",
+            "Remediation tracking",
+            "Periodic security posture reporting"
+          ],
+          "benefits": [
+            "Reduced application attack surface",
+            "Better application security posture",
+            "Reduced web and API exposure",
+            "Earlier detection of software weaknesses",
+            "Stronger secure-development practices",
+            "Better remediation visibility",
+            "Improved security before release"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains reduced application attack surface."
+        }
+      ]
+    },
+    {
+      "code": "C08",
+      "name": "Protect your data",
+      "tagline": "Know what you have, keep it from leaving.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C08-S01",
+          "name": "Data Shield",
+          "blurb": "Data protection built around what your business holds.",
+          "price": "$10",
+          "unit": "/user/mo",
+          "problem": "**Data Shield protect sensitive and business-critical data across its lifecycle, including storage, processing, transmission, backup, and controlled sharing.**\n\nIn practice, that means we identify critical data stores; establish data protection baselines; protect data at rest and in transit.",
+          "what_we_do": "Protect sensitive and business-critical data across its lifecycle, including storage, processing, transmission, backup, and controlled sharing.",
+          "deliverables": [
+            "Data security baseline",
+            "Data inventory/classification information where applicable",
+            "Security/privacy findings",
+            "Risk prioritization",
+            "Protection recommendations",
+            "DLP policies or recommendations where applicable",
+            "Privacy workflow/reporting",
+            "Monitoring reports",
+            "Exception records",
+            "Remediation tracking"
+          ],
+          "benefits": [
+            "Better visibility into sensitive data",
+            "Reduced data-loss risk",
+            "Stronger data protection",
+            "Improved privacy controls",
+            "Better classification and governance",
+            "Better monitoring of sensitive-data activity",
+            "Improved compliance readiness",
+            "More controlled data lifecycle"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better visibility into sensitive data."
+        },
+        {
+          "code": "C08-S02",
+          "name": "Data Guard",
+          "blurb": "Stop sensitive data from leaving when it shouldn't.",
+          "price": "$8",
+          "unit": "/user/mo",
+          "problem": "**Data Guard prevent unauthorized disclosure, transfer, copying, or exfiltration of sensitive information across endpoints, email, cloud applications, and other approved channels.**\n\nIn practice, that means we identify sensitive-data movement; apply DLP policies; protect data across approved channels.",
+          "what_we_do": "Prevent unauthorized disclosure, transfer, copying, or exfiltration of sensitive information across endpoints, email, cloud applications, and other approved channels.",
+          "deliverables": [
+            "Data security baseline",
+            "Data inventory/classification information where applicable",
+            "Security/privacy findings",
+            "Risk prioritization",
+            "Protection recommendations",
+            "DLP policies or recommendations where applicable",
+            "Privacy workflow/reporting",
+            "Monitoring reports",
+            "Exception records",
+            "Remediation tracking"
+          ],
+          "benefits": [
+            "Better visibility into sensitive data",
+            "Reduced data-loss risk",
+            "Stronger data protection",
+            "Improved privacy controls",
+            "Better classification and governance",
+            "Better monitoring of sensitive-data activity",
+            "Improved compliance readiness",
+            "More controlled data lifecycle"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better visibility into sensitive data."
+        },
+        {
+          "code": "C08-S03",
+          "name": "Privacy Guard",
+          "blurb": "Privacy compliance without the guesswork.",
+          "price": "$700",
+          "unit": "/mo",
+          "problem": "**Privacy Guard help organizations manage privacy-related security controls and processes for personal and sensitive data, including privacy requirements, data handling, rights workflows, and accountability.**\n\nIn practice, that means we identify personal-data processing; map privacy-related controls; support privacy risk assessment.",
+          "what_we_do": "Help organizations manage privacy-related security controls and processes for personal and sensitive data, including privacy requirements, data handling, rights workflows, and accountability.",
+          "deliverables": [
+            "Data security baseline",
+            "Data inventory/classification information where applicable",
+            "Security/privacy findings",
+            "Risk prioritization",
+            "Protection recommendations",
+            "DLP policies or recommendations where applicable",
+            "Privacy workflow/reporting",
+            "Monitoring reports",
+            "Exception records",
+            "Remediation tracking"
+          ],
+          "benefits": [
+            "Better visibility into sensitive data",
+            "Reduced data-loss risk",
+            "Stronger data protection",
+            "Improved privacy controls",
+            "Better classification and governance",
+            "Better monitoring of sensitive-data activity",
+            "Improved compliance readiness",
+            "More controlled data lifecycle"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better visibility into sensitive data."
+        },
+        {
+          "code": "C08-S04",
+          "name": "Data Classifier",
+          "blurb": "Know what data you have and how sensitive it is.",
+          "price": "$400",
+          "unit": "/mo",
+          "problem": "**Data Classifier discover, classify, label, and govern data according to sensitivity, business value, ownership, regulatory requirements, and approved handling rules.**\n\nIn practice, that means we discover data repositories; classify sensitive data; apply labels where supported.",
+          "what_we_do": "Discover, classify, label, and govern data according to sensitivity, business value, ownership, regulatory requirements, and approved handling rules.",
+          "deliverables": [
+            "Data security baseline",
+            "Data inventory/classification information where applicable",
+            "Security/privacy findings",
+            "Risk prioritization",
+            "Protection recommendations",
+            "DLP policies or recommendations where applicable",
+            "Privacy workflow/reporting",
+            "Monitoring reports",
+            "Exception records",
+            "Remediation tracking"
+          ],
+          "benefits": [
+            "Better visibility into sensitive data",
+            "Reduced data-loss risk",
+            "Stronger data protection",
+            "Improved privacy controls",
+            "Better classification and governance",
+            "Better monitoring of sensitive-data activity",
+            "Improved compliance readiness",
+            "More controlled data lifecycle"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better visibility into sensitive data."
+        },
+        {
+          "code": "C08-S05",
+          "name": "Data Watch",
+          "blurb": "Ongoing eyes on how your data moves.",
+          "price": "$6",
+          "unit": "/user/mo",
+          "problem": "**Data Watch monitor security-relevant data access, movement, and usage patterns to identify suspicious activity, policy violations, and potential data compromise.**\n\nIn practice, that means we monitor sensitive-data access; detect unusual data activity; identify suspicious data movement.",
+          "what_we_do": "Monitor security-relevant data access, movement, and usage patterns to identify suspicious activity, policy violations, and potential data compromise.",
+          "deliverables": [
+            "Data security baseline",
+            "Data inventory/classification information where applicable",
+            "Security/privacy findings",
+            "Risk prioritization",
+            "Protection recommendations",
+            "DLP policies or recommendations where applicable",
+            "Privacy workflow/reporting",
+            "Monitoring reports",
+            "Exception records",
+            "Remediation tracking"
+          ],
+          "benefits": [
+            "Better visibility into sensitive data",
+            "Reduced data-loss risk",
+            "Stronger data protection",
+            "Improved privacy controls",
+            "Better classification and governance",
+            "Better monitoring of sensitive-data activity",
+            "Improved compliance readiness",
+            "More controlled data lifecycle"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better visibility into sensitive data."
+        }
+      ]
+    },
+    {
+      "code": "C09",
+      "name": "Secure your AI systems",
+      "tagline": "The same discipline, now for your AI.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C09-S01",
+          "name": "AI Check",
+          "blurb": "Find out if your AI systems are actually safe.",
+          "price": "$4,500",
+          "unit": "one-time",
+          "problem": "**AI Check assess an organization's AI systems, use cases, architecture, controls, and exposure to identify AI-specific security risks and establish a prioritized improvement plan.**\n\nIn practice, that means we discover AI systems and use cases; assess AI security architecture; identify AI-specific attack surfaces.",
+          "what_we_do": "Assess an organization's AI systems, use cases, architecture, controls, and exposure to identify AI-specific security risks and establish a prioritized improvement plan.",
+          "deliverables": [
+            "AI system/use-case inventory where applicable",
+            "AI security assessment",
+            "AI risk register",
+            "Governance policies and controls",
+            "Model-security findings where applicable",
+            "AI data-security findings where applicable",
+            "AI threat reports where applicable",
+            "Remediation recommendations",
+            "Governance evidence",
+            "Management reporting",
+            "Remediation tracking"
+          ],
+          "benefits": [
+            "Better visibility into AI use",
+            "Reduced AI-specific security risk",
+            "Stronger AI governance",
+            "Safer AI adoption",
+            "Better protection of models and AI data",
+            "Reduced AI abuse and attack exposure",
+            "Improved accountability and auditability"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better visibility into ai use."
+        },
+        {
+          "code": "C09-S02",
+          "name": "AI Governance",
+          "blurb": "Policy and oversight for how your business uses AI.",
+          "price": "$900",
+          "unit": "/mo",
+          "problem": "**AI Governance establish and manage governance controls for responsible and secure AI use, including AI risk ownership, policies, approval processes, accountability, and lifecycle oversight.**\n\nIn practice, that means we establish AI governance framework; maintain AI system inventory and ownership; assess AI risk.",
+          "what_we_do": "Establish and manage governance controls for responsible and secure AI use, including AI risk ownership, policies, approval processes, accountability, and lifecycle oversight.",
+          "deliverables": [
+            "AI system/use-case inventory where applicable",
+            "AI security assessment",
+            "AI risk register",
+            "Governance policies and controls",
+            "Model-security findings where applicable",
+            "AI data-security findings where applicable",
+            "AI threat reports where applicable",
+            "Remediation recommendations",
+            "Governance evidence",
+            "Management reporting",
+            "Remediation tracking"
+          ],
+          "benefits": [
+            "Better visibility into AI use",
+            "Reduced AI-specific security risk",
+            "Stronger AI governance",
+            "Safer AI adoption",
+            "Better protection of models and AI data",
+            "Reduced AI abuse and attack exposure",
+            "Improved accountability and auditability"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better visibility into ai use."
+        },
+        {
+          "code": "C09-S03",
+          "name": "Model Shield",
+          "blurb": "Protection for the AI models running in production.",
+          "price": "$350",
+          "unit": "/model/mo",
+          "problem": "**Model Shield protect AI models and model-serving systems against model-specific security threats such as manipulation, extraction, poisoning, abuse, and unauthorized changes.**\n\nIn practice, that means we assess model security; protect model access; assess model-serving controls.",
+          "what_we_do": "Protect AI models and model-serving systems against model-specific security threats such as manipulation, extraction, poisoning, abuse, and unauthorized changes.",
+          "deliverables": [
+            "AI system/use-case inventory where applicable",
+            "AI security assessment",
+            "AI risk register",
+            "Governance policies and controls",
+            "Model-security findings where applicable",
+            "AI data-security findings where applicable",
+            "AI threat reports where applicable",
+            "Remediation recommendations",
+            "Governance evidence",
+            "Management reporting",
+            "Remediation tracking"
+          ],
+          "benefits": [
+            "Better visibility into AI use",
+            "Reduced AI-specific security risk",
+            "Stronger AI governance",
+            "Safer AI adoption",
+            "Better protection of models and AI data",
+            "Reduced AI abuse and attack exposure",
+            "Improved accountability and auditability"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better visibility into ai use."
+        },
+        {
+          "code": "C09-S04",
+          "name": "AI Data Guard",
+          "blurb": "Keep the data feeding your AI systems protected.",
+          "price": "$8",
+          "unit": "/user/mo",
+          "problem": "**AI Data Guard protect data used, processed, transmitted, or generated by AI systems, with particular attention to sensitive information, prompts, outputs, training data, privacy, and data leakage.**\n\nIn practice, that means we identify AI-related data flows; protect sensitive AI data; assess prompt and output handling.",
+          "what_we_do": "Protect data used, processed, transmitted, or generated by AI systems, with particular attention to sensitive information, prompts, outputs, training data, privacy, and data leakage.",
+          "deliverables": [
+            "AI system/use-case inventory where applicable",
+            "AI security assessment",
+            "AI risk register",
+            "Governance policies and controls",
+            "Model-security findings where applicable",
+            "AI data-security findings where applicable",
+            "AI threat reports where applicable",
+            "Remediation recommendations",
+            "Governance evidence",
+            "Management reporting",
+            "Remediation tracking"
+          ],
+          "benefits": [
+            "Better visibility into AI use",
+            "Reduced AI-specific security risk",
+            "Stronger AI governance",
+            "Safer AI adoption",
+            "Better protection of models and AI data",
+            "Reduced AI abuse and attack exposure",
+            "Improved accountability and auditability"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better visibility into ai use."
+        },
+        {
+          "code": "C09-S05",
+          "name": "AI Threat Guard",
+          "blurb": "Threats built specifically for AI, detected and stopped.",
+          "price": "$400",
+          "unit": "/mo",
+          "problem": "**AI Threat Guard detect and reduce AI-specific threats and malicious activity affecting AI systems, users, models, agents, and AI-enabled workflows.**\n\nIn practice, that means we monitor AI security events; detect AI-specific attack patterns; identify prompt injection and abuse indicators.",
+          "what_we_do": "Detect and reduce AI-specific threats and malicious activity affecting AI systems, users, models, agents, and AI-enabled workflows.",
+          "deliverables": [
+            "AI system/use-case inventory where applicable",
+            "AI security assessment",
+            "AI risk register",
+            "Governance policies and controls",
+            "Model-security findings where applicable",
+            "AI data-security findings where applicable",
+            "AI threat reports where applicable",
+            "Remediation recommendations",
+            "Governance evidence",
+            "Management reporting",
+            "Remediation tracking"
+          ],
+          "benefits": [
+            "Better visibility into AI use",
+            "Reduced AI-specific security risk",
+            "Stronger AI governance",
+            "Safer AI adoption",
+            "Better protection of models and AI data",
+            "Reduced AI abuse and attack exposure",
+            "Improved accountability and auditability"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better visibility into ai use."
+        }
+      ]
+    },
+    {
+      "code": "C10",
+      "name": "Test your real defenses",
+      "tagline": "Certified specialists try to break in, safely.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C10-S01",
+          "name": "Real-World Test",
+          "blurb": "Certified specialists try to break in, safely.",
+          "price": "$7,500-$18,000",
+          "unit": "per engagement",
+          "problem": "You need proof that your defenses actually work, not just an assessment that says they might have gaps.",
+          "what_we_do": "A certified human tester attempts authorized exploitation within an agreed scope, documents exactly what they were able to do, and gives you a prioritized plan to close it.",
+          "deliverables": [
+            "A signed testing agreement",
+            "A full evidence-based findings report",
+            "An executive summary",
+            "A prioritized remediation roadmap"
+          ],
+          "benefits": [
+            "Undeniable proof of real risk, not theoretical scoring",
+            "Evidence that satisfies insurers, enterprise customers, and auditors",
+            "A clear, prioritized fix list based on what was actually exploitable"
+          ],
+          "process": "Scope & authorize → Test → Document → Report → Fix → Retest.",
+          "outcome": "You know exactly what an attacker could actually do — and you've closed it."
+        }
+      ]
+    }
+  ],
+  "business_automation_tier2": [
+    {
+      "code": "C11",
+      "name": "Find your AI opportunities",
+      "tagline": "Where AI actually pays off in your business.",
+      "tier": "Tier 2 - Business Automation",
+      "services": [
+        {
+          "code": "C11-S01",
+          "name": "AI Ready",
+          "blurb": "Find out if your business is actually ready for AI.",
+          "price": "$2,500",
+          "unit": "one-time",
+          "problem": "**AI Ready assess an organization's people, processes, technology, data, governance, and operating model to determine its readiness for practical AI adoption.**\n\nIn practice, that means we assess organizational AI readiness; evaluate technology readiness; assess data readiness.",
+          "what_we_do": "Assess an organization's people, processes, technology, data, governance, and operating model to determine its readiness for practical AI adoption.",
+          "deliverables": [
+            "AI readiness assessment",
+            "Process discovery results",
+            "AI opportunity portfolio",
+            "Prioritized use cases",
+            "Business-value analysis",
+            "Transformation roadmap",
+            "Capability-gap analysis",
+            "Adoption/optimization reports",
+            "Benefits tracking",
+            "Management recommendations"
+          ],
+          "benefits": [
+            "Clearer AI strategy",
+            "Better understanding of AI readiness",
+            "Identification of high-value opportunities",
+            "Reduced wasted AI investment",
+            "Practical transformation roadmap",
+            "Better adoption",
+            "Measurable business outcomes",
+            "Continuous improvement"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains clearer ai strategy."
+        },
+        {
+          "code": "C11-S02",
+          "name": "Process Finder",
+          "blurb": "Map the processes AI could take off your plate.",
+          "price": "$3,500",
+          "unit": "project",
+          "problem": "**Process Finder discover business processes and workflows where AI, automation, or intelligent decision support can create measurable operational value.**\n\nIn practice, that means we map business processes; identify repetitive and manual work; identify bottlenecks.",
+          "what_we_do": "Discover business processes and workflows where AI, automation, or intelligent decision support can create measurable operational value.",
+          "deliverables": [
+            "AI readiness assessment",
+            "Process discovery results",
+            "AI opportunity portfolio",
+            "Prioritized use cases",
+            "Business-value analysis",
+            "Transformation roadmap",
+            "Capability-gap analysis",
+            "Adoption/optimization reports",
+            "Benefits tracking",
+            "Management recommendations"
+          ],
+          "benefits": [
+            "Clearer AI strategy",
+            "Better understanding of AI readiness",
+            "Identification of high-value opportunities",
+            "Reduced wasted AI investment",
+            "Practical transformation roadmap",
+            "Better adoption",
+            "Measurable business outcomes",
+            "Continuous improvement"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains clearer ai strategy."
+        },
+        {
+          "code": "C11-S03",
+          "name": "AI Opportunities",
+          "blurb": "Turn AI potential into a ranked list of real opportunities.",
+          "price": "$4,000",
+          "unit": "project",
+          "problem": "**AI Opportunities identify, evaluate, and prioritize AI use cases based on business value, feasibility, risk, data requirements, cost, and expected return.**\n\nIn practice, that means we generate AI use-case candidates; evaluate business value; assess technical feasibility.",
+          "what_we_do": "Identify, evaluate, and prioritize AI use cases based on business value, feasibility, risk, data requirements, cost, and expected return.",
+          "deliverables": [
+            "AI readiness assessment",
+            "Process discovery results",
+            "AI opportunity portfolio",
+            "Prioritized use cases",
+            "Business-value analysis",
+            "Transformation roadmap",
+            "Capability-gap analysis",
+            "Adoption/optimization reports",
+            "Benefits tracking",
+            "Management recommendations"
+          ],
+          "benefits": [
+            "Clearer AI strategy",
+            "Better understanding of AI readiness",
+            "Identification of high-value opportunities",
+            "Reduced wasted AI investment",
+            "Practical transformation roadmap",
+            "Better adoption",
+            "Measurable business outcomes",
+            "Continuous improvement"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains clearer ai strategy."
+        },
+        {
+          "code": "C11-S04",
+          "name": "AI Roadmap",
+          "blurb": "A clear, sequenced plan for adopting AI.",
+          "price": "$5,000",
+          "unit": "project",
+          "problem": "**AI Roadmap translate prioritized AI opportunities into a practical transformation roadmap covering initiatives, dependencies, capabilities, resources, milestones, and implementation priorities.**\n\nIn practice, that means we sequence AI initiatives; define transformation phases; identify dependencies.",
+          "what_we_do": "Translate prioritized AI opportunities into a practical transformation roadmap covering initiatives, dependencies, capabilities, resources, milestones, and implementation priorities.",
+          "deliverables": [
+            "AI readiness assessment",
+            "Process discovery results",
+            "AI opportunity portfolio",
+            "Prioritized use cases",
+            "Business-value analysis",
+            "Transformation roadmap",
+            "Capability-gap analysis",
+            "Adoption/optimization reports",
+            "Benefits tracking",
+            "Management recommendations"
+          ],
+          "benefits": [
+            "Clearer AI strategy",
+            "Better understanding of AI readiness",
+            "Identification of high-value opportunities",
+            "Reduced wasted AI investment",
+            "Practical transformation roadmap",
+            "Better adoption",
+            "Measurable business outcomes",
+            "Continuous improvement"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains clearer ai strategy."
+        },
+        {
+          "code": "C11-S05",
+          "name": "AI Optimizer",
+          "blurb": "Keep improving what's already automated.",
+          "price": "$1,500",
+          "unit": "/mo",
+          "problem": "**AI Optimizer help organizations adopt AI in day-to-day operations, measure results, improve workflows, manage adoption barriers, and continuously optimize AI-enabled processes.**\n\nIn practice, that means we support AI adoption; track usage and adoption; identify adoption barriers.",
+          "what_we_do": "Help organizations adopt AI in day-to-day operations, measure results, improve workflows, manage adoption barriers, and continuously optimize AI-enabled processes.",
+          "deliverables": [
+            "AI readiness assessment",
+            "Process discovery results",
+            "AI opportunity portfolio",
+            "Prioritized use cases",
+            "Business-value analysis",
+            "Transformation roadmap",
+            "Capability-gap analysis",
+            "Adoption/optimization reports",
+            "Benefits tracking",
+            "Management recommendations"
+          ],
+          "benefits": [
+            "Clearer AI strategy",
+            "Better understanding of AI readiness",
+            "Identification of high-value opportunities",
+            "Reduced wasted AI investment",
+            "Practical transformation roadmap",
+            "Better adoption",
+            "Measurable business outcomes",
+            "Continuous improvement"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains clearer ai strategy."
+        }
+      ]
+    },
+    {
+      "code": "C12",
+      "name": "Automate your workflows",
+      "tagline": "The repetitive work your team shouldn't do by hand.",
+      "tier": "Tier 2 - Business Automation",
+      "services": [
+        {
+          "code": "C12-S01",
+          "name": "Flow Automator",
+          "blurb": "Repetitive workflows, built once, run automatically.",
+          "price": "$6,000",
+          "unit": "/workflow",
+          "problem": "**Flow Automator design, implement, and manage AI-enabled workflows that automate repetitive business activities, decisions, routing, and approved actions.**\n\nIn practice, that means we identify automation candidates; design AI-enabled workflows; automate repetitive activities.",
+          "what_we_do": "Design, implement, and manage AI-enabled workflows that automate repetitive business activities, decisions, routing, and approved actions.",
+          "deliverables": [
+            "Automation assessment",
+            "Workflow designs",
+            "Integration architecture",
+            "Agent integration designs",
+            "Workflow automations",
+            "System integrations",
+            "Orchestration workflows",
+            "Monitoring and execution reports",
+            "Exception handling",
+            "Optimization recommendations"
+          ],
+          "benefits": [
+            "Reduced manual work",
+            "Faster business processes",
+            "Fewer repetitive tasks",
+            "Better system connectivity",
+            "More consistent execution",
+            "Improved workflow visibility",
+            "Better AI utilization",
+            "Lower operational friction",
+            "Measurable automation outcomes"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains reduced manual work."
+        },
+        {
+          "code": "C12-S02",
+          "name": "Agent Connect",
+          "blurb": "AI agents that plug into the tools you already use.",
+          "price": "$8,000",
+          "unit": "project",
+          "problem": "**Agent Connect connect AI agents with approved tools, data sources, systems, and other agents so they can exchange information and perform coordinated work.**\n\nIn practice, that means we connect AI agents; define agent interfaces; connect approved tools.",
+          "what_we_do": "Connect AI agents with approved tools, data sources, systems, and other agents so they can exchange information and perform coordinated work.",
+          "deliverables": [
+            "Automation assessment",
+            "Workflow designs",
+            "Integration architecture",
+            "Agent integration designs",
+            "Workflow automations",
+            "System integrations",
+            "Orchestration workflows",
+            "Monitoring and execution reports",
+            "Exception handling",
+            "Optimization recommendations"
+          ],
+          "benefits": [
+            "Reduced manual work",
+            "Faster business processes",
+            "Fewer repetitive tasks",
+            "Better system connectivity",
+            "More consistent execution",
+            "Improved workflow visibility",
+            "Better AI utilization",
+            "Lower operational friction",
+            "Measurable automation outcomes"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains reduced manual work."
+        },
+        {
+          "code": "C12-S03",
+          "name": "System Bridge",
+          "blurb": "Your business systems, finally talking to each other.",
+          "price": "$7,000",
+          "unit": "project",
+          "problem": "**System Bridge integrate AI capabilities with business systems such as CRM, ERP, ITSM, communication, document, cloud, and operational platforms.**\n\nIn practice, that means we identify integration requirements; connect business systems; synchronize approved data.",
+          "what_we_do": "Integrate AI capabilities with business systems such as CRM, ERP, ITSM, communication, document, cloud, and operational platforms.",
+          "deliverables": [
+            "Automation assessment",
+            "Workflow designs",
+            "Integration architecture",
+            "Agent integration designs",
+            "Workflow automations",
+            "System integrations",
+            "Orchestration workflows",
+            "Monitoring and execution reports",
+            "Exception handling",
+            "Optimization recommendations"
+          ],
+          "benefits": [
+            "Reduced manual work",
+            "Faster business processes",
+            "Fewer repetitive tasks",
+            "Better system connectivity",
+            "More consistent execution",
+            "Improved workflow visibility",
+            "Better AI utilization",
+            "Lower operational friction",
+            "Measurable automation outcomes"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains reduced manual work."
+        },
+        {
+          "code": "C12-S04",
+          "name": "AI Orchestrator",
+          "blurb": "Complex, multi-step processes, coordinated automatically.",
+          "price": "$2,500",
+          "unit": "/mo",
+          "problem": "**AI Orchestrator coordinate multi-step, multi-agent, and multi-system processes so AI-enabled work can move from trigger through decision, action, approval, and completion.**\n\nIn practice, that means we design end-to-end orchestration; coordinate agents and systems; manage workflow state.",
+          "what_we_do": "Coordinate multi-step, multi-agent, and multi-system processes so AI-enabled work can move from trigger through decision, action, approval, and completion.",
+          "deliverables": [
+            "Automation assessment",
+            "Workflow designs",
+            "Integration architecture",
+            "Agent integration designs",
+            "Workflow automations",
+            "System integrations",
+            "Orchestration workflows",
+            "Monitoring and execution reports",
+            "Exception handling",
+            "Optimization recommendations"
+          ],
+          "benefits": [
+            "Reduced manual work",
+            "Faster business processes",
+            "Fewer repetitive tasks",
+            "Better system connectivity",
+            "More consistent execution",
+            "Improved workflow visibility",
+            "Better AI utilization",
+            "Lower operational friction",
+            "Measurable automation outcomes"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains reduced manual work."
+        },
+        {
+          "code": "C12-S05",
+          "name": "Automation Optimizer",
+          "blurb": "Get more out of the automations you already have.",
+          "price": "$1,200",
+          "unit": "/mo",
+          "problem": "**Automation Optimizer measure AI automation performance and continuously improve workflows, integrations, reliability, efficiency, and business outcomes.**\n\nIn practice, that means we measure automation performance; identify bottlenecks; analyze failures.",
+          "what_we_do": "Measure AI automation performance and continuously improve workflows, integrations, reliability, efficiency, and business outcomes.",
+          "deliverables": [
+            "Automation assessment",
+            "Workflow designs",
+            "Integration architecture",
+            "Agent integration designs",
+            "Workflow automations",
+            "System integrations",
+            "Orchestration workflows",
+            "Monitoring and execution reports",
+            "Exception handling",
+            "Optimization recommendations"
+          ],
+          "benefits": [
+            "Reduced manual work",
+            "Faster business processes",
+            "Fewer repetitive tasks",
+            "Better system connectivity",
+            "More consistent execution",
+            "Improved workflow visibility",
+            "Better AI utilization",
+            "Lower operational friction",
+            "Measurable automation outcomes"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains reduced manual work."
+        }
+      ]
+    },
+    {
+      "code": "C13",
+      "name": "Turn data into decisions",
+      "tagline": "The answers are already in your business.",
+      "tier": "Tier 2 - Business Automation",
+      "services": [
+        {
+          "code": "C13-S01",
+          "name": "Knowledge Hub",
+          "blurb": "Your business knowledge, organized and searchable.",
+          "price": "$1,500",
+          "unit": "/mo",
+          "problem": "**Knowledge Hub build, organize, maintain, and make organizational knowledge accessible to AI systems and authorized users through structured knowledge foundations.**\n\nIn practice, that means we identify knowledge sources; organize enterprise knowledge; build knowledge structures.",
+          "what_we_do": "Build, organize, maintain, and make organizational knowledge accessible to AI systems and authorized users through structured knowledge foundations.",
+          "deliverables": [
+            "Knowledge inventory",
+            "Knowledge structures",
+            "AI-ready knowledge foundation",
+            "Data intelligence outputs",
+            "Knowledge discovery results",
+            "Analytics and insights",
+            "Decision-support outputs",
+            "Knowledge-gap analysis",
+            "Management reports",
+            "Intelligence improvement recommendations"
+          ],
+          "benefits": [
+            "Better access to organizational knowledge",
+            "Reduced knowledge silos",
+            "Better use of existing business data",
+            "Faster information discovery",
+            "More useful business insights",
+            "Better decision support",
+            "Improved organizational intelligence",
+            "Reduced time spent searching for information"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better access to organizational knowledge."
+        },
+        {
+          "code": "C13-S02",
+          "name": "Data Insight",
+          "blurb": "Understand what your data is actually telling you.",
+          "price": "$2,000",
+          "unit": "/mo",
+          "problem": "**Data Insight transform approved business data into structured intelligence that helps organizations understand performance, relationships, trends, and operational conditions.**\n\nIn practice, that means we connect approved data sources; structure business data; identify relevant relationships.",
+          "what_we_do": "Transform approved business data into structured intelligence that helps organizations understand performance, relationships, trends, and operational conditions.",
+          "deliverables": [
+            "Knowledge inventory",
+            "Knowledge structures",
+            "AI-ready knowledge foundation",
+            "Data intelligence outputs",
+            "Knowledge discovery results",
+            "Analytics and insights",
+            "Decision-support outputs",
+            "Knowledge-gap analysis",
+            "Management reports",
+            "Intelligence improvement recommendations"
+          ],
+          "benefits": [
+            "Better access to organizational knowledge",
+            "Reduced knowledge silos",
+            "Better use of existing business data",
+            "Faster information discovery",
+            "More useful business insights",
+            "Better decision support",
+            "Improved organizational intelligence",
+            "Reduced time spent searching for information"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better access to organizational knowledge."
+        },
+        {
+          "code": "C13-S03",
+          "name": "Knowledge Finder",
+          "blurb": "Find the answer buried in your own documents.",
+          "price": "$1,200",
+          "unit": "/mo",
+          "problem": "**Knowledge Finder discover relevant information, relationships, patterns, and previously hidden knowledge across approved organizational information sources.**\n\nIn practice, that means we search organizational knowledge; discover relationships; identify relevant information.",
+          "what_we_do": "Discover relevant information, relationships, patterns, and previously hidden knowledge across approved organizational information sources.",
+          "deliverables": [
+            "Knowledge inventory",
+            "Knowledge structures",
+            "AI-ready knowledge foundation",
+            "Data intelligence outputs",
+            "Knowledge discovery results",
+            "Analytics and insights",
+            "Decision-support outputs",
+            "Knowledge-gap analysis",
+            "Management reports",
+            "Intelligence improvement recommendations"
+          ],
+          "benefits": [
+            "Better access to organizational knowledge",
+            "Reduced knowledge silos",
+            "Better use of existing business data",
+            "Faster information discovery",
+            "More useful business insights",
+            "Better decision support",
+            "Improved organizational intelligence",
+            "Reduced time spent searching for information"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better access to organizational knowledge."
+        },
+        {
+          "code": "C13-S04",
+          "name": "Insight Engine",
+          "blurb": "Analytics that surface what matters, automatically.",
+          "price": "$2,200",
+          "unit": "/mo",
+          "problem": "**Insight Engine analyze business information to generate actionable insights, trends, patterns, forecasts, and performance intelligence for operational and management use.**\n\nIn practice, that means we analyze business performance; identify trends; detect patterns.",
+          "what_we_do": "Analyze business information to generate actionable insights, trends, patterns, forecasts, and performance intelligence for operational and management use.",
+          "deliverables": [
+            "Knowledge inventory",
+            "Knowledge structures",
+            "AI-ready knowledge foundation",
+            "Data intelligence outputs",
+            "Knowledge discovery results",
+            "Analytics and insights",
+            "Decision-support outputs",
+            "Knowledge-gap analysis",
+            "Management reports",
+            "Intelligence improvement recommendations"
+          ],
+          "benefits": [
+            "Better access to organizational knowledge",
+            "Reduced knowledge silos",
+            "Better use of existing business data",
+            "Faster information discovery",
+            "More useful business insights",
+            "Better decision support",
+            "Improved organizational intelligence",
+            "Reduced time spent searching for information"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better access to organizational knowledge."
+        },
+        {
+          "code": "C13-S05",
+          "name": "Decision Engine",
+          "blurb": "Decision support built on your real business data.",
+          "price": "$2,500",
+          "unit": "/mo",
+          "problem": "**Decision Engine provide AI-assisted decision intelligence by combining approved knowledge, data, context, scenarios, and business rules to support better decisions.**\n\nIn practice, that means we combine knowledge and data; analyze decision context; evaluate scenarios.",
+          "what_we_do": "Provide AI-assisted decision intelligence by combining approved knowledge, data, context, scenarios, and business rules to support better decisions.",
+          "deliverables": [
+            "Knowledge inventory",
+            "Knowledge structures",
+            "AI-ready knowledge foundation",
+            "Data intelligence outputs",
+            "Knowledge discovery results",
+            "Analytics and insights",
+            "Decision-support outputs",
+            "Knowledge-gap analysis",
+            "Management reports",
+            "Intelligence improvement recommendations"
+          ],
+          "benefits": [
+            "Better access to organizational knowledge",
+            "Reduced knowledge silos",
+            "Better use of existing business data",
+            "Faster information discovery",
+            "More useful business insights",
+            "Better decision support",
+            "Improved organizational intelligence",
+            "Reduced time spent searching for information"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better access to organizational knowledge."
+        }
+      ]
+    },
+    {
+      "code": "C14",
+      "name": "Simplify your IT operations",
+      "tagline": "Your technology, managed without the overhead.",
+      "tier": "Tier 2 - Business Automation",
+      "services": [
+        {
+          "code": "C14-S01",
+          "name": "IT Manager",
+          "blurb": "IT service management that actually runs itself.",
+          "price": "$35",
+          "unit": "/user/mo",
+          "problem": "**IT Manager manage IT services through structured service processes covering service requests, incidents, changes, problems, service levels, and continual improvement.**\n\nIn practice, that means we manage IT service catalog; manage incidents and requests; coordinate changes.",
+          "what_we_do": "Manage IT services through structured service processes covering service requests, incidents, changes, problems, service levels, and continual improvement.",
+          "deliverables": [
+            "IT service information",
+            "Incident/request records",
+            "Change and problem tracking",
+            "Infrastructure operational reports",
+            "Asset inventory",
+            "Configuration information",
+            "Service desk reports",
+            "Operational monitoring",
+            "Optimization recommendations"
+          ],
+          "benefits": [
+            "Better IT visibility",
+            "Faster issue resolution",
+            "More consistent IT processes",
+            "Better asset control",
+            "Improved infrastructure reliability",
+            "Reduced operational disruption",
+            "Better service performance",
+            "More efficient IT operations"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better it visibility."
+        },
+        {
+          "code": "C14-S02",
+          "name": "Infrastructure Ops",
+          "blurb": "Your infrastructure, operated and optimized.",
+          "price": "$500",
+          "unit": "/mo",
+          "problem": "**Infrastructure Ops operate and maintain the organization's approved IT infrastructure, including servers, networks, cloud resources, core platforms, and supporting technology environments.**\n\nIn practice, that means we maintain infrastructure inventory; coordinate infrastructure operations; manage routine maintenance.",
+          "what_we_do": "Operate and maintain the organization's approved IT infrastructure, including servers, networks, cloud resources, core platforms, and supporting technology environments.",
+          "deliverables": [
+            "IT service information",
+            "Incident/request records",
+            "Change and problem tracking",
+            "Infrastructure operational reports",
+            "Asset inventory",
+            "Configuration information",
+            "Service desk reports",
+            "Operational monitoring",
+            "Optimization recommendations"
+          ],
+          "benefits": [
+            "Better IT visibility",
+            "Faster issue resolution",
+            "More consistent IT processes",
+            "Better asset control",
+            "Improved infrastructure reliability",
+            "Reduced operational disruption",
+            "Better service performance",
+            "More efficient IT operations"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better it visibility."
+        },
+        {
+          "code": "C14-S03",
+          "name": "Asset Control",
+          "blurb": "Know exactly what technology you have and where.",
+          "price": "$10",
+          "unit": "/user/mo",
+          "problem": "**Asset Control maintain visibility and control over IT assets, configurations, ownership, lifecycle status, and relationships between technology components.**\n\nIn practice, that means we maintain asset inventory; track asset ownership; track asset lifecycle.",
+          "what_we_do": "Maintain visibility and control over IT assets, configurations, ownership, lifecycle status, and relationships between technology components.",
+          "deliverables": [
+            "IT service information",
+            "Incident/request records",
+            "Change and problem tracking",
+            "Infrastructure operational reports",
+            "Asset inventory",
+            "Configuration information",
+            "Service desk reports",
+            "Operational monitoring",
+            "Optimization recommendations"
+          ],
+          "benefits": [
+            "Better IT visibility",
+            "Faster issue resolution",
+            "More consistent IT processes",
+            "Better asset control",
+            "Improved infrastructure reliability",
+            "Reduced operational disruption",
+            "Better service performance",
+            "More efficient IT operations"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better it visibility."
+        },
+        {
+          "code": "C14-S04",
+          "name": "IT Helpdesk",
+          "blurb": "Support your team can actually rely on.",
+          "price": "$40",
+          "unit": "/user/mo",
+          "problem": "**IT Helpdesk provide structured IT support for users by receiving, classifying, resolving, escalating, and tracking technology issues and service requests.**\n\nIn practice, that means we receive support requests; classify issues; troubleshoot common problems.",
+          "what_we_do": "Provide structured IT support for users by receiving, classifying, resolving, escalating, and tracking technology issues and service requests.",
+          "deliverables": [
+            "IT service information",
+            "Incident/request records",
+            "Change and problem tracking",
+            "Infrastructure operational reports",
+            "Asset inventory",
+            "Configuration information",
+            "Service desk reports",
+            "Operational monitoring",
+            "Optimization recommendations"
+          ],
+          "benefits": [
+            "Better IT visibility",
+            "Faster issue resolution",
+            "More consistent IT processes",
+            "Better asset control",
+            "Improved infrastructure reliability",
+            "Reduced operational disruption",
+            "Better service performance",
+            "More efficient IT operations"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better it visibility."
+        },
+        {
+          "code": "C14-S05",
+          "name": "IT Watch",
+          "blurb": "Ongoing monitoring that catches issues before they're outages.",
+          "price": "$400",
+          "unit": "/mo",
+          "problem": "**IT Watch monitor IT operational performance and identify reliability, capacity, efficiency, and service-quality improvements across the technology environment.**\n\nIn practice, that means we monitor IT operations; identify operational anomalies; track service performance.",
+          "what_we_do": "Monitor IT operational performance and identify reliability, capacity, efficiency, and service-quality improvements across the technology environment.",
+          "deliverables": [
+            "IT service information",
+            "Incident/request records",
+            "Change and problem tracking",
+            "Infrastructure operational reports",
+            "Asset inventory",
+            "Configuration information",
+            "Service desk reports",
+            "Operational monitoring",
+            "Optimization recommendations"
+          ],
+          "benefits": [
+            "Better IT visibility",
+            "Faster issue resolution",
+            "More consistent IT processes",
+            "Better asset control",
+            "Improved infrastructure reliability",
+            "Reduced operational disruption",
+            "Better service performance",
+            "More efficient IT operations"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains better it visibility."
+        }
+      ]
+    },
+    {
+      "code": "C15",
+      "name": "Grow revenue automatically",
+      "tagline": "From first contact to renewal.",
+      "tier": "Tier 2 - Business Automation",
+      "services": [
+        {
+          "code": "C15-S01",
+          "name": "Customer Care",
+          "blurb": "Customer interactions, handled fast and consistently.",
+          "price": "$1,800",
+          "unit": "/mo",
+          "problem": "**Customer Care automate customer-facing interactions, service requests, communications, and customer journey activities while maintaining appropriate human escalation.**\n\nIn practice, that means we automate customer communications; manage customer requests; route customer interactions.",
+          "what_we_do": "Automate customer-facing interactions, service requests, communications, and customer journey activities while maintaining appropriate human escalation.",
+          "deliverables": [
+            "Customer automation workflows",
+            "Lead automation",
+            "Sales routing and follow-up",
+            "Onboarding workflows",
+            "Customer-health insights",
+            "Retention workflows",
+            "Revenue intelligence",
+            "Performance reporting",
+            "Optimization recommendations"
+          ],
+          "benefits": [
+            "Faster customer response",
+            "Better lead handling",
+            "Improved sales efficiency",
+            "Faster customer onboarding",
+            "Better customer engagement",
+            "Earlier retention signals",
+            "Better revenue visibility",
+            "Reduced manual work",
+            "Improved customer lifecycle management"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains faster customer response."
+        },
+        {
+          "code": "C15-S02",
+          "name": "Sales Flow",
+          "blurb": "Leads followed up automatically, nothing falls through.",
+          "price": "$2,200",
+          "unit": "/mo",
+          "problem": "**Sales Flow automate lead capture, qualification, routing, follow-up, outreach support, and sales-process activities to improve sales efficiency and conversion.**\n\nIn practice, that means we capture leads; qualify leads; score and prioritize leads.",
+          "what_we_do": "Automate lead capture, qualification, routing, follow-up, outreach support, and sales-process activities to improve sales efficiency and conversion.",
+          "deliverables": [
+            "Customer automation workflows",
+            "Lead automation",
+            "Sales routing and follow-up",
+            "Onboarding workflows",
+            "Customer-health insights",
+            "Retention workflows",
+            "Revenue intelligence",
+            "Performance reporting",
+            "Optimization recommendations"
+          ],
+          "benefits": [
+            "Faster customer response",
+            "Better lead handling",
+            "Improved sales efficiency",
+            "Faster customer onboarding",
+            "Better customer engagement",
+            "Earlier retention signals",
+            "Better revenue visibility",
+            "Reduced manual work",
+            "Improved customer lifecycle management"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains faster customer response."
+        },
+        {
+          "code": "C15-S03",
+          "name": "Onboard",
+          "blurb": "New customers, onboarded smoothly every time.",
+          "price": "$1,500",
+          "unit": "/mo",
+          "problem": "**Onboard automate and coordinate the customer journey from signed agreement through onboarding, setup, information collection, activation, and handoff to ongoing service.**\n\nIn practice, that means we initiate onboarding; collect required information; coordinate onboarding tasks.",
+          "what_we_do": "Automate and coordinate the customer journey from signed agreement through onboarding, setup, information collection, activation, and handoff to ongoing service.",
+          "deliverables": [
+            "Customer automation workflows",
+            "Lead automation",
+            "Sales routing and follow-up",
+            "Onboarding workflows",
+            "Customer-health insights",
+            "Retention workflows",
+            "Revenue intelligence",
+            "Performance reporting",
+            "Optimization recommendations"
+          ],
+          "benefits": [
+            "Faster customer response",
+            "Better lead handling",
+            "Improved sales efficiency",
+            "Faster customer onboarding",
+            "Better customer engagement",
+            "Earlier retention signals",
+            "Better revenue visibility",
+            "Reduced manual work",
+            "Improved customer lifecycle management"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains faster customer response."
+        },
+        {
+          "code": "C15-S04",
+          "name": "Customer Pulse",
+          "blurb": "Know which customers are at risk before they leave.",
+          "price": "$1,800",
+          "unit": "/mo",
+          "problem": "**Customer Pulse monitor customer engagement and lifecycle signals to identify retention opportunities, service concerns, expansion opportunities, and potential churn risks.**\n\nIn practice, that means we monitor engagement; identify customer-risk signals; track customer health.",
+          "what_we_do": "Monitor customer engagement and lifecycle signals to identify retention opportunities, service concerns, expansion opportunities, and potential churn risks.",
+          "deliverables": [
+            "Customer automation workflows",
+            "Lead automation",
+            "Sales routing and follow-up",
+            "Onboarding workflows",
+            "Customer-health insights",
+            "Retention workflows",
+            "Revenue intelligence",
+            "Performance reporting",
+            "Optimization recommendations"
+          ],
+          "benefits": [
+            "Faster customer response",
+            "Better lead handling",
+            "Improved sales efficiency",
+            "Faster customer onboarding",
+            "Better customer engagement",
+            "Earlier retention signals",
+            "Better revenue visibility",
+            "Reduced manual work",
+            "Improved customer lifecycle management"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains faster customer response."
+        },
+        {
+          "code": "C15-S05",
+          "name": "Revenue Insight",
+          "blurb": "See where revenue opportunity is hiding in your data.",
+          "price": "$2,500",
+          "unit": "/mo",
+          "problem": "**Revenue Insight analyze customer, sales, service, and revenue information to identify opportunities for conversion, expansion, retention, pricing, and revenue performance improvement.**\n\nIn practice, that means we analyze revenue performance; identify conversion opportunities; identify expansion opportunities.",
+          "what_we_do": "Analyze customer, sales, service, and revenue information to identify opportunities for conversion, expansion, retention, pricing, and revenue performance improvement.",
+          "deliverables": [
+            "Customer automation workflows",
+            "Lead automation",
+            "Sales routing and follow-up",
+            "Onboarding workflows",
+            "Customer-health insights",
+            "Retention workflows",
+            "Revenue intelligence",
+            "Performance reporting",
+            "Optimization recommendations"
+          ],
+          "benefits": [
+            "Faster customer response",
+            "Better lead handling",
+            "Improved sales efficiency",
+            "Faster customer onboarding",
+            "Better customer engagement",
+            "Earlier retention signals",
+            "Better revenue visibility",
+            "Reduced manual work",
+            "Improved customer lifecycle management"
+          ],
+          "process": "Connect → Collect → Analyze → Prioritize → Report → Review together.",
+          "outcome": "The customer gains faster customer response."
+        }
+      ]
+    }
+  ]
+}

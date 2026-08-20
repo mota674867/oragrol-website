@@ -1,293 +1,160 @@
-import type { ComponentType, SVGProps } from "react";
-import { Bug, ClipboardCheck, GraduationCap, UserRound } from "lucide-react";
-import { ButtonLink, Caption, H2, H3, Section, Text } from "../../ui";
+import { Caption, H2, H3, Section, Text } from "../../ui";
 import { Reveal } from "../../motion/reveal";
 import { CapabilitySpotlightVisual } from "./capability-spotlight";
-import { CapabilityDashboardVisual } from "./capability-dashboard-visual";
-import { CapabilityTrainingVisual } from "./capability-training-visual";
 import { CategoryNav, type CategoryNavItem } from "./category-nav";
+import { ServiceCard } from "./service-card";
+import {
+  categoryNumeral,
+  getBusinessAutomationTier2,
+  getCategoryIcon,
+  getServicesTier1,
+  type RawCategory,
+} from "./services-data";
 
 /**
- * Live Services (1-4) — Step 5.
+ * Services — 2026-08-20 full restructure, superseding the D-007/D-012/
+ * D-014 8-capability structure (Virtual CISO, Risk Assessment &
+ * Compliance, ...) entirely. Source: `oragrol-services-data.json` (15
+ * categories / 64 services, 10 cybersecurity + 5 business automation) —
+ * see `services-data.ts` for the data layer and DECISIONS.md for the
+ * full restructure decision.
  *
- * DRAFT COPY — the one-liners are locked (Home teaser, brief-confirmed);
- * the problem/what-we-do/what-you-get/outcome breakdown below is new copy
- * written for this page, not yet reviewed/approved. Deliberately generic
- * and non-specific: no named frameworks/standards, no tool names, no
- * stats, no client counts, no certifications — nothing beyond what's
- * already confirmed elsewhere in the project docs.
+ * Same visual system as the structure this replaces, reused verbatim per
+ * the explicit "do not introduce new design elements" instruction:
+ * `CapabilitySpotlightVisual`/`HeroSchematicVisual` hero-scale schematic
+ * shell (D-013/D-014) now renders once per CATEGORY (15 rows, not 64) —
+ * `HeroSchematicVisual`'s fixed 3-node diagram was confirmed NOT
+ * parametric for arbitrary node counts before this was built (checked
+ * directly, not assumed), so it stays exactly as-is as a decorative
+ * motif, never asked to represent a literal per-service count. Individual
+ * SERVICES render as compact `ServiceCard`s (reusing `CapabilitySpotlightMark`,
+ * the same small-badge treatment `AdditionalCapabilities` used for its 4
+ * not-yet-live cards) inside each category row, each linking to its own
+ * `/services/[code]` detail page.
  *
- * Full-width alternating feature rows, not a card grid — a 4-field
- * breakdown per service (problem/what we do/what you get/outcome) needs
- * more room than a card comfortably gives, and this page already has a
- * card-grid Services teaser on Home; repeating that pattern here at a
- * larger scale would be the exact "identical cards" the brief calls out
- * to avoid. `divide-y` borders (same device as Faq.tsx) instead of boxed
- * Cards, for an editorial rather than boxy read.
- *
- * D-016 (item 1 + item 3, resolved together): the outer wrapper widened
- * from a standard `Container size="lg"` (1280px) to a custom 1680px one
- * with a `[220px_1fr]` grid — CategoryNav now occupies real width in what
- * was previously just empty margin at 1920/2560px viewports, instead of
- * trying to fix "dead space" by chasing the max-width number itself
- * (mathematically can't reach zero gutter while capped — confirmed with
- * Mohammad before this approach). Row content's own width is effectively
- * unchanged (~1280px-equivalent minus the nav column + gap).
+ * Two top-level sections (white/light-blue alternation — the same
+ * environment pairing this page already used to distinguish "live" vs.
+ * "finalizing" capabilities, repurposed here for "Services" (Tier 1,
+ * cybersecurity) vs. "Business Automation" (Tier 2), per the explicit
+ * instruction). `additional-capabilities.tsx` and its 4 bespoke marks are
+ * no longer rendered (removed from app/services/page.tsx) — left on disk
+ * unreferenced, this project's existing convention for superseded
+ * components, not deleted.
  */
 
-interface LiveService {
-  n: string;
-  name: string;
-  icon: ComponentType<SVGProps<SVGSVGElement>>;
-  problem: string;
-  whatWeDo: string;
-  whatYouGet: string;
-  outcome: string;
-  cta: { label: string; href: string };
+function categoryNavItems(categories: RawCategory[]): CategoryNavItem[] {
+  return categories.map((c) => ({
+    id: `category-${c.code.toLowerCase()}`,
+    n: categoryNumeral(c.code),
+    label: c.name,
+  }));
 }
 
-const LIVE_SERVICES: LiveService[] = [
-  {
-    n: "01",
-    name: "Virtual CISO",
-    icon: UserRound,
-    problem:
-      "Most small and mid-sized businesses need senior security leadership and direction, but can't justify a full-time executive hire.",
-    whatWeDo:
-      "Oragrol provides ongoing strategic security guidance — risk prioritization, planning, and reporting — on a schedule that fits the business.",
-    whatYouGet:
-      "A dedicated point of security leadership and regular, clear guidance on where to focus next.",
-    outcome: "Security decisions get made with real strategic rigor, without a full-time cost.",
-    cta: { label: "Talk to Oragrol", href: "/contact" },
-  },
-  {
-    n: "02",
-    name: "Risk Assessment & Compliance",
-    icon: ClipboardCheck,
-    problem:
-      "Businesses often don't have a clear picture of where they actually stand against the frameworks that matter to them.",
-    whatWeDo:
-      "We assess the current environment against what's relevant to the business and translate findings into a prioritized, practical plan.",
-    whatYouGet: "A clear risk picture and a prioritized roadmap — not a report that sits unread.",
-    outcome: "You know exactly where you stand, and what to fix first.",
-    // "Get Your Cyber Health Score" → "Talk to Oragrol" (D-019, item 4):
-    // that label/href pair is Cyber Health's own primary CTA, not
-    // Services' — was the one outlier among the 4 live rows (the other 3
-    // already used "Talk to Oragrol" → /contact). href changed to match;
-    // leaving it at /cyber-health with this button's new text would have
-    // been a mismatched link (says "talk to us", goes to an assessment).
-    cta: { label: "Talk to Oragrol", href: "/contact" },
-  },
-  {
-    n: "03",
-    name: "Vulnerability Assessment & Management",
-    icon: Bug,
-    problem:
-      "Attackers look for the easiest way in — most businesses don't know where those weaknesses are until it's too late.",
-    whatWeDo:
-      "We identify and help prioritize remediation of vulnerabilities across the environment on an ongoing basis, not a one-time scan.",
-    whatYouGet: "Regular visibility into exposure, prioritized by real risk, with practical next steps.",
-    outcome: "Fewer open doors for attackers, and a clear record of what's been fixed.",
-    cta: { label: "Talk to Oragrol", href: "/contact" },
-  },
-  {
-    n: "04",
-    name: "Security Awareness Training",
-    icon: GraduationCap,
-    problem: "Most breaches start with a person, not a piece of technology.",
-    whatWeDo:
-      "We train teams to recognize and respond to real-world threats through ongoing, practical training — not a one-off, check-the-box course.",
-    whatYouGet: "A workforce that can spot phishing and social-engineering attempts before they become incidents.",
-    outcome: "Your team becomes an active layer of defense, not the weakest link.",
-    cta: { label: "Talk to Oragrol", href: "/contact" },
-  },
-];
+function CategoryRow({ category, index }: { category: RawCategory; index: number }) {
+  const reverse = index % 2 === 1;
+  const icon = getCategoryIcon(category.code);
+  const n = categoryNumeral(category.code);
 
-/**
- * Nav items for all 8 capabilities — 01-04 here, 05-08 render in
- * AdditionalCapabilities below (D-007's finalizing tier). Names for 05-08
- * are copied verbatim from additional-capabilities.tsx's FINALIZING_SERVICES
- * — keep both lists in sync if either changes; not extracted to a shared
- * module since the two sections' own data shapes differ (full copy vs.
- * name+one-liner) and duplicating just the label/id pair here is simpler
- * than a shared indirection for 4 static strings.
- */
-const NAV_ITEMS: CategoryNavItem[] = [
-  ...LIVE_SERVICES.map((s) => ({ id: `capability-${s.n}`, n: s.n, label: s.name })),
-  { id: "capability-05", n: "05", label: "Managed Security Services / 24/7 MDR" },
-  { id: "capability-06", n: "06", label: "Penetration Testing" },
-  { id: "capability-07", n: "07", label: "Endpoint Protection / EDR" },
-  { id: "capability-08", n: "08", label: "Incident Response" },
-];
-
-/**
- * Per-row visual (D-022): Capability 04's dark-panel/dot-grid/glow-orb
- * shell was disapproved and replaced with `CapabilityTrainingVisual`
- * (module checklist + completion ring), approved live after review at
- * `/services/prototype-v3` (now removed — same lifecycle as every other
- * prototype route this project has used).
- *
- * D-021/D-032: Capability 02's shell was separately prototyped as
- * `CapabilityDashboardVisual` (score + risk-tier breakdown, reusing Cyber
- * Health's already-approved illustrative example) at
- * `/services/prototype-v2` and approved after review (now removed).
- *
- * D-033: no project record showed Capability 03 ever being included in
- * D-021's original prototype/approval (that was explicitly scoped to
- * "ONE new treatment for Capability 02" only) — flagged to Mohammad
- * rather than silently extended or silently left as-is. He confirmed:
- * extend it to 03 as a new decision. `CapabilityDashboardVisual` doesn't
- * take per-capability content props (its illustrative score/category
- * copy is hardcoded, shared with Capability 02) — reused as-is rather
- * than forked into a near-duplicate component, since both rows are
- * risk/vulnerability-assessment-shaped content and the brief was to
- * extend the SAME treatment, not build a variant.
- */
-function CapabilityVisual({ service }: { service: LiveService }) {
-  if (service.n === "02" || service.n === "03") {
-    return <CapabilityDashboardVisual />;
-  }
-  if (service.n === "04") {
-    return <CapabilityTrainingVisual />;
-  }
-  return <CapabilitySpotlightVisual n={service.n} icon={service.icon} />;
-}
-
-function ServiceField({ label, children }: { label: string; children: string }) {
   return (
-    <div>
-      {/* size="sm" — hierarchy fix (D-015/D-016): quieter than the
-          headline, not competing with it. */}
-      <Caption tone="muted" size="sm">
-        {label}
-      </Caption>
-      {/* size="base" (was "sm") — D-016: body copy needs to read as its
-          own distinct tier, not visually adjacent to the tiny label. */}
-      <Text size="base" tone="secondary" className="mt-1.5">
-        {children}
-      </Text>
+    <div
+      id={`category-${category.code.toLowerCase()}`}
+      className="grid scroll-mt-28 gap-8 py-14 md:grid-cols-[0.9fr_1.1fr] md:items-start md:gap-16"
+    >
+      <div className={reverse ? "md:order-2" : undefined}>
+        <div className="mx-auto max-w-md">
+          <CapabilitySpotlightVisual n={n} icon={icon} />
+        </div>
+      </div>
+      <div className={reverse ? "md:order-1" : undefined}>
+        <Caption tone="accent">Category {n}</Caption>
+        <H3 size="lg" className="mt-2">
+          {category.name}
+        </H3>
+        <Text size="base" tone="secondary" className="mt-4 max-w-xl">
+          {category.tagline}
+        </Text>
+        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          {category.services.map((service) => (
+            <ServiceCard key={service.code} service={service} icon={icon} />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
 
-export function LiveServices() {
+function TierSection({
+  environment,
+  eyebrow,
+  heading,
+  intro,
+  categories,
+}: {
+  environment: "white" | "light-blue";
+  eyebrow: string;
+  heading: string;
+  intro: string;
+  categories: RawCategory[];
+}) {
+  const navItems = categoryNavItems(categories);
+
   return (
-    <Section environment="white">
-      {/*
-        Asymmetric pt/pb, not the usual py-24/32: each row below already
-        carries its own py-14 (top AND bottom padding, for the divide-y
-        rhythm between rows). A uniform py-24/32 here would stack its own
-        bottom padding on top of the last row's already-present pb-14,
-        producing a much bigger gap before the next section than the
-        entrance gap before the first row — confirmed as the reported
-        "excessive blank gap" before Additional Capabilities. Top padding
-        stays the standard 24/32 (unaffected, wasn't part of the report);
-        bottom is cut down since the last row's own pb-14 already covers
-        most of that space.
-      */}
+    <Section environment={environment}>
+      {/* Asymmetric pt/pb — see the original D-016 comment this pattern is
+          carried over from: each row below already carries its own
+          py-14 (top AND bottom), so a uniform section py would stack an
+          extra gap on top of the last row's own pb-14. */}
       <div className="mx-auto w-full max-w-[1680px] px-6 pb-8 pt-24 md:px-12 md:pb-12 md:pt-32">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[220px_1fr] lg:items-start lg:gap-16">
-          <CategoryNav items={NAV_ITEMS} />
+          <CategoryNav items={navItems} />
 
           <div>
             <Reveal>
-              <Caption tone="accent">Live capabilities</Caption>
+              <Caption tone="accent">{eyebrow}</Caption>
             </Reveal>
             <Reveal delay={0.05}>
-              <H2 className="mt-4 max-w-xl">Available today.</H2>
+              <H2 className="mt-4 max-w-xl">{heading}</H2>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <Text size="base" tone="secondary" className="mt-4 max-w-xl">
+                {intro}
+              </Text>
             </Reveal>
 
             <div className="mt-16 flex flex-col divide-y divide-border border-t border-border">
-              {LIVE_SERVICES.map((service, i) => {
-                const reverse = i % 2 === 1;
-                return (
-                  <Reveal key={service.name} delay={i * 0.06}>
-                    <div
-                      id={`capability-${service.n}`}
-                      // Top-alignment fix (Round 6, item 1): was
-                      // `md:items-center`, which vertically CENTERS the two
-                      // columns relative to each other rather than aligning
-                      // their top edges. Harmless on row 01 ("Virtual CISO"
-                      // — short enough to stay on one H3 line, so both
-                      // columns happen to be nearly the same height and
-                      // centering looks like alignment by coincidence), but
-                      // visibly wrong on rows 02/03 whose longer capability
-                      // names wrap the H3 to two lines, making the content
-                      // column taller than the graphic column — `items-center`
-                      // then shifts the shorter column down to split the
-                      // difference instead of keeping both starting at the
-                      // same top edge. `items-start` makes both columns
-                      // begin flush at the row's own top edge regardless of
-                      // either column's height — a real shared-baseline fix
-                      // on the row's own grid, not a per-row margin patch.
-                      className="grid scroll-mt-28 gap-8 py-14 md:grid-cols-[0.9fr_1.1fr] md:items-start md:gap-16"
-                    >
-                      <div className={reverse ? "md:order-2" : undefined}>
-                        {/* Design Correction treatment (D-013/D-014) —
-                            hero-scale illustration in a nested dark,
-                            glow-lit, shadow-elevated panel; hover motion
-                            (D-016). Capped narrower (D-018, item 3) — was
-                            filling its whole grid column; now gives the
-                            content column more room, per Mohammad's
-                            explicit "scale down a bit, don't redesign"
-                            instruction (all internal elements/proportions
-                            untouched, just a max-width cap).
-
-                            CTA alignment fix (Round 5): `mx-auto max-w-md`
-                            used to live only on CapabilitySpotlightVisual
-                            itself, with the CTA as an unconstrained sibling
-                            below it. The panel self-centered at 448px
-                            inside this grid column, but the button — no
-                            width cap of its own — started at the column's
-                            own left edge instead, which is only ~448px
-                            wide on a laptop (no visible gap) but far wider
-                            on a 24" monitor (visible left offset vs. the
-                            centered panel above it). Fix: one shared
-                            `max-w-md mx-auto` wrapper is now the actual
-                            parent of both the visual and the CTA, so they
-                            share one width/position box by construction —
-                            not two elements independently trusted to carry
-                            matching classes (which is exactly how they
-                            drifted apart the first time). No
-                            viewport-relative margin involved. */}
-                        <div className="mx-auto max-w-md">
-                          <CapabilityVisual service={service} />
-                          <ButtonLink href={service.cta.href} variant="secondary" size="md" className="mt-6">
-                            {service.cta.label}
-                          </ButtonLink>
-                        </div>
-                      </div>
-                      <div className={reverse ? "md:order-1" : undefined}>
-                        {/* Large content-area headline (D-018, item 1):
-                            D-016's H3 lived only in the visual column,
-                            beside the graphic — the content area itself
-                            (this column) had no headline at all, just the
-                            small field labels immediately above body
-                            text, which is what actually read as "no
-                            hierarchy." Same capability name already shown
-                            in the sidebar, not new copy. Three tiers now
-                            unambiguous within this one column: this
-                            headline > ServiceField's body text >
-                            ServiceField's category label. */}
-                        <Caption tone="accent">Capability {service.n}</Caption>
-                        <H3 size="lg" className="mt-2">
-                          {service.name}
-                        </H3>
-                        <div className="mt-8 grid gap-6 sm:grid-cols-2">
-                          <ServiceField label="The Challenge">{service.problem}</ServiceField>
-                          <ServiceField label="What Oragrol Does">{service.whatWeDo}</ServiceField>
-                          <ServiceField label="What You Get">{service.whatYouGet}</ServiceField>
-                          <ServiceField label="The Outcome">{service.outcome}</ServiceField>
-                        </div>
-                      </div>
-                    </div>
-                  </Reveal>
-                );
-              })}
+              {categories.map((category, i) => (
+                <Reveal key={category.code} delay={i * 0.06}>
+                  <CategoryRow category={category} index={i} />
+                </Reveal>
+              ))}
             </div>
           </div>
         </div>
       </div>
     </Section>
+  );
+}
+
+export function LiveServices() {
+  const tier1 = getServicesTier1();
+  const tier2 = getBusinessAutomationTier2();
+
+  return (
+    <>
+      <TierSection
+        environment="white"
+        eyebrow="Cybersecurity"
+        heading="Services"
+        intro={`${tier1.length} categories covering the full range of cybersecurity work.`}
+        categories={tier1}
+      />
+      <TierSection
+        environment="light-blue"
+        eyebrow="AI & Automation"
+        heading="Business Automation"
+        intro={`${tier2.length} categories using AI and automation to save time and grow revenue.`}
+        categories={tier2}
+      />
+    </>
   );
 }
