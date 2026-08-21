@@ -117,7 +117,7 @@ export function AdditionalCapabilities() {
               <Card
                 id={`capability-${service.n}`}
                 variant="surface"
-                className="flex h-full scroll-mt-28 flex-col gap-3"
+                className="flex h-full scroll-mt-[calc(var(--header-height)+2rem)] flex-col gap-3"
               >
                 <CapabilityMark service={service} />
                 <h3 className="font-heading text-base font-semibold text-text-primary">

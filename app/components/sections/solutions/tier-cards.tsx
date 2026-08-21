@@ -44,7 +44,7 @@ function TierCard({ tier, index }: { tier: SolutionTier; index: number }) {
   const visual = TIER_VISUALS[tier.name];
 
   return (
-    <Card id={tierId(index)} variant="bordered" className="flex h-full scroll-mt-28 flex-col gap-4">
+    <Card id={tierId(index)} variant="bordered" className="flex h-full scroll-mt-[calc(var(--header-height)+2rem)] flex-col gap-4">
       <div
         className={`h-1.5 ${visual.barWidthClass} rounded-full bg-accent`}
         style={{ opacity: visual.accentOpacity / 100 }}

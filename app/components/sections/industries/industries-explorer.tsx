@@ -155,9 +155,11 @@ export function IndustriesExplorer() {
       // mobile (which already did this — see the now-removed
       // `<1024` branch below). This targets the actual content a click
       // promises, independent of the clicked tab's position in an
-      // unrelated list. `scroll-mt-28` on the panel (added below in the
-      // JSX) keeps the sticky header from covering the h2 once scrolled
-      // to `block: "start"`.
+      // unrelated list. `scroll-mt-[calc(var(--header-height)+2rem)]` on
+      // the panel (added below in the JSX; was a hardcoded `scroll-mt-28`
+      // until the 2026-08-21 two-tier header redesign changed the fixed
+      // header's real height — see tokens.css's `--header-height`) keeps
+      // the header from covering the h2 once scrolled to `block: "start"`.
       const panel = document.querySelector('[role="tabpanel"]');
       const hTarget = document.getElementById(tabId(index, "horizontal"));
       console.log("[industries-debug] scroll targets resolved", {
@@ -338,7 +340,7 @@ export function IndustriesExplorer() {
             id={panelId(activeIndex)}
             aria-labelledby={tabId(activeIndex)}
             tabIndex={0}
-            className="min-w-0 scroll-mt-28"
+            className="min-w-0 scroll-mt-[calc(var(--header-height)+2rem)]"
           >
             <h2 className="font-heading text-3xl font-semibold leading-tight tracking-tight text-text-primary md:text-4xl">
               {active.name}

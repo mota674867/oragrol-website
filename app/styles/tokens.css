@@ -145,6 +145,20 @@
   --font-brand: var(--font-epilogue); /* Logo / brand only */
 }
 
+/* 5. Layout — `--header-height` is the one layout constant genuinely
+   shared across files: it's the real, total rendered height of
+   `SiteHeader`'s two-tier fixed header (36px utility bar + 80px main nav
+   row = 116px), needed anywhere content must clear it (the mobile nav
+   panel's own top offset, `scroll-mt-*` on every same-page anchor target,
+   the search overlay's dialog offset). Added 2026-08-21 alongside the
+   two-tier header redesign specifically so those consumers stay correct
+   together if the header's height ever changes again, instead of each
+   carrying its own separately-guessed pixel value (the same class of
+   untested-magic-number bug the header redesign itself was fixing). */
+:root {
+  --header-height: 116px;
+}
+
 /*
  * Spacing, radius, shadows, breakpoints: intentionally undefined here.
  * None of these were previously locked by any design decision, so this

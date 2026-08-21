@@ -89,7 +89,8 @@ export function HeaderSearch() {
             role="dialog"
             aria-modal="true"
             aria-label="Search"
-            className="relative mx-auto mt-24 w-full max-w-2xl px-6"
+            className="relative mx-auto w-full max-w-2xl px-6"
+            style={{ marginTop: "calc(var(--header-height) + 1rem)" }}
           >
             <form
               onSubmit={(event) => event.preventDefault()}

@@ -37,7 +37,9 @@ import { getTiers } from "../sections/solutions/solutions-data";
  *  - Solutions: 3 real tiers (`TierCards`) + 1 real add-on
  *    (`PentestAddon`) — real content, but NO anchor ids existed on
  *    /solutions before this change. Added `id="tier-0N"` /
- *    `id="pentest-addon"` (+ `scroll-mt-28`) directly to those existing
+ *    `id="pentest-addon"` (+ `scroll-mt-[calc(var(--header-height)+2rem)]`,
+ *    a hardcoded `scroll-mt-28` before the 2026-08-21 two-tier header
+ *    redesign) directly to those existing
  *    elements — purely structural, no visual/content change — rather than
  *    link to anchors that didn't exist. Single column (4 items): a real
  *    tier/add-on split exists, but 4 items don't need forced sub-grouping.

@@ -12,7 +12,8 @@ import { NAV_DROPDOWNS, NavItemDropdown } from "./nav-dropdown";
 
 /**
  * SiteHeader — Step 4, refined in Header Refinement Pass 1, fixed in
- * Header Fix Pass 2.
+ * Header Fix Pass 2, redesigned to a two-tier structure 2026-08-21
+ * (utility bar + main nav, Bell Business reference pattern).
  *
  * Composes the Step 3 nav primitives (NavBar shell, NavLink, MobileMenuTrigger)
  * rather than re-implementing them.
@@ -39,39 +40,58 @@ import { NAV_DROPDOWNS, NavItemDropdown } from "./nav-dropdown";
  * (see report) to keep white text at ≥4.5:1 contrast even against a
  * worst-case white background behind it — still visibly softer than the
  * old flat bg-background/95, which is what actually read as "a hard black
- * bar" (a single flat value, snapped in at just 8px of scroll).
+ * bar" (a single flat value, snapped in at just 8px of scroll). The
+ * gradient layers now span the FULL two-tier header (utility bar + main
+ * nav, both inside the same `relative` wrapper), not just the main row.
  *
  * Scoped to env-dark for now: every page that exists today (Home) opens on
  * a Dark-environment section, so this reads correctly everywhere it's
  * currently used. Once light-first pages exist, this should read the
  * entry section's environment instead of assuming Dark.
  *
- * Search is implemented (brief section 6 always specified it) — see
- * header-search.tsx. Live AI Chat remains out of scope: it's its own later
- * build phase per the Implementation Sequence, and this header still
- * doesn't render a non-functional placeholder for it. EN | FR stays a
- * static label (info-architecture presence per the brief) since full
- * locale routing isn't built yet.
+ * Two-tier redesign (2026-08-21): a thin utility bar now sits above the
+ * main nav row — currently just "EN | FR" (moved here from the main row,
+ * where it and the mobile panel each carried their own separate copy —
+ * now there's exactly one, always visible, right-aligned, still the same
+ * static/decorative label since full locale routing isn't built yet). The
+ * `justify-between` layout with a placeholder on the left leaves genuine
+ * room for a future item (a "Blog" link or a "Login" link were both named
+ * as candidates) without another redesign. "Cyber Health" is no longer a
+ * standalone main-nav link — it was a plain `NavLink` pointing at the
+ * exact same `/cyber-health` the CTA button already goes to, a real
+ * redundant duplicate, not a distinct destination. The main-row CTA's
+ * label is now "Get Score" on desktop (the mobile panel's own CTA instance
+ * is untouched — still the full "Get Your Cyber Health Score", where a
+ * full-width button has the room for it).
+ *
+ * Adaptive nav (2026-08-21, root-cause fix for the nav/logo overlap bug):
+ * `NavBar` now decides, via live measurement (see nav.tsx), whether the
+ * nav-links+CTA cluster fits the row — not a guessed Tailwind breakpoint.
+ * See nav.tsx's own doc comment for the full reasoning. `desktopContent`
+ * below is that measured cluster; `HeaderSearch` is `persistentActions`
+ * (always visible, on either side of the fits/doesn't-fit boundary);
+ * `MobileMenuTrigger` is `collapsedContent`. The mobile trigger and mobile
+ * panel are both gated by the SAME `fitsDesktop`-derived state now — there
+ * is no second `lg:hidden`/`lg:flex` pair left to independently drift out
+ * of sync with it.
  *
  * Nav dropdowns (D-053 Services, D-055 Solutions/Industries/Resources): a
  * `NAV_LINKS` entry whose href has a matching `NAV_DROPDOWNS[href]` config
  * renders as `NavItemDropdown` instead of a plain `NavLink`, both here and
  * in the mobile panel below — see nav-dropdown.tsx for the shared
- * component and each config's real-content provenance. Cyber Health and
- * Company stay plain `NavLink`s: both are a single narrative flow with no
- * independently navigable sub-content (confirmed by reading their section
- * files — no ids anywhere), not an oversight.
+ * component and each config's real-content provenance. Company stays a
+ * plain `NavLink`: a single narrative flow with no independently
+ * navigable sub-content (confirmed by reading its section files — no ids
+ * anywhere), not an oversight.
  */
 
-// "Business Automation" added 2026-08-20 (nav split — see DECISIONS.md):
-// a 7th top-level item makes D-054's already-flagged 1024px nav-cramping
-// (labels/CTA/EN|FR wrapping at that exact breakpoint) somewhat worse —
-// flagged, not fixed here; out of scope for this task.
+// "Cyber Health" removed 2026-08-21 — see the two-tier redesign note
+// above: it was a redundant standalone link to the same page the CTA
+// button already goes to.
 const NAV_LINKS = [
   { label: "Services", href: "/services" },
   { label: "Business Automation", href: "/business-automation" },
   { label: "Solutions", href: "/solutions" },
-  { label: "Cyber Health", href: "/cyber-health" },
   { label: "Industries", href: "/industries" },
   { label: "Resources", href: "/resources" },
   { label: "Company", href: "/company" },
@@ -118,11 +138,22 @@ export function SiteHeader() {
     };
   }, [mobileOpen]);
 
+  const navLinks = NAV_LINKS.map((link) => {
+    const dropdown = NAV_DROPDOWNS[link.href];
+    return dropdown ? (
+      <NavItemDropdown key={link.href} config={dropdown} variant="desktop" active={pathname === link.href} />
+    ) : (
+      <NavLink key={link.href} href={link.href} active={pathname === link.href}>
+        {link.label}
+      </NavLink>
+    );
+  });
+
   return (
     <div className="env-dark fixed inset-x-0 top-0 z-50 text-text-primary">
       <div className="relative">
         {/* Base layer — permanent, subtle, blends the header into the Hero
-            even before any scroll. */}
+            even before any scroll. Spans the whole two-tier header. */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/30 to-transparent"
@@ -135,59 +166,54 @@ export function SiteHeader() {
           className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/90 via-background/82 to-background/72 backdrop-blur-sm"
         />
 
+        {/*
+          Top utility bar — thin, full-width, above the main nav row. Just
+          EN | FR for now (moved here from the main row and the mobile
+          panel, where it existed as two separate always-visible copies —
+          now exactly one). `justify-between` with an empty placeholder on
+          the left leaves real room for a future item (a "Blog" or "Login"
+          link were both named as candidates) without needing another
+          layout pass — it's a flex row, not a hardcoded single-child one.
+          Always visible (not gated by the main row's fits/doesn't-fit
+          state) — "EN | FR" alone is short, fixed text that was never at
+          risk of the crowding problem the main row had.
+        */}
+        <div className="relative z-10 border-b border-border/60">
+          <div className="flex h-9 items-center justify-between px-6 md:px-12">
+            <div aria-hidden="true" />
+            <div className="flex items-center gap-6">
+              <span className="font-body text-xs text-text-secondary" aria-hidden="true">
+                EN&nbsp;|&nbsp;FR
+              </span>
+            </div>
+          </div>
+        </div>
+
         <NavBar
-          breakpoint="lg"
           className="relative z-10 border-b border-border"
           logo={
             <Link href="/" className="rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
               <OragrolLogo height={36} />
             </Link>
           }
-          links={NAV_LINKS.map((link) => {
-            const dropdown = NAV_DROPDOWNS[link.href];
-            return dropdown ? (
-              <NavItemDropdown
-                key={link.href}
-                config={dropdown}
-                variant="desktop"
-                active={pathname === link.href}
-              />
-            ) : (
-              <NavLink key={link.href} href={link.href} active={pathname === link.href}>
-                {link.label}
-              </NavLink>
-            );
-          })}
-          actions={
+          desktopContent={
             <>
-              <HeaderSearch />
-              {/*
-                Wrapper divs, not `hidden <bp>:inline-flex` directly on
-                ButtonLink: ButtonLink's own base classes hard-code
-                `inline-flex`, and since Tailwind's generated CSS order isn't
-                guaranteed to follow className string order (see cn.ts),
-                that `hidden` can lose to the component's own `inline-flex`
-                at every width — confirmed live at the 390px mobile check
-                during Step 4 verification, where the CTA stayed visible
-                when it should've been hidden. A plain wrapper with no
-                competing base `display` class sidesteps the issue entirely.
-              */}
-              <div className="hidden items-center gap-4 lg:flex">
-                <span className="font-body text-sm text-text-secondary" aria-hidden="true">
-                  EN&nbsp;|&nbsp;FR
-                </span>
-                <ButtonLink variant="primary" size="sm" href="/cyber-health">
-                  Get Your Cyber Health Score
-                </ButtonLink>
-              </div>
-              <MobileMenuTrigger
-                isOpen={mobileOpen}
-                onClick={() => setMobileOpen((open) => !open)}
-                aria-controls="mobile-nav-panel"
-                className="lg:hidden"
-              />
+              <nav aria-label="Primary" className="flex items-center gap-8">
+                {navLinks}
+              </nav>
+              <ButtonLink variant="primary" size="sm" href="/cyber-health">
+                Get Score
+              </ButtonLink>
             </>
           }
+          collapsedContent={
+            <MobileMenuTrigger
+              isOpen={mobileOpen}
+              onClick={() => setMobileOpen((open) => !open)}
+              aria-controls="mobile-nav-panel"
+            />
+          }
+          persistentActions={<HeaderSearch />}
         />
       </div>
 
@@ -198,18 +224,29 @@ export function SiteHeader() {
         (including a second "Get Your Cyber Health Score" button) bleeding
         in underneath its own bottom edge — two instances of the same CTA
         visible on screen at once. Fixed by making it a real full-viewport
-        overlay instead: `fixed` from the header's own bottom edge (`top-20`
-        matches NavBar's `h-20`) to the bottom of the viewport, opaque
-        `bg-background`, so nothing behind it can show through regardless of
-        how tall its own content is. `overflow-y-auto` covers the case where
-        a future longer link list doesn't fit a short mobile viewport.
+        overlay instead: `fixed` from the header's own bottom edge to the
+        bottom of the viewport, opaque `bg-background`, so nothing behind it
+        can show through regardless of how tall its own content is.
+        `overflow-y-auto` covers the case where a future longer link list
+        doesn't fit a short mobile viewport.
+
+        Top offset (2026-08-21): now `--header-height` (116px, the real
+        two-tier header's total height — see tokens.css) instead of a
+        hardcoded `top-20` that only matched the old single-row header.
+        No `lg:hidden` anymore either — this panel's own visibility is
+        fully driven by `mobileOpen`, which can only become true by
+        clicking `MobileMenuTrigger`, and that trigger only exists in the
+        DOM when `NavBar`'s own live measurement decided the desktop
+        cluster doesn't fit. There's no longer a second, independent
+        breakpoint here that could disagree with that decision.
       */}
       <div
         id="mobile-nav-panel"
         className={cn(
-          "fixed inset-x-0 top-20 bottom-0 overflow-y-auto bg-background transition-opacity duration-200 lg:hidden",
+          "fixed inset-x-0 bottom-0 overflow-y-auto bg-background transition-opacity duration-200",
           mobileOpen ? "opacity-100" : "pointer-events-none opacity-0",
         )}
+        style={{ top: "var(--header-height)" }}
         aria-hidden={!mobileOpen}
         inert={!mobileOpen}
       >
@@ -237,7 +274,6 @@ export function SiteHeader() {
           <ButtonLink variant="primary" size="md" href="/cyber-health" className="mt-3 w-full">
             Get Your Cyber Health Score
           </ButtonLink>
-          <span className="mt-3 font-body text-sm text-text-secondary">EN | FR</span>
         </nav>
       </div>
     </div>

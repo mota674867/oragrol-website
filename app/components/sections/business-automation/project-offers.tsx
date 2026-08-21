@@ -78,7 +78,7 @@ export function ProjectOffers() {
 
   return (
     <Section environment="white">
-      <Container id="packages" size="lg" className="scroll-mt-28 py-24 md:py-32">
+      <Container id="packages" size="lg" className="scroll-mt-[calc(var(--header-height)+2rem)] py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">How it starts</Caption>
         </Reveal>

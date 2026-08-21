@@ -46,7 +46,7 @@ function CategoryRow({
   return (
     <div
       id={`category-${category.code.toLowerCase()}`}
-      className="grid scroll-mt-28 gap-8 py-14 md:grid-cols-[0.9fr_1.1fr] md:items-start md:gap-16"
+      className="grid scroll-mt-[calc(var(--header-height)+2rem)] gap-8 py-14 md:grid-cols-[0.9fr_1.1fr] md:items-start md:gap-16"
     >
       <div className={reverse ? "md:order-2" : undefined}>
         <div className="mx-auto max-w-md">

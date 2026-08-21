@@ -1,4 +1,7 @@
+"use client";
+
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { cn } from "./cn";
 import { Icon } from "./icon-wrapper";
@@ -7,43 +10,96 @@ import { Icon } from "./icon-wrapper";
  * Navigation primitives — Step 3 (shell only; final nav content is out of
  * scope for this step). NavLink lives in link.tsx and is reused here — see
  * that file for its underline/accent hover behavior.
+ *
+ * Redesign, 2026-08-21: `NavBar` used to pick a single Tailwind breakpoint
+ * (`breakpoint="lg"`, i.e. 1024px) below which `links` disappeared and the
+ * mobile trigger took over — a guess about how much horizontal room 6+ nav
+ * items, a search icon, and a CTA button actually need, never verified
+ * against their real rendered width. That guess is exactly what caused the
+ * nav to overlap the logo: `SiteHeader`'s own comment (before this pass)
+ * already flagged "labels/CTA/EN|FR wrapping" right at that breakpoint once
+ * a 7th nav item was added — a symptom of an untested boundary, not a
+ * one-off bug at one specific width. Patching the breakpoint number would
+ * only move the same failure to a different, still-untested width.
+ *
+ * Root-cause fix: `NavBar` now measures. `desktopContent`'s true, unwrapped
+ * width is read live from a hidden clone (same node, rendered twice — see
+ * below) via `ResizeObserver`, and compared against the row's real
+ * available width (also measured, not assumed) every time either changes.
+ * `desktopContent` renders only when it actually fits; `collapsedContent`
+ * (the mobile trigger) renders the instant it doesn't — at ANY width, not
+ * just the ones anyone happened to test. There is no longer a second place
+ * (a matching `lg:hidden`/`lg:flex` pair) that has to independently agree
+ * with this decision — SiteHeader's mobile trigger and mobile panel are now
+ * both driven by this same one boolean.
  */
 
-export type NavBreakpoint = "md" | "lg";
-
-const linksVisibleAt: Record<NavBreakpoint, string> = {
-  md: "md:flex",
-  lg: "lg:flex",
-};
-
 export interface NavBarProps {
-  /** Logo / wordmark slot. */
+  /** Logo / wordmark slot — always rendered, never collapses. */
   logo: ReactNode;
-  /** Desktop nav links — hidden below `breakpoint`. */
-  links?: ReactNode;
-  /** Trailing actions (CTA button, mobile menu trigger, etc.). */
-  actions?: ReactNode;
-  className?: string;
   /**
-   * Breakpoint at which `links` switches from hidden to visible. Defaults
-   * to "md"; use "lg" when the nav has enough items/label length that it
-   * gets cramped at the md range (see SiteHeader, which needs this — 6 nav
-   * items + a long CTA don't fit at 768px).
+   * The full desktop nav cluster (links + CTA, typically) — rendered only
+   * when it actually fits the available row width. Rendered a second time,
+   * invisibly, purely to measure its natural width (see the component body)
+   * — the exact same node both times, so there is no risk of the measured
+   * copy silently drifting out of sync with what's actually shown.
    */
-  breakpoint?: NavBreakpoint;
+  desktopContent: ReactNode;
+  /** Rendered instead of `desktopContent` once it stops fitting — typically a `MobileMenuTrigger`. */
+  collapsedContent: ReactNode;
+  /** Always-visible trailing content that sits between `desktopContent`/`collapsedContent` and the row's edge (e.g. a search icon) — its own rendered width is measured too, not guessed. */
+  persistentActions?: ReactNode;
+  className?: string;
 }
 
-export function NavBar({ logo, links, actions, className, breakpoint = "md" }: NavBarProps) {
-  // No default `bg-background`/`border-*` here — a caller needing a plain
-  // opaque bar can pass those via `className`. Baking in `bg-background` by
-  // default previously fought a caller's own background-image (gradient)
-  // override at the CSS-property level: bg-background sets
-  // `background-color`, a gradient sets `background-image`, so both could
-  // apply simultaneously with the color showing through the gradient's
-  // transparent stops instead of true see-through — confirmed while
-  // debugging Header Fix Pass 2. Leaving background fully caller-owned
-  // avoids that class of bug outright instead of relying on Tailwind's
-  // generated-CSS order (see cn.ts).
+export function NavBar({ logo, desktopContent, collapsedContent, persistentActions, className }: NavBarProps) {
+  const rowRef = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
+  const persistentRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLDivElement>(null);
+
+  // Optimistic default (assume it fits) so a typical desktop load doesn't
+  // flash a hamburger for one frame — corrected before paint on the client
+  // by the layout effect below (useLayoutEffect runs synchronously after
+  // DOM mutations, before the browser paints, which is exactly what avoids
+  // a visible flicker here). On a genuinely narrow device the very first
+  // server-rendered paint may briefly show the desktop cluster before
+  // hydration — the same tradeoff every JS-measured responsive component
+  // makes; a CSS media query default can't replace this without
+  // reintroducing the exact untested-guess problem this exists to fix.
+  const [fitsDesktop, setFitsDesktop] = useState(true);
+
+  useLayoutEffect(() => {
+    const row = rowRef.current;
+    const logoEl = logoRef.current;
+    const persistentEl = persistentRef.current;
+    const measureEl = measureRef.current;
+    if (!row || !logoEl || !measureEl) return;
+
+    function check() {
+      // GAP_BUFFER covers the two `gap-4` flex gaps around the
+      // desktop/collapsed slot (logo↔cluster, cluster↔persistentActions) —
+      // a known, deterministic value derived from the gap classes actually
+      // used below (16px × 2 = 32px), not a guessed content-fit number.
+      const GAP_BUFFER = 40;
+      const persistentWidth = persistentEl?.offsetWidth ?? 0;
+      const available = row!.clientWidth - logoEl!.offsetWidth - persistentWidth - GAP_BUFFER;
+      const needed = measureEl!.scrollWidth;
+      setFitsDesktop(needed <= available);
+    }
+
+    check();
+    // Re-check on any change to the row's available width (viewport
+    // resize, zoom, sidebar/devtools opening) AND on any change to the
+    // cluster's own natural width (e.g. a web font finishing load and
+    // reflowing text at different metrics than its fallback).
+    const ro = new ResizeObserver(check);
+    ro.observe(row);
+    ro.observe(measureEl);
+    if (persistentEl) ro.observe(persistentEl);
+    return () => ro.disconnect();
+  }, []);
+
   return (
     <header className={cn("w-full", className)}>
       {/*
@@ -61,14 +117,39 @@ export function NavBar({ logo, links, actions, className, breakpoint = "md" }: N
         width, matching the Hero's own edge-to-edge behavior instead of
         fighting it.
       */}
-      <div className="flex h-20 w-full items-center justify-between px-6 md:px-12">
-        <div className="flex items-center">{logo}</div>
-        {links && (
-          <nav className={cn("hidden items-center gap-10", linksVisibleAt[breakpoint])} aria-label="Primary">
-            {links}
-          </nav>
-        )}
-        {actions && <div className="flex items-center gap-4">{actions}</div>}
+      <div ref={rowRef} className="flex h-20 w-full items-center justify-between px-6 md:px-12">
+        <div ref={logoRef} className="flex shrink-0 items-center">
+          {logo}
+        </div>
+
+        {/*
+          Hidden measurement clone — the exact same `desktopContent` node,
+          not a hand-copied approximation, so it can never visually drift
+          from what's actually shown. `visibility:hidden` (not
+          `display:none`, which reports zero size) keeps it fully
+          measurable while removing it from layout flow, hit-testing, and
+          tab order; `aria-hidden` + `pointer-events-none` are redundant
+          belt-and-suspenders on top of that. `w-max` forces it to lay out
+          at its natural, unwrapped size regardless of any inherited width
+          constraint from `absolute` positioning.
+        */}
+        <div
+          ref={measureRef}
+          aria-hidden="true"
+          data-nav-measure-clone="true"
+          className="pointer-events-none invisible absolute left-0 top-0 flex w-max items-center gap-8"
+        >
+          {desktopContent}
+        </div>
+
+        <div className="flex items-center gap-4">
+          {fitsDesktop ? desktopContent : collapsedContent}
+          {persistentActions && (
+            <div ref={persistentRef} className="flex shrink-0 items-center">
+              {persistentActions}
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
@@ -82,10 +163,8 @@ export interface MobileMenuTriggerProps
 
 /**
  * Hamburger/close trigger only — the menu panel itself is out of scope.
- * No breakpoint is baked in here: at which width this disappears is a
- * layout decision for whatever header/nav renders it (pair with a
- * matching `hidden <bp>:flex` on the desktop nav cluster), not something
- * this component should assume.
+ * No breakpoint is baked in here — `NavBar` above decides, by measurement,
+ * when this renders at all; this component doesn't need to know why.
  */
 export function MobileMenuTrigger({
   isOpen = false,
