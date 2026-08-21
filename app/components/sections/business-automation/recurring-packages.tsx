@@ -33,6 +33,27 @@ import {
  * documented caution in `cn.ts` against stacking two classes that target
  * the same CSS property with plain concatenation (no tailwind-merge here).
  *
+ * Bug fix (2026-08-21): the featured card's own `ring` visually read as
+ * crossing straight through the "Recommended" badge's own text. Not a
+ * paint-order/z-index bug — `overflow` was `visible` everywhere up the
+ * ancestor chain and the badge was already the topmost element at its own
+ * DOM position by every computed-style/hit-test check (confirmed before
+ * touching anything: `isolate` + explicit `z-index` on the badge, the
+ * standard fix for that class of bug, changed nothing, which is itself
+ * the evidence it wasn't the cause). Root cause, confirmed empirically by
+ * forcing an opaque background inline and watching the "crossing" line
+ * disappear: the shared `Badge` component's "accent" tone is a
+ * *translucent* `bg-accent/10` fill (10% opacity), designed for inline
+ * labels next to body text — reused here for a "ribbon" straddling the
+ * card's own border, the ring underneath was simply showing through the
+ * badge's own see-through background, not painting on top of it. Fixed by
+ * rendering this one badge as a plain opaque pill (`bg-accent-strong
+ * text-white`, the same accessible white-on-accent pairing `Button`'s
+ * `primary` variant already uses per D-010) instead of routing it through
+ * `Badge`'s translucent "accent" tone — not a `Badge` prop, since `Badge`
+ * has no opaque-tone variant and inventing one for a single call site
+ * isn't worth widening its API.
+ *
  * Enterprise/Custom's calculated `monthly_price`/`annual_price` are never
  * rendered — its `display_note` (checked via `hasContactUsPricing`, not a
  * name match) swaps the price block for "Contact us" + a `/contact` CTA,
@@ -91,9 +112,9 @@ function TierCard({ tier }: { tier: RecurringPackage }) {
       }
     >
       {tier.featured && (
-        <Badge tone="accent" className="absolute -top-3 right-6">
+        <span className="absolute -top-3 right-6 z-10 inline-flex items-center rounded-full bg-accent-strong px-2.5 py-1 font-body text-xs font-medium uppercase tracking-wide text-white">
           Recommended
-        </Badge>
+        </span>
       )}
 
       <div
