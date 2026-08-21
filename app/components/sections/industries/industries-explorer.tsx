@@ -124,13 +124,48 @@ export function IndustriesExplorer() {
       console.log("[industries-debug] applySelection", { source, index, name: INDUSTRIES[index]?.name });
       setActiveIndex(index);
       const behavior = reduceMotion ? "auto" : "smooth";
-      document.getElementById(tabId(index, "vertical"))?.scrollIntoView({ behavior, block: "center" });
-      document.getElementById(tabId(index, "horizontal"))?.scrollIntoView({ behavior, block: "nearest", inline: "center" });
+      const vTarget = document.getElementById(tabId(index, "vertical"));
+      const hTarget = document.getElementById(tabId(index, "horizontal"));
+      console.log("[industries-debug] scroll targets resolved", {
+        index,
+        vId: tabId(index, "vertical"),
+        vFound: !!vTarget,
+        vRectTop: vTarget?.getBoundingClientRect().top,
+        hId: tabId(index, "horizontal"),
+        hFound: !!hTarget,
+        hRectTop: hTarget?.getBoundingClientRect().top,
+        scrollYBefore: window.scrollY,
+        innerWidth: window.innerWidth,
+      });
+      vTarget?.scrollIntoView({ behavior, block: "center" });
+      hTarget?.scrollIntoView({ behavior, block: "nearest", inline: "center" });
       if (window.innerWidth < 1024) {
         requestAnimationFrame(() => {
-          document.querySelector('[role="tabpanel"]')?.scrollIntoView({ behavior, block: "start" });
+          const panel = document.querySelector('[role="tabpanel"]');
+          console.log("[industries-debug] mobile panel scroll", {
+            index,
+            panelFound: !!panel,
+            panelRectTop: panel?.getBoundingClientRect().top,
+            scrollYBefore: window.scrollY,
+          });
+          panel?.scrollIntoView({ behavior, block: "start" });
         });
       }
+      // Trace the ACTUAL resting scroll position + rendered h2/active-tab
+      // state at several points after the call, to catch anything that
+      // re-scrolls or re-renders differently afterward (e.g. a competing
+      // scroll, or activeIndex getting overwritten by something else).
+      [0, 100, 300, 800].forEach((delay) => {
+        setTimeout(() => {
+          console.log("[industries-debug] settle check", {
+            delay,
+            index,
+            scrollY: window.scrollY,
+            h2: document.querySelector("h2")?.textContent,
+            selectedTabId: document.querySelector('[role="tab"][aria-selected="true"]')?.id,
+          });
+        }, delay);
+      });
     }
 
     function selectFromHash() {
