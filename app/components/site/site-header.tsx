@@ -60,9 +60,12 @@ import { NAV_DROPDOWNS, NavItemDropdown } from "./nav-dropdown";
  * standalone main-nav link — it was a plain `NavLink` pointing at the
  * exact same `/cyber-health` the CTA button already goes to, a real
  * redundant duplicate, not a distinct destination. The main-row CTA's
- * label is now "Get Score" on desktop (the mobile panel's own CTA instance
- * is untouched — still the full "Get Your Cyber Health Score", where a
- * full-width button has the room for it).
+ * label is now "Get Cyber Score" on desktop — short, but keeps "Cyber" so
+ * it still reads as a specific thing being scored rather than a generic
+ * leaderboard-style "Get Score" (the initial ship of this redesign used
+ * that shorter label; flagged as ambiguous and fixed same-day). The
+ * mobile panel's own CTA instance is untouched — still the full "Get
+ * Your Cyber Health Score", where a full-width button has the room.
  *
  * Adaptive nav (2026-08-21, root-cause fix for the nav/logo overlap bug):
  * `NavBar` now decides, via live measurement (see nav.tsx), whether the
@@ -202,7 +205,7 @@ export function SiteHeader() {
                 {navLinks}
               </nav>
               <ButtonLink variant="primary" size="sm" href="/cyber-health">
-                Get Score
+                Get Cyber Score
               </ButtonLink>
             </>
           }

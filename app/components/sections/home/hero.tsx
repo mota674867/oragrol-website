@@ -36,8 +36,27 @@ export function Hero() {
     <div className="env-dark relative h-[100svh] w-full overflow-hidden bg-background">
       <PerimeterRing />
 
-      {/* Foreground content — unchanged copy/CTAs */}
-      <Container size="xl" className="relative z-10 flex h-full flex-col justify-center">
+      {/*
+        Foreground content — unchanged copy/CTAs. `pt-[var(--header-height)]`
+        added 2026-08-21 (regression fix, same day as the two-tier header
+        that caused it): this section is `h-[100svh]` with the content
+        flex-centered (`justify-center`) inside it — the old `pt-16 md:pt-8`
+        on the inner block is relative breathing room within wherever
+        centering lands the content, not an absolute floor. On a SHORTER
+        viewport (real 14-inch laptops commonly run ~768-900px tall, not
+        just narrower — this was missed in the original verification pass,
+        which tested every width but only ever at a generously tall fixed
+        900px height), centered content sits close enough to the top that
+        it rendered UNDER the header once the header grew from 80px to
+        116px — a real, reported overlap, not just a close call. Reserving
+        `--header-height` as this Container's own top padding shrinks the
+        box `justify-center` actually centers within, so the centered
+        content's effective top can never be less than the header's real
+        height, at any viewport height, not just the ones tested. Verified
+        with Playwright at realistic short-viewport dimensions (1366×768,
+        1440×900), not just the tall 900px height used before.
+      */}
+      <Container size="xl" className="relative z-10 flex h-full flex-col justify-center pt-[var(--header-height)]">
         <div className="max-w-xl pt-16 md:pt-8">
           <Caption tone="accent">Cybersecurity for modern businesses</Caption>
           <H1 size="xl" className="mt-4">

@@ -103,24 +103,41 @@ export function NavBar({ logo, desktopContent, collapsedContent, persistentActio
   return (
     <header className={cn("w-full", className)}>
       {/*
-        No max-width here at all (Header Fix Pass 2 tried max-w-[1920px],
-        which was still a finite cap and broke the same way at 2560px that
-        max-w-7xl/1280px had at 1440/1920px — confirmed by measuring the
-        logo's x-position, which jumped from a consistent 48px at
-        1366/1920px to 368px at 2560px once the cap engaged and centered
-        the content). The Hero this header sits over is genuinely
-        full-bleed at every width tested (its <img> measures edge-to-edge
-        at 1366/1920/2560px, no cap of its own) — so the header needs the
-        same property, not a larger finite cap that just moves the
-        breakpoint where it fails. `px-6 md:px-12` alone keeps the logo and
-        actions pinned to a constant distance from the viewport edge at any
-        width, matching the Hero's own edge-to-edge behavior instead of
-        fighting it.
+        The header BAR itself (this <header>'s own background/border,
+        supplied by the caller via `className`) still has no max-width —
+        unchanged from D-001 (Header Fix Pass 2): it needs to stay
+        genuinely full-bleed, matching the Hero's own edge-to-edge image,
+        or the header reads as a mismatched box floating on top of it.
+
+        The ROW'S CONTENT is different — reported 2026-08-21 (same day as
+        the two-tier redesign) as an "awkward empty gap" at 24"+/1920px+
+        monitors: logo pinned to the true left edge, the nav+CTA cluster
+        pinned to the true right edge, `justify-between` filling
+        whatever's left in between with dead space that grows without
+        bound as the viewport widens — visually broken in the opposite
+        direction from the original overlap bug, but the same root cause
+        (a layout rule that was never checked against how it looks at the
+        width where it actually gets used). Wrapped the row in a
+        `max-w-[1440px]` `mx-auto` container — 1440px because it's not a
+        new number: it's `Container`'s own existing `xl` tier (D-015/016),
+        the same width Home's Hero/Cyber Health's Flow/the footer already
+        use for their own content, so the nav row now lines up with the
+        same content column those sections already establish instead of
+        inventing an unrelated cap. Below 1440px this changes nothing —
+        the wrapper's own width simply equals the viewport's, identical to
+        the unwrapped behavior already verified across 1024-1920px. Above
+        it, logo/cluster move inward together (still `justify-between`
+        against each other, just within the capped box) rather than
+        D-001's finite-cap attempts, which centered the WHOLE header
+        (background included) and broke the "matches the full-bleed Hero"
+        requirement that decision existed to protect — this cap only ever
+        touches the row's own children, never the `<header>`'s background.
       */}
-      <div ref={rowRef} className="flex h-20 w-full items-center justify-between px-6 md:px-12">
-        <div ref={logoRef} className="flex shrink-0 items-center">
-          {logo}
-        </div>
+      <div className="mx-auto w-full max-w-[1440px]">
+        <div ref={rowRef} className="flex h-20 w-full items-center justify-between px-6 md:px-12">
+          <div ref={logoRef} className="flex shrink-0 items-center">
+            {logo}
+          </div>
 
         {/*
           Hidden measurement clone — the exact same `desktopContent` node,
@@ -133,22 +150,23 @@ export function NavBar({ logo, desktopContent, collapsedContent, persistentActio
           at its natural, unwrapped size regardless of any inherited width
           constraint from `absolute` positioning.
         */}
-        <div
-          ref={measureRef}
-          aria-hidden="true"
-          data-nav-measure-clone="true"
-          className="pointer-events-none invisible absolute left-0 top-0 flex w-max items-center gap-8"
-        >
-          {desktopContent}
-        </div>
+          <div
+            ref={measureRef}
+            aria-hidden="true"
+            data-nav-measure-clone="true"
+            className="pointer-events-none invisible absolute left-0 top-0 flex w-max items-center gap-8"
+          >
+            {desktopContent}
+          </div>
 
-        <div className="flex items-center gap-4">
-          {fitsDesktop ? desktopContent : collapsedContent}
-          {persistentActions && (
-            <div ref={persistentRef} className="flex shrink-0 items-center">
-              {persistentActions}
-            </div>
-          )}
+          <div className="flex items-center gap-4">
+            {fitsDesktop ? desktopContent : collapsedContent}
+            {persistentActions && (
+              <div ref={persistentRef} className="flex shrink-0 items-center">
+                {persistentActions}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>
