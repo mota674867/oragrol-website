@@ -116,7 +116,12 @@ export function IndustriesExplorer() {
       return INDUSTRIES.findIndex((industry) => slugifyIndustryName(industry.name) === slug);
     }
 
-    function applySelection(index: number) {
+    function applySelection(index: number, source: string) {
+      // TEMPORARY diagnostic logging (2026-08-21) — trace exactly which
+      // index gets applied and from which code path, per explicit
+      // instruction to verify with runtime tracing rather than static
+      // review or automated assertions alone. Remove once resolved.
+      console.log("[industries-debug] applySelection", { source, index, name: INDUSTRIES[index]?.name });
       setActiveIndex(index);
       const behavior = reduceMotion ? "auto" : "smooth";
       document.getElementById(tabId(index, "vertical"))?.scrollIntoView({ behavior, block: "center" });
@@ -130,25 +135,33 @@ export function IndustriesExplorer() {
 
     function selectFromHash() {
       const slug = window.location.hash.replace(/^#industry-/, "");
+      console.log("[industries-debug] selectFromHash", { hash: window.location.hash, slug });
       if (!slug) return;
       const index = slugToIndex(slug);
       if (index === -1) return;
-      applySelection(index);
+      applySelection(index, "hashchange-or-mount");
     }
 
     function onDocumentClickCapture(event: MouseEvent) {
       const anchor = (event.target as HTMLElement | null)?.closest?.("a");
       const href = anchor?.getAttribute("href");
+      console.log("[industries-debug] click captured", {
+        targetTag: (event.target as HTMLElement | null)?.tagName,
+        foundAnchor: !!anchor,
+        href,
+      });
       if (!href) return;
       const hashPos = href.indexOf("#industry-");
       if (hashPos === -1) return;
       const path = href.slice(0, hashPos);
       if (path && path !== window.location.pathname) return;
-      const index = slugToIndex(href.slice(hashPos + "#industry-".length));
+      const slug = href.slice(hashPos + "#industry-".length);
+      const index = slugToIndex(slug);
+      console.log("[industries-debug] click resolved", { href, slug, index, name: INDUSTRIES[index]?.name });
       if (index === -1) return;
       // Deferred one frame: let the click's own default navigation run
       // first (Next.js updates the URL/hash), so this doesn't race it.
-      requestAnimationFrame(() => applySelection(index));
+      requestAnimationFrame(() => applySelection(index, "click-capture"));
     }
 
     selectFromHash();

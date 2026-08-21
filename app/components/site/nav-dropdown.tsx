@@ -263,6 +263,7 @@ export function NavItemDropdown({
   const flatItems = config.columns.flatMap((column) => column.items);
 
   const cancelScheduledClose = () => {
+    console.log("[navdrop-debug] cancelScheduledClose", { label: config.label, hadPending: !!closeTimeoutRef.current, t: Date.now() });
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = null;
@@ -270,8 +271,12 @@ export function NavItemDropdown({
   };
 
   const scheduleClose = () => {
+    console.log("[navdrop-debug] scheduleClose armed", { label: config.label, t: Date.now() });
     cancelScheduledClose();
-    closeTimeoutRef.current = setTimeout(() => setOpen(false), CLOSE_DELAY_MS);
+    closeTimeoutRef.current = setTimeout(() => {
+      console.log("[navdrop-debug] scheduleClose FIRED (closing)", { label: config.label, t: Date.now() });
+      setOpen(false);
+    }, CLOSE_DELAY_MS);
   };
 
   // Route change (different page) closes the panel — adjusted during render
@@ -287,6 +292,10 @@ export function NavItemDropdown({
 
   // Unmount safety — don't fire setOpen after the component's gone.
   useEffect(() => cancelScheduledClose, []);
+
+  useEffect(() => {
+    console.log("[navdrop-debug] open state changed", { label: config.label, open, t: Date.now() });
+  }, [open, config.label]);
 
   // Outside click closes it, regardless of how it was opened.
   //
@@ -314,13 +323,21 @@ export function NavItemDropdown({
   useEffect(() => {
     if (!open) return;
     const onClick = (event: MouseEvent) => {
+      const inside = containerRef.current?.contains(event.target as Node);
+      console.log("[navdrop-debug] outside-click listener fired", {
+        label: config.label,
+        inside,
+        targetTag: (event.target as HTMLElement)?.tagName,
+        targetHref: (event.target as HTMLElement)?.closest?.("a")?.getAttribute("href"),
+        t: Date.now(),
+      });
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setOpen(false);
       }
     };
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
-  }, [open]);
+  }, [open, config.label]);
 
   // Escape closes and returns focus to the trigger, from anywhere (covers
   // hover-opened state too, not just keyboard-focused state).
@@ -355,7 +372,10 @@ export function NavItemDropdown({
     }
   };
 
-  const closePanel = () => setOpen(false);
+  const closePanel = () => {
+    console.log("[navdrop-debug] item Link onClick -> closePanel", { label: config.label, t: Date.now() });
+    setOpen(false);
+  };
 
   // Shared across both variants: assigns each item link a stable index into
   // the flattened list (for itemRefs / roving arrow-key focus) as the
@@ -494,10 +514,14 @@ export function NavItemDropdown({
       ref={containerRef}
       className={cn("relative", className)}
       onMouseEnter={() => {
+        console.log("[navdrop-debug] container onMouseEnter", { label: config.label, t: Date.now() });
         cancelScheduledClose();
         setOpen(true);
       }}
-      onMouseLeave={scheduleClose}
+      onMouseLeave={() => {
+        console.log("[navdrop-debug] container onMouseLeave", { label: config.label, t: Date.now() });
+        scheduleClose();
+      }}
       // Hardening for a reported bug ("clicking an Industries item closes
       // the dropdown but doesn't navigate"): `cancelScheduledClose()` was
       // previously only wired to `onMouseEnter`, so a `scheduleClose()`
