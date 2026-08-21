@@ -439,6 +439,11 @@ export function NavItemDropdown({
                         }}
                         href={item.href}
                         onClick={closePanel}
+                        // See the matching comment on the other item `<Link>`
+                        // below (mobile-accordion variant) for why this is
+                        // disabled specifically for Industries' own hash
+                        // links.
+                        scroll={!item.href.includes("#industry-")}
                         className={itemLinkClasses}
                       >
                         {item.label}
@@ -472,6 +477,46 @@ export function NavItemDropdown({
                         }}
                         href={item.href}
                         onClick={closePanel}
+                        // REAL ROOT CAUSE #3, found 2026-08-21 (the one that
+                        // actually explained Mohammad's evidence — settle
+                        // checks agreeing at a WRONG, steady value): traced
+                        // with a Playwright rAF scrollY tracer, not just the
+                        // 0/100/300/800ms snapshots. `applySelection`'s own
+                        // scroll (see industries-explorer.tsx) lands
+                        // correctly FIRST, every time — the very next
+                        // settle-check tick (delay:0) already shows the
+                        // right scrollY with the h2 visible. Then, ~100-300ms
+                        // later, the position silently jumps again to a
+                        // WRONG value and stays there through every later
+                        // check. That second, later mover is Next.js's own
+                        // router: by default `<Link>` (`scroll` prop
+                        // defaults to true) does its own post-navigation
+                        // scroll-to-hash, independently calling
+                        // `document.getElementById(hash)` — which resolves
+                        // to the SIDEBAR TAB BUTTON (`id="industry-<slug>"`,
+                        // the real deep-link anchor `industries-explorer.tsx`
+                        // intentionally keeps on the tab, not the panel) —
+                        // and scrolling to THAT, exactly the same
+                        // depends-on-list-position bug already fixed once in
+                        // `industries-explorer.tsx`, just re-introduced one
+                        // layer up, from Next's router instead of our own
+                        // code. It fires late enough to win the race against
+                        // `applySelection`'s already-correct scroll, on
+                        // every same-page dropdown click, every industry —
+                        // matching the "settles, but at the wrong place"
+                        // shape exactly. Fixed by disabling Next's own
+                        // scroll-restoration for Industries' hash links only
+                        // (`scroll={false}`, a real, documented `<Link>`
+                        // prop) — `industries-explorer.tsx`'s own click-
+                        // capture + `applySelection` already fully own
+                        // scroll behavior for this page, so there's nothing
+                        // left for Next's router to usefully do here. Other
+                        // dropdowns' own hash links (Business Automation's
+                        // `#packages`, Solutions' `#pentest-addon`) have no
+                        // competing custom scroll logic, so they're left on
+                        // Next's default (untouched, `item.href` won't match
+                        // `#industry-` anyway).
+                        scroll={!item.href.includes("#industry-")}
                         className={itemLinkClasses}
                       >
                         {item.label}

@@ -124,44 +124,98 @@ export function IndustriesExplorer() {
       console.log("[industries-debug] applySelection", { source, index, name: INDUSTRIES[index]?.name });
       setActiveIndex(index);
       const behavior = reduceMotion ? "auto" : "smooth";
-      const vTarget = document.getElementById(tabId(index, "vertical"));
+
+      // REAL ROOT CAUSE, found 2026-08-21 from Mohammad's own screenshot
+      // (console showed h2:"Education" correctly and settled, but the
+      // visible viewport showed only the tail of Approach's text then
+      // blank space into the footer — no h2/Risk/Priorities in view at
+      // all): this used to `scrollIntoView({block:"center"})` the SIDEBAR
+      // TAB BUTTON (`tabId(index, "vertical")`). On desktop the sidebar
+      // tablist and the detail panel sit in the SAME grid row, with the
+      // panel's content (h2 first, then the 4 subsections) always
+      // starting at the row's own top — but each tab BUTTON's vertical
+      // position within that row depends purely on its ARRAY INDEX (9
+      // stacked items). Centering a tab deep in the list — Education is
+      // index 7 of 8, Other SMBs is the very last at index 8 — scrolls the
+      // viewport to whatever position suits THAT tab's depth in the
+      // sidebar, which has no relationship to how tall the panel's own
+      // content is. For a late index, that routinely lands well past the
+      // panel's h2/Risk/Priorities and into Approach/Next Step, or past
+      // the panel entirely — while state (`activeIndex`, the rendered h2)
+      // was always correct the whole time, which is exactly why every
+      // earlier console trace looked right: the BUG WAS NEVER THE STATE,
+      // only the CHOICE OF SCROLL TARGET. Confirmed by re-reading my own
+      // "working" screenshots from earlier today: they also only ever
+      // showed Approach/Next Step, never the h2 itself — missed until
+      // this report pointed at it specifically.
+      //
+      // Fixed by scrolling to `[role="tabpanel"]` itself (a stable
+      // selector — there's only ever one, regardless of which industry is
+      // active) with `block: "start"`, for every viewport width, not just
+      // mobile (which already did this — see the now-removed
+      // `<1024` branch below). This targets the actual content a click
+      // promises, independent of the clicked tab's position in an
+      // unrelated list. `scroll-mt-28` on the panel (added below in the
+      // JSX) keeps the sticky header from covering the h2 once scrolled
+      // to `block: "start"`.
+      const panel = document.querySelector('[role="tabpanel"]');
       const hTarget = document.getElementById(tabId(index, "horizontal"));
       console.log("[industries-debug] scroll targets resolved", {
         index,
-        vId: tabId(index, "vertical"),
-        vFound: !!vTarget,
-        vRectTop: vTarget?.getBoundingClientRect().top,
+        panelFound: !!panel,
+        panelRectTop: panel?.getBoundingClientRect().top,
         hId: tabId(index, "horizontal"),
         hFound: !!hTarget,
         hRectTop: hTarget?.getBoundingClientRect().top,
         scrollYBefore: window.scrollY,
         innerWidth: window.innerWidth,
       });
-      vTarget?.scrollIntoView({ behavior, block: "center" });
-      hTarget?.scrollIntoView({ behavior, block: "nearest", inline: "center" });
-      if (window.innerWidth < 1024) {
-        requestAnimationFrame(() => {
-          const panel = document.querySelector('[role="tabpanel"]');
-          console.log("[industries-debug] mobile panel scroll", {
-            index,
-            panelFound: !!panel,
-            panelRectTop: panel?.getBoundingClientRect().top,
-            scrollYBefore: window.scrollY,
-          });
-          panel?.scrollIntoView({ behavior, block: "start" });
-        });
+      panel?.scrollIntoView({ behavior, block: "start" });
+      // Still bring the mobile horizontal tab strip's own active tab into
+      // view along its own scroll axis — `block: "nearest"` is a
+      // deliberate vertical no-op here (the panel scroll above already
+      // handles vertical positioning); this call's only job is the
+      // horizontal `inline` position within that strip.
+      //
+      // REAL ROOT CAUSE #2, found 2026-08-21 via a Playwright rAF trace
+      // (a per-frame scrollY sample, not just the 0/100/300/800ms settle
+      // snapshots): on desktop the mobile strip's ancestor `<nav
+      // className="lg:hidden">` is `display:none`, so `hTarget` here has a
+      // zero-size, zero-position box (`getBoundingClientRect()` all 0s).
+      // Calling `scrollIntoView({behavior:"smooth"})` on it ANYWAY — same
+      // tick, same scrolling box (the window) as the panel's own call above
+      // — does not no-op like the old comment assumed: the trace showed the
+      // panel's smooth animation genuinely start (several eased frames),
+      // then SNAP in a single frame to a wrong, much larger scrollY and
+      // freeze there — the exact "settle checks agree with each other but
+      // the screen is wrong" shape Mohammad's console evidence showed.
+      // Chrome appears to compute this second call's target from the
+      // zero'd geometry and replace the first call's in-flight scroll
+      // animation with it, on every desktop click, not intermittently.
+      // Fixed by only issuing this call when `hTarget` actually has a
+      // rendered box — false on desktop (skipped, panel's own scroll is
+      // untouched and completes normally), true on mobile (unchanged
+      // behavior, confirmed still correct below).
+      const hHasBox = hTarget && hTarget.getClientRects().length > 0;
+      if (hHasBox) {
+        hTarget.scrollIntoView({ behavior, block: "nearest", inline: "center" });
       }
+
       // Trace the ACTUAL resting scroll position + rendered h2/active-tab
       // state at several points after the call, to catch anything that
       // re-scrolls or re-renders differently afterward (e.g. a competing
       // scroll, or activeIndex getting overwritten by something else).
-      [0, 100, 300, 800].forEach((delay) => {
+      [0, 100, 300, 800, 1500].forEach((delay) => {
         setTimeout(() => {
           console.log("[industries-debug] settle check", {
             delay,
             index,
             scrollY: window.scrollY,
             h2: document.querySelector("h2")?.textContent,
+            h2VisibleInViewport: (() => {
+              const rect = document.querySelector("h2")?.getBoundingClientRect();
+              return rect ? rect.top >= 0 && rect.top < window.innerHeight : null;
+            })(),
             selectedTabId: document.querySelector('[role="tab"][aria-selected="true"]')?.id,
           });
         }, delay);
@@ -284,7 +338,7 @@ export function IndustriesExplorer() {
             id={panelId(activeIndex)}
             aria-labelledby={tabId(activeIndex)}
             tabIndex={0}
-            className="min-w-0"
+            className="min-w-0 scroll-mt-28"
           >
             <h2 className="font-heading text-3xl font-semibold leading-tight tracking-tight text-text-primary md:text-4xl">
               {active.name}
