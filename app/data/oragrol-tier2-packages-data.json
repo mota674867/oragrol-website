@@ -1,0 +1,430 @@
+{
+  "reference_scale_note": "Reference scale: Core / 50-employee company, matching Tier 1's methodology. C14 services are per-user priced and were scaled to 50 employees before summing into any package.",
+  "pricing_confidence_note": "Prices are provisional — built from real per-service reference prices with a stated discount, not yet validated against real client quotes. Do not present as final, locked prices without review.",
+  "contract_terms": {
+    "annual": "Standard / preferred billing",
+    "monthly": "+20% surcharge vs. annual rate",
+    "implementation": "Billed separately from recurring packages",
+    "expansion": "Additional workflows/integrations beyond a package's included scope are billed at the stated overage rate"
+  },
+  "funnel": "Assessment → Implementation → Recurring Package → Expansion",
+  "one_time_and_project_offers": [
+    {
+      "name": "Assessment",
+      "type": "one-time",
+      "tagline": "Find out where AI actually pays off in your business.",
+      "services": [
+        {
+          "code": "C11-S01",
+          "name": "AI Ready",
+          "blurb": "Find out if your business is actually ready for AI.",
+          "price": "$2,500",
+          "unit": "one-time"
+        },
+        {
+          "code": "C11-S02",
+          "name": "Process Finder",
+          "blurb": "Map the processes AI could take off your plate.",
+          "price": "$3,500",
+          "unit": "project"
+        }
+      ],
+      "sum_before_discount": 6000,
+      "discount_pct": 0.1,
+      "price": "$5,400",
+      "note": "AI Opportunities and AI Roadmap are natural upsells after Assessment, offered individually rather than force-included."
+    },
+    {
+      "name": "Implementation",
+      "type": "project",
+      "tagline": "Build the automation — workflows, agents, and system integrations.",
+      "services": [
+        {
+          "code": "C12-S01",
+          "name": "Flow Automator",
+          "blurb": "Repetitive workflows, built once, run automatically.",
+          "price": "$6,000",
+          "unit": "/workflow"
+        },
+        {
+          "code": "C12-S02",
+          "name": "Agent Connect",
+          "blurb": "AI agents that plug into the tools you already use.",
+          "price": "$8,000",
+          "unit": "project"
+        },
+        {
+          "code": "C12-S03",
+          "name": "System Bridge",
+          "blurb": "Your business systems, finally talking to each other.",
+          "price": "$7,000",
+          "unit": "project"
+        }
+      ],
+      "sum_before_discount": 21000,
+      "discount_pct": 0.15,
+      "price": "$17,850"
+    }
+  ],
+  "recurring_packages": [
+    {
+      "name": "Starter",
+      "tagline": "A small, focused automation package to start seeing value.",
+      "services": [
+        {
+          "code": "C12-S05",
+          "name": "Automation Optimizer",
+          "blurb": "Get more out of the automations you already have.",
+          "price": "$1,200",
+          "unit": "/mo"
+        },
+        {
+          "code": "C13-S02",
+          "name": "Data Insight",
+          "blurb": "Understand what your data is actually telling you.",
+          "price": "$2,000",
+          "unit": "/mo"
+        },
+        {
+          "code": "C15-S01",
+          "name": "Customer Care",
+          "blurb": "Customer interactions, handled fast and consistently.",
+          "price": "$1,800",
+          "unit": "/mo"
+        }
+      ],
+      "sum_before_discount": 5000,
+      "discount_pct": 0.1,
+      "monthly_price": "$4,500/mo",
+      "annual_price": "$54,000/yr",
+      "month_to_month_price": "$5,400/mo",
+      "scope_limits": {
+        "included_users": 25,
+        "included_active_workflows": 2,
+        "included_integrations": 2,
+        "support_level": "Email support, business hours",
+        "overage_per_workflow": "$400/mo",
+        "overage_per_integration": "$300 one-time"
+      }
+    },
+    {
+      "name": "Growth",
+      "featured": true,
+      "tagline": "The core package — automate, understand, and grow.",
+      "services": [
+        {
+          "code": "C12-S04",
+          "name": "AI Orchestrator",
+          "blurb": "Complex, multi-step processes, coordinated automatically.",
+          "price": "$2,500",
+          "unit": "/mo"
+        },
+        {
+          "code": "C12-S05",
+          "name": "Automation Optimizer",
+          "blurb": "Get more out of the automations you already have.",
+          "price": "$1,200",
+          "unit": "/mo"
+        },
+        {
+          "code": "C13-S02",
+          "name": "Data Insight",
+          "blurb": "Understand what your data is actually telling you.",
+          "price": "$2,000",
+          "unit": "/mo"
+        },
+        {
+          "code": "C13-S04",
+          "name": "Insight Engine",
+          "blurb": "Analytics that surface what matters, automatically.",
+          "price": "$2,200",
+          "unit": "/mo"
+        },
+        {
+          "code": "C15-S02",
+          "name": "Sales Flow",
+          "blurb": "Leads followed up automatically, nothing falls through.",
+          "price": "$2,200",
+          "unit": "/mo"
+        },
+        {
+          "code": "C15-S01",
+          "name": "Customer Care",
+          "blurb": "Customer interactions, handled fast and consistently.",
+          "price": "$1,800",
+          "unit": "/mo"
+        }
+      ],
+      "sum_before_discount": 11900,
+      "discount_pct": 0.15,
+      "monthly_price": "$10,115/mo",
+      "annual_price": "$121,380/yr",
+      "month_to_month_price": "$12,138/mo",
+      "scope_limits": {
+        "included_users": 50,
+        "included_active_workflows": 5,
+        "included_integrations": 5,
+        "support_level": "Priority email + monthly review",
+        "overage_per_workflow": "$500/mo",
+        "overage_per_integration": "$400 one-time"
+      }
+    },
+    {
+      "name": "Scale",
+      "tagline": "Broader multi-department automation, including IT operations.",
+      "services": [
+        {
+          "code": "C12-S04",
+          "name": "AI Orchestrator",
+          "blurb": "Complex, multi-step processes, coordinated automatically.",
+          "price": "$2,500",
+          "unit": "/mo"
+        },
+        {
+          "code": "C12-S05",
+          "name": "Automation Optimizer",
+          "blurb": "Get more out of the automations you already have.",
+          "price": "$1,200",
+          "unit": "/mo"
+        },
+        {
+          "code": "C13-S02",
+          "name": "Data Insight",
+          "blurb": "Understand what your data is actually telling you.",
+          "price": "$2,000",
+          "unit": "/mo"
+        },
+        {
+          "code": "C13-S04",
+          "name": "Insight Engine",
+          "blurb": "Analytics that surface what matters, automatically.",
+          "price": "$2,200",
+          "unit": "/mo"
+        },
+        {
+          "code": "C15-S02",
+          "name": "Sales Flow",
+          "blurb": "Leads followed up automatically, nothing falls through.",
+          "price": "$2,200",
+          "unit": "/mo"
+        },
+        {
+          "code": "C15-S01",
+          "name": "Customer Care",
+          "blurb": "Customer interactions, handled fast and consistently.",
+          "price": "$1,800",
+          "unit": "/mo"
+        },
+        {
+          "code": "C13-S01",
+          "name": "Knowledge Hub",
+          "blurb": "Your business knowledge, organized and searchable.",
+          "price": "$1,500",
+          "unit": "/mo"
+        },
+        {
+          "code": "C13-S05",
+          "name": "Decision Engine",
+          "blurb": "Decision support built on your real business data.",
+          "price": "$2,500",
+          "unit": "/mo"
+        },
+        {
+          "code": "C15-S04",
+          "name": "Customer Pulse",
+          "blurb": "Know which customers are at risk before they leave.",
+          "price": "$1,800",
+          "unit": "/mo"
+        },
+        {
+          "code": "C15-S05",
+          "name": "Revenue Insight",
+          "blurb": "See where revenue opportunity is hiding in your data.",
+          "price": "$2,500",
+          "unit": "/mo"
+        },
+        {
+          "code": "C14-S01",
+          "name": "IT Manager",
+          "blurb": "IT service management that actually runs itself.",
+          "price": "$35",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C14-S05",
+          "name": "IT Watch",
+          "blurb": "Ongoing monitoring that catches issues before they're outages.",
+          "price": "$400",
+          "unit": "/mo"
+        }
+      ],
+      "sum_before_discount": 22350,
+      "discount_pct": 0.2,
+      "monthly_price": "$17,880/mo",
+      "annual_price": "$214,560/yr",
+      "month_to_month_price": "$21,456/mo",
+      "scope_limits": {
+        "included_users": 150,
+        "included_active_workflows": 12,
+        "included_integrations": 10,
+        "support_level": "Dedicated contact, faster SLA",
+        "overage_per_workflow": "$600/mo",
+        "overage_per_integration": "$500 one-time"
+      }
+    },
+    {
+      "name": "Enterprise / Custom",
+      "tagline": "Full scope across every automation, intelligence, and operations service.",
+      "services": [
+        {
+          "code": "C11-S05",
+          "name": "AI Optimizer",
+          "blurb": "Keep improving what's already automated.",
+          "price": "$1,500",
+          "unit": "/mo"
+        },
+        {
+          "code": "C12-S04",
+          "name": "AI Orchestrator",
+          "blurb": "Complex, multi-step processes, coordinated automatically.",
+          "price": "$2,500",
+          "unit": "/mo"
+        },
+        {
+          "code": "C12-S05",
+          "name": "Automation Optimizer",
+          "blurb": "Get more out of the automations you already have.",
+          "price": "$1,200",
+          "unit": "/mo"
+        },
+        {
+          "code": "C13-S01",
+          "name": "Knowledge Hub",
+          "blurb": "Your business knowledge, organized and searchable.",
+          "price": "$1,500",
+          "unit": "/mo"
+        },
+        {
+          "code": "C13-S02",
+          "name": "Data Insight",
+          "blurb": "Understand what your data is actually telling you.",
+          "price": "$2,000",
+          "unit": "/mo"
+        },
+        {
+          "code": "C13-S03",
+          "name": "Knowledge Finder",
+          "blurb": "Find the answer buried in your own documents.",
+          "price": "$1,200",
+          "unit": "/mo"
+        },
+        {
+          "code": "C13-S04",
+          "name": "Insight Engine",
+          "blurb": "Analytics that surface what matters, automatically.",
+          "price": "$2,200",
+          "unit": "/mo"
+        },
+        {
+          "code": "C13-S05",
+          "name": "Decision Engine",
+          "blurb": "Decision support built on your real business data.",
+          "price": "$2,500",
+          "unit": "/mo"
+        },
+        {
+          "code": "C14-S01",
+          "name": "IT Manager",
+          "blurb": "IT service management that actually runs itself.",
+          "price": "$35",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C14-S02",
+          "name": "Infrastructure Ops",
+          "blurb": "Your infrastructure, operated and optimized.",
+          "price": "$500",
+          "unit": "/mo"
+        },
+        {
+          "code": "C14-S03",
+          "name": "Asset Control",
+          "blurb": "Know exactly what technology you have and where.",
+          "price": "$10",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C14-S04",
+          "name": "IT Helpdesk",
+          "blurb": "Support your team can actually rely on.",
+          "price": "$40",
+          "unit": "/user/mo"
+        },
+        {
+          "code": "C14-S05",
+          "name": "IT Watch",
+          "blurb": "Ongoing monitoring that catches issues before they're outages.",
+          "price": "$400",
+          "unit": "/mo"
+        },
+        {
+          "code": "C15-S01",
+          "name": "Customer Care",
+          "blurb": "Customer interactions, handled fast and consistently.",
+          "price": "$1,800",
+          "unit": "/mo"
+        },
+        {
+          "code": "C15-S02",
+          "name": "Sales Flow",
+          "blurb": "Leads followed up automatically, nothing falls through.",
+          "price": "$2,200",
+          "unit": "/mo"
+        },
+        {
+          "code": "C15-S03",
+          "name": "Onboard",
+          "blurb": "New customers, onboarded smoothly every time.",
+          "price": "$1,500",
+          "unit": "/mo"
+        },
+        {
+          "code": "C15-S04",
+          "name": "Customer Pulse",
+          "blurb": "Know which customers are at risk before they leave.",
+          "price": "$1,800",
+          "unit": "/mo"
+        },
+        {
+          "code": "C15-S05",
+          "name": "Revenue Insight",
+          "blurb": "See where revenue opportunity is hiding in your data.",
+          "price": "$2,500",
+          "unit": "/mo"
+        }
+      ],
+      "sum_before_discount": 29550,
+      "discount_pct": 0.25,
+      "monthly_price": "$22,162/mo (illustrative)",
+      "annual_price": "$265,944/yr (illustrative)",
+      "month_to_month_price": "N/A — custom contract",
+      "display_note": "Present as ‘Contact us’ on the live site, not as a fixed listed price. The calculated figure exists for internal sanity-checking only.",
+      "scope_limits": {
+        "included_users": "Custom",
+        "included_active_workflows": "Custom",
+        "included_integrations": "Custom",
+        "support_level": "Named account team",
+        "overage_per_workflow": "Negotiated",
+        "overage_per_integration": "Negotiated"
+      }
+    }
+  ],
+  "individual_services_note": "All 25 Tier 2 services remain available individually / à la carte outside of these packages — customers are not required to buy a package to access a specific service.",
+  "category_narrative": {
+    "C11": "Discover — entry / strategy",
+    "C12": "Automate — the automation engine",
+    "C13": "Understand — the intelligence layer",
+    "C14": "Operate — IT operations",
+    "C15": "Grow — revenue and customer layer"
+  }
+}

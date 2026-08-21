@@ -141,8 +141,11 @@ const SERVICES_DROPDOWN: NavDropdownConfig = {
   ],
 };
 
-// Single column, 5 items — same shape/size as the existing Solutions
-// dropdown (w-64), not a new pattern.
+// Single column, 6 items — same shape/size as the existing Solutions
+// dropdown (w-64), not a new pattern. "Packages" (2026-08-21) is listed
+// first, matching the page's own top-to-bottom order (ProjectOffers +
+// RecurringPackages sit above the 5 categories on the page) — links to
+// `id="packages"` on `ProjectOffers`, the first of those two sections.
 const BUSINESS_AUTOMATION_DROPDOWN: NavDropdownConfig = {
   label: "Business Automation",
   href: "/business-automation",
@@ -150,10 +153,13 @@ const BUSINESS_AUTOMATION_DROPDOWN: NavDropdownConfig = {
   desktopLayoutClassName: "flex flex-col",
   columns: [
     {
-      items: SERVICES_TIER2_CATEGORIES.map((c) => ({
-        label: c.name,
-        href: `/business-automation#category-${c.code.toLowerCase()}`,
-      })),
+      items: [
+        { label: "Packages", href: "/business-automation#packages" },
+        ...SERVICES_TIER2_CATEGORIES.map((c) => ({
+          label: c.name,
+          href: `/business-automation#category-${c.code.toLowerCase()}`,
+        })),
+      ],
     },
   ],
 };
