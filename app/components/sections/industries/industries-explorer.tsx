@@ -68,47 +68,55 @@ export function IndustriesExplorer() {
   // direct `/industries#industry-healthcare` link), and again on any
   // same-page hash change (clicking the same link, or a browser back/
   // forward, while already on this page — the component doesn't remount
-  // just because the hash changed, so `hashchange` is the real signal).
-  // Also explicitly scrolls the matching tab into view: relying on the
-  // browser's own native hash-scroll isn't enough on its own once the
-  // *content* selection needs to change too, and `scrollIntoView` on the
-  // currently-hidden orientation's (display:none) element is a documented
-  // no-op — calling it on both ids is safe, only the one actually laid out
-  // at the current viewport width moves.
+  // just because the hash changed). Also explicitly scrolls the matching
+  // tab into view: relying on the browser's own native hash-scroll isn't
+  // enough on its own once the *content* selection needs to change too,
+  // and `scrollIntoView` on the currently-hidden orientation's
+  // (display:none) element is a documented no-op — calling it on both ids
+  // is safe, only the one actually laid out at the current viewport width
+  // moves.
   //
-  // Bug fix (2026-08-21): on mobile, clicking a nav dropdown industry link
-  // correctly selected the right tab/panel content internally (confirmed:
-  // the `<h2>` always updated) but the page never visibly scrolled — a real
-  // "nothing happened" bug, not the reported "lands near the footer"
-  // verbatim, but the same underlying failure (a click that promises a
-  // specific industry's content doesn't bring it into view). Root-caused
-  // by testing the actual click flow directly (desktop worked in every
-  // test — cold load, warm client-side transition, dev and production
-  // builds) rather than guessing: mobile's own `scrollIntoView` call below
-  // targets the horizontal tab strip with `block: "nearest"`, which is
+  // Bug fix (2026-08-21, mobile): fixed a real "nothing happened" bug where
+  // the right tab/panel content WAS selected internally (`<h2>` always
+  // updated) but the page never visibly scrolled on mobile — the
+  // horizontal tab strip's own `scrollIntoView({ block: "nearest" })` is
   // *correctly* a no-op whenever that strip is already inside the
-  // viewport — true on every mobile page load, since the strip sits near
-  // the top of the page. That left the actual detail panel (stacked BELOW
-  // the tab strip on mobile, `grid-cols-1` until `lg:`) off-screen with
-  // nothing telling the visitor a selection even happened. Desktop never
-  // had this problem: the sidebar tab and the panel sit side-by-side in
-  // the same row there, so centering the tab already brings the panel
-  // along with it — confirmed this fix doesn't touch that already-working
-  // path by scoping it to below the `lg` breakpoint (1024px, the same cutoff
-  // this component's own `hidden lg:block` / `lg:hidden` layout already
-  // uses). Targets `[role="tabpanel"]` (a stable selector — there is only
-  // ever one, regardless of which industry is active) rather than the
-  // panel's own `id` (which changes with `activeIndex` and wouldn't
-  // resolve to the new selection synchronously, since `setActiveIndex`
-  // hasn't committed yet at this point in the function) — deferred one
-  // frame via `requestAnimationFrame` so the position measured is the
-  // post-switch one, not the outgoing panel's.
+  // viewport, true on every mobile load since it sits near the top of the
+  // page, leaving the actual detail panel (stacked BELOW the strip until
+  // `lg:`) off-screen. Fixed by also scrolling `[role="tabpanel"]` (a
+  // stable selector — there's only ever one) into view below the `lg`
+  // breakpoint (1024px, the same cutoff this component's own layout
+  // already uses); desktop's already-working path is untouched, guarded by
+  // the same check.
+  //
+  // Bug fix (2026-08-21, desktop — the real root cause of the original
+  // report): clicking a DIFFERENT industry from the header dropdown while
+  // ALREADY on this page did nothing at all — confirmed live (an
+  // instrumented click logged zero `hashchange`/`popstate` events even
+  // though `location.hash` genuinely changed to the clicked industry).
+  // Root cause: Next.js's `<Link>` updates the URL for a same-route,
+  // hash-only navigation via the History API directly (a `pushState`-style
+  // update), and that does NOT fire a native `hashchange` event — only a
+  // real hash-only navigation (typing a new hash, a plain non-JS anchor, or
+  // browser back/forward) does. The `hashchange` listener below is
+  // therefore only ever reached by those cases; every dropdown click while
+  // already on `/industries` silently missed it, leaving the display stuck
+  // on whichever industry was last reached by an actual full-page
+  // navigation (which is why it looked "hardcoded" to one industry rather
+  // than simply not moving). Fixed with a `click` listener on `document` in
+  // the capture phase (runs before the `<Link>`'s own handler, so it
+  // doesn't depend on or interfere with Next's routing) that reads the
+  // clicked anchor's `href` directly — not `location.hash`, which hasn't
+  // updated yet at this point in the capture phase — extracts the target
+  // industry, and applies the same selection logic the hash-based path
+  // uses. `applySelection` is shared between both paths so they can't drift
+  // out of sync with each other.
   useEffect(() => {
-    function selectFromHash() {
-      const slug = window.location.hash.replace(/^#industry-/, "");
-      if (!slug) return;
-      const index = INDUSTRIES.findIndex((industry) => slugifyIndustryName(industry.name) === slug);
-      if (index === -1) return;
+    function slugToIndex(slug: string): number {
+      return INDUSTRIES.findIndex((industry) => slugifyIndustryName(industry.name) === slug);
+    }
+
+    function applySelection(index: number) {
       setActiveIndex(index);
       const behavior = reduceMotion ? "auto" : "smooth";
       document.getElementById(tabId(index, "vertical"))?.scrollIntoView({ behavior, block: "center" });
@@ -119,9 +127,37 @@ export function IndustriesExplorer() {
         });
       }
     }
+
+    function selectFromHash() {
+      const slug = window.location.hash.replace(/^#industry-/, "");
+      if (!slug) return;
+      const index = slugToIndex(slug);
+      if (index === -1) return;
+      applySelection(index);
+    }
+
+    function onDocumentClickCapture(event: MouseEvent) {
+      const anchor = (event.target as HTMLElement | null)?.closest?.("a");
+      const href = anchor?.getAttribute("href");
+      if (!href) return;
+      const hashPos = href.indexOf("#industry-");
+      if (hashPos === -1) return;
+      const path = href.slice(0, hashPos);
+      if (path && path !== window.location.pathname) return;
+      const index = slugToIndex(href.slice(hashPos + "#industry-".length));
+      if (index === -1) return;
+      // Deferred one frame: let the click's own default navigation run
+      // first (Next.js updates the URL/hash), so this doesn't race it.
+      requestAnimationFrame(() => applySelection(index));
+    }
+
     selectFromHash();
     window.addEventListener("hashchange", selectFromHash);
-    return () => window.removeEventListener("hashchange", selectFromHash);
+    document.addEventListener("click", onDocumentClickCapture, true);
+    return () => {
+      window.removeEventListener("hashchange", selectFromHash);
+      document.removeEventListener("click", onDocumentClickCapture, true);
+    };
   }, [reduceMotion]);
 
   function handleKeyDown(e: React.KeyboardEvent, i: number, orientation: "vertical" | "horizontal") {
