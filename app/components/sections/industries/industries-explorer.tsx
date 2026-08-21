@@ -75,6 +75,34 @@ export function IndustriesExplorer() {
   // currently-hidden orientation's (display:none) element is a documented
   // no-op — calling it on both ids is safe, only the one actually laid out
   // at the current viewport width moves.
+  //
+  // Bug fix (2026-08-21): on mobile, clicking a nav dropdown industry link
+  // correctly selected the right tab/panel content internally (confirmed:
+  // the `<h2>` always updated) but the page never visibly scrolled — a real
+  // "nothing happened" bug, not the reported "lands near the footer"
+  // verbatim, but the same underlying failure (a click that promises a
+  // specific industry's content doesn't bring it into view). Root-caused
+  // by testing the actual click flow directly (desktop worked in every
+  // test — cold load, warm client-side transition, dev and production
+  // builds) rather than guessing: mobile's own `scrollIntoView` call below
+  // targets the horizontal tab strip with `block: "nearest"`, which is
+  // *correctly* a no-op whenever that strip is already inside the
+  // viewport — true on every mobile page load, since the strip sits near
+  // the top of the page. That left the actual detail panel (stacked BELOW
+  // the tab strip on mobile, `grid-cols-1` until `lg:`) off-screen with
+  // nothing telling the visitor a selection even happened. Desktop never
+  // had this problem: the sidebar tab and the panel sit side-by-side in
+  // the same row there, so centering the tab already brings the panel
+  // along with it — confirmed this fix doesn't touch that already-working
+  // path by scoping it to below the `lg` breakpoint (1024px, the same cutoff
+  // this component's own `hidden lg:block` / `lg:hidden` layout already
+  // uses). Targets `[role="tabpanel"]` (a stable selector — there is only
+  // ever one, regardless of which industry is active) rather than the
+  // panel's own `id` (which changes with `activeIndex` and wouldn't
+  // resolve to the new selection synchronously, since `setActiveIndex`
+  // hasn't committed yet at this point in the function) — deferred one
+  // frame via `requestAnimationFrame` so the position measured is the
+  // post-switch one, not the outgoing panel's.
   useEffect(() => {
     function selectFromHash() {
       const slug = window.location.hash.replace(/^#industry-/, "");
@@ -85,6 +113,11 @@ export function IndustriesExplorer() {
       const behavior = reduceMotion ? "auto" : "smooth";
       document.getElementById(tabId(index, "vertical"))?.scrollIntoView({ behavior, block: "center" });
       document.getElementById(tabId(index, "horizontal"))?.scrollIntoView({ behavior, block: "nearest", inline: "center" });
+      if (window.innerWidth < 1024) {
+        requestAnimationFrame(() => {
+          document.querySelector('[role="tabpanel"]')?.scrollIntoView({ behavior, block: "start" });
+        });
+      }
     }
     selectFromHash();
     window.addEventListener("hashchange", selectFromHash);
