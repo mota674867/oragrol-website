@@ -54,3 +54,6 @@ node_modules/
 # Python bytecode cache (ui-ux-pro-max skill script)
 __pycache__/
 *.pyc
+
+.vercel
+.env*
