@@ -39,10 +39,15 @@ import { serviceSlug } from "./services-data";
  * brief is correcting), and the border/icon/arrow shifting toward accent.
  * No scale, no bounce, `duration-200` only.
  *
- * `featured`: when true, the card gets more breathing room and a larger
- * title — used by `service-category-row.tsx` for the one asymmetric
- * "large featured service" per category (brief sections 11/14), decided
- * there from real per-category service counts, not hardcoded here.
+ * `featured`: when true, the card reads larger — bigger icon, bigger
+ * title, wider description column, bigger price — and (via
+ * `service-category-row.tsx`'s own grid classes, not this file) spans
+ * more grid columns. Padding stays the same as every other card (D-070 —
+ * see the className comment below for why an earlier version that also
+ * bumped padding on `featured` cards was removed, not just fixed) — used
+ * by `service-category-row.tsx` for the one asymmetric "large featured
+ * service" per category (brief sections 11/14), decided there from real
+ * per-category service counts, not hardcoded here.
  */
 export function ServiceCardPremium({
   service,
@@ -59,57 +64,68 @@ export function ServiceCardPremium({
     <Card
       href={`${basePath}/${serviceSlug(service.code)}`}
       variant="surface"
-      // Not using Card's own `interactive` flag (D-070): it adds a
+      // Not using Card's own `interactive` flag: it adds a
       // `hover:border-text-secondary` rule that would sit alongside this
       // card's own `hover:border-accent/30` on the same property — cn()
       // is plain concatenation (see cn.ts's own documented caveat), so
       // two classes for the same property don't reliably resolve in
       // string order. Building the interactive treatment directly here
       // instead keeps exactly one hover:border rule.
-      className="group relative h-full rounded-2xl border border-border/40 transition-[transform,box-shadow,border-color] duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-[0_16px_40px_-20px_var(--color-accent)]"
+      //
+      // D-070 fix: this used to fight Card's own base `p-6` with an
+      // inner `-m-6 h-[calc(100%+3rem)]` wrapper so `featured` cards
+      // could get more padding — that arbitrary-value string was missing
+      // Tailwind's required underscore-escaped spaces around `+`
+      // (`calc(100%_+_3rem)`), so the browser never applied a valid
+      // height to it. The wrapper's height silently fell back to its
+      // natural content height while `-m-6` still pulled its box 24px
+      // outside Card's own edges on every side, misaligning it against
+      // Card's actual (unrelated, correctly-sized) box and spilling its
+      // content into the row below — the "dark shape covering the price
+      // text" damage. Root-caused and removed the whole margin/height
+      // workaround rather than fixing the escaping: `featured` now gets
+      // its extra visual weight entirely from content (2-col grid span,
+      // larger icon/title/price) instead of extra padding, so this
+      // layout classes sit directly on Card's own className — same `p-6`
+      // Card's base already declares (identical value, so even that
+      // isn't a real conflict) — with no second wrapper element, no
+      // margin cancellation, nothing that can misalign from Card's own
+      // box again.
+      className="group relative flex h-full flex-col justify-between gap-6 rounded-2xl border border-border/40 p-6 transition-[transform,box-shadow,border-color] duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-[0_16px_40px_-20px_var(--color-accent)]"
     >
-      {/* Card's own base classes always include a plain `p-6` ahead of
-          this component's own className in the same cn() call — a
-          class-level `p-8` override for `featured` cards can't reliably
-          beat that (same specificity, source-order-dependent). `-m-6`
-          cancels Card's own padding visually (a plain sibling-independent
-          margin, no specificity conflict with anything) and this inner
-          wrapper reapplies the real padding itself. */}
-      <div className={`-m-6 flex h-[calc(100%+3rem)] flex-col justify-between gap-6 ${featured ? "p-8" : "p-6"}`}>
-        <div className="flex flex-col gap-4">
-          <div className="flex items-start justify-between gap-3">
-            <span className="font-data text-xs font-medium uppercase tracking-[0.18em] text-accent">
-              {service.code}
-            </span>
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center text-text-primary transition-colors duration-200 group-hover:text-accent">
-              <Icon icon={icon} size={featured ? "lg" : "md"} />
-            </span>
-          </div>
-
-          <div>
-            <h4
-              className={`font-heading font-semibold leading-snug text-text-primary ${
-                featured ? "text-2xl" : "text-lg"
-              }`}
-            >
-              {service.name}
-            </h4>
-            <Text size="sm" tone="secondary" className={featured ? "mt-3 max-w-md" : "mt-2"}>
-              {service.blurb}
-            </Text>
-          </div>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-start justify-between gap-3">
+          <span className="font-data text-xs font-medium uppercase tracking-[0.18em] text-accent">
+            {service.code}
+          </span>
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center text-text-primary transition-colors duration-200 group-hover:text-accent">
+            <Icon icon={icon} size={featured ? "lg" : "md"} />
+          </span>
         </div>
 
-        <div className="flex items-end justify-between gap-3 border-t border-border/40 pt-4">
-          <DataText size={featured ? "lg" : "sm"} tone="primary">
-            {formatPrice(service.price, service.unit)}
-          </DataText>
-          <ArrowUpRight
-            className="h-4 w-4 shrink-0 text-text-muted transition-[color,transform] duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent"
-            strokeWidth={1.75}
-            aria-hidden="true"
-          />
+        <div>
+          <h4
+            className={`font-heading font-semibold leading-snug text-text-primary ${
+              featured ? "text-2xl" : "text-lg"
+            }`}
+          >
+            {service.name}
+          </h4>
+          <Text size="sm" tone="secondary" className={featured ? "mt-3 max-w-md" : "mt-2"}>
+            {service.blurb}
+          </Text>
         </div>
+      </div>
+
+      <div className="flex items-end justify-between gap-3 border-t border-border/40 pt-4">
+        <DataText size={featured ? "lg" : "sm"} tone="primary">
+          {formatPrice(service.price, service.unit)}
+        </DataText>
+        <ArrowUpRight
+          className="h-4 w-4 shrink-0 text-text-muted transition-[color,transform] duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent"
+          strokeWidth={1.75}
+          aria-hidden="true"
+        />
       </div>
     </Card>
   );

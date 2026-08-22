@@ -165,7 +165,20 @@ function TransitionOverlay({
       style={{
         background: `linear-gradient(in oklab ${gradientDirection}, ${ENV_RAW_BACKGROUND[from]} 0%, ${ENV_RAW_BACKGROUND[to]} 100%)`,
       }}
-      className={cn("pointer-events-none absolute", positionClass, transitionSizeClass(from, to, direction))}
+      // -z-10 (D-070, tightened): explicit, not incidental. A plain
+      // position:absolute descendant with no z-index is NOT guaranteed to
+      // paint behind ordinary in-flow siblings by DOM order alone — per
+      // the CSS2.1 stacking algorithm, positioned z-index:auto/0
+      // descendants (this overlay) paint AFTER (on top of) non-positioned
+      // in-flow content (a plain Section child), regardless of which
+      // comes first in the DOM. This codebase's actual page content
+      // happened to render correctly in every check so far, but that
+      // isn't a guarantee this rule should keep depending on — an
+      // explicit negative z-index (paints in CSS2.1's step 2, strictly
+      // before ALL non-positioned content in step 3) makes "background
+      // fade, never content" an architectural fact instead of an
+      // implicit one.
+      className={cn("pointer-events-none absolute -z-10", positionClass, transitionSizeClass(from, to, direction))}
     />
   );
 }
@@ -182,15 +195,22 @@ export function Section({
 }: SectionProps) {
   return (
     <Component
-      className={cn(envClasses[environment], "relative bg-background text-text-primary", className)}
+      // `isolate` (D-070): forces Section to establish its own real
+      // stacking context (`isolation: isolate`), so the overlay's -z-10
+      // stays properly CONTAINED within this one Section — without it, a
+      // negative z-index on a plain `position:relative` (non-stacking-
+      // context) parent can escape further than intended and interact
+      // with sibling sections/the fixed header instead of just this
+      // section's own content. "Clean, intentional stacking context," not
+      // an incidental one.
+      className={cn(envClasses[environment], "relative isolate bg-background text-text-primary", className)}
       {...props}
     >
-      {/* Both overlays render BEFORE `children`, regardless of which edge
-          they sit on (top/bottom/left/right is just position, not paint
-          order) — position:absolute descendants with no z-index paint in
-          DOM order, so this keeps both strictly behind real content
-          without requiring every call site's children to opt into their
-          own z-10 wrapper (D-069; see the module doc comment). */}
+      {/* Both overlays render as the first children, purely decorative
+          (aria-hidden, pointer-events-none) and pinned behind real
+          content via an explicit -z-10 (see TransitionOverlay itself) —
+          not relying on DOM-order alone (D-070; see the module doc
+          comment above for why that distinction matters). */}
       {transitionFrom && transitionFrom !== environment && (
         <TransitionOverlay from={transitionFrom} to={environment} direction={transitionDirection} edge="leading" />
       )}
