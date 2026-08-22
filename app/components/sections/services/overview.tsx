@@ -1,26 +1,26 @@
 import { Caption, Container, DataText, H2, Section, Text } from "../../ui";
 import { Reveal } from "../../motion/reveal";
-import { GlowEffect } from "./glow-effect";
 import { getServicesTier1 } from "./services-data";
 
 /**
- * ServicesOverview — Services Landing Page brief (Level 1, panel 2 of 2).
- * Second large panel, mirrored asymmetry from the hero (stat visual on
- * the left this time, copy on the right) — gives the landing genuine
- * multi-panel editorial rhythm instead of "hero, then straight into the
- * catalogue," per the brief's explicit "do not make this hero-only."
+ * ServicesOverview — Services Landing Page, visual-correction pass (2026-08-22
+ * follow-up to D-072). D-072's version repeated the hero's exact rounded
+ * `bg-surface/40` + full-panel `GlowEffect` treatment — the "same large
+ * colored card twice in a row" the brief calls out by name. This pass drops
+ * the panel entirely: no border, no fill, no glow. The section is plain
+ * dark ground (inherits `Section`'s own `environment="dark"` background),
+ * distinguished from the hero purely by a different compositional rhythm —
+ * a thin top rule (the only line on the page here) instead of a card
+ * boundary, and a tighter, more asymmetric grid — so consecutive sections
+ * read as distinct editorial beats rather than the same block repeated.
  *
- * Content: the exact eyebrow/heading/intro copy `LiveServices` already
- * carried at the top of its own body before this pass (see git history)
- * — moved up into its own panel, not rewritten, plus the real category/
- * service counts (already computed from the same data source every
- * category row uses) presented as a big-number statement — the same
- * "large real figure, not a sentence" treatment already established
- * elsewhere on the site (e.g. the Cyber Health Score), not a new pattern.
- *
- * `LiveServices` itself no longer renders this intro block — its own
- * body now starts directly at the category-nav/row list (Level 2),
- * completely unchanged otherwise.
+ * Content unchanged from D-072: the exact eyebrow/heading/intro copy
+ * `live-services.tsx` used to render at its own top (relocated there, not
+ * rewritten), plus the real category/service counts (already computed from
+ * the same data source every category row uses) as a big-number statement
+ * — the same "large real figure, not a sentence" treatment already
+ * established elsewhere on the site (Cyber Health Score), not a new
+ * pattern. `LiveServices` itself still doesn't render this intro block.
  */
 export function ServicesOverview() {
   const tier1 = getServicesTier1();
@@ -28,51 +28,44 @@ export function ServicesOverview() {
 
   return (
     <Section environment="dark">
-      <Container size="2xl" className="py-8 md:py-12">
-        <div className="relative overflow-hidden rounded-[2rem] border border-border/40 bg-surface/40 p-8 md:rounded-[2.5rem] md:p-14 lg:p-20">
-          <GlowEffect
-            blur="strongest"
-            className="opacity-[0.15]"
-            colors={["var(--color-accent-light)", "var(--color-accent)", "var(--color-accent-strong)"]}
-          />
-          <div className="relative grid grid-cols-1 items-center gap-16 lg:grid-cols-[0.95fr_1.05fr]">
-            <Reveal>
-              <div className="flex items-center justify-center gap-10 lg:justify-start lg:gap-14">
-                <div>
-                  <DataText size="xl" tone="accent">
-                    {tier1.length}
-                  </DataText>
-                  <Text size="sm" tone="secondary" className="mt-2">
-                    Categories
-                  </Text>
-                </div>
-                <div className="h-16 w-px bg-border" aria-hidden="true" />
-                <div>
-                  <DataText size="xl" tone="accent">
-                    {totalServices}
-                  </DataText>
-                  <Text size="sm" tone="secondary" className="mt-2">
-                    Services
-                  </Text>
-                </div>
-              </div>
+      <Container size="2xl" className="border-t border-border/15 py-16 md:py-20">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-end lg:gap-16">
+          <div>
+            <Reveal delay={0.05}>
+              <Caption tone="accent">Cybersecurity</Caption>
             </Reveal>
-
-            <div>
-              <Reveal delay={0.05}>
-                <Caption tone="accent">Cybersecurity</Caption>
-              </Reveal>
-              <Reveal delay={0.1}>
-                <H2 className="mt-4 max-w-xl">Services</H2>
-              </Reveal>
-              <Reveal delay={0.15}>
-                <Text size="base" tone="secondary" className="mt-4 max-w-lg">
-                  {tier1.length} categories covering the full range of cybersecurity work — explore
-                  what each one covers below.
-                </Text>
-              </Reveal>
-            </div>
+            <Reveal delay={0.1}>
+              <H2 className="mt-4 max-w-md">Services</H2>
+            </Reveal>
+            <Reveal delay={0.15}>
+              <Text size="base" tone="secondary" className="mt-4 max-w-md">
+                {tier1.length} categories covering the full range of cybersecurity work — explore
+                what each one covers below.
+              </Text>
+            </Reveal>
           </div>
+
+          <Reveal>
+            <div className="flex items-end gap-10 lg:justify-end lg:gap-16">
+              <div>
+                <DataText size="xl" tone="accent">
+                  {tier1.length}
+                </DataText>
+                <Text size="sm" tone="secondary" className="mt-2">
+                  Categories
+                </Text>
+              </div>
+              <div className="h-16 w-px bg-border/40" aria-hidden="true" />
+              <div>
+                <DataText size="xl" tone="accent">
+                  {totalServices}
+                </DataText>
+                <Text size="sm" tone="secondary" className="mt-2">
+                  Services
+                </Text>
+              </div>
+            </div>
+          </Reveal>
         </div>
       </Container>
     </Section>
