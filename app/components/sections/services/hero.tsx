@@ -3,59 +3,39 @@ import { CONTAINER_MAX_WIDTH, H1, Section, Text } from "../../ui";
 import { Reveal } from "../../motion/reveal";
 
 /**
- * Services Hero — "face image implementation" pass (2026-08-22), superseding
- * the abstract-schematic version this hero used since the prior two
- * visual-correction passes. Mohammad's explicit instruction: bring the
- * existing photographic asset from `_reference/` into the hero as the
- * dominant visual, in place of the illustrated network/schematic, with
- * Mohammad's explicit confirmation that Oragrol holds the rights to use
- * this specific file (asked directly before proceeding — the source file
- * is a screenshot of a different company's own marketing page, carrying
- * that company's own logo/headline baked into the pixels; using it as-is
- * would have been reproducing someone else's branded asset, not "drawing
- * inspiration from" it, so this wasn't implemented on the first ask).
+ * Services Hero — extended-background visual swap (2026-08-22), on top of
+ * the "face image implementation" pass. Mohammad supplied
+ * `public/images/services-hero.png` (1512x1145, landscape) as a
+ * finished, already-outpainted version of the previous portrait crop
+ * (`services-hero-visual.jpg`, 457x618) — background extended outward on
+ * all sides (dark fade left, warm amber/orange fade right and bottom),
+ * face/lighting/mechanical detail unchanged. Produced outside this
+ * codebase and handed over as a finished file per Mohammad's own
+ * instruction, after this session's attempt to run Adobe's
+ * `image_generative_expand` tool was blocked (no whitelisted URL for the
+ * source image, and the local-file upload path was denied by this
+ * environment's own safety classifier) — surfaced to Mohammad rather than
+ * worked around, and he opted to produce the asset separately instead.
  *
- * Asset handling: `_reference/8878.png` (1017x618) was cropped to
- * `public/images/services-hero-visual.jpg` (457x618, ~65KB) — the crop
- * keeps only the face/visual portion (roughly the right 45% of the
- * original frame) and deliberately excludes the other company's own logo
- * and headline text, which sat in the left ~55% of that same source image
- * and aren't part of what Mohammad confirmed rights to reuse as Oragrol's
- * own hero visual. No AI regeneration, no illustrated replacement, no new
- * visual invented — the actual photograph, cropped only to isolate the
- * subject, per the explicit "use the existing image, do not generate a
- * replacement" instruction.
+ * Only the image swaps: same layout, same headline/copy, same nav/
+ * structure. The container's aspect ratio changes from the old crop's
+ * portrait `457:618` to this file's native landscape `1512:1145`
+ * (~1.32:1) — `aspect-[1512/1145]`, `w-full` (fills the grid column,
+ * height auto-derives from the ratio) rather than the previous
+ * height-capped/width-auto sizing that portrait crop needed. A landscape
+ * image in this landscape-ish `1.3fr` track doesn't risk the runaway
+ * height a portrait image would at ultra-wide viewports, so no height cap
+ * is needed to keep the hero from growing excessively tall — confirmed via
+ * screenshot at 1440/1920/2560px, not assumed from the math alone.
+ * `object-cover` kept for parity with the rest of the codebase's image
+ * pattern (founder-bio.tsx); since the box always matches the image's own
+ * ratio, cover never actually crops anything.
  *
  * No card, no border, no background panel around the image — it sits
- * directly on the section's own dark ground, at its own native 457:618
- * aspect ratio (`aspect-[457/618]`) so `object-cover` never has anything
- * to crop beyond what the box's own height cap forces at the very
- * widest viewports (crops top/bottom evenly there, never stretches or
- * distorts — the photo's own aspect ratio is preserved by construction
- * whenever the box isn't height-capped, which is most viewports). Sized
- * by height (`max-h-*` per breakpoint) with width auto-derived from the
- * aspect ratio, rather than filling the grid column's own width — this
- * guarantees the face is never cropped more than marginally, at the
- * deliberate cost of not literally touching the row's right edge at
- * every viewport; `lg:ml-auto` still pushes it against that edge once
- * the two-column layout activates, which is where "bleed toward the
- * right edge" actually reads visually.
- *
- * Logo/badge removal (D-074) and the header-clearance fix that pass
- * required are untouched — this pass only replaces the visual half's
- * contents and updates the supporting copy to the shorter wording
- * supplied with this brief (same claim, same "explore what each category
- * covers below" idea folded into the single question, not new marketing
- * copy — provided verbatim in the brief itself).
- *
- * Colors: the brief re-quoted the pre-D-068 retired hex values a fourth
- * time (#080A0D background / #D95A2B accent, vs. the current authoritative
- * #0A0C12 / #DB5227) — flagged again, proceeding on the current tokens.css
- * palette via the existing semantic Tailwind classes (`H1`/`Text` already
- * resolve through `--text-primary`/`--text-secondary`; the section's own
- * `environment="dark"` background is `--palette-deep-ink`), so no raw hex
- * needed hardcoding here regardless. Warm Off-White (#E9E5DC) is identical
- * in both palettes, no discrepancy there.
+ * directly on the section's own dark ground. Everything else from the
+ * prior pass is untouched: logo/badge removal (D-074), the
+ * `calc(var(--header-height) + Nrem)` clearance fix, and the shortened
+ * supporting copy.
  *
  * D-069/D-070: this section carries no `transitionFrom`/`transitionTo` —
  * every section on `/services` is `environment="dark"`. Section's own
@@ -83,13 +63,13 @@ export function ServicesHero() {
           </div>
 
           <Reveal delay={0.15}>
-            <div className="relative mx-auto aspect-[457/618] w-auto max-w-full max-h-[420px] sm:max-h-[500px] md:max-h-[560px] lg:mx-0 lg:ml-auto lg:max-h-[620px] xl:max-h-[680px]">
+            <div className="relative aspect-[1512/1145] w-full">
               <Image
-                src="/images/services-hero-visual.jpg"
+                src="/images/services-hero.png"
                 alt=""
                 fill
                 priority
-                sizes="(min-width: 1280px) 500px, (min-width: 1024px) 460px, (min-width: 640px) 420px, 300px"
+                sizes="(min-width: 1024px) 55vw, 100vw"
                 className="object-cover"
               />
             </div>
