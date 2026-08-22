@@ -1,5 +1,6 @@
 import { Caption, Container, H2, Section, Text } from "../../ui";
 import { Reveal } from "../../motion/reveal";
+import { C01Showcase } from "./c01-showcase";
 import { CategoryNav, type CategoryNavItem } from "./category-nav";
 import { ServiceCategoryRow } from "./service-category-row";
 import { categoryNumeral, getCategoryIcon, getServicesTier1 } from "./services-data";
@@ -57,12 +58,21 @@ export function LiveServices() {
             <div className="mt-8 flex flex-col">
               {tier1.map((category, i) => (
                 <Reveal key={category.code} delay={i * 0.06}>
-                  <ServiceCategoryRow
-                    category={category}
-                    icon={getCategoryIcon(category.code)}
-                    basePath="/services"
-                    numeral={categoryNumeral(category.code)}
-                  />
+                  {/* Services Visual Direction brief (pilot): C01 only
+                      gets the new scene-based showcase; every other
+                      category keeps the exact `ServiceCategoryRow` it
+                      already had, unmodified — nothing here changes for
+                      C02-C10. */}
+                  {category.code === "C01" ? (
+                    <C01Showcase category={category} icon={getCategoryIcon(category.code)} numeral={categoryNumeral(category.code)} />
+                  ) : (
+                    <ServiceCategoryRow
+                      category={category}
+                      icon={getCategoryIcon(category.code)}
+                      basePath="/services"
+                      numeral={categoryNumeral(category.code)}
+                    />
+                  )}
                 </Reveal>
               ))}
             </div>
