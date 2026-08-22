@@ -35,7 +35,11 @@ export function Insights() {
           </Text>
         </Reveal>
 
-        <Grid cols={{ base: 2, sm: 3, lg: 4 }} gap="md" className="mt-14">
+        {/* xl:5 (2026-08-22): 5 topics total — without this tier, `lg:4`
+            held flat all the way to 2560px+, leaving a permanent orphan
+            5th card alone on its own row on any wide desktop. All 5 now
+            fit one row from 1280px+. */}
+        <Grid cols={{ base: 2, sm: 3, lg: 4, xl: 5 }} gap="md" className="mt-14">
           {TOPICS.map((topic, i) => (
             <Reveal key={topic.label} delay={i * 0.06}>
               <div className="flex flex-col items-start gap-3 rounded-2xl border border-border bg-surface p-6">

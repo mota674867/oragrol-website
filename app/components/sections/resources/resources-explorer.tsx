@@ -190,7 +190,11 @@ export function ResourcesExplorer() {
                 </Reveal>
               )}
               {rest.length > 0 && (
-                <Grid cols={{ base: 1, md: 2, lg: 3 }} gap="lg" className={featured ? "mt-8" : undefined}>
+                // xl:4 (2026-08-22): this is a growing content listing (not
+                // a fixed-count set), so unlike most grids in the site it
+                // should keep adding columns as the viewport (and the
+                // article count) grows, instead of holding `lg:3` flat.
+                <Grid cols={{ base: 1, md: 2, lg: 3, xl: 4 }} gap="lg" className={featured ? "mt-8" : undefined}>
                   {rest.map((article, i) => (
                     <Reveal key={article.slug} delay={i * 0.05}>
                       <ArticleCard article={article} />

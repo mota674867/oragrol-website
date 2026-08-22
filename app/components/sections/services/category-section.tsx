@@ -1,4 +1,4 @@
-import { Caption, H2, H3, Section, Text } from "../../ui";
+import { Caption, Container, H2, H3, Section, Text } from "../../ui";
 import { Reveal } from "../../motion/reveal";
 import { CapabilitySpotlightVisual } from "./capability-spotlight";
 import { CategoryNav, type CategoryNavItem } from "./category-nav";
@@ -94,8 +94,20 @@ export function CategorySection({
     <Section environment={environment}>
       {/* Asymmetric pt/pb — each row below already carries its own py-14
           (top AND bottom), so a uniform section py would stack an extra
-          gap on top of the last row's own pb-14 (D-016). */}
-      <div className="mx-auto w-full max-w-[1680px] px-6 pb-8 pt-24 md:px-12 md:pb-12 md:pt-32">
+          gap on top of the last row's own pb-14 (D-016).
+
+          `size="2xl"` (2026-08-22): this used to be a standalone
+          `max-w-[1680px]` div, bypassing `Container` entirely with its
+          own undocumented one-off cap — a second, wider ceiling nothing
+          else in the site shared, and one that also never grew past
+          1680px at 24"+ viewports (part of the wide-viewport dead-space
+          bug). Now uses `Container`'s own `2xl` tier (fluid, formalized
+          in container.tsx) instead of a bespoke number, so this sidebar+
+          grid layout — which genuinely benefits from more room than the
+          standard `xl` tier, given the 220px nav rail eating into the
+          content column — scales the same fluid way every other page
+          does, through the one shared system. */}
+      <Container size="2xl" className="pb-8 pt-24 md:pb-12 md:pt-32">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[220px_1fr] lg:items-start lg:gap-16">
           <CategoryNav items={navItems} />
 
@@ -121,7 +133,7 @@ export function CategorySection({
             </div>
           </div>
         </div>
-      </div>
+      </Container>
     </Section>
   );
 }

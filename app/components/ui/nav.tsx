@@ -4,6 +4,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { useLayoutEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { cn } from "./cn";
+import { CONTAINER_MAX_WIDTH } from "./container";
 import { Icon } from "./icon-wrapper";
 
 /**
@@ -117,13 +118,18 @@ export function NavBar({ logo, desktopContent, collapsedContent, persistentActio
         bound as the viewport widens — visually broken in the opposite
         direction from the original overlap bug, but the same root cause
         (a layout rule that was never checked against how it looks at the
-        width where it actually gets used). Wrapped the row in a
-        `max-w-[1440px]` `mx-auto` container — 1440px because it's not a
-        new number: it's `Container`'s own existing `xl` tier (D-015/016),
-        the same width Home's Hero/Cyber Health's Flow/the footer already
-        use for their own content, so the nav row now lines up with the
-        same content column those sections already establish instead of
-        inventing an unrelated cap. Below 1440px this changes nothing —
+        width where it actually gets used). Wrapped the row in a `mx-auto`
+        container sharing `Container`'s own `xl` tier, imported as
+        `CONTAINER_MAX_WIDTH.xl` rather than a re-hardcoded `max-w-[1440px]`
+        literal: the same width Home's Hero/Cyber Health's Flow/the footer
+        already use for their own content, so the nav row lines up with the
+        same content column those sections already establish. 2026-08-22:
+        that tier became fluid (see container.tsx's own doc comment)
+        instead of a flat 1440px, so importing the shared value (not a
+        copied number) is what keeps this row growing in step with the
+        rest of the page's `Container`-based content all the way to
+        ~1800px, instead of freezing at 1440px while the page kept
+        widening past it. Below the tier's own MIN this changes nothing —
         the wrapper's own width simply equals the viewport's, identical to
         the unwrapped behavior already verified across 1024-1920px. Above
         it, logo/cluster move inward together (still `justify-between`
@@ -133,7 +139,7 @@ export function NavBar({ logo, desktopContent, collapsedContent, persistentActio
         requirement that decision existed to protect — this cap only ever
         touches the row's own children, never the `<header>`'s background.
       */}
-      <div className="mx-auto w-full max-w-[1440px]">
+      <div className={cn("mx-auto w-full", CONTAINER_MAX_WIDTH.xl)}>
         <div ref={rowRef} className="flex h-20 w-full items-center justify-between px-6 md:px-12">
           <div ref={logoRef} className="flex shrink-0 items-center">
             {logo}

@@ -63,7 +63,11 @@ export function AddonMenu() {
           </Text>
         </Reveal>
 
-        <Grid cols={{ base: 1, sm: 2, lg: 4 }} gap="md" className="mt-14 items-start">
+        {/* xl:6 (2026-08-22): 12 add-ons total — `lg:4` (3 rows) held flat
+            all the way to 2560px+, leaving cards oversized instead of
+            denser. 12 divides evenly into 6, so widescreens get 2 rows
+            of 6 instead of 3 rows of 4. */}
+        <Grid cols={{ base: 1, sm: 2, lg: 4, xl: 6 }} gap="md" className="mt-14 items-start">
           {services.map((addon, i) => (
             <Reveal key={addon.code} delay={i * 0.03}>
               <AddonCard addon={addon} />
