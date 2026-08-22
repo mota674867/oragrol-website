@@ -67,7 +67,7 @@ const STAGES: Stage[] = [
 
 export function StageSequence() {
   return (
-    <Section environment="light-blue">
+    <Section environment="deep-blue">
       <Container size="md" className="py-24 md:py-32">
         <div className="relative">
           <div
@@ -80,7 +80,7 @@ export function StageSequence() {
               return (
                 <Reveal key={stage.n} delay={i * 0.08}>
                   <div className="relative flex items-start gap-6 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-x-10">
-                    <span className="relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-accent bg-background font-data text-sm font-medium text-accent sm:col-start-2 sm:row-start-1">
+                    <span className="relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-border bg-background font-data text-sm font-medium text-text-primary sm:col-start-2 sm:row-start-1">
                       {stage.n}
                     </span>
                     <div

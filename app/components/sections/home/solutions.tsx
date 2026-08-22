@@ -20,7 +20,7 @@ const LEVELS = [
 
 export function Solutions() {
   return (
-    <Section environment="light-blue">
+    <Section environment="deep-blue">
       <Container size="lg" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">Solutions</Caption>
@@ -40,7 +40,7 @@ export function Solutions() {
           {LEVELS.map((level, i) => (
             <Reveal key={level.n} delay={0.1 + i * 0.08}>
               <Card variant="bordered" className="flex h-full flex-col gap-4">
-                <Icon icon={level.icon} size="md" className="text-accent" />
+                <Icon icon={level.icon} size="md" className="text-text-primary" />
                 <h3 className="font-heading text-lg font-semibold text-text-primary">
                   {level.n}
                 </h3>
@@ -55,7 +55,7 @@ export function Solutions() {
         <Reveal delay={0.3}>
           <Card variant="surface" className="mt-6 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <Icon icon={Target} size="md" className="text-accent" />
+              <Icon icon={Target} size="md" className="text-text-primary" />
               <div>
                 <h3 className="font-heading text-base font-semibold text-text-primary">
                   Penetration Testing

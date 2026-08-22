@@ -124,7 +124,7 @@ export function ServiceDetail({ service, category }: { service: RawService; cate
           </Reveal>
           <Reveal delay={0.2}>
             <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-border pt-6">
-              <DataText size="lg" tone="accent">
+              <DataText size="lg" tone="primary">
                 {formatPrice(service.price, service.unit)}
               </DataText>
             </div>
@@ -132,7 +132,7 @@ export function ServiceDetail({ service, category }: { service: RawService; cate
         </Container>
       </Section>
 
-      <Section environment="white" className="py-16 md:py-20">
+      <Section environment="dark" className="py-16 md:py-20">
         <Container size="md">
           <Reveal>
             <ServiceField label="The Challenge">

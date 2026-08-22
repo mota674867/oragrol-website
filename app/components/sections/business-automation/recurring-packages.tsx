@@ -112,7 +112,7 @@ function TierCard({ tier }: { tier: RecurringPackage }) {
       }
     >
       {tier.featured && (
-        <span className="absolute -top-3 right-6 z-10 inline-flex items-center rounded-full bg-accent-strong px-2.5 py-1 font-body text-xs font-medium uppercase tracking-wide text-white">
+        <span className="absolute -top-3 right-6 z-10 inline-flex items-center rounded-full bg-accent px-2.5 py-1 font-body text-xs font-medium uppercase tracking-wide text-ink">
           Recommended
         </span>
       )}
@@ -122,7 +122,7 @@ function TierCard({ tier }: { tier: RecurringPackage }) {
         style={{ opacity: visual.accentOpacity / 100 }}
         aria-hidden="true"
       />
-      <Icon icon={visual.icon} size="md" className="text-accent" />
+      <Icon icon={visual.icon} size="md" className="text-text-primary" />
       <h3 className="font-heading text-lg font-semibold text-text-primary">{tier.name}</h3>
       <Text size="sm" tone="secondary">
         {tier.tagline}
@@ -130,7 +130,7 @@ function TierCard({ tier }: { tier: RecurringPackage }) {
 
       {contactUs ? (
         <div className="mt-2 flex flex-col items-start gap-3 border-t border-border pt-4">
-          <DataText size="lg" tone="accent">
+          <DataText size="lg" tone="primary">
             Contact us
           </DataText>
           <Text size="sm" tone="muted">
@@ -143,7 +143,7 @@ function TierCard({ tier }: { tier: RecurringPackage }) {
       ) : (
         <>
           <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-border pt-4">
-            <DataText size="lg" tone="accent">
+            <DataText size="lg" tone="primary">
               {tier.monthly_price}
             </DataText>
           </div>
@@ -175,7 +175,7 @@ export function RecurringPackages() {
   const packages = getRecurringPackages();
 
   return (
-    <Section environment="white" className="border-t border-border">
+    <Section environment="deep-blue" className="border-t border-border">
       <Container size="lg" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">Recurring packages</Caption>

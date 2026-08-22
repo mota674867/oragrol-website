@@ -44,7 +44,7 @@ const riskFillClasses: Record<RiskTier, string> = {
 
 export function OutputShape() {
   return (
-    <Section environment="light-blue">
+    <Section environment="deep-blue">
       <Container size="lg" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">What you get</Caption>

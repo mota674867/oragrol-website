@@ -19,11 +19,15 @@ import { cn } from "../ui/cn";
 export interface OragrolRingProps extends Omit<ComponentPropsWithoutRef<"svg">, "viewBox" | "children"> {
   /** Width/height in px — the ring is always square. */
   size?: number;
-  /** Ring stroke color. Defaults to the accent token. */
+  /** Ring stroke color. Defaults to the accent token (D-068: this doc
+   *  comment used to be aspirational — the default was actually a
+   *  hardcoded hex copy of the old accent value, so none of this
+   *  component's 3 call sites picked up a token change automatically.
+   *  Fixed to a real `var(--color-accent)` reference.) */
   color?: string;
 }
 
-export function OragrolRing({ size = 150, color = "#018ABE", className, ...props }: OragrolRingProps) {
+export function OragrolRing({ size = 150, color = "var(--color-accent)", className, ...props }: OragrolRingProps) {
   return (
     <svg
       width={size}

@@ -11,12 +11,12 @@ import { Reveal } from "../../motion/reveal";
  */
 export function SolutionsBridge() {
   return (
-    <Section environment="white" className="border-t border-border">
+    <Section environment="dark" className="border-t border-border">
       <Container size="lg" className="py-14">
         <Reveal>
           <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-4">
-              <Icon icon={Layers} size="md" className="mt-0.5 shrink-0 text-accent" />
+              <Icon icon={Layers} size="md" className="mt-0.5 shrink-0 text-text-primary" />
               <Text tone="secondary" size="base" className="max-w-xl">
                 Services are individual capabilities, like risk assessments or security awareness
                 training. Solutions are packaged levels of protection that combine several

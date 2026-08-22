@@ -86,7 +86,7 @@ function LocationCard({ location }: { location: Location }) {
       <div className="flex flex-col gap-4">
         {rows.map((row) => (
           <div key={row.label} className="flex items-start gap-3">
-            <Icon icon={row.icon} size="sm" className="mt-0.5 shrink-0 text-accent" />
+            <Icon icon={row.icon} size="sm" className="mt-0.5 shrink-0 text-text-primary" />
             <div>
               <Caption size="sm" tone="muted">
                 {row.label}
@@ -111,7 +111,7 @@ export function LocationsSection() {
   const thunderBay = LOCATIONS.find((l) => l.id === "thunder-bay")!;
 
   return (
-    <Section environment="light-blue">
+    <Section environment="deep-blue">
       <Container size="lg" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">Locations</Caption>

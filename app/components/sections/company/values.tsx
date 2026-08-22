@@ -26,7 +26,7 @@ const ICON_BADGE_STYLE: CSSProperties = {
  */
 export function ValuesSection() {
   return (
-    <Section environment="white" className="py-24 md:py-32">
+    <Section environment="light" className="py-24 md:py-32">
       <Container size="xl">
         <Reveal>
           <H2 className="text-center">Our Difference</H2>

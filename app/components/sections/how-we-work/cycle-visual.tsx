@@ -83,7 +83,7 @@ export function HowWeWorkCycleVisual({ className }: { className?: string }) {
   return (
     <div
       className={
-        "group relative overflow-hidden rounded-3xl border border-border bg-background env-dark shadow-2xl shadow-accent/30 " +
+        "group relative overflow-hidden rounded-3xl border border-border bg-background env-dark shadow-2xl shadow-depth/30 " +
         (className ?? "")
       }
     >

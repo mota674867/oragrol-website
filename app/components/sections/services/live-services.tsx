@@ -20,7 +20,7 @@ export function LiveServices() {
 
   return (
     <CategorySection
-      environment="white"
+      environment="dark"
       eyebrow="Cybersecurity"
       heading="Services"
       intro={`${tier1.length} categories covering the full range of cybersecurity work.`}

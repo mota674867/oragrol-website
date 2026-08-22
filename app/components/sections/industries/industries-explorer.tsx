@@ -307,7 +307,7 @@ export function IndustriesExplorer() {
   }
 
   return (
-    <Section environment="white">
+    <Section environment="dark">
       <Container size="lg" className="py-24 md:py-32">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[280px_1fr] lg:gap-16">
           {/* Mobile: horizontal scrollable tabs */}

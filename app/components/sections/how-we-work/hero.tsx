@@ -18,7 +18,7 @@ import { HowWeWorkCycleVisual } from "./cycle-visual";
  */
 export function HowWeWorkHero() {
   return (
-    <Section environment="white">
+    <Section environment="dark">
       <Container size="lg" className="py-24 md:py-32">
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div>

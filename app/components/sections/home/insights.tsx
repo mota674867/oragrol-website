@@ -20,7 +20,7 @@ const TOPICS = [
 
 export function Insights() {
   return (
-    <Section environment="white">
+    <Section environment="dark">
       <Container size="lg" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">Insights</Caption>
@@ -43,7 +43,7 @@ export function Insights() {
           {TOPICS.map((topic, i) => (
             <Reveal key={topic.label} delay={i * 0.06}>
               <div className="flex flex-col items-start gap-3 rounded-2xl border border-border bg-surface p-6">
-                <Icon icon={topic.icon} size="md" className="text-accent" />
+                <Icon icon={topic.icon} size="md" className="text-text-primary" />
                 <Text size="sm" className="font-medium">
                   {topic.label}
                 </Text>

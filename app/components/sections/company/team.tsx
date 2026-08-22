@@ -13,13 +13,13 @@ import { Reveal } from "../../motion/reveal";
  */
 export function TeamSection() {
   return (
-    <Section environment="white" className="border-y border-border py-16 md:py-20">
+    <Section environment="dark" className="border-y border-border py-16 md:py-20">
       <Container size="md">
         <Reveal>
           <div className="flex flex-col items-center gap-4 text-center">
             <span
               aria-hidden="true"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface text-accent"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface text-text-primary"
             >
               <Icon icon={Users} size="md" />
             </span>

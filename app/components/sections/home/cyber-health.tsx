@@ -51,7 +51,7 @@ export function CyberHealth() {
                 {FLOW_STEPS.map((step, i) => (
                   <li key={step.label} className="flex items-center gap-2">
                     <span className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5">
-                      <Icon icon={step.icon} size="sm" className="text-accent" />
+                      <Icon icon={step.icon} size="sm" className="text-text-primary" />
                       <span className="font-body text-xs font-medium text-text-secondary">
                         {step.label}
                       </span>

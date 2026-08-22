@@ -41,7 +41,7 @@ const FAQ_ITEMS = [
 
 export function Faq() {
   return (
-    <Section environment="light-blue">
+    <Section environment="dark">
       <Container size="md" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">Frequently Asked</Caption>

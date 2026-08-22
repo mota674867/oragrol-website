@@ -147,7 +147,7 @@ export function ResourcesExplorer() {
   const anyFilterActive = filters.contentType || filters.topic || filters.industry;
 
   return (
-    <Section environment="white" className="py-16 md:py-20">
+    <Section environment="dark" className="py-16 md:py-20">
       <Container size="xl">
         <Reveal>
           <div className="flex flex-col gap-6 rounded-2xl border border-border bg-surface p-6 sm:flex-row sm:flex-wrap sm:gap-x-10 sm:gap-y-5">

@@ -2,22 +2,31 @@ import type { ComponentPropsWithoutRef } from "react";
 import { cn } from "./cn";
 
 /**
- * Section — wraps a block of the page in one of the three approved
- * background environments (app/styles/tokens.css: .env-dark / .env-white /
- * .env-light-blue). Only background + text-primary/secondary repoint per
- * environment; surface, border, accent, and text-muted stay constant by
- * design, so cards/badges/buttons/inputs read the same regardless of which
- * Section they sit in — that's what "every component must work in three
- * section environments" means in practice, and it's why components in this
- * folder only ever reference the semantic tokens, never raw hex.
+ * Section — wraps a block of the page in one of the approved background
+ * environments (app/styles/tokens.css: .env-dark / .env-deep-blue /
+ * .env-light). Each environment repoints the same semantic tokens
+ * (background, surface, border, text-primary/secondary/muted, accent) —
+ * that's what "every component must work in every section environment"
+ * means in practice, and it's why components in this folder only ever
+ * reference the semantic tokens, never raw hex.
+ *
+ * D-068 (visual-system migration): "white"/"light-blue" retired — the new
+ * approved palette has no light-background color at all except Warm
+ * Off-White, which is used sparingly (see `light` below), not as a
+ * systemic second theme. Most former White/Light-blue sections became
+ * `dark`; former Light-blue sections (plus a few former White ones whose
+ * content reads as "supporting depth" — pricing/selected cards,
+ * dashboard-ish data, process visuals) became `deep-blue`, matching the
+ * brief's own Deep Blue role. See each Section call site's own comment for
+ * why that specific section got the tone it did.
  */
 
-export type SectionEnvironment = "dark" | "white" | "light-blue";
+export type SectionEnvironment = "dark" | "deep-blue" | "light";
 
 const envClasses: Record<SectionEnvironment, string> = {
   dark: "env-dark",
-  white: "env-white",
-  "light-blue": "env-light-blue",
+  "deep-blue": "env-deep-blue",
+  light: "env-light",
 };
 
 // Deliberately NOT a fully generic/polymorphic `as` (e.g. `ElementType` or

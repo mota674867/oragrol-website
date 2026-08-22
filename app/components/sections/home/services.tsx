@@ -84,7 +84,7 @@ const FINALIZING_SERVICES: ServiceEntry[] = [
 
 export function Services() {
   return (
-    <Section environment="white">
+    <Section environment="dark">
       <Container size="xl" className="py-24 md:py-32">
         <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div>
@@ -115,7 +115,7 @@ export function Services() {
                 href="/services"
                 className={i === 0 ? "flex h-full flex-col justify-between p-8" : "flex h-full flex-col justify-between"}
               >
-                <Icon icon={service.icon} size={i === 0 ? "lg" : "md"} className="text-accent" />
+                <Icon icon={service.icon} size={i === 0 ? "lg" : "md"} className="text-text-primary" />
                 <div className="mt-6">
                   <h3
                     className={

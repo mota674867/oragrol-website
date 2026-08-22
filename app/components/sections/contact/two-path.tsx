@@ -33,7 +33,7 @@ const HQ_EMAIL = hq.email as string;
 
 export function TwoPath() {
   return (
-    <Section environment="white">
+    <Section environment="dark">
       <Container size="lg" className="py-24 md:py-32">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
           <Reveal>

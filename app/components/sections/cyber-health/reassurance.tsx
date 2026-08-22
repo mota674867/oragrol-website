@@ -25,13 +25,13 @@ const POINTS: Point[] = [
 
 export function Reassurance() {
   return (
-    <Section environment="white" className="border-t border-border">
+    <Section environment="dark" className="border-t border-border">
       <Container size="lg" className="py-14">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {POINTS.map((point, i) => (
             <Reveal key={point.copy} delay={i * 0.06}>
               <div className="flex items-center gap-3">
-                <Icon icon={point.icon} size="md" className="shrink-0 text-accent" />
+                <Icon icon={point.icon} size="md" className="shrink-0 text-text-primary" />
                 <Text size="sm" tone="secondary">
                   {point.copy}
                 </Text>

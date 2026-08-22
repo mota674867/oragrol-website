@@ -16,9 +16,11 @@ const PROBLEM_POINTS = [
   "Most teams don't have the time or in-house expertise to know what actually matters most.",
 ];
 
+// dark (D-068): was "white" under the old system; the new palette has no
+// light-background color used systemically — see tokens.css.
 export function SecurityChallenge() {
   return (
-    <Section environment="white" className="relative overflow-hidden">
+    <Section environment="dark" className="relative overflow-hidden">
       {/* restrained architectural graphic — thin outline slab, not stock imagery */}
       <div
         aria-hidden="true"

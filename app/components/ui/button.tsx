@@ -29,10 +29,13 @@ const sizeClasses: Record<ButtonSize, string> = {
 };
 
 const variantClasses: Record<ButtonVariant, string> = {
-  // bg-accent-strong, not bg-accent: white text directly on --accent only
-  // computes to 3.90:1 (fails WCAG AA's 4.5:1 for normal text) — see D-010.
-  // accent-strong is the same blue family, just dark enough to clear AA.
-  primary: "bg-accent-strong text-white hover:bg-accent-strong/90",
+  // D-068 (visual-system migration): Deep Ink text directly on plain
+  // --accent (Burnt Orange) now computes to 4.89:1 — passes AA on its own,
+  // unlike the old cyan (3.90:1, needed a separate darkened fill just to
+  // clear contrast — see the original D-010). bg-accent-strong on hover is
+  // now a pure visual-feedback lightening, not a contrast fix (see
+  // tokens.css's own --accent-strong comment for the actual numbers).
+  primary: "bg-accent text-ink hover:bg-accent-strong",
   secondary:
     "border border-border bg-surface text-text-primary hover:border-text-secondary hover:bg-text-primary/5",
   ghost: "text-text-primary hover:bg-text-primary/5",

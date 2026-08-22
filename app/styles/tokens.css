@@ -1,18 +1,23 @@
 /**
  * Global design-token system.
  *
- * Source of truth: Website Implementation Brief, Step 1 (amended in Step 3
- * — see the Step 3 note in section 3 below for the one addition since).
- * Every hex value below is copied verbatim from an approved brief — do not
- * add, change, or reinterpret any value here without approval.
+ * Visual-system migration (2026-08-22, D-068): the entire color and
+ * typography system replaced site-wide per the approved ORAGROL Visual
+ * System brief — a color/type migration, not a redesign. Page
+ * architecture, content, and the Section-environment MECHANISM below are
+ * unchanged; only what each token resolves to, and which environment each
+ * section opts into, changed. The previous system (Oragrol Cyan #018ABE +
+ * Space Grotesk/Inter/JetBrains Mono/Epilogue) is fully superseded — see
+ * DECISIONS.md D-068 for the full record, including the contrast-driven
+ * decisions below.
  *
- * Structure:
+ * Structure (unchanged from the original Step 1/3 architecture):
  *   1. Raw palette   — the approved hex values, named after the value itself.
  *   2. Semantic layer — what each raw value MEANS (background, text, accent…).
  *      This is the layer components should reference (via Tailwind utilities
  *      below), never the raw palette directly.
- *   3. Section environments — Dark / White / Light-blue. Sections opt into an
- *      environment with a class (`.env-dark`, `.env-white`, `.env-light-blue`)
+ *   3. Section environments — Dark / Deep-Blue / Light. Sections opt into an
+ *      environment with a class (`.env-dark`, `.env-deep-blue`, `.env-light`)
  *      which repoints the semantic layer for everything inside it.
  *   4. Tailwind wiring — exposes the semantic layer as Tailwind utilities
  *      (bg-background, text-text-secondary, font-heading, etc.) via
@@ -20,101 +25,140 @@
  */
 
 :root {
-  /* 1. Raw palette — approved values only */
-  --palette-black-900: #0a0a0a; /* Background (dark) */
-  --palette-black-800: #141414; /* Surface (dark) */
-  --palette-black-700: #262626; /* Border (dark) */
-  --palette-gray-100: #f4f4f5; /* Surface (White env) — Step 3 addition, see note below */
-  --palette-gray-200: #e4e4e7; /* Border (White / Light-blue envs) — Step 3 addition */
-  --palette-blue-600: #018abe; /* Primary accent */
-  --palette-blue-700: #017cac; /* Accent, darkened — text-on-fill contrast fix, D-010 */
-  --palette-blue-300: #97cadb; /* Light tint */
-  --palette-white: #ffffff; /* Text primary */
-  --palette-gray-400: #9ca3af; /* Text secondary */
-  --palette-gray-450: #75828d; /* Text muted, Dark env only — contrast fix, D-010 */
-  --palette-gray-500: #6b7280; /* Text muted */
-  --palette-red-500: #e24b4a; /* Risk: Critical */
-  --palette-orange-400: #f2994a; /* Risk: High */
-  --palette-yellow-400: #f2c94c; /* Risk: Medium */
-  --palette-green-500: #27ae60; /* Risk: Low */
+  /* 1. Raw palette — the 6 approved brand colors, verbatim hex. */
+  --palette-deep-ink: #0a0c12; /* Background (dark), ~48% weight, dominant */
+  --palette-deep-blue: #023661; /* Supporting depth, ~15% weight — never primary identity */
+  --palette-warm-off-white: #e9e5dc; /* Text (replaces pure white), ~18% weight */
+  --palette-violet-gray: #3f3a42; /* Secondary cards / elevated panels, ~7% weight */
+  --palette-steel: #76828e; /* Secondary text, metadata, borders, ~7% weight */
+  --palette-burnt-orange: #db5227; /* Signature accent ONLY — CTA/hover/highlight, ~5% weight, never dominant */
+
+  /* Derived variants — same technique this file has always used (see the
+     original D-010 --accent-strong/--text-muted precedent): a color from
+     the approved 6 is blended toward black/white to fix ONE specific
+     legibility failure, never a new hue invented from outside the palette.
+     Verified via the actual WCAG contrast formula (relative luminance),
+     not eyeballed — see D-068 for the full pair-by-pair numbers.
+
+     --accent-on-light: Burnt Orange text/icons directly on a Warm
+     Off-White background (the new `.env-light`) computes to 3.18:1 — below
+     AA's 4.5:1 for normal text. Darkened 25% toward black: 5.09:1. Used
+     only inside `.env-light`.
+     --accent-on-deep-blue / --text-secondary-on-deep-blue: Burnt Orange
+     (3.08:1) and Steel Gray (3.14:1) both fail 4.5:1 directly on Deep Blue.
+     Lightened toward Warm Off-White until both clear 4.5:1. Used only
+     inside `.env-deep-blue`. */
+  --accent-on-light: #a43e1d; /* Burnt Orange darkened 25% — 5.09:1 on Warm Off-White */
+  --accent-on-deep-blue: #ef8562; /* Burnt Orange lightened toward Warm Off-White — 4.85:1 on Deep Blue */
+  --text-secondary-on-deep-blue: #b7c0c8; /* Steel Gray lightened toward Warm Off-White — 6.02:1 on Deep Blue */
+
+  /* --ink: a fixed reference to Deep Ink, NOT repointed by any
+     environment (unlike --text-primary etc.) — needed because the
+     brief's primary-CTA spec is literally "Burnt Orange background, Deep
+     Ink text", and that pairing must hold regardless of which environment
+     the button happens to render in. Verified: Deep Ink on the base
+     --accent (4.89:1) and on --accent-on-deep-blue (7.63:1) both pass;
+     Deep Ink on --accent-on-light (a darkened variant meant for
+     text-legibility-on-light-bg, not for a button fill) would fail
+     (3.06:1) — a real edge case, but `.env-light` is used for exactly 2
+     sections today and neither renders a primary Button, so this is
+     flagged rather than solved with a second accent token nothing
+     currently needs. */
+  --ink: var(--palette-deep-ink);
+
+  /* --depth family: Deep Blue-based, for AMBIENT/BACKGROUND effects only
+     (glows, shadow washes behind cards) — never a foreground icon/text
+     stroke. Raw Deep Blue is far too dark to read as a visible icon color
+     on top of an already-dark background (verified: 1.6:1 on Deep Ink,
+     1.1:1 on Violet-Gray — effectively invisible), but that same darkness
+     is exactly right for a soft blurred "depth" glow sitting BEHIND
+     content, matching the brief's own "background behind 3D elements"
+     framing. Used by GlowEffect's default colors (replaces the old
+     accent-family default) so the ~16 cards that use it for ambient
+     depth read as "supporting depth", not "everything glows orange". */
+  --depth-light: color-mix(in srgb, var(--palette-deep-blue) 55%, var(--palette-warm-off-white));
+  --depth: var(--palette-deep-blue);
+  --depth-strong: color-mix(in srgb, var(--palette-deep-blue) 70%, black);
 
   /* 2. Semantic layer — defaults to the Dark environment, since the site
      base (including the 3D hero, which stays untouched) is dark. */
-  --background: var(--palette-black-900);
-  --surface: var(--palette-black-800);
-  --border: var(--palette-black-700);
-  --text-primary: var(--palette-white);
-  --text-secondary: var(--palette-gray-400);
-  --text-muted: var(--palette-gray-500);
-  --accent: var(--palette-blue-600);
-  --accent-light: var(--palette-blue-300);
-  /* Accent-on-fill contrast fix (D-010, 2026-08-13 audit finding #6): white
-     text on --accent computes to 3.90:1, below WCAG AA's 4.5:1 for normal
-     text (it does clear the 3:1 large-text/UI-component threshold). Rather
-     than change the locked brand --accent itself — used everywhere, not
-     just text-on-fill — --accent-strong is a dedicated, slightly darker
-     value (~4.7:1 with white text) for the one context that needs it: the
-     Button/ButtonLink primary variant's solid fill. Same hue/family as
-     --accent, not a different color. Constant across environments, same as
-     --accent itself (not repointed per section below). */
-  --accent-strong: var(--palette-blue-700);
+  --background: var(--palette-deep-ink);
+  --surface: var(--palette-violet-gray);
+  --border: var(--palette-steel);
+  --text-primary: var(--palette-warm-off-white);
+  --text-secondary: var(--palette-steel);
+  --text-muted: color-mix(in srgb, var(--palette-steel) 65%, var(--palette-deep-ink));
+  --accent: var(--palette-burnt-orange);
+  --accent-light: color-mix(in srgb, var(--palette-burnt-orange) 55%, var(--palette-warm-off-white));
+  /* Accent-on-fill contrast (D-068): Deep Ink text directly on plain
+     Burnt Orange computes to 4.89:1 — passes AA, but only just, so there's
+     very little room to DARKEN further for a hover state without dropping
+     back under 4.5:1 (verified: darkening loses contrast here since Deep
+     Ink text is already near-black — the gap shrinks, not grows). Old cyan
+     had the opposite problem (3.90:1, needed darkening just to reach AA).
+     --accent-strong is therefore a slight LIGHTENING instead — still moves
+     visibly on hover, and contrast only improves (5.58:1) as it lightens. */
+  --accent-strong: color-mix(in srgb, var(--palette-burnt-orange) 90%, white);
 
   /* Risk-tier colors are functional data indicators only (severity labels,
-     score badges, charts) — never use them decoratively. */
-  --risk-critical: var(--palette-red-500);
-  --risk-high: var(--palette-orange-400);
-  --risk-medium: var(--palette-yellow-400);
-  --risk-low: var(--palette-green-500);
+     score badges, charts) — outside the 6-color brand system by design,
+     unchanged by this migration. Never use them decoratively. */
+  --risk-critical: #e24b4a;
+  --risk-high: #f2994a;
+  --risk-medium: #f2c94c;
+  --risk-low: #27ae60;
 }
 
-/* 3. Section environments — applied per-section, not tied to a fixed
-   rhythm or to OS light/dark preference. Each overrides only what the
-   brief specifies for that environment; anything unspecified (text-muted,
-   accent) inherits the root/Dark values unchanged.
+/* 3. Section environments — applied per-section. Only Dark/Deep-Blue/Light
+   exist now (D-068 retired White/Light-blue): every color in the approved
+   palette is dark-family except Warm Off-White, which is a TEXT color, not
+   a background — see D-068 for why "White"/"Light-blue" sections were
+   converted rather than just recolored. `.env-light` is the deliberate,
+   sparing exception (2 sections site-wide, chosen for a genuine contrast
+   beat — see each Section's own call site), not a systemic replacement. */
 
-   Step 3 addition: .env-white and .env-light-blue now also repoint
-   --surface/--border. Originally (Step 1) they didn't, which meant every
-   environment inherited the Dark surface/border (#141414 / #262626) —
-   fine for Dark, but on a white or light-blue background it rendered
-   bordered cards, secondary buttons, and form inputs as near-black boxes
-   with near-black text on top (text-secondary is also near-black in these
-   two environments), which is illegible. Confirmed visually while building
-   the Step 3 component kit (app/components/ui/), approved to fix here.
-   --palette-gray-100/200 are new — not in either brief — chosen as the
-   minimal light-neutral pair needed to keep those components legible. */
-
-/* Dark — explicit class form of the root default, for clarity when a
-   Dark section is nested inside a non-Dark one. */
 .env-dark {
-  --background: var(--palette-black-900);
-  --surface: var(--palette-black-800);
-  --border: var(--palette-black-700);
-  --text-primary: var(--palette-white);
-  --text-secondary: var(--palette-gray-400);
-  /* Contrast fix (D-010, 2026-08-13 audit finding #7): the root/default
-     --text-muted (--palette-gray-500, #6B7280) computes to 4.09:1 on this
-     environment's #0A0A0A background — below WCAG AA's 4.5:1 for normal
-     text. On White/Light-blue it's ~4.84:1, already passing, so only Dark
-     needs an override here rather than changing the shared raw value. */
-  --text-muted: var(--palette-gray-450);
+  --background: var(--palette-deep-ink);
+  --surface: var(--palette-violet-gray);
+  --border: var(--palette-steel);
+  --text-primary: var(--palette-warm-off-white);
+  --text-secondary: var(--palette-steel);
+  --text-muted: color-mix(in srgb, var(--palette-steel) 65%, var(--palette-deep-ink));
+  --accent: var(--palette-burnt-orange);
 }
 
-/* White */
-.env-white {
-  --background: var(--palette-white);
-  --surface: var(--palette-gray-100);
-  --border: var(--palette-gray-200);
-  --text-primary: var(--palette-black-900);
-  --text-secondary: var(--palette-black-800);
+/* Deep-Blue — the "supporting depth" rhythm environment (D-068): most
+   former Light-blue sections, plus a handful of former White sections
+   whose content genuinely reads as "structural depth" (pricing/selected
+   cards, dashboard-ish data, process/cycle visuals) per the brief's own
+   Deep Blue role. --accent/--text-secondary are repointed to lightened,
+   contrast-safe variants here (see the derived-variant comment above) —
+   plain --accent/--text-secondary would fail 4.5:1 directly on this
+   background. --surface stays Violet-Gray (still the correct "elevated
+   panel on a dark background" role regardless of which dark background). */
+.env-deep-blue {
+  --background: var(--palette-deep-blue);
+  --surface: var(--palette-violet-gray);
+  --border: var(--palette-steel);
+  --text-primary: var(--palette-warm-off-white);
+  --text-secondary: var(--text-secondary-on-deep-blue);
+  --text-muted: color-mix(in srgb, var(--palette-steel) 75%, var(--palette-deep-blue));
+  --accent: var(--accent-on-deep-blue);
 }
 
-/* Light-blue */
-.env-light-blue {
-  --background: var(--palette-blue-300);
-  --surface: var(--palette-white);
-  --border: var(--palette-gray-200);
-  --text-primary: var(--palette-black-900);
-  --text-secondary: var(--palette-black-800);
+/* Light — Warm Off-White background / Deep Ink text. The one deliberate
+   "lighter" beat in an otherwise dark-family site — used sparingly (2
+   sections total: Company/Values, Contact/General Inquiry), never as a
+   systemic second theme. --accent is repointed to the darkened variant
+   (plain Burnt Orange fails 4.5:1 on this background). */
+.env-light {
+  --background: var(--palette-warm-off-white);
+  --surface: #ffffff;
+  --border: color-mix(in srgb, var(--palette-steel) 35%, var(--palette-warm-off-white));
+  --text-primary: var(--palette-deep-ink);
+  --text-secondary: color-mix(in srgb, var(--palette-steel) 75%, var(--palette-deep-ink));
+  --text-muted: color-mix(in srgb, var(--palette-steel) 55%, var(--palette-deep-ink));
+  --accent: var(--accent-on-light);
 }
 
 /* 4. Tailwind wiring — `inline` so these resolve the CSS variables above at
@@ -131,18 +175,28 @@
   --color-accent: var(--accent);
   --color-accent-light: var(--accent-light);
   --color-accent-strong: var(--accent-strong);
+  --color-ink: var(--ink);
+  --color-depth-light: var(--depth-light);
+  --color-depth: var(--depth);
+  --color-depth-strong: var(--depth-strong);
   --color-risk-critical: var(--risk-critical);
   --color-risk-high: var(--risk-high);
   --color-risk-medium: var(--risk-medium);
   --color-risk-low: var(--risk-low);
 
-  /* Typography — current baseline, intentionally NOT locked. Swap a
-     typeface by changing its next/font import in app/layout.tsx; nothing
-     else needs to change. */
-  --font-heading: var(--font-space-grotesk); /* Headings */
-  --font-body: var(--font-inter); /* Body / UI */
-  --font-data: var(--font-jetbrains-mono); /* Scores / data */
-  --font-brand: var(--font-epilogue); /* Logo / brand only */
+  /* Typography (D-068): Space Grotesk stays for headings/brand identity
+     (H1-H3, service/package names, major numbers). Manrope replaces Inter
+     for body/UI (nav, buttons, paragraphs, forms) — the everyday font.
+     IBM Plex Sans replaces JetBrains Mono for technical/data (service
+     codes, tables, Cyber Health Score data) — swap a typeface by changing
+     its next/font import in app/layout.tsx; nothing else needs to change.
+     font-brand (Epilogue) is untouched — it belongs to the locked
+     OragrolLogo mark's own source file, not this content typography
+     system; see oragrol-logo.tsx. */
+  --font-heading: var(--font-space-grotesk); /* Headings / brand identity */
+  --font-body: var(--font-manrope); /* Body / UI */
+  --font-data: var(--font-ibm-plex-sans); /* Scores / technical data */
+  --font-brand: var(--font-epilogue); /* Logo / brand only — unchanged */
 }
 
 /* 5. Layout — `--header-height` is the one layout constant genuinely

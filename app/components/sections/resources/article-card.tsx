@@ -85,7 +85,7 @@ export function FeaturedArticleCard({ article }: { article: ResourceArticle }) {
       href={`/resources/${article.slug}`}
       className={cn(
         "group relative block overflow-hidden rounded-3xl border border-border bg-background p-8 md:p-12",
-        "env-dark shadow-2xl shadow-accent/30",
+        "env-dark shadow-2xl shadow-depth/30",
         "transition-[box-shadow,border-color,transform] duration-200 hover:-translate-y-1 hover:border-accent/40 hover:shadow-accent/50",
       )}
     >

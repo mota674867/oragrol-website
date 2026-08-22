@@ -59,7 +59,7 @@ export function GeneralInquiry() {
   }
 
   return (
-    <Section environment="white" className="border-t border-border">
+    <Section environment="light" className="border-t border-border">
       <Container size="lg" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">General Inquiry</Caption>
@@ -78,7 +78,7 @@ export function GeneralInquiry() {
           <Card className="mt-10 max-w-xl p-8">
             {status === "success" ? (
               <div className="flex flex-col items-start gap-3 py-4" role="status" aria-live="polite">
-                <Icon icon={CheckCircle2} size="lg" className="text-accent" />
+                <Icon icon={CheckCircle2} size="lg" className="text-text-primary" />
                 <Text tone="primary" className="font-medium">
                   Message sent — we&rsquo;ll get back to you soon.
                 </Text>

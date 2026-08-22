@@ -64,7 +64,15 @@ export type GlowEffectProps = {
   duration?: number;
 };
 
-const DEFAULT_COLORS = ["var(--color-accent-light)", "var(--color-accent)", "var(--color-accent-strong)"];
+// D-068 (visual-system migration): was the accent family (Oragrol Cyan,
+// then Burnt Orange). Ambient background glows behind ~16 cards
+// site-wide are exactly the ubiquitous "ambient" role the brief reserves
+// Burnt Orange from ("never a dominant color") — moved to the new Deep
+// Blue-based --depth family instead, matching its explicit "background
+// behind 3D elements / supporting depth" role. A handful of call sites
+// that want a genuine accent-colored glow (a real highlight, not ambient
+// depth) can still pass `colors` explicitly.
+const DEFAULT_COLORS = ["var(--color-depth-light)", "var(--color-depth)", "var(--color-depth-strong)"];
 
 export function GlowEffect({
   className,

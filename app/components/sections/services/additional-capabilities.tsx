@@ -102,7 +102,7 @@ function CapabilityMark({ service }: { service: FinalizingService }) {
 
 export function AdditionalCapabilities() {
   return (
-    <Section environment="light-blue">
+    <Section environment="deep-blue">
       <Container size="lg" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">Additional capabilities</Caption>

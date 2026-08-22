@@ -50,14 +50,14 @@ function TierCard({ tier, index }: { tier: SolutionTier; index: number }) {
         style={{ opacity: visual.accentOpacity / 100 }}
         aria-hidden="true"
       />
-      <Icon icon={visual.icon} size="md" className="text-accent" />
+      <Icon icon={visual.icon} size="md" className="text-text-primary" />
       <h3 className="font-heading text-lg font-semibold text-text-primary">{tier.name}</h3>
       <Text size="sm" tone="secondary">
         {tier.tagline}
       </Text>
 
       <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-border pt-4">
-        <DataText size="lg" tone="accent">
+        <DataText size="lg" tone="primary">
           {tier.monthly_price}
         </DataText>
       </div>
@@ -85,7 +85,7 @@ export function TierCards() {
   const tiers = getTiers();
 
   return (
-    <Section environment="white">
+    <Section environment="deep-blue">
       <Container size="lg" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">The three levels</Caption>

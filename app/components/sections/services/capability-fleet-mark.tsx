@@ -62,7 +62,7 @@ export function CapabilityFleetMark({ className }: { className?: string }) {
           Endpoint coverage
         </Caption>
         <div className="flex items-baseline gap-1">
-          <DataText size="md" tone="accent">
+          <DataText size="md" tone="primary">
             {PROTECTED_COUNT}
           </DataText>
           <DataText size="sm" tone="muted">

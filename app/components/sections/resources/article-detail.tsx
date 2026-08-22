@@ -119,7 +119,7 @@ export function ArticleDetail({ article }: { article: ResourceArticle }) {
         </Container>
       </Section>
 
-      <Section environment="white" className="py-16 md:py-20">
+      <Section environment="dark" className="py-16 md:py-20">
         <Container size="md">
           <Reveal>
             <ArticleBody body={article.body} />

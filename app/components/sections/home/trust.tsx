@@ -37,7 +37,7 @@ const PILLARS = [
 
 export function Trust() {
   return (
-    <Section environment="white">
+    <Section environment="dark">
       <Container size="lg" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">Why Businesses Work With Oragrol</Caption>
@@ -50,7 +50,7 @@ export function Trust() {
           {PILLARS.map((pillar, i) => (
             <Reveal key={pillar.title} delay={i * 0.08}>
               <div className="flex flex-col gap-3">
-                <Icon icon={pillar.icon} size="md" className="text-accent" />
+                <Icon icon={pillar.icon} size="md" className="text-text-primary" />
                 <h3 className="font-heading text-base font-semibold text-text-primary">
                   {pillar.title}
                 </h3>

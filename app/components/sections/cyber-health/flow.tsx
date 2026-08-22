@@ -32,7 +32,7 @@ const FLOW_STEPS: FlowStep[] = [
 
 export function Flow() {
   return (
-    <Section environment="white">
+    <Section environment="dark">
       <Container size="xl" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">The flow</Caption>
@@ -59,8 +59,8 @@ export function Flow() {
             {FLOW_STEPS.map((step, i) => (
               <Reveal key={step.n} delay={i * 0.06}>
                 <div className="relative flex flex-col gap-3">
-                  <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border border-accent bg-background">
-                    <Icon icon={step.icon} size="md" className="text-accent" />
+                  <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background">
+                    <Icon icon={step.icon} size="md" className="text-text-primary" />
                   </div>
                   <div>
                     <span className="font-data text-xs text-text-muted">{step.n}</span>

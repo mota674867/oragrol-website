@@ -32,7 +32,7 @@ const STAGES = [
 
 export function HowWeWork() {
   return (
-    <Section environment="light-blue">
+    <Section environment="deep-blue">
       <Container size="md" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">How We Work</Caption>
@@ -52,7 +52,7 @@ export function HowWeWork() {
               return (
                 <Reveal key={stage.n} delay={i * 0.1}>
                   <div className="relative flex items-start gap-6 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-x-10">
-                    <span className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent bg-background font-data text-sm text-accent sm:col-start-2 sm:row-start-1">
+                    <span className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-background font-data text-sm text-text-primary sm:col-start-2 sm:row-start-1">
                       {stage.n}
                     </span>
                     <div

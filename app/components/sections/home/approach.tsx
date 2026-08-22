@@ -16,9 +16,11 @@ const STAGES = [
   { n: "04", label: "Improve", copy: "Continue strengthening security posture.", icon: TrendingUp },
 ] as const;
 
+// deep-blue (D-068): rhythm variation on Home's long section stack — was
+// already dark by default; promoted for "supporting depth" alternation.
 export function Approach() {
   return (
-    <Section environment="dark">
+    <Section environment="deep-blue">
       <Container size="lg" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">The Oragrol Approach</Caption>

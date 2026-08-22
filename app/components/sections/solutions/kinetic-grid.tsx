@@ -100,15 +100,25 @@ const LINE_BASE = { r: 255, g: 255, b: 255, a: 0.13 };
 const NODE_BASE_RADIUS = 1.8;
 const NODE_ACTIVE_RADIUS = 3.2;
 
-// Locked-palette theme (item 2) — raw hex values copied verbatim from
-// tokens.css, not reinterpreted. #0a0a0a = --palette-black-900
-// (--background in .env-dark). #018abe = --palette-blue-600 (--accent).
+// Locked-palette theme (item 2) — raw hex/RGB values copied verbatim from
+// tokens.css, not reinterpreted. Canvas 2D can't read CSS custom
+// properties, so these are a hand-kept mirror of the token values — see
+// D-068 (2026-08-22 visual-system migration): #0a0a0a/#018abe (Oragrol
+// Cyan) replaced with the new palette's Deep Ink background and Burnt
+// Orange active color. Burnt Orange fits the "active/hover" role here
+// specifically because this canvas's active state IS a hover/pointer
+// interaction (the warp effect follows the cursor, ripple fires on
+// click) — the resting/idle grid stays a neutral white wash (unchanged
+// below), so the accent color only ever appears as a real interaction
+// highlight, never as the canvas's dominant resting color.
+// #0A0C12 = --palette-deep-ink (--background in .env-dark).
+// #DB5227 = --palette-burnt-orange (--accent) = rgb(219, 82, 39).
 const THEME = {
-  bg: "#0a0a0a",
-  lineActive: { r: 1, g: 138, b: 190, a: 0.9 },
-  nodeActive: { r: 1, g: 138, b: 190, a: 1.0 },
-  glow: "1,138,190",
-  ripple: "1,138,190",
+  bg: "#0A0C12",
+  lineActive: { r: 219, g: 82, b: 39, a: 0.9 },
+  nodeActive: { r: 219, g: 82, b: 39, a: 1.0 },
+  glow: "219,82,39",
+  ripple: "219,82,39",
 };
 
 function lerpN(a: number, b: number, t: number) {
@@ -386,7 +396,7 @@ export function KineticGrid({ children, className }: { children?: ReactNode; cla
   }, [draw, reducedMotion]);
 
   return (
-    <div ref={wrapperRef} className={cn("relative w-full overflow-hidden bg-[#0a0a0a]", className)}>
+    <div ref={wrapperRef} className={cn("relative w-full overflow-hidden bg-background", className)}>
       <canvas ref={canvasRef} className="absolute inset-0 z-0 h-full w-full" aria-hidden="true" />
       <div className="relative z-10">{children}</div>
     </div>

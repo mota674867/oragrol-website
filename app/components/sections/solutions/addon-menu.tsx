@@ -27,15 +27,15 @@ function AddonCard({ addon }: { addon: AddonService }) {
     <Card variant="bordered" className="flex h-full flex-col gap-3">
       <span
         aria-hidden="true"
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-surface"
       >
-        <Icon icon={Plus} size="sm" className="text-accent" />
+        <Icon icon={Plus} size="sm" className="text-text-primary" />
       </span>
       <h3 className="font-heading text-base font-semibold text-text-primary">{addon.name}</h3>
       <Text size="sm" tone="secondary">
         {addon.blurb}
       </Text>
-      <DataText size="sm" tone="accent" className="mt-1">
+      <DataText size="sm" tone="primary" className="mt-1">
         {formatPrice(addon.price, addon.unit)}
       </DataText>
       <Text size="sm" tone="muted" className="mt-auto border-t border-border pt-3">
@@ -49,7 +49,7 @@ export function AddonMenu() {
   const { description, services } = getAddonMenu();
 
   return (
-    <Section environment="white" className="border-t border-border">
+    <Section environment="dark" className="border-t border-border">
       <Container size="lg" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">Available add-ons</Caption>

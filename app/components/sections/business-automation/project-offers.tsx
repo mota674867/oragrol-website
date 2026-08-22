@@ -34,9 +34,9 @@ function OfferCard({ offer, step }: { offer: OneTimeOffer; step: number }) {
       <div className="flex items-center gap-3">
         <span
           aria-hidden="true"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-surface"
         >
-          <Icon icon={icon} size="sm" className="text-accent" />
+          <Icon icon={icon} size="sm" className="text-text-primary" />
         </span>
         <Caption tone="accent">
           Step {step} · {offer.type}
@@ -57,7 +57,7 @@ function OfferCard({ offer, step }: { offer: OneTimeOffer; step: number }) {
       </div>
 
       <div className="mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-border pt-4">
-        <DataText size="lg" tone="accent">
+        <DataText size="lg" tone="primary">
           {offer.price}
         </DataText>
         <Text size="sm" tone="muted">
@@ -77,7 +77,7 @@ export function ProjectOffers() {
   const offers = getOneTimeOffers();
 
   return (
-    <Section environment="white">
+    <Section environment="dark">
       <Container id="packages" size="lg" className="scroll-mt-[calc(var(--header-height)+2rem)] py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">How it starts</Caption>

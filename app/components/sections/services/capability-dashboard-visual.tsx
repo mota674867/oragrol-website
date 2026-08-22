@@ -65,7 +65,7 @@ export function CapabilityDashboardVisual({ className }: { className?: string })
     <div
       className={
         "group relative overflow-hidden rounded-3xl border border-border bg-background " +
-        "env-dark shadow-2xl shadow-accent/30 " +
+        "env-dark shadow-2xl shadow-depth/30 " +
         "transition-[box-shadow,border-color,transform] duration-200 " +
         "hover:-translate-y-1 hover:border-accent/40 hover:shadow-accent/50 " +
         (className ?? "")
@@ -81,7 +81,7 @@ export function CapabilityDashboardVisual({ className }: { className?: string })
         </div>
 
         <div className="mt-6 flex items-baseline gap-2">
-          <DataText size="xl" tone="accent">
+          <DataText size="xl" tone="primary">
             78
           </DataText>
           <DataText size="lg" tone="secondary">

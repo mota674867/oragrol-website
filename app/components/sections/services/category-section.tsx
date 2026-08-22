@@ -80,7 +80,7 @@ export function CategorySection({
   basePath,
   numeralFor,
 }: {
-  environment: "white" | "light-blue";
+  environment: "dark" | "deep-blue";
   eyebrow: string;
   heading: string;
   intro: string;
