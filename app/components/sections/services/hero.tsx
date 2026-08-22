@@ -24,11 +24,33 @@ import { Reveal } from "../../motion/reveal";
  * top/bottom on wide desktop viewports (section proportionally wider than
  * the 1512:1145 image) and left/right on narrow/tall mobile viewports
  * (section proportionally taller), never both, and never distorts the
- * photo itself. `object-position` is anchored near the face's own
- * position in the source frame (roughly 62% across, 36% down) so the
- * crop stays face-centered regardless of which axis a given viewport
- * crops — verified by screenshot at every required breakpoint, not
- * assumed from the aspect-ratio math alone.
+ * photo itself. `object-position` (`object-[62%_36%]`) is anchored near
+ * the face's own position in the source frame so the crop stays
+ * face-centered regardless of which axis a given viewport crops.
+ *
+ * Desktop repositioning (2026-08-22 follow-up): Mohammad reported the
+ * face reading as too centered, overlapping the headline. Root cause:
+ * at desktop widths the section's box is proportionally WIDER than the
+ * 1512:1145 image, so `object-cover` scales to match width exactly —
+ * there is zero horizontal excess left for `object-position`'s X value
+ * to pan across (it only ever affects the vertical/top-bottom crop at
+ * these viewports), which is why the face sat wherever the source
+ * photo's own native composition placed it rather than anywhere
+ * `object-position` implied. A first attempt (`transform: scale()` on
+ * a shifted `transform-origin`) was tried and rejected after screenshot
+ * review — it changed the framing but didn't land the face predictably
+ * in the right half. Fixed instead with a plain `translateX` (`md:
+ * translate-x-[10%] lg:translate-x-[16%] xl:translate-x-[20%]`,
+ * desktop-only, mobile/tablet untouched): translating the already-fitted
+ * `object-cover` box rightward reveals flat `--background` on its now-
+ * exposed left edge (exactly the "clean dark left" the brief asks for,
+ * with zero extra markup) while the image's own excess simply clips
+ * further past the right edge, still fully covered. No zoom, no resize
+ * — the face's on-screen size is unchanged, only its position shifted,
+ * per the explicit "keep it large, don't shrink it to solve the
+ * overlap" instruction. Verified via screenshot at 1440/1920/2560 (face
+ * lands in the right ~45% at each, headline fully clear) and re-checked
+ * at 390px mobile to confirm the unrelated breakpoints were untouched.
  *
  * Top edge: no fade needed here — `SiteHeader` (`fixed`) already carries
  * its own two-stacked-gradient background (D-066/067's fix, "so the
@@ -74,8 +96,7 @@ export function ServicesHero() {
           fill
           priority
           sizes="100vw"
-          className="object-cover"
-          style={{ objectPosition: "62% 36%" }}
+          className="object-cover object-[62%_36%] md:translate-x-[10%] lg:translate-x-[16%] xl:translate-x-[20%]"
         />
         {/* Left-side scrim — reinforces the dark ground the headline/copy
             sit on. The source photo already fades dark on its own left
