@@ -20,7 +20,7 @@ const TOPICS = [
 
 export function Insights() {
   return (
-    <Section environment="dark">
+    <Section environment="dark" transitionFrom="deep-blue">
       <Container size="lg" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">Insights</Caption>

@@ -7,13 +7,20 @@ import { Reveal } from "../../motion/reveal";
  * quiet band, not a padded-out grid implying a headcount that doesn't
  * exist yet. Matches both the content brief's own two-sentence brevity
  * and the explicit instruction this section "can be minimal given it's
- * founder-led today." Bordered top/bottom rather than a full-bleed
- * background, so it reads as a brief pause between Mission's manifesto
- * and Values' grid rather than a fourth competing block.
+ * founder-led today."
+ *
+ * Used to be bordered top/bottom (`border-y`) rather than full-bleed, as
+ * the "brief pause" device between Mission's manifesto and Values' grid.
+ * D-069: both of those boundaries are now real color changes (deep-blue
+ * in, light out) softened by the atmospheric-transition system instead —
+ * a hard border line at either edge would sit directly on top of the new
+ * blend and look like the exact seam it's meant to remove. Values' own
+ * `transitionFrom="dark"` handles the Team->Values edge; this section
+ * only needs to declare its OWN incoming one.
  */
 export function TeamSection() {
   return (
-    <Section environment="dark" className="border-y border-border py-16 md:py-20">
+    <Section environment="dark" transitionFrom="deep-blue" className="py-16 md:py-20">
       <Container size="md">
         <Reveal>
           <div className="flex flex-col items-center gap-4 text-center">

@@ -73,6 +73,7 @@ function CategoryRow({
 
 export function CategorySection({
   environment,
+  transitionFrom,
   eyebrow,
   heading,
   intro,
@@ -81,6 +82,12 @@ export function CategorySection({
   numeralFor,
 }: {
   environment: "dark" | "deep-blue";
+  /** D-069: same reasoning as FinalCta's own — this component is shared
+   *  between /services (LiveServices, always dark-after-dark, no
+   *  transition needed) and /business-automation (Categories, which comes
+   *  right after the deep-blue RecurringPackages and needs one). Optional,
+   *  left undefined by default. */
+  transitionFrom?: "dark" | "deep-blue";
   eyebrow: string;
   heading: string;
   intro: string;
@@ -91,7 +98,7 @@ export function CategorySection({
   const navItems = categoryNavItems(categories, numeralFor);
 
   return (
-    <Section environment={environment}>
+    <Section environment={environment} transitionFrom={transitionFrom}>
       {/* Asymmetric pt/pb — each row below already carries its own py-14
           (top AND bottom), so a uniform section py would stack an extra
           gap on top of the last row's own pb-14 (D-016).

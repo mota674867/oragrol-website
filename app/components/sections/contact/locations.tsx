@@ -111,7 +111,13 @@ export function LocationsSection() {
   const thunderBay = LOCATIONS.find((l) => l.id === "thunder-bay")!;
 
   return (
-    <Section environment="deep-blue">
+    // transitionFrom="light" (D-069): softens the boundary from
+    // GeneralInquiry. transitionTo="dark": this is Contact's LAST
+    // section before the shared SiteFooter (always dark, rendered from
+    // the root layout — it has no way to know this page's own last
+    // section, so the blend has to live here instead, on the trailing
+    // edge, not on the footer's leading edge).
+    <Section environment="deep-blue" transitionFrom="light" transitionTo="dark">
       <Container size="lg" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">Locations</Caption>

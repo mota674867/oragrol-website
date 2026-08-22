@@ -20,7 +20,7 @@ const STAGES = [
 // already dark by default; promoted for "supporting depth" alternation.
 export function Approach() {
   return (
-    <Section environment="deep-blue">
+    <Section environment="deep-blue" transitionFrom="dark">
       <Container size="lg" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">The Oragrol Approach</Caption>

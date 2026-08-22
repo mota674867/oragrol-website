@@ -23,7 +23,7 @@ const FLOW_STEPS = [
 
 export function CyberHealth() {
   return (
-    <Section environment="dark">
+    <Section environment="dark" transitionFrom="deep-blue">
       <Container size="xl" className="py-24 md:py-32">
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>

@@ -45,11 +45,14 @@ function AddonCard({ addon }: { addon: AddonService }) {
   );
 }
 
+// No border-t on this Section anymore (D-069): a hard divider line at
+// exactly the same boundary the atmospheric blend now softens would just
+// reintroduce a visible seam on top of it.
 export function AddonMenu() {
   const { description, services } = getAddonMenu();
 
   return (
-    <Section environment="dark" className="border-t border-border">
+    <Section environment="dark" transitionFrom="deep-blue">
       <Container size="lg" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">Available add-ons</Caption>

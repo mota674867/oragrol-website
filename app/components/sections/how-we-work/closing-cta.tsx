@@ -12,7 +12,7 @@ import { Reveal } from "../../motion/reveal";
  */
 export function HowWeWorkClosingCta() {
   return (
-    <Section environment="dark" className="relative overflow-hidden">
+    <Section environment="dark" transitionFrom="deep-blue" className="relative overflow-hidden">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -right-32 top-1/2 -translate-y-1/2 opacity-[0.08]"

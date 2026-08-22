@@ -26,7 +26,7 @@ import { GlowEffect } from "../services/glow-effect";
  */
 export function MissionStory() {
   return (
-    <Section environment="deep-blue" className="relative overflow-hidden py-24 md:py-32">
+    <Section environment="deep-blue" transitionFrom="dark" className="relative overflow-hidden py-24 md:py-32">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute left-1/2 top-0 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/3 opacity-30"

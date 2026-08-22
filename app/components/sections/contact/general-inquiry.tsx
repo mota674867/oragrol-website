@@ -59,7 +59,9 @@ export function GeneralInquiry() {
   }
 
   return (
-    <Section environment="light" className="border-t border-border">
+    // No border-t on this Section anymore (D-069): the atmospheric blend
+    // from TwoPath's dark now softens this exact boundary.
+    <Section environment="light" transitionFrom="dark">
       <Container size="lg" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">General Inquiry</Caption>

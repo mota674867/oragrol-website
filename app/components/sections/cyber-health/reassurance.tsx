@@ -23,9 +23,12 @@ const POINTS: Point[] = [
   { copy: "Executive PDF report included", icon: FileCheck },
 ];
 
+// No border-t on this Section anymore (D-069): the atmospheric blend
+// from OutputShape's deep-blue now softens this exact boundary — a hard
+// divider line at the same spot would just reintroduce the seam.
 export function Reassurance() {
   return (
-    <Section environment="dark" className="border-t border-border">
+    <Section environment="dark" transitionFrom="deep-blue">
       <Container size="lg" className="py-14">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {POINTS.map((point, i) => (

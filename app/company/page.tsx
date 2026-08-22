@@ -39,7 +39,7 @@ export default function CompanyPage() {
       <MissionStory />
       <TeamSection />
       <ValuesSection />
-      <FinalCta />
+      <FinalCta transitionFrom="light" />
     </>
   );
 }

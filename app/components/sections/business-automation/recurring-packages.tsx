@@ -175,7 +175,9 @@ export function RecurringPackages() {
   const packages = getRecurringPackages();
 
   return (
-    <Section environment="deep-blue" className="border-t border-border">
+    // No border-t on this Section anymore (D-069): the atmospheric blend
+    // from ProjectOffers' dark now softens this exact boundary.
+    <Section environment="deep-blue" transitionFrom="dark">
       <Container size="lg" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">Recurring packages</Caption>

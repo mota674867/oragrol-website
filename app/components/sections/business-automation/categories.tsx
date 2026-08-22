@@ -21,6 +21,7 @@ export function BusinessAutomationCategories() {
   return (
     <CategorySection
       environment="dark"
+      transitionFrom="deep-blue"
       eyebrow="AI & Automation"
       heading="Business Automation"
       intro={`${tier2.length} categories using AI and automation to save time and grow revenue. ${getIndividualServicesNote()}`}

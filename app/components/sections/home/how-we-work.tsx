@@ -32,7 +32,7 @@ const STAGES = [
 
 export function HowWeWork() {
   return (
-    <Section environment="deep-blue">
+    <Section environment="deep-blue" transitionFrom="dark">
       <Container size="md" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">How We Work</Caption>

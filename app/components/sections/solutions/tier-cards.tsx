@@ -85,7 +85,7 @@ export function TierCards() {
   const tiers = getTiers();
 
   return (
-    <Section environment="deep-blue">
+    <Section environment="deep-blue" transitionFrom="dark">
       <Container size="lg" className="py-24 md:py-32">
         <Reveal>
           <Caption tone="accent">The three levels</Caption>

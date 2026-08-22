@@ -84,7 +84,7 @@ const FINALIZING_SERVICES: ServiceEntry[] = [
 
 export function Services() {
   return (
-    <Section environment="dark">
+    <Section environment="dark" transitionFrom="deep-blue">
       <Container size="xl" className="py-24 md:py-32">
         <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div>

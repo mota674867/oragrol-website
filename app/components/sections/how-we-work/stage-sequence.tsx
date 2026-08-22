@@ -67,7 +67,7 @@ const STAGES: Stage[] = [
 
 export function StageSequence() {
   return (
-    <Section environment="deep-blue">
+    <Section environment="deep-blue" transitionFrom="dark">
       <Container size="md" className="py-24 md:py-32">
         <div className="relative">
           <div
