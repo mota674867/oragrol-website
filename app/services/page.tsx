@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ServicesHero } from "../components/sections/services/hero";
+import { ServicesOverview } from "../components/sections/services/overview";
 import { LiveServices } from "../components/sections/services/live-services";
 import { SolutionsBridge } from "../components/sections/services/solutions-bridge";
 import { FinalCta } from "../components/sections/home/final-cta";
@@ -11,22 +12,24 @@ export const metadata: Metadata = {
 };
 
 /**
- * Services — 2026-08-20 full restructure (see DECISIONS.md, this date).
- * Flow: Hero → Services (Tier 1, 10 categories) + Business Automation
- * (Tier 2, 5 categories) — both now rendered by `LiveServices` — →
- * Services/Solutions bridge → Final CTA (reused from Home) → Footer
- * (global, layout.tsx). `AdditionalCapabilities` (the old "5-8 finalizing
- * capabilities" section, D-007) is no longer part of this page's render
- * tree — the new data has no live/finalizing distinction to preserve.
- * Left on disk unreferenced, not deleted, per this project's convention
- * for superseded components. Individual per-service detail pages now
- * exist (`/services/[code]`), superseding D-007's "out of scope for this
- * pass" note.
+ * Services — Services Landing Page brief (2 levels):
+ * Level 1 (landing/introduction, editorial composition): Hero → Overview
+ * — two large rounded panels, mirrored asymmetry, same approved copy this
+ * page already had, just recomposed (see `hero.tsx`/`overview.tsx`).
+ * Level 2 (existing architecture, untouched): `LiveServices` (Tier 1, 10
+ * categories) → Services/Solutions bridge → Final CTA (reused from Home)
+ * → Footer (global, layout.tsx). `AdditionalCapabilities` (the old "5-8
+ * finalizing capabilities" section, D-007) is no longer part of this
+ * page's render tree — the new data has no live/finalizing distinction
+ * to preserve. Left on disk unreferenced, not deleted, per this project's
+ * convention for superseded components. Individual per-service detail
+ * pages exist at `/services/[code]`.
  */
 export default function ServicesPage() {
   return (
     <>
       <ServicesHero />
+      <ServicesOverview />
       <LiveServices />
       <SolutionsBridge />
       <FinalCta />
