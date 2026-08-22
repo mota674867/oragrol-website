@@ -1,4 +1,4 @@
-import { Card, Caption, DataText, Text } from "../../ui";
+import { Card, DataText, Text } from "../../ui";
 import { CapabilitySpotlightMark } from "./capability-spotlight";
 import type { LucideIconComponent, RawService } from "./services-data";
 import { serviceSlug } from "./services-data";
@@ -51,9 +51,13 @@ export function ServiceCard({
         <DataText size="sm" tone="accent">
           {formatPrice(service.price, service.unit)}
         </DataText>
-        <Caption tone="muted" size="sm">
+        {/* D-068 follow-up: service codes are technical/data content per
+            the brief (IBM Plex Sans), not body copy — `Caption` itself is
+            font-body (Manrope) by design, so this is a deliberate one-off
+            override to font-data rather than a Caption prop. */}
+        <span className="font-data text-[10px] font-normal uppercase tracking-[0.22em] text-text-muted">
           {service.code}
-        </Caption>
+        </span>
       </div>
     </Card>
   );

@@ -111,7 +111,16 @@ export function ServiceDetail({ service, category }: { service: RawService; cate
                 <Icon icon={icon} size="sm" />
                 {category.name}
               </Badge>
-              <Caption tone="secondary">{service.code}</Caption>
+              {/* D-068 follow-up: service codes are technical/data content
+                  per the brief (IBM Plex Sans), not body copy — `Caption`
+                  itself is font-body (Manrope) by design for eyebrow/label
+                  text everywhere else, so this is a deliberate one-off
+                  override to font-data rather than a Caption prop, matching
+                  the same plain-span pattern category-nav.tsx already uses
+                  for its own numeral labels. */}
+              <span className="font-data text-xs font-medium uppercase tracking-widest text-text-secondary">
+                {service.code}
+              </span>
             </div>
           </Reveal>
           <Reveal delay={0.1}>

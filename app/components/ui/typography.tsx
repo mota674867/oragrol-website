@@ -5,7 +5,8 @@ import { cn } from "./cn";
  * Typography primitives — Website Implementation Brief, Step 3.
  *
  * Headings use font-heading (Space Grotesk); body/caption use font-body
- * (Inter); data/score figures use font-data (JetBrains Mono). All colors
+ * (Manrope, D-068 — was Inter); data/score figures use font-data (IBM Plex
+ * Sans, D-068 — was JetBrains Mono). All colors
  * come from the semantic tokens (never raw hex) so every variant works
  * unchanged across the Dark / White / Light-blue section environments.
  */

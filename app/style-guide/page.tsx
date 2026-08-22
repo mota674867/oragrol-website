@@ -115,7 +115,7 @@ export default function StyleGuidePage() {
 
         {/* 02 — Body / UI */}
         <section className="mt-20 border-t border-border pt-12">
-          <SectionLabel>02 — Body / UI · font-body · Inter</SectionLabel>
+          <SectionLabel>02 — Body / UI · font-body · Manrope</SectionLabel>
 
           <p className="mt-6 max-w-2xl font-body text-lg leading-relaxed text-text-primary">
             Most breaches don&rsquo;t start with a zero-day — they start with
@@ -133,7 +133,7 @@ export default function StyleGuidePage() {
 
         {/* 03 — Scores / Data */}
         <section className="mt-20 border-t border-border pt-12">
-          <SectionLabel>03 — Scores / Data · font-data · JetBrains Mono</SectionLabel>
+          <SectionLabel>03 — Scores / Data · font-data · IBM Plex Sans</SectionLabel>
 
           <div className="mt-6 w-full max-w-sm rounded-2xl border border-border p-8">
             <p className="font-body text-xs font-medium uppercase tracking-widest text-text-secondary">
