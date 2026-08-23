@@ -1606,4 +1606,30 @@ Fixed: `home/hero.tsx`'s content `Container` gets `pt-[var(--header-height)]`, r
 - Get Mohammad's live review of the Services hero at 1920/2560+ real hardware, then push if approved.
 
 ---
+
+### 2026-08-23 (later same day) — Services hero: D-080 pushed live, real screenshot caught a real sign bug, fixed as D-081
+**Completed:**
+- Mohammad reported D-080 "not solved" on his real 24-inch monitor. Before touching any CSS, checked whether the fix had even reached the live site — it hadn't: both D-079 and D-080 were local-only commits (his own "don't push" instructions, honored each time), confirmed by curling the live HTML and finding the original pre-fix classes still served. Asked before pushing, got a yes, pushed, confirmed via polling the deployed HTML that the real `clamp()` fix was live, and re-screenshotted the actual production URL (not localhost) — 1440/1920/2560/mobile all looked correct.
+- Mohammad then reported a real, different defect on that now-actually-live version: top of head clear, but mouth/chin now cropped off. Verified this was genuinely a new code problem (not another deployment gap) by comparing computed styles between live and local — identical, ruling out any prod/dev mismatch.
+- Root-caused via direct empirical testing (not more theorizing): object-position's Y resolves against a NEGATIVE reference at these widths (box shorter than the scaled image), which flips the intuitive sign of `%`-`px` calc() arithmetic. D-080's `calc(36% - …)` was moving the wrong direction from the start; its outer `clamp(4%, …, 36%)` additionally had its authored min/max invert once resolved through that same negative reference, silently snapping the value to the extreme "4%" position for any width past 1536px — nearly zero top crop, ~685px of excess removed from the bottom instead, which is what ate the mouth and chin. Confirmed by testing plain unclamped percentages side by side (behaved exactly as D-079's original screenshots already showed) before touching the real fix.
+- Fixed by flipping the sign (`+` not `-`) and replacing the broken `clamp()` with a `min()` that only bounds the correction's own pixel magnitude (no percentage comparison, so it can't repeat the same trap). Coefficient `0.35` bisected empirically against real screenshots at 1920px. Logged as D-081, superseding D-080's implementation.
+- Verified: `tsc`/lint/build clean, same 85 routes. Full-section (untruncated) screenshots at all 4 requested viewports (1920×1080/1536×864/1440×900/1280×720) plus tablet/mobile — computed style shows a fully-resolved, literal `"62% 36%"` (not symbolic) at everything ≤1536px, and 1920 now shows the complete face, forehead through chin, top clear of the header.
+
+**Files changed:**
+- `app/components/sections/services/hero.tsx` (image `style` value + documenting comment)
+- `DECISIONS.md` (D-081, D-080 marked superseded), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- A real, non-obvious CSS bug: combining `%` and `px` via `calc()`/`clamp()` inside `object-position` behaves counter-intuitively when the position's percentage reference is negative (box shorter than the image) — worth remembering if this hero's positioning is ever touched again. Also re-confirms (a second time this session) that "don't push" instructions, while correctly honored, mean local verification alone can't catch everything a real deployed environment will — this bug was only findable once real hardware saw real production code.
+
+**Problems solved:**
+- Ultra-wide clipping fix now correct on both axes simultaneously (top-of-head AND full lower face), verified against the actual reported defect rather than a proxy metric.
+
+**Still open / needs verification:**
+- Mohammad's live review of D-081 (not yet seen by him — deliberately not pushed this round per his explicit instruction). He'll need to ask again before this ships to production.
+
+**Next recommended step:**
+- Get Mohammad's go-ahead to push D-081, then confirm live.
+
+---
 *(New sessions get added above this line, newest first. When this file passes ~10 sessions, move the oldest ones into PROJECT_MEMORY_ARCHIVE.md.)*

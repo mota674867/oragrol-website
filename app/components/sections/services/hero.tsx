@@ -91,23 +91,51 @@ import { Reveal } from "../../motion/reveal";
  * problem, and a visible "jump" right at the 2xl edge instead of a smooth
  * response to width.
  *
- * Replaced with one continuous formula (no discrete breakpoints at all):
- * `object-position: 62% clamp(4%, calc(36% - max(0px, (100vw - 1536px)) *
- * 0.0293), 36%)`. Below 1536px width, `max(0px, 100vw - 1536px)` is
- * exactly `0px`, so the whole expression reduces to exactly `36%` —
- * bit-for-bit the original value, at every width from 1440px down through
- * mobile, with no separate rule needed to protect that range. Above
- * 1536px, Y decreases linearly with width. The `0.0293` slope
- * (`30/1024`) was fit, not guessed, to reproduce the 3 points already
- * confirmed by direct screenshot in D-079 (~36%→24% by 1920, →16% by
- * 2200, →~6% by 2560), so this is the same visually-verified correction
- * expressed as one continuous line through those points instead of 3
- * steps — `clamp(4%, …, 36%)` just keeps it from overshooting past that
- * line's natural range (floor of 4% for anything beyond ultra-wide,
- * ceiling of 36% as a redundant safety net matching the unmodified base
- * value). Applied via inline `style` (not a Tailwind arbitrary class)
- * since `calc()`/`max()`/`clamp()` nested this deeply is unreadable once
- * Tailwind's space-to-underscore escaping is applied to it.
+ * D-080 replaced the 3 discrete breakpoints with one continuous formula:
+ * `62% clamp(4%, calc(36% - max(0px, (100vw - 1536px)) * 0.0293), 36%)`.
+ * It was WRONG — shipped, then caught by Mohammad's actual 1920px
+ * screenshot: the top of the head cleared the header, but the mouth/chin
+ * were now cropped off entirely.
+ *
+ * Root cause, worked out by testing plain percentages empirically rather
+ * than trusting the calc() math (D-081, 2026-08-23): object-position's Y
+ * percentage resolves as `offset = (box_height - scaled_image_height) *
+ * Y/100`, and at these widths `(box_height - scaled_image_height)` is
+ * NEGATIVE (the box is shorter than the scaled image). Subtracting a
+ * positive px amount from `36%` in that formula makes the resolved offset
+ * MORE negative, not less — i.e. it INCREASES top crop, the opposite of
+ * D-080's intent — while `clamp(4%, …, 36%)` compares the three terms
+ * AFTER they've each resolved through that same negative-reference
+ * formula, so its "floor" of 4% actually resolves to a LESS negative
+ * number than its "ceiling" of 36% — clamp() has no way to know the
+ * authored min/max are inverted in the resolved domain, so it silently
+ * snapped every width past 1536px straight to the 4% position: almost no
+ * top crop at all, and nearly the entire vertical excess (~685px of it at
+ * 1920px) removed from the bottom instead — which is exactly what ate the
+ * mouth and chin. Confirmed by testing plain, unclamped percentages
+ * (`62% 36%`, `62% 24%`, `62% 16%`) side by side: each behaves exactly as
+ * D-079 originally found (lower % = more top visible, mouth/chin stay in
+ * frame) — the bug was specific to combining `%` and `px` inside `calc()`/
+ * `clamp()` against this particular negative reference, not to the
+ * underlying idea of lowering Y.
+ *
+ * Fixed by flipping the sign — ADD to `36%` instead of subtracting — and
+ * dropping the broken `clamp()` for a plain `min()` that only ever bounds
+ * the correction's own magnitude (a pure length-to-length comparison, no
+ * percentage involved, so no repeat of the same trap): `62% calc(36% +
+ * min(400px, max(0px, (100vw - 1536px)) * 0.35))`. Below 1536px this is
+ * still exactly `36%` (`max(0px, …)` is `0px`), so 1440/1366/1280/mobile
+ * are provably untouched. The `0.35` coefficient was bisected empirically
+ * against real screenshots at 1920px (not algebraically derived, since
+ * the true target curve is quadratic in viewport width once you account
+ * for the image having to scale to cover it — not worth a fragile
+ * closed-form match) — verified at 1920px to clear the header AND keep
+ * the full mouth/chin in frame, and `min(400px, …)` keeps the correction
+ * from ever overshooting into revealing flat background above the image
+ * at widths this hero isn't expected to see. Applied via inline `style`
+ * (not a Tailwind arbitrary class) since Tailwind's space-to-underscore
+ * escaping makes a `calc()`/`min()`/`max()` this deep unreadable as a
+ * class string.
  *
  * Top edge: no fade needed here — `SiteHeader` (`fixed`) already carries
  * its own two-stacked-gradient background (D-066/067's fix, "so the
@@ -155,7 +183,7 @@ export function ServicesHero() {
           sizes="100vw"
           className="object-cover md:translate-x-[10%] lg:translate-x-[16%] xl:translate-x-[20%]"
           style={{
-            objectPosition: "62% clamp(4%, calc(36% - max(0px, (100vw - 1536px)) * 0.0293), 36%)",
+            objectPosition: "62% calc(36% + min(400px, max(0px, (100vw - 1536px)) * 0.35))",
           }}
         />
         {/* Left-side scrim — reinforces the dark ground the headline/copy
