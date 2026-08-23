@@ -52,6 +52,34 @@ import { Reveal } from "../../motion/reveal";
  * lands in the right ~45% at each, headline fully clear) and re-checked
  * at 390px mobile to confirm the unrelated breakpoints were untouched.
  *
+ * Ultra-wide follow-up (2026-08-23): Mohammad reported the 14-inch
+ * (~1440px) framing above as the correct reference, but on a 24-inch
+ * desktop monitor the top of the head was pushed up far enough to clip
+ * under the fixed header. Root cause, confirmed with live Playwright
+ * screenshots at each width rather than assumed from the math alone: the
+ * section's `min-h-*` caps at 740px from `xl` upward with no further
+ * increase, while the section's width keeps growing well past that —
+ * `object-cover` has to scale the image ever larger to keep covering that
+ * width, so the fixed vertical crop this hero already relies on (see
+ * above: box wider than the 1512:1145 image, top/bottom crop only, `62%
+ * 36%` sets a 36%-from-top/64%-from-bottom split) removes a growing
+ * number of *absolute* pixels off the top even though the split ratio
+ * itself never changes — fine at 1440/1536, visibly clipping the
+ * hairline by ~1920 and clipping into the forehead by 2560.
+ *
+ * Fixed by lowering just the Y component of `object-position` in three
+ * screenshot-verified steps above `2xl` (1536px — below this, and at the
+ * reference 1440px, nothing changes): `2xl:object-[62%_24%]` (clean at
+ * 1600/1728/1920), `min-[2200px]:object-[62%_16%]`, `min-[2560px]:
+ * object-[62%_5%]`. A lower Y value reveals more of the image's own top
+ * (less top crop, more bottom crop) — visually the face/head settles
+ * lower in the frame without moving via `transform`, so it isn't the same
+ * "reveal flat background" mechanism `translate-x` above uses; this is a
+ * genuine re-crop of the same untouched source file. `62%` (X) and every
+ * `translate-x-*` step are unchanged — confirmed via screenshot that
+ * horizontal placement stays correct at every one of these widths, this
+ * was a vertical-only defect. No height, text, nav, or image-asset change.
+ *
  * Top edge: no fade needed here — `SiteHeader` (`fixed`) already carries
  * its own two-stacked-gradient background (D-066/067's fix, "so the
  * header blends into the Hero image instead of sitting on a hard edge")
@@ -96,7 +124,7 @@ export function ServicesHero() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[62%_36%] md:translate-x-[10%] lg:translate-x-[16%] xl:translate-x-[20%]"
+          className="object-cover object-[62%_36%] md:translate-x-[10%] lg:translate-x-[16%] xl:translate-x-[20%] 2xl:object-[62%_24%] min-[2200px]:object-[62%_16%] min-[2560px]:object-[62%_5%]"
         />
         {/* Left-side scrim — reinforces the dark ground the headline/copy
             sit on. The source photo already fades dark on its own left

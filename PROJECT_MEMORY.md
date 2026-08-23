@@ -1551,4 +1551,32 @@ Fixed: `home/hero.tsx`'s content `Container` gets `pt-[var(--header-height)]`, r
 - Get Cyber Health reviewed, then decide Step 8 vs. Services retrofit order.
 
 ---
+
+### 2026-08-23 — Discovery session (no code) + Services hero: ultra-wide face-clipping fix
+**Completed:**
+- Opened with a requested discovery pass before touching anything: read `CLAUDE.md`, `git log`/`git status`, and the tail of `PROJECT_MEMORY.md`/`DECISIONS.md`. Reported back that the project is far more built out than Mohammad's own summary implied (12 routes, not just Home; 78 logged decisions), and flagged two of his stated facts as stale: the brand palette (superseded the day before by D-068's 6-color system) and the hero mechanism (no longer an 8-frame crossfade — it's `PerimeterRing` after D-057/059/061). Live-verified his three named "open bugs" (logo, header gradient, 2560px layout) via Playwright against the dev server rather than trusting memory alone — all three confirmed already fixed, screenshots shown, no code changed in this part of the session.
+- Second request: a surgical fix for the Services hero face clipping at 24-inch desktop widths while preserving the 14-inch reference exactly. Inspected `hero.tsx` first to find the actual mechanism (D-078's `object-[62%_36%]` + `translate-x-*`) before touching anything, then screenshotted the real bug at 1440/1920/2560 to confirm it before assuming the diagnosis.
+- Root-caused: `min-h-*` caps at 740px from `xl` up with no further increase, so as width grows past that the image has to scale ever larger to keep covering it, and the existing fixed 36%-Y crop removes more absolute top pixels as that scale grows — invisible at 1440, clipping by 1920/2560.
+- Live-tuned the fix by injecting candidate `object-position` values via Playwright at 1536/1600/1728/1920/2200/2560/3000 and screenshotting each before writing any code — landed on 3 graduated steps: `2xl:object-[62%_24%]`, `min-[2200px]:object-[62%_16%]`, `min-[2560px]:object-[62%_5%]`. Nothing below `2xl` (1536px) touched, so 1440 is byte-for-byte the pre-existing reference. Logged as D-079.
+- Verified against the actual compiled build (not the live-tuning override): `tsc`/lint/build all clean, same 85 routes; screenshots at all 5 requested widths plus the wide spot-checks confirm the head clears the header everywhere from 1536 up, and 390/768/1024/1280 are unaffected.
+
+**Files changed:**
+- `app/components/sections/services/hero.tsx` (one `className` string + its documenting comment)
+- `DECISIONS.md` (D-079), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- Two screenshots (1280, 390) came back with the headline/nav missing or malformed during the verification batch — root-caused as a transient dev-server compile race from loading 11 routes back-to-back (the same class of screenshot-methodology artifact this project's memory has flagged before, e.g. the Cyber Health `Flow` false-positive), not a real regression. Re-captured in isolation with an explicit wait and confirmed correct before reporting done — not left ambiguous.
+
+**Problems solved:**
+- Discovery session corrected two stale assumptions (palette, hero mechanism) before they could cause wasted work, and confirmed three "known bugs" were already fixed rather than re-fixing things that didn't need it.
+- Services hero ultra-wide clipping fixed with a 3-step responsive `object-position`, 14-inch baseline provably untouched.
+
+**Still open / needs verification:**
+- Mohammad's review of D-079 (not yet seen live by him). Per his "verify and STOP" instruction, this session did not commit/push — that's still open if he wants it shipped.
+- The dev-server compile-race artifact above is worth a passing mention if it recurs — not a code bug, just a note for future screenshot batches (stagger or add explicit waits on the first pass rather than after the fact).
+
+**Next recommended step:**
+- Get Mohammad's live review of the Services hero at 1920/2560, then commit/push if approved.
+
+---
 *(New sessions get added above this line, newest first. When this file passes ~10 sessions, move the oldest ones into PROJECT_MEMORY_ARCHIVE.md.)*
