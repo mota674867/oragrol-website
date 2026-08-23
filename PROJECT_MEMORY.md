@@ -1579,4 +1579,31 @@ Fixed: `home/hero.tsx`'s content `Container` gets `pt-[var(--header-height)]`, r
 - Get Mohammad's live review of the Services hero at 1920/2560, then commit/push if approved.
 
 ---
+
+### 2026-08-23 (later same day) — Services hero fix revisited: discrete breakpoints replaced with one continuous formula
+**Completed:**
+- Mohammad pushed back on D-079's approach: rejected "another arbitrary width breakpoint," asked for viewport-height/aspect-ratio-aware or interpolating CSS, and asked for computed dimensions to be inspected at 6 named viewports before any change — explicitly warning not to assume physical monitor size matters.
+- Did the diagnostic first: measured the hero's actual rendered box via Playwright `getBoundingClientRect()` at all 6 viewports (1440×900/1536×864/1920×1080/1366×768/1280×720/390×844). Found the box height is a flat 740px at every desktop size regardless of viewport height (900/864/1080/768/720 all identical) — the section's `min-h` is a fixed px value the short copy never exceeds, not a `vh`-based one. Reported this back plainly: viewport height has zero effect here; width is the only real variable, so a height-aware mechanism would have nothing to respond to.
+- That same measurement surfaced a real flaw in D-079: its `2xl` bucket starts exactly at 1536px, so 1536×864 (a genuine 16" laptop width, not the reported bug) was being shifted from 36% to 24% unnecessarily.
+- Replaced the 3 discrete Tailwind breakpoint classes with one continuous `object-position` formula via inline style: `62% clamp(4%, calc(36% - max(0px, (100vw - 1536px)) * 0.0293), 36%)`. Below 1536px this reduces to exactly 36% (the original, untouched value) — confirmed via `getComputedStyle`, not just eyeballed. The `0.0293` slope was fit to reproduce D-079's own already-verified data points (not a new guess). Logged as D-080, superseding D-079's implementation (its diagnosis stands).
+- Verified: `tsc`/lint/build clean, same 85 routes. Computed-style + screenshot verification at all 6 requested viewports plus a 2560 continuity spot-check — 1440/1536/1366/1280/390 pixel/formula-identical to the pre-fix reference, 1920/2560 both clear the header.
+
+**Files changed:**
+- `app/components/sections/services/hero.tsx` (image `className`/`style` + documenting comment)
+- `DECISIONS.md` (D-080, D-079 marked superseded), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- D-079's own discrete breakpoint edge (2xl = 1536px) coincided with a real, common laptop width and over-corrected it unnecessarily — not a visible bug, but an unforced deviation from baseline the continuous formula eliminates.
+
+**Problems solved:**
+- Confirmed empirically (not assumed) that viewport height doesn't factor into this component at all — useful fact for any future work on this hero.
+- Ultra-wide clipping fix now expressed as one continuous line through the same verified data points, with zero discrete breakpoints and mathematically provable baseline preservation below 1536px.
+
+**Still open / needs verification:**
+- Mohammad's live review of D-080 (not yet seen by him). Per his "verify this single fix and STOP" instruction, this session did not commit/push beyond a local commit.
+
+**Next recommended step:**
+- Get Mohammad's live review of the Services hero at 1920/2560+ real hardware, then push if approved.
+
+---
 *(New sessions get added above this line, newest first. When this file passes ~10 sessions, move the oldest ones into PROJECT_MEMORY_ARCHIVE.md.)*

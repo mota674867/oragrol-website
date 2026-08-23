@@ -67,18 +67,47 @@ import { Reveal } from "../../motion/reveal";
  * itself never changes — fine at 1440/1536, visibly clipping the
  * hairline by ~1920 and clipping into the forehead by 2560.
  *
- * Fixed by lowering just the Y component of `object-position` in three
- * screenshot-verified steps above `2xl` (1536px — below this, and at the
- * reference 1440px, nothing changes): `2xl:object-[62%_24%]` (clean at
- * 1600/1728/1920), `min-[2200px]:object-[62%_16%]`, `min-[2560px]:
- * object-[62%_5%]`. A lower Y value reveals more of the image's own top
- * (less top crop, more bottom crop) — visually the face/head settles
- * lower in the frame without moving via `transform`, so it isn't the same
- * "reveal flat background" mechanism `translate-x` above uses; this is a
- * genuine re-crop of the same untouched source file. `62%` (X) and every
- * `translate-x-*` step are unchanged — confirmed via screenshot that
- * horizontal placement stays correct at every one of these widths, this
- * was a vertical-only defect. No height, text, nav, or image-asset change.
+ * Fixed by lowering just the Y component of `object-position` — a lower Y
+ * reveals more of the image's own top (less top crop, more bottom crop),
+ * so the face/head settles lower in the frame as a genuine re-crop of the
+ * same untouched source file, not the "reveal flat background" mechanism
+ * `translate-x` above uses. `62%` (X) and every `translate-x-*` step are
+ * unchanged — this was a vertical-only defect. No height, text, nav, or
+ * image-asset change.
+ *
+ * First version of this fix (D-079, 2026-08-23) used three discrete
+ * Tailwind breakpoints (`2xl:`/`min-[2200px]:`/`min-[2560px]:`). Superseded
+ * same day (D-080) after confirming via `getBoundingClientRect` at the
+ * exact 6 viewports Mohammad specified (1440x900/1536x864/1920x1080/
+ * 1366x768/1280x720/390x844) that this section's rendered height is a flat
+ * 740px at EVERY desktop size tested regardless of viewport height (900 vs
+ * 864 vs 1080 vs 768 vs 720 all measured identically) — the box's aspect
+ * ratio is driven entirely by width, since height is a fixed `min-h`
+ * floor the short hero copy never exceeds. That also exposed a real flaw
+ * in the discrete version: its `2xl` bucket started exactly at 1536px, so
+ * 1536×864 (a real 16" laptop resolution, not the reported bug) was
+ * getting shifted to 24% even though 36% was already correct there —
+ * an unforced deviation from baseline at a viewport that never had the
+ * problem, and a visible "jump" right at the 2xl edge instead of a smooth
+ * response to width.
+ *
+ * Replaced with one continuous formula (no discrete breakpoints at all):
+ * `object-position: 62% clamp(4%, calc(36% - max(0px, (100vw - 1536px)) *
+ * 0.0293), 36%)`. Below 1536px width, `max(0px, 100vw - 1536px)` is
+ * exactly `0px`, so the whole expression reduces to exactly `36%` —
+ * bit-for-bit the original value, at every width from 1440px down through
+ * mobile, with no separate rule needed to protect that range. Above
+ * 1536px, Y decreases linearly with width. The `0.0293` slope
+ * (`30/1024`) was fit, not guessed, to reproduce the 3 points already
+ * confirmed by direct screenshot in D-079 (~36%→24% by 1920, →16% by
+ * 2200, →~6% by 2560), so this is the same visually-verified correction
+ * expressed as one continuous line through those points instead of 3
+ * steps — `clamp(4%, …, 36%)` just keeps it from overshooting past that
+ * line's natural range (floor of 4% for anything beyond ultra-wide,
+ * ceiling of 36% as a redundant safety net matching the unmodified base
+ * value). Applied via inline `style` (not a Tailwind arbitrary class)
+ * since `calc()`/`max()`/`clamp()` nested this deeply is unreadable once
+ * Tailwind's space-to-underscore escaping is applied to it.
  *
  * Top edge: no fade needed here — `SiteHeader` (`fixed`) already carries
  * its own two-stacked-gradient background (D-066/067's fix, "so the
@@ -124,7 +153,10 @@ export function ServicesHero() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[62%_36%] md:translate-x-[10%] lg:translate-x-[16%] xl:translate-x-[20%] 2xl:object-[62%_24%] min-[2200px]:object-[62%_16%] min-[2560px]:object-[62%_5%]"
+          className="object-cover md:translate-x-[10%] lg:translate-x-[16%] xl:translate-x-[20%]"
+          style={{
+            objectPosition: "62% clamp(4%, calc(36% - max(0px, (100vw - 1536px)) * 0.0293), 36%)",
+          }}
         />
         {/* Left-side scrim — reinforces the dark ground the headline/copy
             sit on. The source photo already fades dark on its own left
