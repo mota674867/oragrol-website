@@ -1632,4 +1632,31 @@ Fixed: `home/hero.tsx`'s content `Container` gets `pt-[var(--header-height)]`, r
 - Get Mohammad's go-ahead to push D-081, then confirm live.
 
 ---
+
+### 2026-08-23 (later still) — Services hero: replaced object-position tuning with a structural master-composition-frame fix
+**Completed:**
+- Mohammad rejected the entire D-079/080/081 approach (tuning `object-position` as a function of viewport width) and asked for a structural fix: treat the 14-inch composition as a fixed artboard, let only the background bleed wider, don't let the face re-crop/re-scale/reposition from viewport growth alone. Explicitly required inspecting the current mechanism first and verifying against real anchor points at 1440/1536/1920/2560/3440.
+- Inspected `hero.tsx` and `container.tsx` before changing anything. Root cause: the image sized itself against the full `Section` (= raw viewport), while the text sized itself against `<Container size="2xl">`'s own fluid-but-capped box (`clamp(1600px, 940px + 40vw, 2000px)`) — two different boxes that only coincided below ~1650px. Every prior object-position tuning pass was compensating for that mismatch after the fact rather than fixing it.
+- Fix: wrapped the image in a new frame div reusing `CONTAINER_MAX_WIDTH["2xl"]` — the exact same constant the text's own Container already imports elsewhere in the codebase (`nav.tsx` already established this reuse pattern). Since `next/image`'s `fill` sizes against the nearest positioned ancestor, this makes the image's `object-cover` box track the text's box in lockstep instead of the viewport. Reset `object-position` to the plain, untuned `62% 36%` — the frame capping the growth means no correction is needed.
+- Caught and fixed a real bug mid-implementation via direct DOM inspection rather than shipping on faith: `getBoundingClientRect()` showed the image's rendered box spilling ~393px past the frame's own edge at 1920px+ — `translate-x-[20%]` shifts the already-sized box AFTER `object-cover` runs, and the frame (unlike the old full-section box) had no `overflow-hidden` of its own to catch the overshoot. Added it.
+- Found and fixed one more real defect via zoomed screenshots (not assumed clean from the measurement alone): even after clipping, the frame's bare edge was a hard vertical cut through the image's own lit content at wide viewports — conflicts with this hero's own standing "no visible image frame/border" rule (D-070). Added a right-edge fade whose width is mathematically zero at 1440px and below (proven via the same clamp formula, not just visually eyeballed), so the master reference is untouched by construction. Disclosed this addition explicitly as beyond the literal ask rather than folding it in silently.
+- Verified: `tsc`/lint/build clean, same 85 routes. Measured frame/image rects at exactly 1440/1536/1920/2560/3440 (full-width at 1440/1536, symmetric inset at 1920/2560, capped/identical at 3440), confirmed `object-position` is the literal unmodified string at every width, and screenshotted (full-section, untruncated) all 5 plus tablet/mobile — 1440 is the untouched master, 1536 identical, 1920/2560/3440 all preserve the same face scale/position relative to the headline with a graceful (not hard-cut) frame edge, tablet/mobile pixel-unaffected.
+
+**Files changed:**
+- `app/components/sections/services/hero.tsx` (new frame wrapper, `object-position` reset, `overflow-hidden`, right-edge fade, consolidated D-082 doc comment)
+- `DECISIONS.md` (D-082, D-079/080/081 marked superseded), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- Two real bugs caught DURING this fix by direct measurement rather than assumed away: the `translate-x` overshoot past the frame edge, and the resulting hard-edge artifact once clipping was added. Both fixed and re-verified before reporting done, not left as known issues.
+
+**Problems solved:**
+- The actual root cause behind three straight rounds of object-position tuning (image and text tracking two different boxes) is now structurally eliminated rather than continuously compensated for.
+
+**Still open / needs verification:**
+- Mohammad's live review of D-082 (not yet seen by him — not pushed this round per his explicit instruction).
+
+**Next recommended step:**
+- Get Mohammad's go-ahead to push D-082, then confirm live on his actual monitor.
+
+---
 *(New sessions get added above this line, newest first. When this file passes ~10 sessions, move the oldest ones into PROJECT_MEMORY_ARCHIVE.md.)*

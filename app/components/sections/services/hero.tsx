@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Container, H1, Section, Text } from "../../ui";
+import { CONTAINER_MAX_WIDTH, Container, H1, Section, Text } from "../../ui";
 import { Reveal } from "../../motion/reveal";
 
 /**
@@ -14,128 +14,114 @@ import { Reveal } from "../../motion/reveal";
  * — this is a layout/integration change, not an image edit (the same
  * `services-hero.png` file from D-076, no re-crop, no regeneration).
  *
- * Structure: the image is a `pointer-events-none absolute inset-0 -z-10`
- * layer (D-070's own hardened "guaranteed behind content" pattern — an
- * `absolute` layer with `z-index:auto` does not reliably paint behind a
- * plain non-positioned sibling per CSS2.1's painting-order algorithm;
- * `-z-10` + `Section`'s own `isolate` stacking context makes it explicit
- * instead of relying on DOM order alone), sized via `object-cover` so it
- * fills the section's box in both dimensions without stretching — crops
- * top/bottom on wide desktop viewports (section proportionally wider than
- * the 1512:1145 image) and left/right on narrow/tall mobile viewports
- * (section proportionally taller), never both, and never distorts the
- * photo itself. `object-position` (`object-[62%_36%]`) is anchored near
- * the face's own position in the source frame so the crop stays
- * face-centered regardless of which axis a given viewport crops.
+ * Structure: a `pointer-events-none absolute inset-0 -z-10` layer (D-070's
+ * own hardened "guaranteed behind content" pattern — an `absolute` layer
+ * with `z-index:auto` does not reliably paint behind a plain non-positioned
+ * sibling per CSS2.1's painting-order algorithm; `-z-10` + `Section`'s own
+ * `isolate` stacking context makes it explicit instead of relying on DOM
+ * order alone) spans the full Section for the flat dark ground, but the
+ * image itself lives inside an inner **master composition frame** — see
+ * D-082 below for why that frame exists and what it fixed — sized via
+ * `object-cover` so it fills THAT frame's box in both dimensions without
+ * stretching — crops top/bottom at desktop-proportioned frame widths (frame
+ * proportionally wider than the 1512:1145 image) and left/right at
+ * narrow/tall mobile viewports (frame proportionally taller, since below
+ * the frame's own max-width it simply equals the viewport), never both, and
+ * never distorts the photo itself. `object-position` (`object-[62%_36%]`)
+ * is anchored near the face's own position in the source frame so the crop
+ * stays face-centered regardless of which axis a given width crops.
  *
  * Desktop repositioning (2026-08-22 follow-up): Mohammad reported the
  * face reading as too centered, overlapping the headline. Root cause:
- * at desktop widths the section's box is proportionally WIDER than the
+ * at desktop widths the frame's box is proportionally WIDER than the
  * 1512:1145 image, so `object-cover` scales to match width exactly —
  * there is zero horizontal excess left for `object-position`'s X value
  * to pan across (it only ever affects the vertical/top-bottom crop at
- * these viewports), which is why the face sat wherever the source
- * photo's own native composition placed it rather than anywhere
- * `object-position` implied. A first attempt (`transform: scale()` on
- * a shifted `transform-origin`) was tried and rejected after screenshot
- * review — it changed the framing but didn't land the face predictably
- * in the right half. Fixed instead with a plain `translateX` (`md:
- * translate-x-[10%] lg:translate-x-[16%] xl:translate-x-[20%]`,
- * desktop-only, mobile/tablet untouched): translating the already-fitted
- * `object-cover` box rightward reveals flat `--background` on its now-
- * exposed left edge (exactly the "clean dark left" the brief asks for,
- * with zero extra markup) while the image's own excess simply clips
- * further past the right edge, still fully covered. No zoom, no resize
- * — the face's on-screen size is unchanged, only its position shifted,
- * per the explicit "keep it large, don't shrink it to solve the
- * overlap" instruction. Verified via screenshot at 1440/1920/2560 (face
- * lands in the right ~45% at each, headline fully clear) and re-checked
- * at 390px mobile to confirm the unrelated breakpoints were untouched.
+ * these widths), which is why the face sat wherever the source photo's
+ * own native composition placed it rather than anywhere `object-position`
+ * implied. A first attempt (`transform: scale()` on a shifted
+ * `transform-origin`) was tried and rejected after screenshot review — it
+ * changed the framing but didn't land the face predictably in the right
+ * half. Fixed instead with a plain `translateX` (`md:translate-x-[10%]
+ * lg:translate-x-[16%] xl:translate-x-[20%]`, desktop-only, mobile/tablet
+ * untouched): translating the already-fitted `object-cover` box rightward
+ * reveals flat `--background` on its now-exposed left edge (exactly the
+ * "clean dark left" the brief asks for, with zero extra markup) while the
+ * image's own excess simply clips further past the right edge, still fully
+ * covered. No zoom, no resize — the face's on-screen size is unchanged,
+ * only its position shifted, per the explicit "keep it large, don't shrink
+ * it to solve the overlap" instruction. Verified via screenshot at
+ * 1440/1920/2560 (face lands in the right ~45% at each, headline fully
+ * clear) and re-checked at 390px mobile to confirm the unrelated
+ * breakpoints were untouched. This positioning is unaffected by D-082
+ * below — it still translates the image relative to its own (now
+ * frame-sized rather than section-sized) box, same mechanism either way.
  *
- * Ultra-wide follow-up (2026-08-23): Mohammad reported the 14-inch
- * (~1440px) framing above as the correct reference, but on a 24-inch
- * desktop monitor the top of the head was pushed up far enough to clip
- * under the fixed header. Root cause, confirmed with live Playwright
- * screenshots at each width rather than assumed from the math alone: the
- * section's `min-h-*` caps at 740px from `xl` upward with no further
- * increase, while the section's width keeps growing well past that —
- * `object-cover` has to scale the image ever larger to keep covering that
- * width, so the fixed vertical crop this hero already relies on (see
- * above: box wider than the 1512:1145 image, top/bottom crop only, `62%
- * 36%` sets a 36%-from-top/64%-from-bottom split) removes a growing
- * number of *absolute* pixels off the top even though the split ratio
- * itself never changes — fine at 1440/1536, visibly clipping the
- * hairline by ~1920 and clipping into the forehead by 2560.
+ * Ultra-wide saga, D-079 through D-081 (2026-08-23, all same day —
+ * summarized here, full blow-by-blow in DECISIONS.md): Mohammad reported
+ * the top of the head clipping under the header on a 24-inch monitor. Root
+ * cause at the time: the section's `min-h-*` floor (740px from `xl` up)
+ * never grows, but the section's WIDTH — which `object-cover` had to keep
+ * covering — grew unboundedly with the raw viewport, so the fixed `62%
+ * 36%` vertical crop removed a growing number of *absolute* pixels off the
+ * top the wider the viewport got. Three consecutive attempts all tried to
+ * COMPENSATE for that unbounded growth by making `object-position` a
+ * function of `100vw`: D-079 (3 discrete Tailwind breakpoints — fixed the
+ * clipping but visibly jumped at each edge, and over-corrected 1536×864, a
+ * real laptop width that was never actually broken), D-080 (one continuous
+ * `calc()`/`clamp()` formula — same idea, smoother, but shipped with an
+ * inverted sign that went undetected locally and cropped the mouth off
+ * once Mohammad's real 24-inch screenshot caught it), D-081 (fixed that
+ * specific sign bug with a corrected, empirically-bisected coefficient —
+ * worked, but was still fundamentally "guess a function of viewport width
+ * and re-tune it every time a new width exposes a new problem").
  *
- * Fixed by lowering just the Y component of `object-position` — a lower Y
- * reveals more of the image's own top (less top crop, more bottom crop),
- * so the face/head settles lower in the frame as a genuine re-crop of the
- * same untouched source file, not the "reveal flat background" mechanism
- * `translate-x` above uses. `62%` (X) and every `translate-x-*` step are
- * unchanged — this was a vertical-only defect. No height, text, nav, or
- * image-asset change.
+ * D-082 (2026-08-23, same day) — the actual structural fix: replaced the
+ * whole "compensate for the section's ever-growing width" approach with
+ * removing the cause of that growth. The image no longer sizes itself
+ * against the full `Section` (= the raw viewport). It's wrapped in a
+ * `relative mx-auto h-full w-full` frame using `CONTAINER_MAX_WIDTH["2xl"]`
+ * — the EXACT SAME fluid max-width the `<Container size="2xl">` below
+ * already uses for the text, imported from `container.tsx` rather than a
+ * new literal (the same reuse pattern `nav.tsx` already established for
+ * `CONTAINER_MAX_WIDTH.xl`). Since `next/image`'s `fill` sizes an image
+ * against its nearest positioned ancestor, marking this frame `relative`
+ * makes the image's `object-cover` box the FRAME, not the section — the
+ * frame's width, not the viewport's, is what `object-position`/
+ * `translate-x` now have to reckon with.
  *
- * First version of this fix (D-079, 2026-08-23) used three discrete
- * Tailwind breakpoints (`2xl:`/`min-[2200px]:`/`min-[2560px]:`). Superseded
- * same day (D-080) after confirming via `getBoundingClientRect` at the
- * exact 6 viewports Mohammad specified (1440x900/1536x864/1920x1080/
- * 1366x768/1280x720/390x844) that this section's rendered height is a flat
- * 740px at EVERY desktop size tested regardless of viewport height (900 vs
- * 864 vs 1080 vs 768 vs 720 all measured identically) — the box's aspect
- * ratio is driven entirely by width, since height is a fixed `min-h`
- * floor the short hero copy never exceeds. That also exposed a real flaw
- * in the discrete version: its `2xl` bucket started exactly at 1536px, so
- * 1536×864 (a real 16" laptop resolution, not the reported bug) was
- * getting shifted to 24% even though 36% was already correct there —
- * an unforced deviation from baseline at a viewport that never had the
- * problem, and a visible "jump" right at the 2xl edge instead of a smooth
- * response to width.
+ * Why this is the right fix and not another tuning pass: Container's
+ * `2xl` size is `clamp(1600px, 940px + 40vw, 2000px)` — width-bound below
+ * ~1650px (so at 1440/1536 the frame still equals the full section, byte-
+ * for-byte the pre-D-082 behavior, zero regression) and CEILINGED at
+ * 2000px beyond that. Once the viewport is wide enough that the clamp's
+ * ceiling binds (roughly 2650px+), the frame's width — and therefore the
+ * exact crop `object-cover` produces — physically CANNOT keep growing no
+ * matter how wide the monitor gets, which is what makes 2560px and 3440px
+ * render the identical composition instead of needing their own tuned
+ * value. Between ~1650px and ~2650px the frame does still grow somewhat
+ * (same clamp ramp), but that's the SAME box the text's own `Container`
+ * lives in — both grow together, in lockstep, by construction (same
+ * import, same class), so the face's position RELATIVE TO THE TEXT never
+ * drifts even while the whole composition breathes slightly with the
+ * viewport, exactly Mohammad's own "same relationship as the 14-inch
+ * reference" framing. Previously the image (section-sized) and the text
+ * (Container-sized) were tracking two DIFFERENT boxes that only happened
+ * to coincide below ~1650px — that mismatch was the actual root cause
+ * every prior object-position tuning pass was fighting without addressing.
  *
- * D-080 replaced the 3 discrete breakpoints with one continuous formula:
- * `62% clamp(4%, calc(36% - max(0px, (100vw - 1536px)) * 0.0293), 36%)`.
- * It was WRONG — shipped, then caught by Mohammad's actual 1920px
- * screenshot: the top of the head cleared the header, but the mouth/chin
- * were now cropped off entirely.
+ * With the frame capping how extreme the crop math can ever get, the
+ * plain, un-adjusted `object-[62%_36%]` from before the whole D-079–081
+ * saga is correct again — confirmed by screenshot at 1920/2560/3440, not
+ * assumed. All of D-079/080/081's `calc()`/`clamp()`/`min()`/`max()`
+ * object-position machinery is gone.
  *
- * Root cause, worked out by testing plain percentages empirically rather
- * than trusting the calc() math (D-081, 2026-08-23): object-position's Y
- * percentage resolves as `offset = (box_height - scaled_image_height) *
- * Y/100`, and at these widths `(box_height - scaled_image_height)` is
- * NEGATIVE (the box is shorter than the scaled image). Subtracting a
- * positive px amount from `36%` in that formula makes the resolved offset
- * MORE negative, not less — i.e. it INCREASES top crop, the opposite of
- * D-080's intent — while `clamp(4%, …, 36%)` compares the three terms
- * AFTER they've each resolved through that same negative-reference
- * formula, so its "floor" of 4% actually resolves to a LESS negative
- * number than its "ceiling" of 36% — clamp() has no way to know the
- * authored min/max are inverted in the resolved domain, so it silently
- * snapped every width past 1536px straight to the 4% position: almost no
- * top crop at all, and nearly the entire vertical excess (~685px of it at
- * 1920px) removed from the bottom instead — which is exactly what ate the
- * mouth and chin. Confirmed by testing plain, unclamped percentages
- * (`62% 36%`, `62% 24%`, `62% 16%`) side by side: each behaves exactly as
- * D-079 originally found (lower % = more top visible, mouth/chin stay in
- * frame) — the bug was specific to combining `%` and `px` inside `calc()`/
- * `clamp()` against this particular negative reference, not to the
- * underlying idea of lowering Y.
- *
- * Fixed by flipping the sign — ADD to `36%` instead of subtracting — and
- * dropping the broken `clamp()` for a plain `min()` that only ever bounds
- * the correction's own magnitude (a pure length-to-length comparison, no
- * percentage involved, so no repeat of the same trap): `62% calc(36% +
- * min(400px, max(0px, (100vw - 1536px)) * 0.35))`. Below 1536px this is
- * still exactly `36%` (`max(0px, …)` is `0px`), so 1440/1366/1280/mobile
- * are provably untouched. The `0.35` coefficient was bisected empirically
- * against real screenshots at 1920px (not algebraically derived, since
- * the true target curve is quadratic in viewport width once you account
- * for the image having to scale to cover it — not worth a fragile
- * closed-form match) — verified at 1920px to clear the header AND keep
- * the full mouth/chin in frame, and `min(400px, …)` keeps the correction
- * from ever overshooting into revealing flat background above the image
- * at widths this hero isn't expected to see. Applied via inline `style`
- * (not a Tailwind arbitrary class) since Tailwind's space-to-underscore
- * escaping makes a `calc()`/`min()`/`max()` this deep unreadable as a
- * class string.
+ * The two overlay layers (left scrim, bottom fade) moved inside the same
+ * frame, for the same reason as the image: outside the frame there is no
+ * photographic content to protect text legibility against or fade to
+ * begin with — that area is already flat `--background` (Section's own
+ * `bg-background`, D-070), which is the exact color the fade already
+ * targets, so no separate treatment is needed there.
  *
  * Top edge: no fade needed here — `SiteHeader` (`fixed`) already carries
  * its own two-stacked-gradient background (D-066/067's fix, "so the
@@ -175,35 +161,79 @@ export function ServicesHero() {
   return (
     <Section environment="dark" className="relative overflow-hidden">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-        <Image
-          src="/images/services-hero.png"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover md:translate-x-[10%] lg:translate-x-[16%] xl:translate-x-[20%]"
-          style={{
-            objectPosition: "62% calc(36% + min(400px, max(0px, (100vw - 1536px)) * 0.35))",
-          }}
-        />
-        {/* Left-side scrim — reinforces the dark ground the headline/copy
-            sit on. The source photo already fades dark on its own left
-            edge, but at the crop windows this section actually renders
-            (object-cover against a much wider-than-1512:1145 box on most
-            viewports), that dark margin alone isn't reliably wide enough
-            to keep body-copy-weight text legible against the brighter
-            facial/rim-light area behind it — confirmed by screenshot, not
-            assumed. This is the "extend the dark background further left,
-            behind the text" instruction implemented directly, not a new
-            visual element. */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, var(--color-background) 0%, color-mix(in srgb, var(--color-background) 60%, transparent) 40%, transparent 68%)",
-          }}
-        />
-        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-b from-transparent to-background" />
+        {/* Master composition frame (D-082): the SAME fluid max-width
+            `<Container size="2xl">` below uses for the text, so the image's
+            own `object-cover` box tracks the text's box in lockstep instead
+            of the raw, unboundedly-growing viewport. Below ~1650px this
+            equals the section's full width (unchanged from before D-082);
+            above it, it grows only as far as Container itself does, capping
+            at 2000px — the actual structural fix, not another tuned value.
+            `overflow-hidden` here (not just on `Section`) is load-bearing,
+            not decorative: `translate-x-*` below shifts the already-sized
+            image rightward AFTER `object-cover` sizes it to the frame —
+            `getBoundingClientRect()` on the image confirmed its rendered
+            box spills up to ~393px past the frame's own right edge at
+            `xl`'s 20% translate on a ~1964px-wide frame. Without clipping
+            the frame itself, that overshoot painted straight through where
+            the right-edge fade below expects the frame to actually end,
+            which is what the first version of this fix got wrong — found
+            by inspecting the real rendered rects, not assumed fixed by the
+            frame's width alone. */}
+        <div className={`relative mx-auto h-full w-full overflow-hidden ${CONTAINER_MAX_WIDTH["2xl"]}`}>
+          <Image
+            src="/images/services-hero.png"
+            alt=""
+            fill
+            priority
+            sizes="(min-width: 2000px) 2000px, 100vw"
+            className="object-cover object-[62%_36%] md:translate-x-[10%] lg:translate-x-[16%] xl:translate-x-[20%]"
+          />
+          {/* Left-side scrim — reinforces the dark ground the headline/copy
+              sit on. The source photo already fades dark on its own left
+              edge, but at the crop windows this frame actually renders
+              (object-cover against a much wider-than-1512:1145 box at most
+              widths), that dark margin alone isn't reliably wide enough to
+              keep body-copy-weight text legible against the brighter
+              facial/rim-light area behind it — confirmed by screenshot, not
+              assumed. This is the "extend the dark background further left,
+              behind the text" instruction implemented directly, not a new
+              visual element. */}
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, var(--color-background) 0%, color-mix(in srgb, var(--color-background) 60%, transparent) 40%, transparent 68%)",
+            }}
+          />
+          <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-b from-transparent to-background" />
+
+          {/* Right-edge bridge fade — found necessary AFTER building the
+              D-082 frame above, not part of the original ask: once the
+              frame is narrower than the section (>=~1920px), its bare right
+              edge was a hard-cut vertical line straight through the image's
+              own lit content — exactly the "visible image frame/border"
+              this hero's own D-070 brief rules out. `width` is derived from
+              the ACTUAL gap the frame leaves — half of (viewport minus the
+              frame's own rendered width) — using the identical clamp
+              `CONTAINER_MAX_WIDTH["2xl"]` compiles to (duplicated here as a
+              literal since a compiled Tailwind class can't be read back out
+              as a calc()-usable value; keep the two in sync if that tier's
+              tuning ever changes), capped at 420px so it can't balloon on a
+              huge monitor. This makes the fade PROVABLY zero-width at the
+              1440px reference and below — `clamp(1600px, 940px + 40vw,
+              2000px)` there evaluates to >=1440px, so `100vw - clamp(...)`
+              is negative, `max(0px, ...)` floors it to exactly `0px`, and a
+              0px-wide div renders nothing. Confirmed via screenshot: 1440px
+              is unaffected, 1920/2560/3440 no longer show a hard edge. */}
+          <div
+            aria-hidden="true"
+            className="absolute right-0 top-0 h-full"
+            style={{
+              width: "min(420px, max(0px, (100vw - clamp(1600px, 940px + 40vw, 2000px)) / 2))",
+              backgroundImage: "linear-gradient(to right, transparent 0%, var(--color-background) 100%)",
+            }}
+          />
+        </div>
       </div>
 
       <Container
