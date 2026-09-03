@@ -1,27 +1,24 @@
 import type { Metadata } from "next";
-import { IndustriesHero } from "../components/sections/industries/hero";
-import { IndustriesExplorer } from "../components/sections/industries/industries-explorer";
-import { FinalCta } from "../components/sections/home/final-cta";
+import IndustriesClient from "./industries-client";
 
 export const metadata: Metadata = {
-  title: "Industries | Oragrol Global",
+  title: "Industries | Cybersecurity, Automation & OR ONE by Sector",
   description:
-    "Cybersecurity isn't one-size-fits-all. See the risk, priorities, and approach Oragrol takes for your industry.",
+    "Industry-specific cybersecurity priorities, automation opportunities and OR ONE coordination for professional services, healthcare, financial services, retail & e-commerce, and manufacturing.",
+  alternates: {
+    canonical: "/industries",
+  },
+  openGraph: {
+    title: "Industries | ORAGROL Global",
+    description:
+      "How ORAGROL Global's cybersecurity, automation and OR ONE services apply to your industry's real risks and priorities.",
+    url: "/industries",
+    siteName: "ORAGROL Global",
+    locale: "en_CA",
+    type: "website",
+  },
 };
 
-/**
- * Industries — Website Implementation Brief, Step 9.
- * One elegant interactive experience, not 9 separate pages (PROJECT_MASTER.md
- * Step 9 brief): Hero -> IndustriesExplorer (sidebar/tabs + instant-swap
- * detail panel, all 9 industries) -> Final CTA (reused from Home, same
- * pattern as Solutions) -> Footer (global, layout.tsx).
- */
-export default function IndustriesPage() {
-  return (
-    <>
-      <IndustriesHero />
-      <IndustriesExplorer />
-      <FinalCta />
-    </>
-  );
+export default function Page() {
+  return <IndustriesClient />;
 }
