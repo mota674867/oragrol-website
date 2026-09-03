@@ -443,7 +443,7 @@ function ContactPageClient() {
           </h2>
           <div>
             <span>EXPLORE</span>
-            <Link href="/">Services</Link>
+            <Link href="/services">Services</Link>
             <Link href="/business-automation">Business Automation</Link>
             <Link href="/or-one">OR ONE</Link>
             <Link href="/industries">Industries</Link>

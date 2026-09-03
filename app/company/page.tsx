@@ -156,7 +156,7 @@ export default function CompanyPage() {
             Understand exposure, strengthen essential controls and respond with
             confidence.
           </p>
-          <Link href="/">Cybersecurity Services ↗</Link>
+          <Link href="/services">Cybersecurity Services ↗</Link>
         </div>
         <div>
           <span>02</span>
@@ -283,7 +283,7 @@ export default function CompanyPage() {
           </h2>
           <div>
             <span>EXPLORE</span>
-            <Link href="/">Services</Link>
+            <Link href="/services">Services</Link>
             <Link href="/business-automation">Business Automation</Link>
             <Link href="/or-one">OR ONE</Link>
             <Link href="/industries">Industries</Link>
