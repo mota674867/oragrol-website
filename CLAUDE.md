@@ -92,3 +92,32 @@ At the end of every meaningful session:
 3. Log any durable architectural/design choice in `DECISIONS.md` (not in PROJECT_MEMORY).
 4. `git status` → commit if clean logical unit of work exists.
 5. Report clearly: what was completed, files changed, verification performed, what's still open, recommended next step.
+
+---
+
+## 12. Codebase Architecture Reference
+
+**Stack:** Next.js 16 (App Router, Turbopack), React 19, TypeScript, Tailwind CSS v4, `motion` (Framer Motion), `next/font` (Google Fonts), Resend (contact-form email), react-hook-form + zod. `next-intl` is an installed dependency but is **not wired into the app** — the header's "EN | FR" is static text, not real i18n routing; don't assume locale routing exists. `tests/example.spec.ts` is the untouched Playwright scaffold, not a real suite, and there's no `npm test` script — actual visual/responsive verification is done ad hoc via `playwright-core` scripted from outside the repo against a running dev server (Section 7 above), not `npx playwright test`.
+
+**Routes** (`app/`, one `page.tsx` per route): Home, Services (+ `[code]` detail pages), Solutions, Cyber Health, Industries, Company, How We Work, Contact, Business Automation (+ `[code]`), Resources (+ `[slug]`), Style Guide. `app/api/contact/route.ts` is the only API route.
+
+**Design token system** (`app/styles/tokens.css`) — read this before touching any color, spacing, or typeface:
+1. Raw palette (`--palette-*`) — the 6 approved brand colors, verbatim hex. Never referenced directly by components.
+2. Semantic layer (`--background`, `--text-primary`, `--accent`, etc.) — what components actually use, via Tailwind utilities (`bg-background`, `text-accent`, ...).
+3. Environment overrides — `.env-dark` / `.env-deep-blue` / `.env-light` classes repoint the semantic layer. Every page section opts into one via `<Section environment="...">` (`app/components/ui/section.tsx`); a component written against semantic tokens works correctly in any environment without knowing which one wraps it.
+4. `@theme inline` exposes the semantic layer as Tailwind utilities.
+
+Fonts follow the same indirection: `font-heading`/`font-body`/`font-data`/`font-brand` Tailwind classes → CSS vars set by the `next/font` calls in `app/layout.tsx` → real typefaces. Swap a typeface by editing the import there; no component references a font name directly.
+
+**`Section` + `Container`** (`app/components/ui/`): nearly every page section is a `<Section>` (environment + optional `transitionFrom`/`transitionTo` atmospheric gradient blend into the adjacent section's environment) wrapping a `<Container size="...">`. Container widths (`CONTAINER_MAX_WIDTH` in `container.tsx`) are `clamp()`-based, not flat breakpoints — each size holds at a floor, ramps with viewport width, then caps at a ceiling, so wide monitors get neither a column frozen at laptop width nor text stretched edge-to-edge. Other components needing the same width (e.g. `nav.tsx`) import `CONTAINER_MAX_WIDTH` directly rather than re-hardcoding a value.
+
+**Component layout** (`app/components/`):
+- `ui/` — generic, environment-agnostic primitives (Button, Card, Typography, Section, Container, Nav, form fields). Reference semantic tokens only, never raw hex.
+- `site/` — global chrome rendered on every page from `app/layout.tsx` (SiteHeader, SiteFooter, nav dropdowns, search overlay, emergency-CTA pill).
+- `sections/<page>/` — one folder per top-level route holding that page's own section components (e.g. `sections/services/hero.tsx`). Content-heavy pages keep a co-located `*-data.ts` module in the same folder (e.g. `services-data.ts`, `articles-data.ts`) that either wraps a JSON file from `app/data/` (Services/Solutions/Business Automation) or holds content as TS literals directly (Resources articles) — imported by both `page.tsx` and the section components, so content exists in exactly one place, never duplicated between the list view and the detail view.
+- `brand/` — the two canonical brand-mark components (`OragrolLogo`, `OragrolRing`). Both inline the *exact* geometry from `Oragrol_Logo_Final.svg` (same circle cx/cy/r/stroke-dasharray, same text x/y/font-size) rather than approximating the mark with hand-tuned CSS — a past regression (a hand-recreated footer logo drifting from the header's) made this the deliberate, enforced pattern. Always import one of these two components; never redraw the mark by eye.
+- `motion/` — shared animation primitives (`Reveal`, the scroll-triggered fade/slide-in wrapper used throughout).
+
+**Dynamic routes are data-driven, not authored per page:** `[code]`/`[slug]` routes call `generateStaticParams` off the same data-accessor module the corresponding static list page uses, so a service/article's canonical content lives in exactly one place. `services/[code]` specifically guards against a Business Automation slug leaking into the wrong route (Business Automation detail pages moved to their own `business-automation/[code]` route, split out from Services) since this app isn't configured for `dynamicParams: false` — an unlisted param still reaches the page function and must explicitly `notFound()`.
+
+**Next.js version note:** `AGENTS.md` is auto-generated/re-added by `next dev` (don't strip it from a diff — that only recreates the change) and flags that this Next.js version's APIs/conventions may differ from training data. Check `node_modules/next/dist/docs/` for the installed version's actual behavior before assuming a convention from general Next.js knowledge.

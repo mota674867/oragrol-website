@@ -366,7 +366,7 @@ function IndustriesClient() {
               className={i === 3 ? "active" : ""}
               href={
                 n === "Services"
-                  ? "/"
+                  ? "/services"
                   : n === "Business Automation"
                     ? "/business-automation"
                     : n === "OR ONE"

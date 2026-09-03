@@ -114,7 +114,7 @@ function ContactPageClient() {
             <Link
               href={
                 n === "Services"
-                  ? "/"
+                  ? "/services"
                   : n === "Business Automation"
                     ? "/business-automation"
                     : n === "OR ONE"

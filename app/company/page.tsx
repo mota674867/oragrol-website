@@ -43,7 +43,7 @@ export default function CompanyPage() {
               className={n === "Company" ? "active" : ""}
               href={
                 n === "Services"
-                  ? "/"
+                  ? "/services"
                   : n === "Business Automation"
                     ? "/business-automation"
                     : n === "OR ONE"

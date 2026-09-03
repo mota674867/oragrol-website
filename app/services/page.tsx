@@ -357,13 +357,13 @@ export default function Home() {
   return (
     <main className="services-page">
       <header className="site-header">
-        <Link className="wordmark" href="#">
+        <Link className="wordmark" href="/">
           <span>ORAGROL</span>
           <small>GLOBAL</small>
         </Link>
         <nav className="service-nav">
           {navItems.map((n, i) => (
-            <Link className={i === 0 ? "active" : ""} href={n === "Services" ? "/" : n === "Business Automation" ? "/business-automation" : n === "OR ONE" ? "/or-one" : n === "Industries" ? "/industries" : n === "Resources" ? "/resources" : "/company"} key={n}>
+            <Link className={i === 0 ? "active" : ""} href={n === "Services" ? "/services" : n === "Business Automation" ? "/business-automation" : n === "OR ONE" ? "/or-one" : n === "Industries" ? "/industries" : n === "Resources" ? "/resources" : "/company"} key={n}>
               {n}
             </Link>
           ))}

@@ -185,7 +185,7 @@ const groups = [
 ] as const;
 
 const nav = [
-  ["Services", "/"],
+  ["Services", "/services"],
   ["Business Automation", "/business-automation"],
   ["OR ONE", "/or-one"],
   ["Industries", "/industries"],

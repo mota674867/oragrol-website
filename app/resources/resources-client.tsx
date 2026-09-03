@@ -218,7 +218,7 @@ function ResourcesPageClient() {
               className={n === "Resources" ? "active" : ""}
               href={
                 n === "Services"
-                  ? "/"
+                  ? "/services"
                   : n === "Business Automation"
                     ? "/business-automation"
                     : n === "OR ONE"
