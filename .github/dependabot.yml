@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      # Security patches land as their own PRs, never batched, so they
+      # never wait behind an unrelated feature-dependency review.
+      production-dependencies:
+        applies-to: version-updates
+        dependency-type: "production"
+      dev-dependencies:
+        applies-to: version-updates
+        dependency-type: "development"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
