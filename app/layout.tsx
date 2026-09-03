@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Manrope, IBM_Plex_Sans, Epilogue } from "next/font/google";
 import "./globals.css";
 import { SiteChrome } from "./components/site/site-chrome";
+import { SITE_URL } from "./lib/site-config";
 
 // Design-token typefaces (D-068 visual-system migration — see
 // app/styles/tokens.css). Changing a typeface only requires editing the
@@ -39,7 +40,7 @@ const epilogue = Epilogue({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://oragrolglobal.com"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "ORAGROL Global | Cybersecurity, Automation & Coordinated Protection",
     template: "%s | ORAGROL Global",

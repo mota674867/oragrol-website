@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import ContactPageClient from "./contact-client";
 
 export const metadata: Metadata = {
-  title: "Contact | Start a Conversation with ORAGROL Global",
+  title: "Contact | Start a Clear Conversation",
   description:
     "Start with a clear conversation about cybersecurity, business automation or OR ONE. ORAGROL Global responds to qualified enquiries within two business days.",
   alternates: {

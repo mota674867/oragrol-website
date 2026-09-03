@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
-
-const BASE_URL = "https://oragrolglobal.com";
+import { SITE_URL } from "./lib/site-config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
@@ -17,7 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   return routes.map((route) => ({
-    url: `${BASE_URL}${route.path}`,
+    url: `${SITE_URL}${route.path}`,
     lastModified: new Date(),
     priority: route.priority,
   }));

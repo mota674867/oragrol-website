@@ -48,7 +48,9 @@ export const LOCATIONS: Location[] = [
     primary: false,
     address: "180 Park Ave, Thunder Bay, ON P7B 6J4",
     phone: "+1 (613) 315-0328",
-    email: "info@oragrolglobal.com",
+    // No live oragrolglobal.com or orgro.ca mailbox yet — PENDING rather
+    // than a bounce-prone address (see app/lib/site-config.ts).
+    email: PENDING,
     hours: "Mon–Fri, 10am–8pm",
   },
 ];

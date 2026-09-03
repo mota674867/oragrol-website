@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import HomeClient from "./home-client";
+import { SITE_URL } from "./lib/site-config";
 
 export const metadata: Metadata = {
   title: "Cybersecurity, Automation & Coordinated Protection for Canadian Businesses",
@@ -23,8 +24,10 @@ const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "ORAGROL Global",
-  url: "https://oragrolglobal.com",
-  logo: "https://oragrolglobal.com/logo.png",
+  url: SITE_URL,
+  // No `logo` field yet — no logo asset exists at public/ to point to,
+  // and a broken image URL in structured data is worse than omitting the
+  // field. Add it back once a real logo file is in place.
   description:
     "ORAGROL Global provides cybersecurity services, intelligent business automation and coordinated security operations (OR ONE) for Canadian small and medium-sized businesses.",
   areaServed: {

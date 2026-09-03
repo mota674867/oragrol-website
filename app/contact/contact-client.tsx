@@ -51,6 +51,8 @@ function ContactPageClient() {
   );
   const [scope, setScope] = useState<ScopeItem[]>([]);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   // Hydrate from localStorage after mount (client-only; SSR/first paint
   // stays empty on purpose to avoid a hydration mismatch) — same pattern
   // as ScopeTray's own useScope hook.
@@ -60,9 +62,45 @@ function ContactPageClient() {
       setScope(JSON.parse(localStorage.getItem("oragrol-scope-v2") || "[]"));
     } catch {}
   }, []);
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitError(null);
+    const form = new FormData(e.currentTarget);
+    const scopeSummary =
+      scope.length > 0
+        ? `${scope.length} selection${scope.length === 1 ? "" : "s"}: ${scope.map((x) => x.title).join(", ")}`
+        : undefined;
+    const payload = {
+      firstName: String(form.get("firstName") || ""),
+      lastName: String(form.get("lastName") || ""),
+      email: String(form.get("email") || ""),
+      company: String(form.get("company") || ""),
+      jobTitle: String(form.get("jobTitle") || "") || undefined,
+      companySize: String(form.get("companySize") || "") || undefined,
+      conversation,
+      context: String(form.get("context") || ""),
+      contactMethod: String(form.get("contactMethod") || "") || undefined,
+      preferredTime: String(form.get("preferredTime") || "") || undefined,
+      scopeSummary,
+    };
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data: { ok: boolean; error?: string } = await res.json();
+      if (!res.ok || !data.ok) {
+        setSubmitError(data.error || "Could not send your message. Please try again.");
+        return;
+      }
+      setSubmitted(true);
+    } catch {
+      setSubmitError("Could not send your message. Check your connection and try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
   return (
     <main className="contact-page">
@@ -265,9 +303,15 @@ function ContactPageClient() {
             <input required type="checkbox" /> I agree that ORAGROL Global may
             contact me about this enquiry.
           </label>
-          <button className="contact-submit" type="submit">
-            Submit Enquiry <span>↗</span>
+          <button className="contact-submit" type="submit" disabled={submitting}>
+            {submitting ? "Sending…" : "Submit Enquiry"} <span>↗</span>
           </button>
+          {submitError && (
+            <div className="contact-confirmation" role="alert">
+              <strong>Something went wrong.</strong>
+              <span>{submitError}</span>
+            </div>
+          )}
           {scope.length > 0 && (
             <button
               className="contact-pdf"
@@ -285,9 +329,8 @@ function ContactPageClient() {
             <div className="contact-confirmation" role="status">
               <strong>Thank you.</strong>
               <span>
-                Your enquiry is prepared for ORAGROL Global review. The live
-                email and CRM connection will be activated before the website
-                launches.
+                Your enquiry has been sent to the ORAGROL Global team for
+                review. We aim to respond within two business days.
               </span>
             </div>
           )}

@@ -17,6 +17,11 @@ Two real options, pick one (don't stack both — redundant and slower):
   fight mode.
 Decide which, then either flip it on in the Vercel dashboard or move
 DNS to Cloudflare — both are account actions, not code.
+**Worth noting:** moving orgro.ca's DNS to Cloudflare also unlocks
+Cloudflare Email Routing (free, ~5 min setup) for a real `@orgro.ca`
+inbox — see item 5 below and `app/lib/site-config.ts`. If Cloudflare
+is the pick here, it solves both the WAF question and the email
+question in one DNS move.
 
 ## 2. Secure headers, CSP, HTTPS, HSTS — Done (code)
 `next.config.ts` `headers()`: CSP, `Strict-Transport-Security`
@@ -27,10 +32,12 @@ HTTPS is enforced automatically by Vercel. CSP currently allows
 `style={{}}` usage across ported pages need it without a nonce
 pipeline) — tightening to per-request nonces is a real follow-up, not
 done in this pass.
-**Once live:** submit https://oragrolglobal.com/ to
+**Once live:** submit https://orgro.ca/ to
 https://securityheaders.com and https://hstspreload.org to confirm
 headers land as configured, and to actually get on the HSTS preload
-list (a manual submission, not automatic).
+list (a manual submission, not automatic). (Domain is orgro.ca for
+now — see `app/lib/site-config.ts`; re-run this once the site moves
+to oragrolglobal.com.)
 
 ## 3. MFA and restricted admin access — Ready, needs your action
 Not something I can turn on remotely. Enable:
@@ -59,11 +66,18 @@ No chat-widget backend or other API routes exist yet to secure.
   Code security — the config file alone doesn't turn them on.
 - `.github/workflows/security-checks.yml` added: `npm audit
   --audit-level=high` + `tsc` + `lint` on every push/PR.
-- Secrets already handled correctly: `RESEND_API_KEY` etc. only in
-  `.env.local` (gitignored), never hardcoded — confirmed, no change
-  needed. Set the same env vars in Vercel's dashboard (Encrypted),
-  not in a committed file.
+- Secrets already handled correctly: `RESEND_API_KEY`, `CONTACT_TO_EMAIL`
+  etc. only in `.env.local` (gitignored), never hardcoded — confirmed,
+  no change needed. Set the same env vars in Vercel's dashboard
+  (Encrypted), not in a committed file.
 - `npm audit`: 0 vulnerabilities as of this pass.
+- **Domain/email note:** the site now runs on `orgro.ca` (see
+  `app/lib/site-config.ts`) since oragrolglobal.com isn't accessible
+  yet. `orgro.ca`'s own mailbox isn't active either, so `/api/contact`
+  requires `CONTACT_TO_EMAIL` to point at a real inbox you control for
+  now (no placeholder-domain fallback — see `.env.local.example`).
+  Once Cloudflare Email Routing (or another provider) gives `orgro.ca`
+  a live mailbox, switch `CONTACT_TO_EMAIL` to that address in Vercel.
 
 ## 6. Malware / file-upload protection — Deferred, not yet applicable
 No file upload exists anywhere on the site today (Contact form is

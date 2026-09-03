@@ -25,3 +25,29 @@ export const generalInquirySchema = z.object({
 });
 
 export type GeneralInquiryInput = z.infer<typeof generalInquirySchema>;
+
+/**
+ * Validation for the GPT-redesigned Contact page's enquiry form
+ * (app/contact/contact-client.tsx) — POSTed to /api/contact alongside
+ * `generalInquirySchema` above (still used by the old, now-orphaned
+ * general-inquiry.tsx component; left untouched rather than repurposed,
+ * so this is a separate, additive schema, not a replacement). Field
+ * names match the form's own `name` attributes exactly.
+ */
+export const contactEnquirySchema = z.object({
+  firstName: z.string().trim().min(1, "Enter your first name.").max(100),
+  lastName: z.string().trim().min(1, "Enter your last name.").max(100),
+  email: z.string().trim().min(1, "Enter your email.").email("Enter a valid email address."),
+  company: z.string().trim().min(1, "Enter your company.").max(200),
+  jobTitle: z.string().trim().max(200).optional(),
+  companySize: z.string().trim().max(50).optional(),
+  conversation: z.string().trim().min(1).max(100),
+  context: z.string().trim().min(1, "Tell us what you'd like to achieve.").max(5000),
+  contactMethod: z.string().trim().max(50).optional(),
+  preferredTime: z.string().trim().max(200).optional(),
+  // Short summary of any ScopeTray selections attached at submit time —
+  // built client-side from localStorage state, not itself sensitive.
+  scopeSummary: z.string().trim().max(1000).optional(),
+});
+
+export type ContactEnquiryInput = z.infer<typeof contactEnquirySchema>;
