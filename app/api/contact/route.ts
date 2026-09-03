@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { generalInquirySchema } from "../../lib/contact-schema";
+import { getClientIp, rateLimit } from "../../lib/rate-limit";
 
 /**
  * POST /api/contact — General Inquiry form submission (Contact page,
@@ -40,6 +41,15 @@ function escapeHtml(value: string) {
 }
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  const limited = rateLimit(`contact:${ip}`, { limit: 5, windowMs: 10 * 60 * 1000 });
+  if (!limited.ok) {
+    return NextResponse.json(
+      { ok: false, error: "Too many requests. Please try again shortly." },
+      { status: 429, headers: { "Retry-After": String(Math.ceil((limited.resetAt - Date.now()) / 1000)) } },
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();
