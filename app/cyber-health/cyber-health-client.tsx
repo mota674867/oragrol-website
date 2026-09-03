@@ -16,10 +16,14 @@ const qualification=[
   {id:"timing",label:"When are you looking to make security improvements?",choices:["Immediately","Within 3 months","Within 6 months","Just researching"]},
 ] as const;
 
+type ReportStatus="idle"|"sending"|"sent"|"error";
+
 function CyberHealthClient(){
   const [stage,setStage]=useState<Stage>("intro"),[step,setStep]=useState(0);
   const [answers,setAnswers]=useState<Record<string,Answer>>({}),[qual,setQual]=useState<Record<string,string>>({});
   const [profile,setProfile]=useState<Profile>({company:"",industry:"",province:"",employees:"",platform:"",name:"",email:"",phone:""});
+  const [reportStatus,setReportStatus]=useState<ReportStatus>("idle");
+  const [reportError,setReportError]=useState<string|null>(null);
   const visibleQuestions=useMemo(()=>questions.filter(q=>profile.platform==="Google Workspace"?!q.id.match(/^Q08-[12]$/):!q.id.includes("-GWS")),[profile.platform]);
   const sectionQuestions=visibleQuestions.filter(q=>q.section===sections[step]);
   const sectionComplete=sectionQuestions.every(q=>answers[q.id]);
@@ -32,6 +36,32 @@ function CyberHealthClient(){
   const answered=visibleQuestions.filter(q=>answers[q.id]).length;
   const go=(s:Stage)=>{setStage(s);scrollTo(0,0)};
   const header=(label:string)=><header><Link href="/">ORAGROL <small>GLOBAL</small></Link><b>{label}</b></header>;
+  // Fired once, when the result screen is first reached — the score
+  // itself is already computed and shown client-side (instant), this
+  // just delivers the full PDF report in the background. Server
+  // recomputes the score independently from these raw answers rather
+  // than trusting what's sent here (see app/lib/cyber-health-report.ts).
+  const submitReport=async()=>{
+    setReportStatus("sending");
+    setReportError(null);
+    try{
+      const res=await fetch("/api/cyber-health",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({profile,qualification:qual,answers}),
+      });
+      const data:{ok:boolean;error?:string}=await res.json();
+      if(!res.ok||!data.ok){
+        setReportStatus("error");
+        setReportError(data.error||"Could not send your report. Please try again.");
+        return;
+      }
+      setReportStatus("sent");
+    }catch{
+      setReportStatus("error");
+      setReportError("Could not send your report. Check your connection and try again.");
+    }
+  };
 
   if(stage==="intro")return <main className="nch intro"><span className="nch-or">OR</span>{header("CYBER HEALTH / PRIVATE ASSESSMENT")}<section><p>5–7 MINUTES · 42 SECURITY QUESTIONS</p><h1>Know where you stand.<br/><i>Know what to do next.</i></h1><p>Build a practical baseline across identity, email, devices, cloud, people, data and governance.</p><button onClick={()=>go("profile")}>Begin assessment ↗</button></section></main>;
 
@@ -41,9 +71,9 @@ function CyberHealthClient(){
 
   if(stage==="qualify")return <main className="nch formstage">{header("02 / BUSINESS CONTEXT")}<section><aside><p>QUICK QUESTIONS</p><h1>A little context.</h1><p>Your answers help us make the next conversation relevant. They do not affect your score.</p></aside><div className="nch-q compact">{qualification.map((q,qi)=><fieldset key={q.id}><legend><small>0{qi+1}</small>{q.label}</legend><div>{q.choices.map((v,i)=><label className={qual[q.id]===v?"chosen":""} key={v}><input type="radio" name={q.id} onChange={()=>setQual({...qual,[q.id]:v})}/><b>{String.fromCharCode(65+i)}</b>{v}</label>)}</div></fieldset>)}<footer><button onClick={()=>go("profile")}>← Back</button><button disabled={!qualComplete} onClick={()=>go("assessment")}>Start questions →</button></footer></div></section></main>;
 
-  if(stage==="result")return <main className="nch result">{header("YOUR RESULT")}<section><div><p>CYBER HEALTH SCORE</p><strong>{score}</strong><span>/100</span><dl><div><dt>Risk tier</dt><dd>{tier}</dd></div><div><dt>Suggested path</dt><dd>{pkg}</dd></div></dl></div><article><p className="eyebrow">{profile.company||"YOUR BUSINESS"}</p><h1>{score>=80?"Strong foundation.":score>=60?"A workable base with clear gaps.":score>=40?"Material improvement is needed.":"Start with the essentials."}</h1><p>A directional baseline, not a certification or guarantee. Review uncertain and missing controls before deciding what to improve first.</p><button onClick={()=>{setStep(0);go("assessment")}}>Review answers</button></article></section></main>;
+  if(stage==="result")return <main className="nch result">{header("YOUR RESULT")}<section><div><p>CYBER HEALTH SCORE</p><strong>{score}</strong><span>/100</span><dl><div><dt>Risk tier</dt><dd>{tier}</dd></div><div><dt>Suggested path</dt><dd>{pkg}</dd></div></dl></div><article><p className="eyebrow">{profile.company||"YOUR BUSINESS"}</p><h1>{score>=80?"Strong foundation.":score>=60?"A workable base with clear gaps.":score>=40?"Material improvement is needed.":"Start with the essentials."}</h1><p>A directional baseline, not a certification or guarantee. Review uncertain and missing controls before deciding what to improve first.</p><button onClick={()=>{setStep(0);go("assessment")}}>Review answers</button>{reportStatus!=="idle"&&<p className="ch-report-status" data-status={reportStatus} role="status">{reportStatus==="sending"?`Preparing your full report for ${profile.email}…`:reportStatus==="sent"?`Your full report has been sent to ${profile.email}.`:reportError}</p>}</article></section></main>;
 
-  return <main className="nch assess"><header><Link href="/">ORAGROL <small>GLOBAL</small></Link><div><b>{answered} / {visibleQuestions.length}</b><i><em style={{width:`${answered/visibleQuestions.length*100}%`}}/></i></div></header><section><aside><p>{String(step+1).padStart(2,"0")} / {String(sections.length).padStart(2,"0")}</p><h1>{sections[step]}</h1><p>Select what best reflects the business today.</p><nav>{sections.map((s,i)=><span className={i===step?"on":i<step?"done":""} key={s}>{String(i+1).padStart(2,"0")} {s}</span>)}</nav></aside><div className="nch-q">{sectionQuestions.map(q=><fieldset key={q.id}><legend><small>{q.id.replace("-GWS","")}</small>{q.text}</legend><div>{(["Yes","No","Not Sure"] as Answer[]).map((v,i)=><label className={answers[q.id]===v?"chosen":""} key={v}><input type="radio" name={q.id} checked={answers[q.id]===v} onChange={()=>setAnswers({...answers,[q.id]:v})}/><b>{String.fromCharCode(65+i)}</b>{v}</label>)}</div></fieldset>)}<footer><button onClick={()=>step?setStep(step-1):go("qualify")}>← Back</button>{step<sections.length-1?<button disabled={!sectionComplete} onClick={()=>{setStep(step+1);scrollTo(0,0)}}>Next section →</button>:<button disabled={!sectionComplete} onClick={()=>go("result")}>Calculate score →</button>}</footer></div></section></main>;
+  return <main className="nch assess"><header><Link href="/">ORAGROL <small>GLOBAL</small></Link><div><b>{answered} / {visibleQuestions.length}</b><i><em style={{width:`${answered/visibleQuestions.length*100}%`}}/></i></div></header><section><aside><p>{String(step+1).padStart(2,"0")} / {String(sections.length).padStart(2,"0")}</p><h1>{sections[step]}</h1><p>Select what best reflects the business today.</p><nav>{sections.map((s,i)=><span className={i===step?"on":i<step?"done":""} key={s}>{String(i+1).padStart(2,"0")} {s}</span>)}</nav></aside><div className="nch-q">{sectionQuestions.map(q=><fieldset key={q.id}><legend><small>{q.id.replace("-GWS","")}</small>{q.text}</legend><div>{(["Yes","No","Not Sure"] as Answer[]).map((v,i)=><label className={answers[q.id]===v?"chosen":""} key={v}><input type="radio" name={q.id} checked={answers[q.id]===v} onChange={()=>setAnswers({...answers,[q.id]:v})}/><b>{String.fromCharCode(65+i)}</b>{v}</label>)}</div></fieldset>)}<footer><button onClick={()=>step?setStep(step-1):go("qualify")}>← Back</button>{step<sections.length-1?<button disabled={!sectionComplete} onClick={()=>{setStep(step+1);scrollTo(0,0)}}>Next section →</button>:<button disabled={!sectionComplete} onClick={()=>{go("result");submitReport()}}>Calculate score →</button>}</footer></div></section></main>;
 }
 
 export default CyberHealthClient;
