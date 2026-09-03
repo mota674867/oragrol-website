@@ -15,7 +15,7 @@ import ChatWidget from "../ChatWidget";
  * their current chrome — and no chat widget — until their own redesign pass).
  * Grows by one entry each time another page is ported.
  */
-const REDESIGNED_ROUTES = new Set<string>(["/", "/services", "/business-automation", "/or-one", "/industries", "/resources", "/company"]);
+const REDESIGNED_ROUTES = new Set<string>(["/", "/services", "/business-automation", "/or-one", "/industries", "/resources", "/company", "/contact"]);
 
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
