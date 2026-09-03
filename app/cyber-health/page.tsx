@@ -1,41 +1,24 @@
 import type { Metadata } from "next";
-import { CyberHealthHero } from "../components/sections/cyber-health/hero";
-import { Flow } from "../components/sections/cyber-health/flow";
-import { OutputShape } from "../components/sections/cyber-health/output-shape";
-import { Reassurance } from "../components/sections/cyber-health/reassurance";
-import { ClosingCta } from "../components/sections/cyber-health/closing-cta";
+import CyberHealthClient from "./cyber-health-client";
 
 export const metadata: Metadata = {
-  title: "Cyber Health | Oragrol Global",
+  title: "Cyber Health Assessment | Know Your Score",
   description:
-    "Know your Cyber Health Score in minutes — a focused assessment, a clear score, and a practical plan for what to do next.",
+    "A free, 5-7 minute Cyber Health Assessment covering 42 security questions across identity, email, devices, cloud, people, data and governance — with a practical score and next steps.",
+  alternates: {
+    canonical: "/cyber-health",
+  },
+  openGraph: {
+    title: "Cyber Health Assessment | ORAGROL Global",
+    description:
+      "Know where you stand and what to do next — a practical, 42-question Cyber Health baseline for Canadian businesses.",
+    url: "/cyber-health",
+    siteName: "ORAGROL Global",
+    locale: "en_CA",
+    type: "website",
+  },
 };
 
-/**
- * Cyber Health — Website Implementation Brief, Step 7.
- * Flow: Hero (HeroAmbientLoader, D-043's persistent ambient rotating-ring
- * visual, replacing D-008's static GaugeVisual instrument-panel gauge —
- * see DECISIONS.md D-043; CTA to the
- * real live assessment) -> Flow (the locked 7-step sequence, page-level
- * weight) -> OutputShape (the locked output list + an illustrative report
- * preview) -> Reassurance (facts confirmed from the live form) ->
- * ClosingCta (page-specific, not the reused FinalCta) -> Footer (global,
- * layout.tsx).
- *
- * The actual 42-question assessment, scoring, AI analysis, email, and
- * CRM handoff run on the existing Tally-based MVP
- * (https://tally.so/r/2EzROb, confirmed live with real submissions by
- * Mohammad) — this page is the "product-facing experience" wrapper
- * PROJECT_MASTER.md Step 7 describes, not a rebuild of that flow.
- */
-export default function CyberHealthPage() {
-  return (
-    <>
-      <CyberHealthHero />
-      <Flow />
-      <OutputShape />
-      <Reassurance />
-      <ClosingCta />
-    </>
-  );
+export default function Page() {
+  return <CyberHealthClient />;
 }
