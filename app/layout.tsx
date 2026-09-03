@@ -39,9 +39,13 @@ const epilogue = Epilogue({
 });
 
 export const metadata: Metadata = {
-  title: "Oragrol Global | Cybersecurity clarity for modern businesses",
+  metadataBase: new URL("https://oragrolglobal.com"),
+  title: {
+    default: "ORAGROL Global | Cybersecurity, Automation & Coordinated Protection",
+    template: "%s | ORAGROL Global",
+  },
   description:
-    "Oragrol helps businesses understand risk, prioritize what matters, and build practical protection that moves with the business.",
+    "ORAGROL Global helps Canadian businesses understand risk, prioritize what matters, and build practical protection and automation that move with the business.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

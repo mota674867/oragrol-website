@@ -4,21 +4,30 @@ import { usePathname } from "next/navigation";
 import { SiteHeader } from "./site-header";
 import { SiteFooter } from "./site-footer";
 import { EmergencyCta } from "./emergency-cta";
+import ChatWidget from "../ChatWidget";
 
 /**
- * Home ("/") ships its own full-bleed header/footer as part of the GPT V38
- * redesign (see app/page.tsx + app/homepage-v3.css) — the old site-wide
- * SiteHeader/SiteFooter/EmergencyCta must not also render there, or the page
- * gets two headers and two footers stacked. Every other route keeps the
- * original global chrome untouched until it goes through its own redesign
- * pass.
+ * Routes rebuilt from the GPT V38 redesign ship their own full-bleed
+ * header/footer — the old site-wide SiteHeader/SiteFooter/EmergencyCta must
+ * not also render on these, or the page gets two headers and two footers
+ * stacked. GPT's own root layout also renders its ChatWidget globally, so we
+ * add it here for every redesigned route (old, not-yet-ported routes keep
+ * their current chrome — and no chat widget — until their own redesign pass).
+ * Grows by one entry each time another page is ported.
  */
+const REDESIGNED_ROUTES = new Set<string>(["/", "/services"]);
+
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isHome = pathname === "/";
+  const isRedesigned = pathname !== null && REDESIGNED_ROUTES.has(pathname);
 
-  if (isHome) {
-    return <>{children}</>;
+  if (isRedesigned) {
+    return (
+      <>
+        {children}
+        <ChatWidget />
+      </>
+    );
   }
 
   return (
