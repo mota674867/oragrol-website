@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Manrope, IBM_Plex_Sans, Epilogue } from "next/font/google";
 import "./globals.css";
-import { SiteHeader } from "./components/site/site-header";
-import { SiteFooter } from "./components/site/site-footer";
-import { EmergencyCta } from "./components/site/emergency-cta";
+import { SiteChrome } from "./components/site/site-chrome";
 
 // Design-token typefaces (D-068 visual-system migration — see
 // app/styles/tokens.css). Changing a typeface only requires editing the
@@ -53,10 +51,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${spaceGrotesk.variable} ${manrope.variable} ${ibmPlexSans.variable} ${epilogue.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <SiteHeader />
-        <main className="flex-1">{children}</main>
-        <SiteFooter />
-        <EmergencyCta />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );
