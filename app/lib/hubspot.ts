@@ -24,6 +24,83 @@ import type { CyberHealthReport } from "./cyber-health-report";
 
 const HUBSPOT_API_BASE = "https://api.hubapi.com";
 
+/**
+ * Upserts a HubSpot contact for a chat-widget escalation (see
+ * app/api/chat/route.ts) and attaches a note tagged with the lead
+ * source/channel so it's obvious in the CRM this didn't come from the
+ * Contact form or Cyber Health — same upsert-by-email + note pattern as
+ * syncCyberHealthLeadToHubSpot below, deliberately not shared code
+ * since the two payloads are different shapes.
+ */
+export async function syncChatLeadToHubSpot(params: {
+  name: string;
+  email: string;
+  reason: "urgent" | "human-requested";
+  transcript: { role: "visitor" | "oragrol"; text: string }[];
+}): Promise<HubSpotSyncResult> {
+  const token = process.env.HUBSPOT_ACCESS_TOKEN;
+  if (!token) {
+    return { ok: false, error: "HUBSPOT_ACCESS_TOKEN is not set — skipping CRM sync." };
+  }
+
+  const nameParts = params.name.trim().split(/\s+/);
+  const firstName = nameParts[0] ?? params.name;
+  const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+
+  try {
+    const upsertRes = await fetch(`${HUBSPOT_API_BASE}/crm/v3/objects/contacts/batch/upsert`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        inputs: [
+          {
+            idProperty: "email",
+            id: params.email,
+            properties: { email: params.email, firstname: firstName, lastname: lastName },
+          },
+        ],
+      }),
+    });
+
+    if (!upsertRes.ok) {
+      const text = await upsertRes.text().catch(() => "");
+      return { ok: false, error: `HubSpot contact upsert failed: ${upsertRes.status} ${text}`.slice(0, 500) };
+    }
+
+    const upsertData = await upsertRes.json();
+    const contactId: string | undefined = upsertData?.results?.[0]?.id;
+    if (!contactId) return { ok: false, error: "HubSpot contact upsert returned no contact id." };
+
+    const noteBody = [
+      `Lead source: ORAGROL Chat Widget`,
+      `Reason flagged: ${params.reason === "urgent" ? "Urgent / possible incident" : "Requested a human"}`,
+      ``,
+      `Transcript:`,
+      ...params.transcript.map((m) => `  [${m.role === "visitor" ? "Visitor" : "ORAGROL"}] ${m.text}`),
+    ].join("\n");
+
+    const noteRes = await fetch(`${HUBSPOT_API_BASE}/crm/v3/objects/notes`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        properties: { hs_note_body: noteBody, hs_timestamp: Date.now() },
+        associations: [
+          { to: { id: contactId }, types: [{ associationCategory: "HUBSPOT_DEFINED", associationTypeId: 202 }] },
+        ],
+      }),
+    });
+
+    if (!noteRes.ok) {
+      const text = await noteRes.text().catch(() => "");
+      return { ok: true, contactId, error: `Contact synced, but the note failed to attach: ${noteRes.status} ${text}`.slice(0, 500) };
+    }
+
+    return { ok: true, contactId };
+  } catch (err) {
+    return { ok: false, error: `HubSpot chat sync threw: ${err instanceof Error ? err.message : String(err)}` };
+  }
+}
+
 export interface HubSpotSyncResult {
   ok: boolean;
   error?: string;

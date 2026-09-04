@@ -297,3 +297,15 @@ footer{min-height:75svh;background:#0c0e0f;color:#eee;padding:4vw 3vw 22px;displ
 .scope-download{display:flex;flex-direction:column;gap:6px}
 .scope-tray>footer button:disabled{opacity:.4;cursor:not-allowed}
 .scope-download-hint{font-size:8px;letter-spacing:.04em;color:#9ea1a4;line-height:1.4;max-width:220px}
+
+/* Inline name/email capture rendered as a chat-log message when the
+   widget escalates (urgent / human-requested) and no contact info has
+   been collected yet this session — see ChatWidget.tsx. Reuses the
+   existing .or-chat-log article bubble styling; only the form's own
+   internal layout is new. */
+.or-chat-form form{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.or-chat-form label{display:flex;flex-direction:column;gap:4px;font-size:10px;color:#5a5d61}
+.or-chat-form input{border:1px solid #c0bdb5;background:#fff;padding:8px 9px;font:inherit;font-size:12px}
+.or-chat-form button{border:0;background:var(--orange);color:#111;padding:9px;font-size:11px;cursor:pointer;margin-top:2px}
+.or-chat-form button:disabled{opacity:.5;cursor:not-allowed}
+.or-chat-typing p{color:#8d9093;font-style:italic}
