@@ -289,3 +289,11 @@ footer{min-height:75svh;background:#0c0e0f;color:#eee;padding:4vw 3vw 22px;displ
    section — clip the watermark to the section so it can't overlap the
    footer content below it. */
 .nch.intro section{overflow:hidden}
+
+/* Scope tray "Download Branded PDF" button now wraps in a div (with an
+   inline hint shown while the button is disabled) instead of being a
+   bare footer child — keep it laid out like the original bare button
+   and style the disabled state + hint text. */
+.scope-download{display:flex;flex-direction:column;gap:6px}
+.scope-tray>footer button:disabled{opacity:.4;cursor:not-allowed}
+.scope-download-hint{font-size:8px;letter-spacing:.04em;color:#9ea1a4;line-height:1.4;max-width:220px}
