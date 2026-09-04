@@ -604,12 +604,7 @@ function IndustriesClient() {
         <p className="ind-scope-note">Applicable laws, standards and contractual duties vary by province, activity, regulator and data handled. ORAGROL confirms scope before recommending controls or automation.</p>
       </section>
 
-      <PreFooterCta
-        eyebrow="Your clearest next step"
-        headline="Protection works better when it reflects how your industry actually operates."
-        secondaryLabel="Find Your Industry"
-        secondaryHref="/industries#industry-index"
-      />
+      <PreFooterCta page="industries" />
 
       <SiteFooter/>
     </main>

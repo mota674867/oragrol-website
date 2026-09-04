@@ -422,12 +422,7 @@ function ContactPageClient() {
         </div>
       </section>
 
-      <PreFooterCta
-        eyebrow="One clear starting point"
-        headline="Start with clarity. We will help you identify the most valuable next step."
-        secondaryLabel="Submit an Enquiry"
-        secondaryHref="/contact#enquiry"
-      />
+      <PreFooterCta page="contact" />
 
       <SiteFooter/>
     </main>

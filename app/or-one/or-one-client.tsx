@@ -633,12 +633,7 @@ function OrOneClient() {
           </small>
         </div>
       </section>
-      <PreFooterCta
-        eyebrow="Begin privately"
-        headline="Bring security, automation and operational intelligence into one coordinated system."
-        secondaryLabel="Explore OR ONE"
-        secondaryHref="/or-one#one-intro"
-      />
+      <PreFooterCta page="or-one" />
       <SiteFooter/>
       <ScopeTray
         items={scope.items}

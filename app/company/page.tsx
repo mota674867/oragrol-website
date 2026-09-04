@@ -260,12 +260,7 @@ export default function CompanyPage() {
         </aside>
       </section>
 
-      <PreFooterCta
-        eyebrow="One clear starting point"
-        headline="Discover the thinking, experience and purpose behind ORAGROL Global."
-        secondaryLabel="Start a Conversation"
-        secondaryHref="/contact"
-      />
+      <PreFooterCta page="company" />
 
       <SiteFooter/>
     </main>

@@ -370,12 +370,7 @@ function BusinessAutomationClient() {
           </article>
         </div>
       </section>
-      <PreFooterCta
-        eyebrow="Your clearest next step"
-        headline="Find where time is being lost and where intelligent automation can create measurable value."
-        secondaryLabel="Explore Automation Packages"
-        secondaryHref="/business-automation#packages"
-      />
+      <PreFooterCta page="business-automation" />
       <SiteFooter/>
       <ScopeTray
         items={scope.items}

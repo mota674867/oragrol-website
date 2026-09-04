@@ -1,5 +1,9 @@
 "use client";
 import {FormEvent,useEffect,useState} from "react";
+// Self-contained stylesheet (defines its own --orange fallback and the
+// dismiss/reopen affordance) — see app/chat-widget.css header comment for
+// why this is a separate file from gpt-pages.css's own .or-chat rules.
+import "../chat-widget.css";
 
 type Message={
   from:"visitor"|"oragrol";
@@ -37,6 +41,7 @@ export default function ChatWidget(){
  useEffect(()=>{if(sessionStorage.getItem("oragrol-chat-widget-dismissed")){setDismissed(true);return}if(sessionStorage.getItem("oragrol-chat-greeting-dismissed"))return;const show=()=>setGreeting(true);const timer=setTimeout(show,17000);const scroll=()=>{const depth=(scrollY+innerHeight)/document.documentElement.scrollHeight;if(depth>=.5){clearTimeout(timer);show();removeEventListener("scroll",scroll)}};addEventListener("scroll",scroll,{passive:true});return()=>{clearTimeout(timer);removeEventListener("scroll",scroll)}},[]);
  const dismissGreeting=()=>{setGreeting(false);sessionStorage.setItem("oragrol-chat-greeting-dismissed","1")};
  const dismissChat=()=>{setOpen(false);setGreeting(false);setDismissed(true);sessionStorage.setItem("oragrol-chat-widget-dismissed","1")};
+ const restoreChat=()=>{setDismissed(false);sessionStorage.removeItem("oragrol-chat-widget-dismissed")};
  const launch=()=>{setOpen(!open);if(!open)dismissGreeting()};
 
  // Sends {name, email} to /api/chat with mode "escalate" — a real email
@@ -113,6 +118,6 @@ export default function ChatWidget(){
   runReply(next);
  };
 
- if(dismissed)return null;
+ if(dismissed)return <div className="or-chat or-chat-collapsed"><button className="or-chat-restore" onClick={restoreChat} aria-label="Reopen ORAGROL chat"><span aria-hidden="true"/></button></div>;
  return <div className="or-chat">{greeting&&!open&&<aside className="or-chat-greeting"><button onClick={dismissGreeting} aria-label="Dismiss chat greeting">×</button><small>ORAGROL</small><p>Have a question? We can help you find the right next step.</p><a onClick={launch}>Start a conversation ↗</a></aside>}<div className="or-chat-controls"><button className="or-chat-cancel" onClick={dismissChat} aria-label="Hide chat for this visit">×</button><button className="or-chat-launch" aria-label={open?"Close ORAGROL chat":"Open ORAGROL chat"} aria-expanded={open} onClick={launch}><span aria-hidden="true"/><b>{open?"Close":"Chat"}</b></button></div>{open&&<section className="or-chat-panel" role="dialog" aria-label="ORAGROL chat"><header><div><span className="or-chat-status" aria-hidden="true"/><div><strong>ORAGROL</strong><small>PRIVATE CONVERSATION</small></div></div><button onClick={()=>setOpen(false)} aria-label="Close chat window">×</button></header><div className="or-chat-log" aria-live="polite">{messages.map((m,i)=>m.kind==="form"?<article className="oragrol or-chat-form" key={i}><small>ORAGROL</small><form onSubmit={e=>submitForm(e,m.reason||"human-requested")}><label>Name<input required value={formValue.name} onChange={e=>setFormValue(s=>({...s,name:e.target.value}))}/></label><label>Email<input required type="email" value={formValue.email} onChange={e=>setFormValue(s=>({...s,email:e.target.value}))}/></label><button disabled={sending} type="submit">Send to ORAGROL ↗</button></form></article>:<article className={m.from} key={i}><small>{m.from==="oragrol"?"ORAGROL":"YOU"}</small><p>{m.text}</p>{m.email&&<a href="mailto:mota6748@gmail.com?subject=Priority ORAGROL enquiry">Email priority summary ↗</a>}</article>)}{sending&&<article className="oragrol or-chat-typing"><small>ORAGROL</small><p>Typing…</p></article>}</div><form onSubmit={submit}><label htmlFor="or-chat-input">Your message</label><textarea id="or-chat-input" rows={2} value={value} onChange={e=>setValue(e.target.value)} placeholder="Write your question…"/><button disabled={sending} aria-label="Send message">Send <span>↗</span></button></form><footer><span/>Available 24/7 · Human availability varies</footer></section>}</div>
 }

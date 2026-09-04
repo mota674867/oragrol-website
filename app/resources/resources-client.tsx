@@ -339,12 +339,7 @@ function ResourcesPageClient() {
         </div>
       </section>
 
-      <PreFooterCta
-        eyebrow="One useful starting point"
-        headline="Turn credible insight into clearer decisions and practical action."
-        secondaryLabel="Explore Our Resources"
-        secondaryHref="/resources#resource-library"
-      />
+      <PreFooterCta page="resources" />
 
       <SiteFooter/>
     </main>

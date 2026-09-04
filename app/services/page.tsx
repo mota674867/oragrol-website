@@ -520,12 +520,7 @@ export default function Home() {
         </div>
       </section>
 
-      <PreFooterCta
-        eyebrow="Your clearest next step"
-        headline="The right protection begins with understanding what matters most."
-        secondaryLabel="Build Your Scope"
-        secondaryHref="/services#or10-index"
-      />
+      <PreFooterCta page="services" />
 
       <SiteFooter/>
       <ScopeTray

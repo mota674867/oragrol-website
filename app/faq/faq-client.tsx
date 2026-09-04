@@ -273,12 +273,7 @@ function FAQPageClient() {
           </p>
         )}
       </section>
-      <PreFooterCta
-        eyebrow="Still have a question?"
-        headline="Still looking for clarity? Let us help you find the right answer."
-        secondaryLabel="Contact ORAGROL"
-        secondaryHref="/contact"
-      />
+      <PreFooterCta page="faq" />
       <SiteFooter/>
     </main>
   );
