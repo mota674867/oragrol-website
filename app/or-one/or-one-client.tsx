@@ -2,6 +2,8 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ScopeTray, useScope } from "../components/ScopeTray";
+import PreFooterCta from "../components/site/pre-footer-cta";
+import SiteFooter from "../components/site/footer";
 import "../gpt-pages.css";
 type Risk = "Standard" | "Controlled" | "Critical";
 type Item = { name: string; points: number; risk: Risk };
@@ -631,65 +633,13 @@ function OrOneClient() {
           </small>
         </div>
       </section>
-      <section className="orone-cta" id="orone-call">
-        <p>Begin privately</p>
-        <h2>
-          Design the system
-          <br />
-          <span>your business actually needs.</span>
-        </h2>
-        <a href="#">
-          Book a Private Scoping Call <span>↗</span>
-        </a>
-        <div>
-          <a href="#team-builder">Build Your Team Online</a>
-          <a href="#">Download the Selection Form</a>
-        </div>
-      </section>
-      <footer className="inner-footer orone-footer">
-        <div className="footer-top">
-          <h2>
-            Cybersecurity protection.
-            <br />
-            Intelligent business automation.
-            <br />
-            One coordinated partner.
-          </h2>
-          <div>
-            <span>EXPLORE</span>
-            <Link href="/services">Services</Link>
-            <Link href="/business-automation">Business Automation</Link>
-            <Link href="/or-one">OR ONE</Link>
-            <Link href="/industries">Industries</Link>
-          </div>
-          <div>
-            <span>COMPANY</span>
-            <Link href="/company">Company</Link>
-            <Link href="/resources">Resources</Link>
-            <Link href="/faq">FAQ</Link>
-            <Link href="/contact">Contact</Link>
-          </div>
-          <div>
-            <span>LEGAL</span>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Use</a>
-            <a href="#">Accessibility</a>
-          </div>
-        </div>
-        <div className="social">
-          <a aria-label="LinkedIn" href="https://www.linkedin.com/company/oragrol-global/">in</a>
-          <a aria-label="Instagram" href="https://www.instagram.com/oragrolglobal">◎</a>
-        </div>
-        <div className="footer-lockup">
-          <div className="footer-word">ORAGROL</div>
-          <span>GLOBAL</span>
-        </div>
-        <div className="footer-base">
-          <span>© 2026 ORAGROL GLOBAL</span>
-          <span>Thunder Bay · Ontario · Canada</span>
-          <span>EN / FR</span>
-        </div>
-      </footer>
+      <PreFooterCta
+        eyebrow="Begin privately"
+        headline="Bring security, automation and operational intelligence into one coordinated system."
+        secondaryLabel="Explore OR ONE"
+        secondaryHref="/or-one#one-intro"
+      />
+      <SiteFooter/>
       <ScopeTray
         items={scope.items}
         remove={scope.remove}

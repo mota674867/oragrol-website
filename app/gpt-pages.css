@@ -277,3 +277,15 @@ footer{min-height:75svh;background:#0c0e0f;color:#eee;padding:4vw 3vw 22px;displ
 .res-simple-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.res-simple-card{min-width:0}.res-simple-card h3{overflow-wrap:anywhere}
 @media(max-width:1680px){.res-simple-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.res-simple-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* Shared pre-footer CTA styles now live in app/pre-footer-cta.css,
+   imported directly by app/components/site/pre-footer-cta.tsx (so the
+   Home page, which does not load this file, still gets them). */
+
+/* The decorative giant "OR" watermark on the Cyber Health intro screen
+   (.nch-or) intentionally bleeds past its section's bottom edge with a
+   negative offset. That was harmless when nothing followed it inside
+   <main>, but the shared site footer now renders right after that
+   section — clip the watermark to the section so it can't overlap the
+   footer content below it. */
+.nch.intro section{overflow:hidden}

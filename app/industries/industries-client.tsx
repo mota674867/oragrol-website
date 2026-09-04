@@ -3,6 +3,8 @@ import Link from "next/link";
 
 import { KeyboardEvent, useState } from "react";
 import { industryDetails } from "./industry-details";
+import PreFooterCta from "../components/site/pre-footer-cta";
+import SiteFooter from "../components/site/footer";
 import "../gpt-pages.css";
 
 type Industry = {
@@ -602,61 +604,14 @@ function IndustriesClient() {
         <p className="ind-scope-note">Applicable laws, standards and contractual duties vary by province, activity, regulator and data handled. ORAGROL confirms scope before recommending controls or automation.</p>
       </section>
 
-      <section className="ind-recommend">
-        <div>
-          <span>Recommended path / {industry.name}</span>
-          <h2>{industry.path}</h2>
-        </div>
-        <Link href={industry.href}>
-          {industry.cta}
-          <span>↗</span>
-        </Link>
-      </section>
+      <PreFooterCta
+        eyebrow="Your clearest next step"
+        headline="Protection works better when it reflects how your industry actually operates."
+        secondaryLabel="Find Your Industry"
+        secondaryHref="/industries#industry-index"
+      />
 
-      <footer className="industry-footer">
-        <div className="footer-top">
-          <h2>
-            Cybersecurity protection.
-            <br />
-            Intelligent business automation.
-            <br />
-            One coordinated partner.
-          </h2>
-          <div>
-            <span>EXPLORE</span>
-            <Link href="/services">Services</Link>
-            <Link href="/business-automation">Business Automation</Link>
-            <Link href="/or-one">OR ONE</Link>
-            <Link href="/industries">Industries</Link>
-          </div>
-          <div>
-            <span>COMPANY</span>
-            <Link href="/company">Company</Link>
-            <Link href="/resources">Resources</Link>
-            <Link href="/faq">FAQ</Link>
-            <Link href="/contact">Contact</Link>
-          </div>
-          <div>
-            <span>LEGAL</span>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Use</a>
-            <a href="#">Accessibility</a>
-          </div>
-        </div>
-        <div className="social">
-          <a aria-label="LinkedIn" href="https://www.linkedin.com/company/oragrol-global/">in</a>
-          <a aria-label="Instagram" href="https://www.instagram.com/oragrolglobal">◎</a>
-        </div>
-        <div className="footer-lockup">
-          <div className="footer-word">ORAGROL</div>
-          <span>GLOBAL</span>
-        </div>
-        <div className="footer-base">
-          <span>© 2026 ORAGROL GLOBAL</span>
-          <span>Thunder Bay · Ontario · Canada</span>
-          <span>EN / FR</span>
-        </div>
-      </footer>
+      <SiteFooter/>
     </main>
   );
 }

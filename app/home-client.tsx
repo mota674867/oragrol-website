@@ -2,6 +2,8 @@
 import Link from "next/link";
 import {useState} from "react";
 import CanadaCoverageStudy from "./canada-coverage-study/page";
+import PreFooterCta from "./components/site/pre-footer-cta";
+import SiteFooter from "./components/site/footer";
 import "./homepage-v3.css";
 
 const nav=[["Services","/services"],["Business Automation","/business-automation"],["OR ONE","/or-one"],["Industries","/industries"],["Resources","/resources"],["Company","/company"]] as const;
@@ -32,8 +34,8 @@ function HomeClient(){
   <section className="security-index"><header><p className="section-label">04 / Cybersecurity</p><h2>Ten categories.<br/><span>One coordinated approach.</span></h2><p>Every service answers one question: what does this business need to protect, and what is the most direct way to protect it?</p><Link href="/services">View all cybersecurity services <Arrow/></Link></header><div className="security-orbit"><div className="orbit-ring" aria-hidden="true"/><div className="orbit-core"><strong>{String(category+1).padStart(2,"0")}</strong><span>{security[category]}</span></div>{security.map((item,index)=><button style={{"--i":index} as React.CSSProperties} className={category===index?"active":""} onMouseEnter={()=>setCategory(index)} onFocus={()=>setCategory(index)} onClick={()=>setCategory(index)} key={item}><span>{String(index+1).padStart(2,"0")}</span>{item}</button>)}</div></section>
   <section className="cyber-health-home"><div className="health-copy"><p className="section-label">05 / Start with clarity</p><h2>Know where you stand.<br/><span>Know what to do next.</span></h2><p>A guided assessment gives you a practical view of your cybersecurity position, priorities and next steps.</p><Link href="/cyber-health">Get Your Cyber Health Score <Arrow/></Link></div><div className="health-score"><span>CYBER HEALTH / ILLUSTRATIVE</span><strong>78</strong><small>/100</small><div><i style={{width:"78%"}}/><p><span>Current position</span><b>Clearer next priorities</b></p></div></div></section>
   <section className="industries-wrap"><CanadaCoverageStudy/></section>
-  <section className="home-close"><p className="section-label">Clarity before complexity</p><h2>Start with a clearer view of your business.</h2><div><p>Understand your cyber health and identify what matters next.</p><Link href="/cyber-health">Get Your Cyber Health Score <Arrow/></Link><Link href="/contact">Talk to ORAGROL</Link></div></section>
-  <footer className="home-footer"><div className="footer-grid"><p>Cybersecurity protection, intelligent automation and operational clarity brought together.</p><nav><strong>Explore</strong><Link href="/services">Services</Link><Link href="/business-automation">Business Automation</Link><Link href="/or-one">OR ONE</Link><Link href="/industries">Industries</Link></nav><nav><strong>Company</strong><Link href="/company">Company</Link><Link href="/resources">Resources</Link><Link href="/faq">FAQ</Link><Link href="/contact">Contact</Link></nav><div className="footer-social"><a aria-label="LinkedIn" href="https://www.linkedin.com/company/oragrol-global/" target="_blank" rel="noreferrer">in</a><a aria-label="Instagram" href="https://www.instagram.com/oragrolglobal/" target="_blank" rel="noreferrer">◎</a></div></div><div className="footer-brand">ORAGROL <small>GLOBAL</small></div><div className="footer-meta"><span>© 2026 ORAGROL GLOBAL</span><span>Thunder Bay · Ontario · Canada</span><span>EN / FR</span></div></footer>
+  <PreFooterCta eyebrow="Clarity before complexity" headline="Cybersecurity protection. Intelligent business automation. OR ONE coordinated system." secondaryLabel="Explore What ORAGROL Does" secondaryHref="/services"/>
+  <SiteFooter/>
  </main>
 }
 

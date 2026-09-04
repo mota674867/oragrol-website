@@ -2,6 +2,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ScopeTray, useScope } from "../components/ScopeTray";
+import PreFooterCta from "../components/site/pre-footer-cta";
+import SiteFooter from "../components/site/footer";
 import "../gpt-pages.css";
 
 type Job = {
@@ -340,7 +342,7 @@ function BusinessAutomationClient() {
           ))}
         </div>
       </section>
-      <section className="fee-explainer">
+      <section className="fee-explainer" id="packages">
         <div>
           <p>Two fees. Two responsibilities.</p>
           <h2>
@@ -368,66 +370,13 @@ function BusinessAutomationClient() {
           </article>
         </div>
       </section>
-      <section className="ba-final-cta" id="ba-cta">
-        <p>Your clearest next step</p>
-        <h2>
-          Choose the work.
-          <br />
-          <span>We&apos;ll shape the right scope.</span>
-        </h2>
-        <button onClick={() => setTrayOpen(true)}>
-          Open My Scope <span>↗</span>
-        </button>
-        <p>
-          {scope.items.length
-            ? `${scope.items.length} selection${scope.items.length === 1 ? "" : "s"} ready to review.`
-            : "Start by selecting the job that best matches your need."}
-        </p>
-      </section>
-      <footer className="inner-footer">
-        <div className="footer-top">
-          <h2>
-            Cybersecurity protection.
-            <br />
-            Intelligent business automation.
-            <br />
-            One coordinated partner.
-          </h2>
-          <div>
-            <span>EXPLORE</span>
-            <Link href="/services">Services</Link>
-            <Link href="/business-automation">Business Automation</Link>
-            <Link href="/or-one">OR ONE</Link>
-            <Link href="/industries">Industries</Link>
-          </div>
-          <div>
-            <span>COMPANY</span>
-            <Link href="/company">Company</Link>
-            <Link href="/resources">Resources</Link>
-            <Link href="/faq">FAQ</Link>
-            <Link href="/contact">Contact</Link>
-          </div>
-          <div>
-            <span>LEGAL</span>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Use</a>
-            <a href="#">Accessibility</a>
-          </div>
-        </div>
-        <div className="social">
-          <a aria-label="LinkedIn" href="https://www.linkedin.com/company/oragrol-global/">in</a>
-          <a aria-label="Instagram" href="https://www.instagram.com/oragrolglobal">◎</a>
-        </div>
-        <div className="footer-lockup">
-          <div className="footer-word">ORAGROL</div>
-          <span>GLOBAL</span>
-        </div>
-        <div className="footer-base">
-          <span>© 2026 ORAGROL GLOBAL</span>
-          <span>Thunder Bay · Ontario · Canada</span>
-          <span>EN / FR</span>
-        </div>
-      </footer>
+      <PreFooterCta
+        eyebrow="Your clearest next step"
+        headline="Find where time is being lost and where intelligent automation can create measurable value."
+        secondaryLabel="Explore Automation Packages"
+        secondaryHref="/business-automation#packages"
+      />
+      <SiteFooter/>
       <ScopeTray
         items={scope.items}
         remove={scope.remove}

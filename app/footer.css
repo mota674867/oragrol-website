@@ -1,0 +1,37 @@
+/* Shared site footer — one component/style used identically on every
+   page. Imported directly by app/components/site/footer.tsx so every
+   page gets it automatically, with no dependency on the host page's own
+   stylesheet or CSS variables (colours hardcoded on purpose, same reason
+   as pre-footer-cta.css — must work standalone on Home). Fixed desktop
+   height ~420px.
+
+   Class names are prefixed "sf-" deliberately, to avoid colliding with
+   generic footer class names (.footer-top, .social, .footer-base,
+   .footer-brand, .footer-social...) left behind in gpt-pages.css and
+   homepage-v3.css by the old, now-removed per-page footers. */
+.site-footer{background:#e4e1d9!important;color:#111315!important;width:100%;min-height:420px;box-sizing:border-box;padding:44px 5vw 20px;display:flex;flex-direction:column;justify-content:space-between}
+.sf-top{display:grid;grid-template-columns:1.1fr 1fr .6fr .6fr .6fr .9fr;gap:5vw;align-items:start}
+.sf-mark{grid-column:1}
+.sf-or{display:inline-flex;font-weight:600;line-height:.78;letter-spacing:-.02em;font-size:clamp(90px,9vw,150px)}
+.sf-or em,.sf-or b{font-style:normal;color:transparent!important;background:none!important}
+.sf-or em{-webkit-text-stroke:2px #111315;text-stroke:2px #111315}
+.sf-or b{-webkit-text-stroke:2px #ef4d00;text-stroke:2px #ef4d00}
+.sf-caps{margin:14px 0 0;font-size:10px;letter-spacing:.14em;color:#50545c!important}
+.sf-brand h2{margin:0 0 10px;font-size:19px;font-weight:700;letter-spacing:-.01em;color:#111315!important}
+.sf-brand p{margin:0 0 14px;font-size:13px;line-height:1.5;color:#3a3d41!important;max-width:28ch}
+.sf-dash{display:block;width:26px;height:2px;background:#ef4d00!important}
+.sf-col{border-left:1px solid rgba(17,19,21,.18);padding-left:20px;display:flex;flex-direction:column;gap:10px;min-height:1px}
+.sf-col-head{font-size:10px;letter-spacing:.16em;font-weight:600;color:#111315!important;display:flex;align-items:center;gap:6px}
+.sf-col-head::before{content:"";width:6px;height:6px;background:#ef4d00!important;display:inline-block;flex:none}
+.sf-col a{font-size:13px;color:#111315!important;text-decoration:none!important}
+.sf-col a:hover{color:#ef4d00!important}
+.sf-pending{font-size:13px;color:#9a9d9f!important;cursor:default}
+.sf-meta{display:flex;flex-direction:column;gap:8px;font-size:12px;color:#4b4e52!important}
+.sf-social{display:flex;gap:10px;margin-top:6px}
+.sf-social a{width:30px;height:30px;border:1px solid #111315;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#111315!important;text-decoration:none!important}
+.sf-social a:hover{background:#111315!important;color:#e4e1d9!important}
+.sf-social svg{width:15px;height:15px}
+.sf-base{display:flex;align-items:center;gap:18px;margin-top:32px;padding-top:16px;border-top:1px solid rgba(17,19,21,.18);font-size:9px;letter-spacing:.18em;color:#6a6d70!important;text-transform:uppercase}
+.sf-base-line{flex:1;height:1px;background:rgba(17,19,21,.18);display:block}
+@media(max-width:1100px){.sf-top{grid-template-columns:1fr 1fr;gap:6vw 8vw}.sf-mark{grid-column:1/-1}.sf-col{border-left:0;padding-left:0;border-top:1px solid rgba(17,19,21,.18);padding-top:14px}.sf-meta{grid-column:1/-1;border-top:1px solid rgba(17,19,21,.18);padding-top:16px}}
+@media(max-width:700px){.site-footer{min-height:0;padding:40px 20px 24px}.sf-top{grid-template-columns:1fr;gap:26px}.sf-or{font-size:32vw}}

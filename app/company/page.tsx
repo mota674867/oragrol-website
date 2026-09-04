@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import PreFooterCta from "../components/site/pre-footer-cta";
+import SiteFooter from "../components/site/footer";
 import "../gpt-pages.css";
 
 export const metadata: Metadata = {
@@ -258,64 +260,14 @@ export default function CompanyPage() {
         </aside>
       </section>
 
-      <section className="company-cta">
-        <div>
-          <span>One clear starting point</span>
-          <h2>
-            Know where you stand.
-            <br />
-            Know what to do next.
-          </h2>
-        </div>
-        <a href="#">
-          Get Your Cyber Health Score <b>↗</b>
-        </a>
-      </section>
+      <PreFooterCta
+        eyebrow="One clear starting point"
+        headline="Discover the thinking, experience and purpose behind ORAGROL Global."
+        secondaryLabel="Start a Conversation"
+        secondaryHref="/contact"
+      />
 
-      <footer className="industry-footer company-footer">
-        <div className="footer-top">
-          <h2>
-            Cybersecurity protection.
-            <br />
-            Intelligent business automation.
-            <br />
-            One coordinated partner.
-          </h2>
-          <div>
-            <span>EXPLORE</span>
-            <Link href="/services">Services</Link>
-            <Link href="/business-automation">Business Automation</Link>
-            <Link href="/or-one">OR ONE</Link>
-            <Link href="/industries">Industries</Link>
-          </div>
-          <div>
-            <span>COMPANY</span>
-            <Link href="/company">Company</Link>
-            <Link href="/resources">Resources</Link>
-            <Link href="/faq">FAQ</Link>
-            <Link href="/contact">Contact</Link>
-          </div>
-          <div>
-            <span>LEGAL</span>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Use</a>
-            <a href="#">Accessibility</a>
-          </div>
-        </div>
-        <div className="social">
-          <a aria-label="LinkedIn" href="https://www.linkedin.com/company/oragrol-global/">in</a>
-          <a aria-label="Instagram" href="https://www.instagram.com/oragrolglobal">◎</a>
-        </div>
-        <div className="footer-lockup">
-          <div className="footer-word">ORAGROL</div>
-          <span>GLOBAL</span>
-        </div>
-        <div className="footer-base">
-          <span>© 2026 ORAGROL GLOBAL</span>
-          <span>Thunder Bay · Ontario · Canada</span>
-          <span>EN / FR</span>
-        </div>
-      </footer>
+      <SiteFooter/>
     </main>
   );
 }

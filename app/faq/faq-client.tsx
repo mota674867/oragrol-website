@@ -1,6 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import PreFooterCta from "../components/site/pre-footer-cta";
+import SiteFooter from "../components/site/footer";
 import "../gpt-pages.css";
 const groups = [
   {
@@ -271,37 +273,13 @@ function FAQPageClient() {
           </p>
         )}
       </section>
-      <section className="faq-cta">
-        <p>STILL HAVE A QUESTION?</p>
-        <h2>Start with a clear conversation.</h2>
-        <Link href="/contact">Contact ORAGROL ↗</Link>
-      </section>
-      <footer className="faq-footer">
-        <strong>
-          ORAGROL <small>GLOBAL</small>
-        </strong>
-        <nav>
-          <Link href="/company">Company</Link>
-          <Link href="/resources">Resources</Link>
-          <Link href="/faq">FAQ</Link>
-          <Link href="/contact">Contact</Link>
-        </nav>
-        <div className="social">
-          <a
-            aria-label="LinkedIn"
-            href="https://www.linkedin.com/company/oragrol-global/"
-          >
-            in
-          </a>
-          <a
-            aria-label="Instagram"
-            href="https://www.instagram.com/oragrolglobal"
-          >
-            ◎
-          </a>
-        </div>
-        <span>Thunder Bay · Ontario · Canada</span>
-      </footer>
+      <PreFooterCta
+        eyebrow="Still have a question?"
+        headline="Still looking for clarity? Let us help you find the right answer."
+        secondaryLabel="Contact ORAGROL"
+        secondaryHref="/contact"
+      />
+      <SiteFooter/>
     </main>
   );
 }
