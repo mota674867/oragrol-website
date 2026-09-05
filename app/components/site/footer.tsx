@@ -117,12 +117,11 @@ function ORArtwork() {
 const exploreLinks: [string, string][] = [["Services","/services"],["Business Automation","/business-automation"],["OR ONE","/or-one"],["Industries","/industries"]];
 const companyLinks: [string, string][] = [["Company","/company"],["Resources","/resources"],["FAQ","/faq"],["Contact","/contact"]];
 
-// Slugs whose page actually exists and is wired into the site. Privacy
-// Policy shipped 2026-09-05, Terms of Use shipped 2026-09-06; Accessibility
-// isn't live yet — see the Pending Items register — so it still renders as
-// plain text below, not a link.
+// Slugs whose page actually exists and is wired into the site. All three
+// legal pages are now live: Privacy Policy (2026-09-05), Terms of Use
+// (2026-09-06), and Accessibility (2026-09-06).
 const legalLinks: [string, string][] = [["Privacy Policy","/privacy-policy"],["Terms of Use","/terms-of-use"],["Accessibility","/accessibility"]];
-const LIVE_LEGAL = new Set<string>(["/privacy-policy", "/terms-of-use"]);
+const LIVE_LEGAL = new Set<string>(["/privacy-policy", "/terms-of-use", "/accessibility"]);
 
 function FooterColumn({ heading, links, className = "" }: { heading: string; links: [string, string][]; className?: string }) {
   return (
