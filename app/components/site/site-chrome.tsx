@@ -19,7 +19,7 @@ import ChatWidget from "../ChatWidget";
  * they can't be listed here individually — they're matched by prefix below
  * instead, alongside the exact-match set.
  */
-const REDESIGNED_ROUTES = new Set<string>(["/", "/services", "/business-automation", "/or-one", "/industries", "/resources", "/company", "/contact", "/cyber-health", "/faq", "/privacy-policy"]);
+const REDESIGNED_ROUTES = new Set<string>(["/", "/services", "/business-automation", "/or-one", "/industries", "/resources", "/company", "/contact", "/cyber-health", "/faq", "/privacy-policy", "/terms-of-use"]);
 
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
