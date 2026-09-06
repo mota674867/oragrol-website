@@ -1,8 +1,11 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import PreFooterCta from "../components/site/pre-footer-cta";
 import SiteFooter from "../components/site/footer";
+import OragrolMegaNav from "../components/site/oragrol-mega-nav";
+import { NAV_ITEMS } from "../components/site/nav-items";
 import "../gpt-pages.css";
 const groups = [
   {
@@ -186,16 +189,8 @@ const groups = [
   },
 ] as const;
 
-const nav = [
-  ["Services", "/services"],
-  ["Business Automation", "/business-automation"],
-  ["OR ONE", "/or-one"],
-  ["Industries", "/industries"],
-  ["Resources", "/resources"],
-  ["Company", "/company"],
-];
-
 function FAQPageClient() {
+  const pathname = usePathname();
   const [query, setQuery] = useState("");
   const filtered = groups
     .map((g) => ({
@@ -212,13 +207,7 @@ function FAQPageClient() {
           <span>ORAGROL</span>
           <small>GLOBAL</small>
         </Link>
-        <nav>
-          {nav.map(([n, h]) => (
-            <Link href={h} key={n}>
-              {n}
-            </Link>
-          ))}
-        </nav>
+        <OragrolMegaNav items={NAV_ITEMS} activePath={pathname} />
         <Link href="/contact">Contact</Link>
       </header>
       <section className="faq-hero">

@@ -1,9 +1,12 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { ScopeTray, useScope } from "../components/ScopeTray";
 import PreFooterCta from "../components/site/pre-footer-cta";
 import SiteFooter from "../components/site/footer";
+import OragrolMegaNav from "../components/site/oragrol-mega-nav";
+import { NAV_ITEMS } from "../components/site/nav-items";
 import "../gpt-pages.css";
 
 type Job = {
@@ -98,19 +101,21 @@ const jobs: Job[] = [
     accent: "Purpose-built",
   },
 ];
-const navItems = [
-  "Services",
-  "Business Automation",
-  "OR ONE",
-  "Industries",
-  "Resources",
-  "Company",
-];
 function BusinessAutomationClient() {
+  const pathname = usePathname();
   const [active, setActive] = useState(0);
   const [trayOpen, setTrayOpen] = useState(false);
   const scope = useScope();
   const job = jobs[active];
+
+  // Deep-link support for the nav dropdown's per-job links
+  // (/business-automation#ba-job-<id>) — selects the matching job on load.
+  useEffect(() => {
+    const match = window.location.hash.match(/^#ba-job-(.+)$/);
+    if (!match) return;
+    const index = jobs.findIndex((j) => j.id === match[1]);
+    if (index >= 0) setActive(index);
+  }, []);
   const scopeItem = (j: Job) => ({
     id: `automation:${j.id}`,
     area: "Automation" as const,
@@ -130,29 +135,7 @@ function BusinessAutomationClient() {
           <span>ORAGROL</span>
           <small>GLOBAL</small>
         </Link>
-        <nav className="ba-nav">
-          {navItems.map((n, i) => (
-            <Link
-              className={i === 1 ? "active" : ""}
-              href={
-                n === "Services"
-                  ? "/services"
-                  : n === "Business Automation"
-                    ? "/business-automation"
-                    : n === "OR ONE"
-                      ? "/or-one"
-                      : n === "Industries"
-                        ? "/industries"
-                        : n === "Resources"
-                          ? "/resources"
-                          : "/company"
-              }
-              key={n}
-            >
-              {n}
-            </Link>
-          ))}
-        </nav>
+        <OragrolMegaNav items={NAV_ITEMS} activePath={pathname} />
         <div className="header-actions">
           <button
             className="scope-nav-button"
@@ -224,6 +207,7 @@ function BusinessAutomationClient() {
           <nav>
             {jobs.map((j, i) => (
               <button
+                id={`ba-job-${j.id}`}
                 className={active === i ? "active" : ""}
                 onClick={() => setActive(i)}
                 key={j.id}

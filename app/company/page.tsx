@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PreFooterCta from "../components/site/pre-footer-cta";
 import SiteFooter from "../components/site/footer";
+import OragrolMegaNav from "../components/site/oragrol-mega-nav";
+import { NAV_ITEMS } from "../components/site/nav-items";
 import "../gpt-pages.css";
 
 export const metadata: Metadata = {
@@ -22,15 +24,6 @@ export const metadata: Metadata = {
   },
 };
 
-const nav = [
-  "Services",
-  "Business Automation",
-  "OR ONE",
-  "Industries",
-  "Resources",
-  "Company",
-];
-
 export default function CompanyPage() {
   return (
     <main className="company-page">
@@ -39,31 +32,7 @@ export default function CompanyPage() {
           <span>ORAGROL</span>
           <small>GLOBAL</small>
         </Link>
-        <nav>
-          {nav.map((n) => (
-            <Link
-              className={n === "Company" ? "active" : ""}
-              href={
-                n === "Services"
-                  ? "/services"
-                  : n === "Business Automation"
-                    ? "/business-automation"
-                    : n === "OR ONE"
-                      ? "/or-one"
-                      : n === "Industries"
-                        ? "/industries"
-                        : n === "Resources"
-                          ? "/resources"
-                          : n === "Company"
-                            ? "/company"
-                            : "#"
-              }
-              key={n}
-            >
-              {n}
-            </Link>
-          ))}
-        </nav>
+        <OragrolMegaNav items={NAV_ITEMS} activePath="/company" />
         <div>
           <Link href="/cyber-health">Get Cyber Health Score</Link>
           <button className="search" aria-label="Search">

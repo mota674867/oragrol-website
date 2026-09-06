@@ -1,0 +1,116 @@
+import type { NavItem } from "./oragrol-mega-nav";
+
+/**
+ * Single source of truth for the site's top-level navigation, shared by
+ * every page's header. Mirrors the real, existing top-nav link set and
+ * order every page already used before the mega-nav (Services / Business
+ * Automation / OR ONE / Industries / Resources / Company) — no new
+ * top-level items added, none renamed.
+ *
+ * Group links point at real, existing destinations only:
+ * - Services: the 10 real category tabs on /services (radial selector),
+ *   each given a real `id="or10-cat-N"` anchor + hash-select effect.
+ * - Business Automation: the 6 real job tabs on /business-automation, each
+ *   given a real `id="ba-job-<slug>"` anchor + hash-select effect (slugs
+ *   are the jobs' own existing `id` field, not invented).
+ * - Industries: the 9 real industries on /industries, using the page's
+ *   own pre-existing `id="industry-tab-N"` anchors (now wired to a
+ *   hash-select effect too).
+ * - Resources: the 16 real articles on /resources, using their own
+ *   pre-existing real `/resources/<slug>` routes.
+ *
+ * OR ONE and Company stay plain direct links — both are a single
+ * narrative page with no independently navigable sub-content (OR ONE has
+ * two generic layout-flow anchors, `#one-intro`/`#team-builder`, not
+ * distinct sub-pages worth a dropdown; Company has one, `#company-story`).
+ *
+ * Single-column dropdowns throughout (no invented group titles/category-
+ * of-categories) — none of these four pages' real content has a further
+ * real grouping layer above its own list of items, so forcing multi-column
+ * grouping here would invent structure the source content doesn't have.
+ */
+export const NAV_ITEMS: NavItem[] = [
+  {
+    label: "Services",
+    href: "/services",
+    groups: [
+      {
+        links: [
+          { label: "Know & manage your risk", href: "/services#or10-cat-1" },
+          { label: "Find & fix weaknesses", href: "/services#or10-cat-2" },
+          { label: "Detect & stop threats", href: "/services#or10-cat-3" },
+          { label: "Protect your people & devices", href: "/services#or10-cat-4" },
+          { label: "Control who gets in", href: "/services#or10-cat-5" },
+          { label: "Secure your cloud & systems", href: "/services#or10-cat-6" },
+          { label: "Secure your apps & websites", href: "/services#or10-cat-7" },
+          { label: "Protect your data", href: "/services#or10-cat-8" },
+          { label: "Secure your AI systems", href: "/services#or10-cat-9" },
+          { label: "Get certified proof", href: "/services#or10-cat-10" },
+        ],
+      },
+    ],
+  },
+  {
+    label: "Business Automation",
+    href: "/business-automation",
+    groups: [
+      {
+        links: [
+          { label: "Lead-to-Close Automation", href: "/business-automation#ba-job-sales-flow" },
+          { label: "Always-On Customer Support", href: "/business-automation#ba-job-customer-support" },
+          { label: "Know Your Numbers", href: "/business-automation#ba-job-operational-intelligence" },
+          { label: "Outsourced IT Operations", href: "/business-automation#ba-job-managed-it" },
+          { label: "Grow & Retain", href: "/business-automation#ba-job-customer-growth" },
+          { label: "Tailored Automation", href: "/business-automation#ba-job-tailored" },
+        ],
+      },
+    ],
+  },
+  { label: "OR ONE", href: "/or-one" },
+  {
+    label: "Industries",
+    href: "/industries",
+    groups: [
+      {
+        links: [
+          { label: "Professional Services", href: "/industries#industry-tab-0" },
+          { label: "Healthcare", href: "/industries#industry-tab-1" },
+          { label: "Financial Services", href: "/industries#industry-tab-2" },
+          { label: "Retail & E-commerce", href: "/industries#industry-tab-3" },
+          { label: "Manufacturing", href: "/industries#industry-tab-4" },
+          { label: "Technology", href: "/industries#industry-tab-5" },
+          { label: "Construction & Real Estate", href: "/industries#industry-tab-6" },
+          { label: "Education", href: "/industries#industry-tab-7" },
+          { label: "Other Canadian SMBs", href: "/industries#industry-tab-8" },
+        ],
+      },
+    ],
+  },
+  {
+    label: "Resources",
+    href: "/resources",
+    groups: [
+      {
+        links: [
+          { label: "What Is a Cyber Health Score?", href: "/resources/what-is-a-cyber-health-score" },
+          { label: "MFA: The One Control That Stops Most Breaches", href: "/resources/mfa-one-control-stops-most-breaches" },
+          { label: "Ransomware Recovery: What Canadian SMBs Get Wrong", href: "/resources/ransomware-recovery-canadian-smbs" },
+          { label: "Email Security Basics for Small Business", href: "/resources/email-security-basics-small-business" },
+          { label: "Cybersecurity for Professional Services Firms", href: "/resources/cybersecurity-professional-services-firms" },
+          { label: "Understanding PIPEDA: What It Means for Your Business", href: "/resources/understanding-pipeda-business" },
+          { label: "Cyber Insurance Readiness Checklist", href: "/resources/cyber-insurance-readiness-checklist-canadian-smbs" },
+          { label: "DMARC Enforcement: Monitoring to p=reject", href: "/resources/dmarc-enforcement-p-reject" },
+          { label: "The First 24 Hours of a Cyber Incident", href: "/resources/first-24-hours-cyber-incident" },
+          { label: "Vendor Risk Before You Grant Access", href: "/resources/vendor-risk-before-granting-access" },
+          { label: "A Practical AI Use Policy for Canadian Businesses", href: "/resources/practical-ai-use-policy-canadian-businesses" },
+          { label: "Microsoft 365 Security Baseline for an SMB", href: "/resources/microsoft-365-security-baseline-smb" },
+          { label: "Cybersecurity for Accounting and Bookkeeping Firms", href: "/resources/cybersecurity-accounting-bookkeeping-firms" },
+          { label: "Canadian SMB Cyber-Risk Brief 2026", href: "/resources/canadian-smb-cyber-risk-brief-2026" },
+          { label: "Business Automation Readiness Assessment", href: "/resources/business-automation-readiness-assessment" },
+          { label: "When Separate Automations Should Become OR ONE", href: "/resources/when-automations-become-or-one" },
+        ],
+      },
+    ],
+  },
+  { label: "Company", href: "/company" },
+];

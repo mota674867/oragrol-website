@@ -1,7 +1,10 @@
 "use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import PreFooterCta from "../components/site/pre-footer-cta";
 import SiteFooter from "../components/site/footer";
+import OragrolMegaNav from "../components/site/oragrol-mega-nav";
+import { NAV_ITEMS } from "../components/site/nav-items";
 import "../gpt-pages.css";
 
 type Resource = {
@@ -196,15 +199,8 @@ const resources: Resource[] = [
   },
 ];
 
-const nav = [
-  "Services",
-  "Business Automation",
-  "OR ONE",
-  "Industries",
-  "Resources",
-  "Company",
-];
 function ResourcesPageClient() {
+  const pathname = usePathname();
   const essential = resources.slice(0, 6),
     newResources = resources.slice(6);
   return (
@@ -214,29 +210,7 @@ function ResourcesPageClient() {
           <span>ORAGROL</span>
           <small>GLOBAL</small>
         </Link>
-        <nav>
-          {nav.map((n) => (
-            <Link
-              className={n === "Resources" ? "active" : ""}
-              href={
-                n === "Services"
-                  ? "/services"
-                  : n === "Business Automation"
-                    ? "/business-automation"
-                    : n === "OR ONE"
-                      ? "/or-one"
-                      : n === "Industries"
-                        ? "/industries"
-                        : n === "Resources"
-                          ? "/resources"
-                          : "/company"
-              }
-              key={n}
-            >
-              {n}
-            </Link>
-          ))}
-        </nav>
+        <OragrolMegaNav items={NAV_ITEMS} activePath={pathname} />
         <div>
           <Link href="/cyber-health">Get Cyber Health Score</Link>
           <button className="search" aria-label="Search">

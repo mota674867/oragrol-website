@@ -14,6 +14,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Fragment, type ReactNode } from "react";
 import SiteFooter from "../components/site/footer";
+import OragrolMegaNav from "../components/site/oragrol-mega-nav";
+import { NAV_ITEMS } from "../components/site/nav-items";
 import "../gpt-pages.css";
 import {
   PRIVACY_POLICY,
@@ -27,18 +29,6 @@ export const metadata: Metadata = {
   alternates: { canonical: "/privacy-policy" },
   robots: { index: true, follow: true },
 };
-
-// Same six links as the standard nav on Company/Resources/Industries/Contact.
-// Privacy Policy is deliberately not one of them — it stays reachable only
-// through the footer's Legal column.
-const nav = [
-  "Services",
-  "Business Automation",
-  "OR ONE",
-  "Industries",
-  "Resources",
-  "Company",
-];
 
 function sectionId(number: string, title: string) {
   return `${number}-${title}`
@@ -135,28 +125,7 @@ export default function PrivacyPolicyPage() {
             <span>ORAGROL</span>
             <small>GLOBAL</small>
           </Link>
-          <nav>
-            {nav.map((n) => (
-              <Link
-                href={
-                  n === "Services"
-                    ? "/services"
-                    : n === "Business Automation"
-                      ? "/business-automation"
-                      : n === "OR ONE"
-                        ? "/or-one"
-                        : n === "Industries"
-                          ? "/industries"
-                          : n === "Resources"
-                            ? "/resources"
-                            : "/company"
-                }
-                key={n}
-              >
-                {n}
-              </Link>
-            ))}
-          </nav>
+          <OragrolMegaNav items={NAV_ITEMS} />
           <div>
             <button className="search" aria-label="Search">
               <span />

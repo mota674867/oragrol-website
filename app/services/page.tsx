@@ -2,10 +2,13 @@
 import Link from "next/link";
 import "../gpt-pages.css";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { ScopeTray, useScope } from "../components/ScopeTray";
 import PreFooterCta from "../components/site/pre-footer-cta";
 import SiteFooter from "../components/site/footer";
+import OragrolMegaNav from "../components/site/oragrol-mega-nav";
+import { NAV_ITEMS } from "../components/site/nav-items";
 
 type Service = { code: string; name: string; line: string; price: string };
 type Category = {
@@ -342,20 +345,22 @@ const categories: Category[] = [
   },
 ];
 
-const navItems = [
-  "Services",
-  "Business Automation",
-  "OR ONE",
-  "Industries",
-  "Resources",
-  "Company",
-];
 
 export default function Home() {
   const [active, setActive] = useState(0);
   const [trayOpen, setTrayOpen] = useState(false);
   const scope = useScope();
   const selected = categories[active];
+
+  // Deep-link support for the nav dropdown's per-category links
+  // (/services#or10-cat-N) — selects the matching category on load.
+  useEffect(() => {
+    const match = window.location.hash.match(/^#or10-cat-(\d+)$/);
+    if (!match) return;
+    const index = Number(match[1]) - 1;
+    if (index >= 0 && index < categories.length) setActive(index);
+  }, []);
+  const pathname = usePathname();
   return (
     <main className="services-page">
       <header className="site-header">
@@ -363,13 +368,7 @@ export default function Home() {
           <span>ORAGROL</span>
           <small>GLOBAL</small>
         </Link>
-        <nav className="service-nav">
-          {navItems.map((n, i) => (
-            <Link className={i === 0 ? "active" : ""} href={n === "Services" ? "/services" : n === "Business Automation" ? "/business-automation" : n === "OR ONE" ? "/or-one" : n === "Industries" ? "/industries" : n === "Resources" ? "/resources" : "/company"} key={n}>
-              {n}
-            </Link>
-          ))}
-        </nav>
+        <OragrolMegaNav items={NAV_ITEMS} activePath={pathname} />
         <div className="header-actions">
           <button
             className="scope-nav-button"
@@ -444,6 +443,7 @@ export default function Home() {
             </div>
             {categories.map((c, i) => (
               <button
+                id={`or10-cat-${i + 1}`}
                 onClick={() => setActive(i)}
                 className={`radial-node node-${i + 1} ${active === i ? "selected" : ""}`}
                 key={c.title}

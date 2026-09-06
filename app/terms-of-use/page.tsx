@@ -11,6 +11,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Fragment, type ReactNode } from "react";
 import SiteFooter from "../components/site/footer";
+import OragrolMegaNav from "../components/site/oragrol-mega-nav";
+import { NAV_ITEMS } from "../components/site/nav-items";
 import "../gpt-pages.css";
 import { TERMS_OF_USE, type TermsBlock } from "./ORAGROL_TermsOfUseContent";
 
@@ -20,17 +22,6 @@ export const metadata: Metadata = {
   alternates: { canonical: "/terms-of-use" },
   robots: { index: true, follow: true },
 };
-
-// Same six links as the standard nav on Privacy Policy/Resources/Company/
-// Industries/Contact. Terms of Use is deliberately not one of them.
-const nav = [
-  "Services",
-  "Business Automation",
-  "OR ONE",
-  "Industries",
-  "Resources",
-  "Company",
-];
 
 function sectionId(number: string, title: string) {
   return `${number}-${title}`.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -75,28 +66,7 @@ export default function TermsOfUsePage() {
           <span>ORAGROL</span>
           <small>GLOBAL</small>
         </Link>
-        <nav>
-          {nav.map((n) => (
-            <Link
-              href={
-                n === "Services"
-                  ? "/services"
-                  : n === "Business Automation"
-                    ? "/business-automation"
-                    : n === "OR ONE"
-                      ? "/or-one"
-                      : n === "Industries"
-                        ? "/industries"
-                        : n === "Resources"
-                          ? "/resources"
-                          : "/company"
-              }
-              key={n}
-            >
-              {n}
-            </Link>
-          ))}
-        </nav>
+        <OragrolMegaNav items={NAV_ITEMS} />
         <div>
           <button className="search" aria-label="Search">
             <span />

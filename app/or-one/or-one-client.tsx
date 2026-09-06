@@ -1,9 +1,12 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 import { ScopeTray, useScope } from "../components/ScopeTray";
 import PreFooterCta from "../components/site/pre-footer-cta";
 import SiteFooter from "../components/site/footer";
+import OragrolMegaNav from "../components/site/oragrol-mega-nav";
+import { NAV_ITEMS } from "../components/site/nav-items";
 import "../gpt-pages.css";
 type Risk = "Standard" | "Controlled" | "Critical";
 type Item = { name: string; points: number; risk: Risk };
@@ -222,14 +225,6 @@ const tiers = [
     note: "Approximately 6 roles",
   },
 ];
-const nav = [
-  "Services",
-  "Business Automation",
-  "OR ONE",
-  "Industries",
-  "Resources",
-  "Company",
-];
 const tierFor = (points: number, categoryCount: number) =>
   points === 0
     ? "Not estimated"
@@ -242,6 +237,7 @@ const tierFor = (points: number, categoryCount: number) =>
           : "OR/ONE 400";
 
 function OrOneClient() {
+  const pathname = usePathname();
   const [active, setActive] = useState(0);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [trayOpen, setTrayOpen] = useState(false);
@@ -309,29 +305,7 @@ function OrOneClient() {
           <span>ORAGROL</span>
           <small>GLOBAL</small>
         </Link>
-        <nav className="one-nav">
-          {nav.map((n, i) => (
-            <Link
-              className={i === 2 ? "active" : ""}
-              href={
-                n === "Services"
-                  ? "/services"
-                  : n === "Business Automation"
-                    ? "/business-automation"
-                    : n === "OR ONE"
-                      ? "/or-one"
-                      : n === "Industries"
-                        ? "/industries"
-                        : n === "Resources"
-                          ? "/resources"
-                          : "/company"
-              }
-              key={n}
-            >
-              {n}
-            </Link>
-          ))}
-        </nav>
+        <OragrolMegaNav items={NAV_ITEMS} activePath={pathname} />
         <div className="one-actions">
           <button
             className="scope-nav-button"

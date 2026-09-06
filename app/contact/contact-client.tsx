@@ -1,9 +1,12 @@
 "use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { FormEvent, useEffect, useState } from "react";
 import PreFooterCta from "../components/site/pre-footer-cta";
 import SiteFooter from "../components/site/footer";
+import OragrolMegaNav from "../components/site/oragrol-mega-nav";
+import { NAV_ITEMS } from "../components/site/nav-items";
 import "../gpt-pages.css";
 
 type Conversation =
@@ -13,14 +16,6 @@ type Conversation =
   | "Partnership or General Enquiry";
 type ScopeItem = { id: string; area: string; code: string; title: string };
 
-const nav = [
-  "Services",
-  "Business Automation",
-  "OR ONE",
-  "Industries",
-  "Resources",
-  "Company",
-];
 const options: { name: Conversation; index: string; summary: string }[] = [
   {
     name: "Cybersecurity Services",
@@ -48,6 +43,7 @@ const options: { name: Conversation; index: string; summary: string }[] = [
 ];
 
 function ContactPageClient() {
+  const pathname = usePathname();
   const [conversation, setConversation] = useState<Conversation>(
     "Cybersecurity Services",
   );
@@ -111,28 +107,7 @@ function ContactPageClient() {
           <span>ORAGROL</span>
           <small>GLOBAL</small>
         </Link>
-        <nav>
-          {nav.map((n) => (
-            <Link
-              href={
-                n === "Services"
-                  ? "/services"
-                  : n === "Business Automation"
-                    ? "/business-automation"
-                    : n === "OR ONE"
-                      ? "/or-one"
-                      : n === "Industries"
-                        ? "/industries"
-                        : n === "Resources"
-                          ? "/resources"
-                          : "/company"
-              }
-              key={n}
-            >
-              {n}
-            </Link>
-          ))}
-        </nav>
+        <OragrolMegaNav items={NAV_ITEMS} activePath={pathname} />
         <div>
           <a className="active" href="#enquiry">
             Start enquiry

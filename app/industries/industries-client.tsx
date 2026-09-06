@@ -1,10 +1,13 @@
 "use client";
 import Link from "next/link";
 
-import { KeyboardEvent, useState } from "react";
+import { KeyboardEvent, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { industryDetails } from "./industry-details";
 import PreFooterCta from "../components/site/pre-footer-cta";
 import SiteFooter from "../components/site/footer";
+import OragrolMegaNav from "../components/site/oragrol-mega-nav";
+import { NAV_ITEMS } from "../components/site/nav-items";
 import "../gpt-pages.css";
 
 type Industry = {
@@ -327,15 +330,6 @@ const industries: Industry[] = [
   },
 ];
 
-const nav = [
-  "Services",
-  "Business Automation",
-  "OR ONE",
-  "Industries",
-  "Resources",
-  "Company",
-];
-
 const currentJobName: Record<string, string> = {
   "Sales Flow Automation": "Lead-to-Close Automation",
   "Customer Support Automation": "Always-On Customer Support",
@@ -345,9 +339,19 @@ const currentJobName: Record<string, string> = {
 };
 
 function IndustriesClient() {
+  const pathname = usePathname();
   const [active, setActive] = useState(0);
   const industry = industries[active];
   const detail = industryDetails[industry.name];
+
+  // Deep-link support for the nav dropdown's per-industry links
+  // (/industries#industry-tab-N) — selects the matching industry on load.
+  useEffect(() => {
+    const match = window.location.hash.match(/^#industry-tab-(\d+)$/);
+    if (!match) return;
+    const index = Number(match[1]);
+    if (index >= 0 && index < industries.length) setActive(index);
+  }, []);
   const move = (e: KeyboardEvent<HTMLDivElement>) => {
     if (!["ArrowDown", "ArrowUp", "ArrowRight", "ArrowLeft"].includes(e.key))
       return;
@@ -362,29 +366,7 @@ function IndustriesClient() {
           <span>ORAGROL</span>
           <small>GLOBAL</small>
         </Link>
-        <nav>
-          {nav.map((n, i) => (
-            <Link
-              className={i === 3 ? "active" : ""}
-              href={
-                n === "Services"
-                  ? "/services"
-                  : n === "Business Automation"
-                    ? "/business-automation"
-                    : n === "OR ONE"
-                      ? "/or-one"
-                      : n === "Industries"
-                        ? "/industries"
-                        : n === "Resources"
-                          ? "/resources"
-                          : "/company"
-              }
-              key={n}
-            >
-              {n}
-            </Link>
-          ))}
-        </nav>
+        <OragrolMegaNav items={NAV_ITEMS} activePath={pathname} />
         <div>
           <Link href="/cyber-health">Get Cyber Health Score</Link>
           <button className="search" aria-label="Search">
