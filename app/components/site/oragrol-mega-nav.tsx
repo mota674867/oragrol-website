@@ -248,6 +248,27 @@ const styles = `
 .om-panel a:hover .om-description,.om-panel a:focus-visible .om-description{color:inherit}
 .om-nav :focus-visible{outline:2px solid currentColor;outline-offset:4px}
 .om-panel a:focus-visible{outline-color:#111315}
+/* Several pages' own header CSS sets a blanket !important color on every
+   bare <a>/<button> inside their header, meant for the visible top-bar
+   wordmark/CTA on that page's own theme (e.g. light text on Resources'
+   dark header). Since the panel is DOM-nested inside that same header,
+   those rules were bleeding into the panel's own content too — turning
+   its "dark text on a light titanium panel" into invisible white-on-
+   light. The panel's own colors must never depend on which page it's
+   mounted in, so every rule below is deliberately over-specified
+   (.om-nav .om-panel ...) plus !important to always win regardless of
+   what a given page's header CSS does. Only the panel's own content is
+   covered here — .om-trigger/.om-direct and .om-mobile-toggle are left
+   alone on purpose, since those sit directly on the header itself and
+   correctly take on that page's own header color scheme (light text on
+   a dark header, dark text on a light one). */
+.om-nav .om-panel{color:var(--om-text)!important}
+.om-nav .om-overview{color:var(--om-text)!important}
+.om-nav .om-link{color:var(--om-text)!important}
+.om-nav .om-group h2{color:var(--om-muted)!important}
+.om-nav .om-description{color:var(--om-muted)!important}
+.om-nav .om-panel a:hover,.om-nav .om-panel a:focus-visible{color:#fff!important}
+.om-nav .om-panel a:hover .om-description,.om-nav .om-panel a:focus-visible .om-description{color:inherit!important}
 .om-mobile-toggle{display:none;font:inherit;font-size:12px;color:inherit;border:1px solid currentColor;background:transparent;padding:8px 14px;min-height:38px}
 @media(max-width:1100px){
 .om-nav{width:100%}
