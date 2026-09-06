@@ -160,6 +160,9 @@ function BusinessAutomationClient() {
           >
             My Scope <b>{scope.items.length}</b>
           </button>
+          <Link className="score-link" href="/cyber-health">
+            Get Cyber Health Score
+          </Link>
           <button className="search" aria-label="Search">
             <span />
           </button>

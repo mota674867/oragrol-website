@@ -65,7 +65,7 @@ export default function CompanyPage() {
           ))}
         </nav>
         <div>
-          <a href="#company-story">Our story</a>
+          <Link href="/cyber-health">Get Cyber Health Score</Link>
           <button className="search" aria-label="Search">
             <span />
           </button>

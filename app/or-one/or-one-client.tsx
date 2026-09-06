@@ -339,7 +339,7 @@ function OrOneClient() {
           >
             My Scope <b>{scope.items.length}</b>
           </button>
-          <a href="#orone-call">Book a Scoping Call</a>
+          <Link href="/cyber-health">Get Cyber Health Score</Link>
           <button className="one-search" aria-label="Search">
             <span />
           </button>

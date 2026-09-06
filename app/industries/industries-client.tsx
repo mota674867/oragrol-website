@@ -386,7 +386,7 @@ function IndustriesClient() {
           ))}
         </nav>
         <div>
-          <a href="#industry-advisory">Find your path</a>
+          <Link href="/cyber-health">Get Cyber Health Score</Link>
           <button className="search" aria-label="Search">
             <span />
           </button>

@@ -238,7 +238,7 @@ function ResourcesPageClient() {
           ))}
         </nav>
         <div>
-          <a href="#resource-library">Explore resources</a>
+          <Link href="/cyber-health">Get Cyber Health Score</Link>
           <button className="search" aria-label="Search">
             <span />
           </button>
