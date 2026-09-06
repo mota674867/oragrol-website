@@ -82,6 +82,14 @@ export default function OragrolMegaNav({ items, label = "Main navigation", activ
   }, [mobileOpen]);
 
   useEffect(() => {
+    // Only listen while something is actually open — previously this ran
+    // unconditionally on every single pointerdown anywhere on the page
+    // (clicking a footer link included) and always called setOpen(null)/
+    // setMobileOpen(false) regardless of state, forcing a redundant
+    // re-render of this component on every click on the page. Harmless by
+    // itself, but unnecessary and one less thing competing with a click
+    // elsewhere on the page while this fires.
+    if (open === null && !mobileOpen) return;
     function outside(event: PointerEvent) {
       if (event.target instanceof Node && !root.current?.contains(event.target)) {
         setOpen(null);
@@ -90,7 +98,7 @@ export default function OragrolMegaNav({ items, label = "Main navigation", activ
     }
     document.addEventListener("pointerdown", outside);
     return () => document.removeEventListener("pointerdown", outside);
-  }, []);
+  }, [open, mobileOpen]);
 
   // Close on route change — every item click already calls close(), but
   // this also covers browser back/forward and the logo link.
@@ -220,7 +228,8 @@ const styles = `
 .om-nav{--om-panel:#d9d9d6;--om-text:#111315;--om-muted:#666;--om-rule:#b8b7b2;position:relative;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-stretch:normal;font-weight:400;z-index:50}
 .om-nav *{box-sizing:border-box}
 .om-list,.om-group ul{list-style:none;padding:0;margin:0}
-.om-list{display:flex;align-items:center;gap:clamp(18px,2vw,38px)}
+.om-list{display:flex;align-items:center;justify-content:center;gap:clamp(18px,2vw,38px)}
+.om-item{position:relative}
 .om-trigger,.om-direct{font-family:inherit;font-size:12px;line-height:1.4;color:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:0;border:0;background:transparent;cursor:pointer;white-space:nowrap;position:relative}
 .om-active{position:relative}
 .om-active:after{content:"";position:absolute;left:0;right:0;bottom:-14px;height:2px;background:var(--om-active,#ef4d00)}

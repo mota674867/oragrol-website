@@ -21,9 +21,9 @@ import { LinkedInIcon, InstagramIcon } from "./social-icons";
  * Legal links (Privacy Policy / Terms of Use / Accessibility) render as
  * plain, non-clickable text until those pages actually exist — never link
  * to a route that doesn't exist yet. All three are live as of this build.
- * Careers / Talent / Partnerships have no dedicated pages yet — the
- * handoff explicitly says not to invent destinations, so they render as
- * plain text too, same treatment as a not-yet-live legal page.
+ * Careers / Talent / Partnerships shipped 2026-09-06 as their own
+ * standalone logo-only pages (no shared nav/footer, per the handoff) and
+ * are now real links here too.
  */
 
 type NewsletterSubmission = { firstName: string; email: string; consent: true };
@@ -48,13 +48,14 @@ const sitemapLinks: [string, string][] = [
   ["Resources", "/resources"],
 ];
 
-// Careers, Talent and Partnerships have no live route yet — plain text,
-// not a fake link, until those pages actually ship.
+// Careers, Talent and Partnerships shipped 2026-09-06 as standalone
+// logo-only pages (no shared nav/footer) — see
+// app/components/site/oragrol-opportunity-page.tsx.
 const companyLinks: [string, string | null][] = [
   ["Company", "/company"],
-  ["Careers", null],
-  ["Talent", null],
-  ["Partnerships", null],
+  ["Careers", "/careers"],
+  ["Talent", "/talent"],
+  ["Partnerships", "/partnerships"],
   ["FAQ", "/faq"],
   ["Contact", "/contact"],
 ];

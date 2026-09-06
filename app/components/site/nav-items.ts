@@ -24,10 +24,14 @@ import type { NavItem } from "./oragrol-mega-nav";
  * two generic layout-flow anchors, `#one-intro`/`#team-builder`, not
  * distinct sub-pages worth a dropdown; Company has one, `#company-story`).
  *
- * Single-column dropdowns throughout (no invented group titles/category-
- * of-categories) — none of these four pages' real content has a further
- * real grouping layer above its own list of items, so forcing multi-column
- * grouping here would invent structure the source content doesn't have.
+ * Single-column dropdowns for Services/Business Automation/Industries (no
+ * invented group titles/category-of-categories) — none of those three
+ * pages' real content has a further real grouping layer above its own list
+ * of items, so forcing multi-column grouping there would invent structure
+ * the source content doesn't have. Resources is the one exception: its 16
+ * links overflowed a single column into an internally-scrolling panel, so
+ * it's chunked into 3 untitled groups purely for layout (same links, same
+ * order — no new category names, just a wider card instead of a tall one).
  */
 export const NAV_ITEMS: NavItem[] = [
   {
@@ -89,6 +93,12 @@ export const NAV_ITEMS: NavItem[] = [
   {
     label: "Resources",
     href: "/resources",
+    // Split into 3 untitled groups purely so the panel lays out as a wide
+    // multi-column card instead of one tall single column that has to
+    // scroll internally — same 16 real links/routes/order as before, just
+    // chunked for layout. No new category titles invented; each group
+    // still renders with no <h2>, so nothing implies a real topic split
+    // that doesn't exist.
     groups: [
       {
         links: [
@@ -98,11 +108,19 @@ export const NAV_ITEMS: NavItem[] = [
           { label: "Email Security Basics for Small Business", href: "/resources/email-security-basics-small-business" },
           { label: "Cybersecurity for Professional Services Firms", href: "/resources/cybersecurity-professional-services-firms" },
           { label: "Understanding PIPEDA: What It Means for Your Business", href: "/resources/understanding-pipeda-business" },
+        ],
+      },
+      {
+        links: [
           { label: "Cyber Insurance Readiness Checklist", href: "/resources/cyber-insurance-readiness-checklist-canadian-smbs" },
           { label: "DMARC Enforcement: Monitoring to p=reject", href: "/resources/dmarc-enforcement-p-reject" },
           { label: "The First 24 Hours of a Cyber Incident", href: "/resources/first-24-hours-cyber-incident" },
           { label: "Vendor Risk Before You Grant Access", href: "/resources/vendor-risk-before-granting-access" },
           { label: "A Practical AI Use Policy for Canadian Businesses", href: "/resources/practical-ai-use-policy-canadian-businesses" },
+        ],
+      },
+      {
+        links: [
           { label: "Microsoft 365 Security Baseline for an SMB", href: "/resources/microsoft-365-security-baseline-smb" },
           { label: "Cybersecurity for Accounting and Bookkeeping Firms", href: "/resources/cybersecurity-accounting-bookkeeping-firms" },
           { label: "Canadian SMB Cyber-Risk Brief 2026", href: "/resources/canadian-smb-cyber-risk-brief-2026" },
