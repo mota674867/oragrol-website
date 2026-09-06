@@ -57,4 +57,4 @@ __pycache__/
 
 .vercel
 .env*
-"Claude outputs/" 
+Claude outputs/
