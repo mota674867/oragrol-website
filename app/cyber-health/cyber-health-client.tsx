@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import {useMemo,useState} from "react";
+import {useMemo,useRef,useState} from "react";
 import {categories,questions,sections} from "./assessment-data";
 import SiteFooter from "../components/site/footer";
 import "../gpt-pages.css";
@@ -25,6 +25,11 @@ function CyberHealthClient(){
   const [profile,setProfile]=useState<Profile>({company:"",industry:"",province:"",employees:"",platform:"",name:"",email:"",phone:""});
   const [reportStatus,setReportStatus]=useState<ReportStatus>("idle");
   const [reportError,setReportError]=useState<string|null>(null);
+  // Tracks the exact payload of the last successfully-sent report so
+  // "Review answers" -> unchanged -> "Calculate score" again can't
+  // fire a duplicate email. A real answer change still sends an
+  // updated report.
+  const lastSentPayload=useRef<string|null>(null);
   const visibleQuestions=useMemo(()=>questions.filter(q=>profile.platform==="Google Workspace"?!q.id.match(/^Q08-[12]$/):!q.id.includes("-GWS")),[profile.platform]);
   const sectionQuestions=visibleQuestions.filter(q=>q.section===sections[step]);
   const sectionComplete=sectionQuestions.every(q=>answers[q.id]);
@@ -43,13 +48,15 @@ function CyberHealthClient(){
   // recomputes the score independently from these raw answers rather
   // than trusting what's sent here (see app/lib/cyber-health-report.ts).
   const submitReport=async()=>{
+    const payload=JSON.stringify({profile,qualification:qual,answers});
+    if(reportStatus==="sent"&&lastSentPayload.current===payload)return;
     setReportStatus("sending");
     setReportError(null);
     try{
       const res=await fetch("/api/cyber-health",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({profile,qualification:qual,answers}),
+        body:payload,
       });
       const data:{ok:boolean;error?:string}=await res.json();
       if(!res.ok||!data.ok){
@@ -58,6 +65,7 @@ function CyberHealthClient(){
         return;
       }
       setReportStatus("sent");
+      lastSentPayload.current=payload;
     }catch{
       setReportStatus("error");
       setReportError("Could not send your report. Check your connection and try again.");
