@@ -33,7 +33,7 @@ function CyberHealthClient(){
   const categoryScores=useMemo(()=>categories.map(c=>{const qs=visibleQuestions.filter(q=>q.id.startsWith(`Q${c.id}-`));const earned=qs.reduce((n,q)=>n+(answers[q.id]==="Yes"?2:answers[q.id]==="Not Sure"?1:0),0);return {...c,score:qs.length?earned/(2*qs.length)*100:0}}),[answers,visibleQuestions]);
   const score=useMemo(()=>Math.round(categoryScores.reduce((n,c)=>n+c.score*c.weight,0)/38),[categoryScores]);
   const tier=score>=80?"Low":score>=60?"Medium":score>=40?"High":"Critical";
-  const pkg=score>=80?"Starter":score>=60?"Standard":"Premium";
+  const pkg=score>=80?"Essential":score>=60?"Growth":"Enterprise";
   const answered=visibleQuestions.filter(q=>answers[q.id]).length;
   const go=(s:Stage)=>{setStage(s);scrollTo(0,0)};
   const header=(label:string)=><header><Link href="/">ORAGROL <small>GLOBAL</small></Link><b>{label}</b></header>;

@@ -483,19 +483,19 @@ export function riskTier(score: number): "Low" | "Medium" | "High" | "Critical" 
   return score >= 80 ? "Low" : score >= 60 ? "Medium" : score >= 40 ? "High" : "Critical";
 }
 
-export type PackageTier = "Starter" | "Standard" | "Premium";
+export type PackageTier = "Essential" | "Growth" | "Enterprise";
 
 export function recommendedPackage(score: number): PackageTier {
-  return score >= 80 ? "Starter" : score >= 60 ? "Standard" : "Premium";
+  return score >= 80 ? "Essential" : score >= 60 ? "Growth" : "Enterprise";
 }
 
 export const PACKAGE_CONTENT: Record<
   PackageTier,
   { timeline: string; why: string; included: string[]; outcome: string; idealFor: string }
 > = {
-  Starter: {
+  Essential: {
     timeline: "30-60 Days",
-    why: "Your foundation is solid — the Starter package closes the remaining gaps without over-building.",
+    why: "Your foundation is solid — the Essential package closes the remaining gaps without over-building.",
     included: [
       "A tailored remediation plan for the specific gaps found",
       "Guided setup for the highest-priority items",
@@ -504,9 +504,9 @@ export const PACKAGE_CONTENT: Record<
     outcome: "A confirmed, fully closed baseline with no material gaps left open.",
     idealFor: "Businesses at your current risk tier and maturity level.",
   },
-  Standard: {
+  Growth: {
     timeline: "60-90 Days",
-    why: "Based on your assessment results, the Standard package is the recommended starting point for your current risk profile.",
+    why: "Based on your assessment results, the Growth package is the recommended starting point for your current risk profile.",
     included: [
       "A tailored remediation plan",
       "Ongoing monitoring and support",
@@ -515,9 +515,9 @@ export const PACKAGE_CONTENT: Record<
     outcome: "A measurable reduction in risk exposure and a clearer path toward stronger cyber resilience.",
     idealFor: "Businesses at your current risk tier and maturity level.",
   },
-  Premium: {
+  Enterprise: {
     timeline: "90-120 Days",
-    why: "Several core areas need attention at once — the Premium package addresses them together rather than one at a time.",
+    why: "Several core areas need attention at once — the Enterprise package addresses them together rather than one at a time.",
     included: [
       "A full remediation roadmap across every flagged category",
       "Active monitoring and incident response coverage",
