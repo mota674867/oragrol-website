@@ -1,558 +1,137 @@
-import { Circle, Document, Image, Page, StyleSheet, Svg, Text, View } from "@react-pdf/renderer";
-import type { CyberHealthReport } from "../lib/cyber-health-report";
-import { categoryIdsForGroup, type Finding, type Severity } from "./report-data";
+import React from "react";
+import { Document, Page, Text, View, StyleSheet, Link, Image } from "@react-pdf/renderer";
 
-/**
- * The Cyber Health PDF report — server-side only (rendered via
- * `renderToBuffer` in app/api/cyber-health/route.ts), never imported into
- * a client bundle. Content comes entirely from the `CyberHealthReport`
- * the server already computed from the raw submission — no client-
- * supplied score/copy is trusted here (see cyber-health-report.ts).
- *
- * Visual reference: the Tally/n8n-era PDF report the client shared
- * (9 pages: cover, summary, executive dashboard, category dashboard,
- * top risks, quick wins + recommendations, 90-day roadmap + package,
- * why-Oragrol + booking CTA). Reproduced here with the site's actual
- * brand palette (#ef4d00 orange, not the old report's generic amber)
- * and the real Oragrol ring mark (public/brand/oragrol-ring.svg),
- * rather than a byte-for-byte clone.
- */
-
-const NAVY = "#0d2b4e";
-const ORANGE = "#ef4d00";
-const INK = "#111315";
-const MUTED = "#666a6f";
-const BORDER = "#d9d6cd";
-const PAPER = "#f6f4ee";
-const GREEN = "#1a7f37";
-const RED = "#c0392b";
-
-const SEVERITY_COLOR: Record<Severity, string> = {
-  Critical: RED,
-  High: "#c26a1a",
-  Medium: ORANGE,
-  Low: GREEN,
+export type Finding = { title: string; severity: "Critical" | "High" | "Medium" | "Low"; reportedGap: string; impact: string; action: string; categoryIds: string[] };
+export type Category = { id: string; name: string; score: number };
+export type CategoryGroup = { name: string; score: number; categories: Category[] };
+export type CyberHealthReportData = {
+  companyName: string;
+  businessSector: string;
+  employeeCount: string;
+  assessmentDate: string;
+  contactName: string;
+  phoneNumber: string;
+  clientReference: string;
+  score: number;
+  scoreInterpretation: string;
+  /** Existing engine classification, not a commercial tier. */
+  riskTier?: string;
+  groups: CategoryGroup[];
+  findings: Finding[];
+  quickWins: { title: string; action: string }[];
+  specialistSupport: string;
+  roadmap: { period: string; action: string; evidence: string }[];
+  reassessment: string;
 };
-
-const styles = StyleSheet.create({
-  page: { padding: 0, fontFamily: "Helvetica", fontSize: 10, color: INK },
-  body: { paddingHorizontal: 34, paddingBottom: 40 },
-  chromeHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 34,
-    paddingTop: 20,
-    paddingBottom: 10,
-  },
-  chromeHeaderLeft: { flexDirection: "row", alignItems: "center", gap: 6 },
-  chromeHeaderText: { fontSize: 9, letterSpacing: 1, color: NAVY, fontFamily: "Helvetica-Bold" },
-  chromeHeaderRight: { fontSize: 8, color: MUTED },
-  footer: {
-    position: "absolute",
-    bottom: 18,
-    left: 0,
-    right: 0,
-    textAlign: "center",
-    fontSize: 8,
-    color: MUTED,
-  },
-  h1: { fontSize: 22, fontFamily: "Helvetica-Bold", color: NAVY, marginBottom: 4 },
-  h2: { fontSize: 15, fontFamily: "Helvetica-Bold", color: NAVY, marginBottom: 2 },
-  muted: { fontSize: 9, color: MUTED },
-  card: { borderWidth: 1, borderColor: BORDER, borderRadius: 6, padding: 14, backgroundColor: "#fff", marginBottom: 10 },
-  paperCard: { borderWidth: 1, borderColor: BORDER, borderRadius: 6, padding: 14, backgroundColor: PAPER, marginBottom: 10 },
-  badge: {
-    fontSize: 7.5,
-    fontFamily: "Helvetica-Bold",
-    color: "#fff",
-    paddingVertical: 3,
-    paddingHorizontal: 8,
-    borderRadius: 10,
-    letterSpacing: 0.5,
-  },
+export type PdfReportProps = {
+  data: CyberHealthReportData;
+  /** Approved logo only. Omit to use a plain typographic brand treatment. */
+  logoSrc?: string;
+  /** PNG/data URL generated from https://orgro.ca/contact, never an AI-drawn QR. */
+  contactQrSrc?: string;
+};
+const CONTACT = "https://orgro.ca/contact";
+const s = StyleSheet.create({
+  page: { backgroundColor: "#F2F2EE", color: "#111315", fontFamily: "Helvetica", padding: 40, paddingBottom: 58, fontSize: 10, lineHeight: 1.45 },
+  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderBottom: "0.5 solid #D2D3CE", paddingBottom: 12, marginBottom: 22 },
+  logo: { width: 108, height: 30, objectFit: "contain", objectPosition: "left" },
+  small: { fontSize: 8, color: "#626560" },
+  brand: { fontSize: 11, letterSpacing: 2 },
+  title: { fontSize: 22, lineHeight: 1.15, marginBottom: 12 },
+  subtitle: { fontSize: 10, color: "#626560", marginBottom: 18 },
+  heroBrand: { fontSize: 48, fontFamily: "Helvetica-Bold", letterSpacing: -1, marginTop: 14 },
+  global: { fontSize: 11, letterSpacing: 5, marginBottom: 22 },
+  rule: { borderTop: "0.5 solid #D2D3CE", marginVertical: 16 },
+  h2: { fontFamily: "Helvetica-Bold", fontSize: 12, marginBottom: 8 },
+  paragraph: { marginBottom: 10 },
+  scoreBox: { backgroundColor: "#111315", color: "#F2F2EE", padding: 18, flexDirection: "row", gap: 24, marginVertical: 18 },
+  score: { fontSize: 47, lineHeight: 1.1 },
+  orange: { color: "#EF4D00", fontSize: 8, marginBottom: 7 },
+  prepared: { marginTop: 10 },
+  detail: { flexDirection: "row", borderBottom: "0.5 solid #D2D3CE", paddingVertical: 6 },
+  label: { width: "40%", fontSize: 9, color: "#626560" },
+  value: { width: "60%", fontSize: 10 },
+  group: { marginBottom: 13 },
+  groupTitle: { flexDirection: "row", justifyContent: "space-between", marginBottom: 6 },
+  groupName: { fontFamily: "Helvetica-Bold", fontSize: 10 },
+  category: { flexDirection: "row", alignItems: "center", marginBottom: 5 },
+  categoryName: { width: "61%", fontSize: 8 },
+  track: { width: "30%", height: 4, backgroundColor: "#D2D3CE" },
+  bar: { height: 4, backgroundColor: "#111315" },
+  percent: { width: "9%", textAlign: "right", fontSize: 8 },
+  finding: { borderBottom: "0.5 solid #D2D3CE", paddingBottom: 13, marginBottom: 16 },
+  findingTitle: { fontFamily: "Helvetica-Bold", fontSize: 12, marginBottom: 6 },
+  quick: { backgroundColor: "#E5E5DF", padding: 15, marginBottom: 18 },
+  action: { marginBottom: 10 },
+  contact: { backgroundColor: "#111315", padding: 18, marginVertical: 18, flexDirection: "row", justifyContent: "space-between", color: "#F2F2EE" },
+  contactLink: { color: "#F2F2EE", fontSize: 13, marginTop: 8 },
+  qr: { width: 85, height: 85, backgroundColor: "#FFFFFF", padding: 4 },
+  footer: { position: "absolute", bottom: 25, left: 40, right: 40, borderTop: "0.5 solid #D2D3CE", paddingTop: 9, fontSize: 7, color: "#626560", flexDirection: "row", justifyContent: "space-between" },
 });
 
-function ChromeHeader() {
-  return (
-    <View style={styles.chromeHeader} fixed>
-      <View style={styles.chromeHeaderLeft}>
-        <Svg width={12} height={12} viewBox="0 0 150 150">
-          <Circle cx={75} cy={75} r={62} fill="none" stroke="#018ABE" strokeWidth={26} strokeDasharray="365 24" transform="rotate(35 75 75)" />
-        </Svg>
-        <Text style={styles.chromeHeaderText}>ORAGROL GLOBAL</Text>
-      </View>
-      <Text style={styles.chromeHeaderRight}>Cyber Health Assessment Report</Text>
-    </View>
-  );
+/** Pure PDF document. Keep scoring, delivery, QR generation and CRM logic outside. */
+export default function CyberHealthPdfReport({ data: d, logoSrc, contactQrSrc }: PdfReportProps) {
+  validate(d);
+  const critical = d.findings.filter(f => f.severity === "Critical");
+  const priority = d.findings.filter(f => ["Critical", "High"].includes(f.severity));
+  const criticalIds = new Set(critical.flatMap(f => f.categoryIds));
+  const header = (section: string) => <View style={s.header}><View>{logoSrc ? <Image src={logoSrc} style={s.logo} /> : <Text style={s.brand}>ORAGROL GLOBAL</Text>}</View><Text style={s.small}>{section.toUpperCase()}</Text></View>;
+  const footer = <View style={s.footer} fixed><Text>{d.clientReference} · PRIVATE & CONFIDENTIAL</Text><Text render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} /></View>;
+  const page = (section: string, children: React.ReactNode) => <Page size="A4" style={s.page}>{header(section)}{children}{footer}</Page>;
+  return <Document title={`Cyber Health Assessment Report | ${d.companyName}`} author="ORAGROL Global" subject="Questionnaire-based Cyber Health Assessment">
+    {page("Executive brief", <>
+      <Text style={s.heroBrand}>ORAGROL</Text><Text style={s.global}>GLOBAL</Text>
+      <Text style={s.h2}>PROTECT / AUTOMATE / UNIFY</Text>
+      <Text>Cybersecurity, intelligent automation and coordinated operations{"\n"}for Canadian businesses.</Text>
+      <View style={s.scoreBox} wrap={false}><View style={{ width: "35%" }}><Text style={s.score}>{d.score}<Text style={{ fontSize: 15 }}> / 100</Text></Text><Text style={{ fontSize: 7, marginTop: 5 }}>CYBER HEALTH SCORE</Text></View><View style={{ flex: 1 }}><Text style={s.orange}>{critical.length ? `${critical.length} CRITICAL FINDING${critical.length === 1 ? "" : "S"}` : "ASSESSMENT SUMMARY"}</Text><Text>{d.scoreInterpretation}</Text>{d.riskTier && <Text style={{ fontSize: 8, marginTop: 8 }}>Reported risk tier: {d.riskTier}. Individual findings take priority over the average.</Text>}</View></View>
+      <Text style={s.h2}>CYBER HEALTH ASSESSMENT REPORT</Text>
+      <View style={s.prepared}><Text style={s.h2}>PREPARED FOR:</Text>{[
+        ["Company name", d.companyName], ["Business sector", d.businessSector], ["Number of employees", d.employeeCount], ["Assessment date", d.assessmentDate], ["Contact name", d.contactName], ["Phone number", d.phoneNumber], ["Client reference code", d.clientReference],
+      ].map(([label, value]) => <View style={s.detail} key={label} wrap={false}><Text style={s.label}>{label}</Text><Text style={s.value}>{value}</Text></View>)}</View>
+      <Text style={[s.h2, { marginTop: 17 }]}>Inside this report</Text><Text style={s.small}>Your score and control coverage, critical findings, quick wins and a practical action plan to guide your next conversation. Based on assessment responses; controls have not been independently verified.</Text>
+    </>)}
+    {page("Score & control coverage", <>
+      <Text style={s.title}>Your score & control coverage</Text><Text style={s.subtitle}>Overall score: {d.score}/100. A Critical finding overrides its category status, regardless of the average.</Text>
+      {d.groups.map(g => <View key={g.name} style={s.group} wrap={false}><View style={s.groupTitle}><Text style={s.groupName}>{g.name}</Text><Text style={s.groupName}>{g.score}%{g.categories.some(c => criticalIds.has(c.id)) ? " · CRITICAL" : ""}</Text></View>{g.categories.map(c => <View key={c.id} style={s.category}><Text style={s.categoryName}>{c.name}{criticalIds.has(c.id) ? " · CRITICAL" : ""}</Text><View style={s.track}><View style={[s.bar, { width: `${c.score}%` }]} /></View><Text style={s.percent}>{c.score}%</Text></View>)}</View>)}
+      <Text style={s.small}>Percentages describe reported control coverage, not independent verification of effectiveness. Critical flags derive from the findings mapped to each category. A high average does not cancel an individual control gap.</Text>
+    </>)}
+    {page("Priority findings", <>
+      <Text style={s.title}>The gaps that need attention first</Text><Text style={s.subtitle}>Reported findings require validation. Related findings should be coordinated to avoid duplicated work.</Text>
+      {(priority.length ? priority : d.findings).map((f,i) => <View style={s.finding} key={`${f.title}-${i}`} wrap={false}><Text style={s.orange}>{f.severity.toUpperCase()}</Text><Text style={s.findingTitle}>{f.title}</Text><Text><Text style={{ fontFamily: "Helvetica-Bold" }}>Reported gap: </Text>{f.reportedGap}</Text><Text><Text style={{ fontFamily: "Helvetica-Bold" }}>Business impact: </Text>{f.impact}</Text><Text><Text style={{ fontFamily: "Helvetica-Bold" }}>Next action: </Text>{f.action}</Text></View>)}
+      {!d.findings.length && <Text>No findings were supplied for this assessment. This does not establish that no weaknesses exist.</Text>}
+    </>)}
+    {page("Prioritized action plan", <>
+      <Text style={s.title}>A practical sequence for improvement</Text>
+      <View style={s.quick}><Text style={s.h2}>QUICK WINS / YOUR TEAM CAN START</Text>{d.quickWins.map((q,i) => <View style={s.action} key={i}><Text style={{ fontFamily: "Helvetica-Bold" }}>{q.title}</Text><Text>{q.action}</Text></View>)}</View>
+      <Text style={s.h2}>Work that may need specialist support</Text><Text style={s.paragraph}>{d.specialistSupport}</Text>
+      {d.roadmap.map((r,i) => <View key={i} style={s.action} wrap={false}><Text style={s.orange}>{r.period}</Text><Text>{r.action}</Text><Text style={[s.small, { marginTop: 4 }]}>Completion evidence: {r.evidence}</Text></View>)}
+      <Text style={s.small}>Timing is indicative, not a delivery commitment. Critical issues should not wait for a later phase. Validate the need and use existing tools where suitable before purchasing additional services.</Text>
+    </>)}
+    {page("Continue with ORAGROL", <>
+      <Text style={s.title}>Your next step: Private Scope Review</Text><Text style={s.paragraph}>Bring this report to a focused conversation about what needs attention, what your team can handle and where external support would add value.</Text>
+      {[["Review", "Validate reported gaps and clarify controls, priorities and dependencies."], ["Define", "Agree proposed work, responsibilities and evidence needed to confirm improvement."], ["Decide", "Where support is appropriate, consider a tailored proposal defining deliverables, timing and pricing. No commercial package is assigned by this report."]].map(([title, body]) => <View style={s.action} key={title}><Text style={s.h2}>{title}</Text><Text>{body}</Text></View>)}
+      <View style={s.contact} wrap={false}><View style={{ width: "73%" }}><Text style={{ fontSize: 19 }}>Book a conversation</Text><Link src={CONTACT} style={s.contactLink}>orgro.ca/contact</Link><Text style={{ fontSize: 8, marginTop: 9 }}>Reference: {d.clientReference}{"\n"}Scheduling is confirmed after your enquiry.</Text></View>{contactQrSrc && <Image src={contactQrSrc} style={s.qr} />}</View>
+      <Text style={s.h2}>Review progress</Text><Text style={s.paragraph}>{d.reassessment}</Text>
+      <Text style={s.h2}>Report use & limitations</Text><Text style={s.paragraph}>This questionnaire-based report is not a technical audit, compliance certification or guarantee of security. Reported findings require validation. Share only with authorized recipients.</Text>
+      <Text style={s.paragraph}>This report is automatically generated; no signature is required. Use it as a reference when booking a Private Scope Review or continuing your enquiry with ORAGROL. It does not constitute a service agreement.</Text>
+      <View style={s.rule} /><Text style={s.small}>ORAGROL GLOBAL · PROTECT / AUTOMATE / UNIFY</Text>
+    </>)}
+  </Document>;
 }
 
-// Content length varies with the submission (more failed questions means
-// more Recommendation cards, which can overflow a single physical page)
-// — a hardcoded "Page X of Y" would repeat the wrong number on any
-// overflow page. react-pdf's `render` prop computes the real running
-// page number and total across the whole document, overflow included.
-function Footer() {
-  return (
-    <Text
-      style={styles.footer}
-      fixed
-      render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`}
-    />
-  );
-}
-
-function ScoreGauge({ score, size = 130 }: { score: number; size?: number }) {
-  const r = size / 2 - 10;
-  const c = 2 * Math.PI * r;
-  const filled = (Math.max(0, Math.min(100, score)) / 100) * c;
-  const color = score >= 80 ? GREEN : score >= 60 ? ORANGE : score >= 40 ? "#c26a1a" : RED;
-  return (
-    <View style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>
-      <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <Circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#e4e1d9" strokeWidth={12} />
-        <Circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          fill="none"
-          stroke={color}
-          strokeWidth={12}
-          strokeDasharray={`${filled} ${c}`}
-          strokeLinecap="round"
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
-        />
-      </Svg>
-      <View style={{ position: "absolute", alignItems: "center" }}>
-        <Text style={{ fontSize: 30, fontFamily: "Helvetica-Bold", color: NAVY }}>{score}</Text>
-        <Text style={{ fontSize: 8, color: MUTED }}>out of 100</Text>
-      </View>
-    </View>
-  );
-}
-
-function SeverityBadge({ severity }: { severity: Severity }) {
-  return (
-    <Text style={[styles.badge, { backgroundColor: SEVERITY_COLOR[severity] }]}>{severity.toUpperCase()}</Text>
-  );
-}
-
-function StatusBadge({ status }: { status: "GOOD" | "CRITICAL" }) {
-  return (
-    <Text style={[styles.badge, { backgroundColor: status === "GOOD" ? GREEN : RED }]}>{status}</Text>
-  );
-}
-
-function FindingCard({ f }: { f: Finding }) {
-  return (
-    <View style={styles.card} wrap={false}>
-      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
-        <Text style={{ fontSize: 11, fontFamily: "Helvetica-Bold", color: INK, maxWidth: 380 }}>{f.title}</Text>
-        <SeverityBadge severity={f.severity} />
-      </View>
-      <View style={{ gap: 3 }}>
-        <Text style={styles.muted}>
-          <Text style={{ fontFamily: "Helvetica-Bold" }}>BUSINESS IMPACT  </Text>
-          {f.businessImpact}
-        </Text>
-        <Text style={styles.muted}>
-          <Text style={{ fontFamily: "Helvetica-Bold" }}>LIKELIHOOD  </Text>
-          {f.likelihood}
-        </Text>
-        <Text style={styles.muted}>
-          <Text style={{ fontFamily: "Helvetica-Bold" }}>RECOMMENDED ACTION  </Text>
-          {f.action}
-        </Text>
-        <Text style={styles.muted}>
-          <Text style={{ fontFamily: "Helvetica-Bold" }}>ESTIMATED EFFORT  </Text>
-          {f.effort}
-        </Text>
-      </View>
-    </View>
-  );
-}
-
-export function CyberHealthPdf({ report, qrDataUri, bookingUrl }: { report: CyberHealthReport; qrDataUri: string | null; bookingUrl: string }) {
-  const dateStr = report.generatedAt.toLocaleDateString("en-CA", { year: "numeric", month: "long", day: "numeric" });
-  const nextDateStr = report.nextAssessmentAt.toLocaleDateString("en-CA", { year: "numeric", month: "long" });
-
-  return (
-    <Document
-      title={`Cyber Health Assessment Report — ${report.profile.company}`}
-      author="ORAGROL Global"
-      subject="Cyber Health Assessment Report"
-    >
-      {/* Page 1 — Cover */}
-      <Page size="A4" style={styles.page}>
-        <ChromeHeader />
-        <View style={[styles.body, { flexGrow: 1 }]}>
-          <View style={{ height: 220, backgroundColor: NAVY, borderRadius: 4, marginBottom: 24 }} />
-          <Svg width={64} height={64} viewBox="0 0 150 150" style={{ marginBottom: 18 }}>
-            <Circle cx={75} cy={75} r={62} fill="none" stroke="#018ABE" strokeWidth={26} strokeDasharray="365 24" transform="rotate(35 75 75)" />
-          </Svg>
-          <Text style={{ fontSize: 26, fontFamily: "Helvetica-Bold", color: NAVY, marginBottom: 6 }}>Cyber Health Assessment</Text>
-          <Text style={{ fontSize: 11, color: MUTED, letterSpacing: 1, marginBottom: 30 }}>EXECUTIVE CYBERSECURITY RISK ASSESSMENT</Text>
-          <Text style={{ fontSize: 9, color: MUTED, letterSpacing: 1, marginBottom: 4 }}>PREPARED FOR</Text>
-          <Text style={{ fontSize: 17, fontFamily: "Helvetica-Bold", color: ORANGE, marginBottom: 20 }}>{report.profile.company}</Text>
-          <Text style={{ fontSize: 10, color: MUTED, marginBottom: 8 }}>{dateStr}</Text>
-          <Text
-            style={{
-              fontSize: 8,
-              color: NAVY,
-              borderWidth: 1,
-              borderColor: NAVY,
-              borderRadius: 10,
-              paddingVertical: 3,
-              paddingHorizontal: 10,
-              alignSelf: "flex-start",
-              letterSpacing: 1,
-            }}
-          >
-            CONFIDENTIAL
-          </Text>
-          <Text style={{ marginTop: "auto", fontSize: 8.5, color: MUTED }}>
-            Oragrol Global Inc. · Canadian-Focused Managed Security Services
-          </Text>
-        </View>
-        <Footer />
-      </Page>
-
-      {/* Page 2 — Summary */}
-      <Page size="A4" style={styles.page}>
-        <ChromeHeader />
-        <View style={styles.body}>
-          <View style={{ height: 200, backgroundColor: NAVY, borderTopLeftRadius: 4, borderTopRightRadius: 4 }} />
-          <View style={{ flexDirection: "row", borderWidth: 1, borderColor: BORDER, borderTop: 0 }}>
-            <View style={{ flex: 1.2, padding: 18 }}>
-              <Text style={{ fontSize: 18, fontFamily: "Helvetica-Bold", color: NAVY, marginBottom: 4 }}>Cyber Health Assessment Report</Text>
-              <Text style={{ fontSize: 9.5, color: MUTED, marginBottom: 10 }}>Executive Cybersecurity Risk Assessment</Text>
-              <Text style={{ fontSize: 9.5, color: INK, marginBottom: 10, lineHeight: 1.4 }}>
-                Understand Your Cyber Risk. Prioritize What Matters. Protect Your Business.
-              </Text>
-              <Text style={{ fontSize: 9, fontFamily: "Helvetica-Bold", color: INK }}>Prepared exclusively for {report.profile.company}</Text>
-            </View>
-            <View style={{ flex: 1, padding: 18, alignItems: "center", borderLeftWidth: 1, borderLeftColor: BORDER }}>
-              <ScoreGauge score={report.score} size={110} />
-              <Text style={{ fontSize: 9, fontFamily: "Helvetica-Bold", color: NAVY, marginTop: 6 }}>{report.maturity.toUpperCase()}</Text>
-              <View style={{ marginTop: 10, width: "100%", gap: 4 }}>
-                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                  <Text style={styles.muted}>RISK TIER</Text>
-                  <Text style={{ fontSize: 9, fontFamily: "Helvetica-Bold" }}>{report.tier}</Text>
-                </View>
-                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                  <Text style={styles.muted}>ASSESSMENT DATE</Text>
-                  <Text style={{ fontSize: 9, fontFamily: "Helvetica-Bold" }}>{dateStr}</Text>
-                </View>
-                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                  <Text style={styles.muted}>CLIENT REFERENCE</Text>
-                  <Text style={{ fontSize: 9, fontFamily: "Helvetica-Bold" }}>{report.clientReference}</Text>
-                </View>
-              </View>
-            </View>
-          </View>
-          <Text style={{ fontSize: 8, color: MUTED, marginTop: 8 }}>
-            {report.profile.company} · {report.profile.industry} · {report.profile.employees} employees · Report ID: {report.reportId} · v1.0
-          </Text>
-        </View>
-        <Footer />
-      </Page>
-
-      {/* Page 3 — Executive Dashboard */}
-      <Page size="A4" style={styles.page}>
-        <ChromeHeader />
-        <View style={styles.body}>
-          <Text style={styles.h1}>Executive Dashboard</Text>
-          <Text style={[styles.muted, { marginBottom: 14 }]}>A snapshot of {report.profile.company}&apos;s current cyber health position.</Text>
-
-          <View style={{ flexDirection: "row", gap: 10, marginBottom: 18 }}>
-            <View style={[styles.paperCard, { flex: 1, alignItems: "center", borderColor: SEVERITY_COLOR.Medium, marginBottom: 0 }]}>
-              <ScoreGauge score={report.score} size={100} />
-              <Text style={{ fontSize: 9, color: MUTED, marginTop: 6 }}>CYBER HEALTH SCORE</Text>
-            </View>
-            <View style={{ flex: 1, gap: 10 }}>
-              <View style={[styles.paperCard, { marginBottom: 0 }]}>
-                <Text style={styles.muted}>RISK TIER</Text>
-                <Text style={{ fontSize: 14, fontFamily: "Helvetica-Bold", color: ORANGE }}>{report.tier}</Text>
-              </View>
-              <View style={[styles.card, { marginBottom: 0 }]}>
-                <Text style={styles.muted}>INDUSTRY</Text>
-                <Text style={{ fontSize: 12, fontFamily: "Helvetica-Bold", color: NAVY }}>{report.profile.industry}</Text>
-              </View>
-            </View>
-            <View style={{ flex: 1, gap: 10 }}>
-              <View style={[styles.paperCard, { marginBottom: 0 }]}>
-                <Text style={styles.muted}>CYBER MATURITY</Text>
-                <Text style={{ fontSize: 14, fontFamily: "Helvetica-Bold", color: ORANGE }}>{report.maturity}</Text>
-              </View>
-              <View style={[styles.card, { marginBottom: 0 }]}>
-                <Text style={styles.muted}>COMPANY SIZE</Text>
-                <Text style={{ fontSize: 12, fontFamily: "Helvetica-Bold", color: NAVY }}>{report.profile.employees}</Text>
-              </View>
-            </View>
-          </View>
-
-          <Text style={styles.h2}>Client Profile & Reference</Text>
-          <View style={[styles.card, { marginTop: 8 }]}>
-            <Text style={{ fontSize: 8, color: MUTED, letterSpacing: 1, marginBottom: 2 }}>ORAGROL CLIENT REFERENCE</Text>
-            <Text style={{ fontSize: 14, fontFamily: "Helvetica-Bold", color: NAVY, marginBottom: 10 }}>{report.clientReference}</Text>
-            {[
-              ["COMPANY NAME", report.profile.company],
-              ["PRIMARY CONTACT", report.profile.name],
-              ["BUSINESS EMAIL", report.profile.email],
-              ["PHONE", report.profile.phone],
-              ["INDUSTRY", report.profile.industry],
-              ["COMPANY SIZE", report.profile.employees],
-              ["ASSESSMENT DATE", dateStr],
-              ["REPORT VERSION", "v1.0"],
-            ].map(([k, v]) => (
-              <View key={k} style={{ flexDirection: "row", justifyContent: "space-between", paddingVertical: 5, borderTopWidth: 1, borderTopColor: BORDER }}>
-                <Text style={{ fontSize: 8.5, color: MUTED }}>{k}</Text>
-                <Text style={{ fontSize: 9.5, color: INK }}>{v}</Text>
-              </View>
-            ))}
-          </View>
-
-          <Text style={[styles.h2, { marginTop: 14 }]}>Business Risk Snapshot</Text>
-          <Text style={[styles.muted, { marginBottom: 8 }]}>At-a-glance status across the areas that matter most day-to-day.</Text>
-          <View style={{ flexDirection: "row", gap: 8 }}>
-            {report.snapshot.map((s) => (
-              <View key={s.label} style={[styles.card, { flex: 1, alignItems: "center", marginBottom: 0 }]}>
-                <Text style={{ fontSize: 9, fontFamily: "Helvetica-Bold", marginBottom: 6 }}>{s.label}</Text>
-                <StatusBadge status={s.status} />
-              </View>
-            ))}
-          </View>
-        </View>
-        <Footer />
-      </Page>
-
-      {/* Page 4 — Category Dashboard */}
-      <Page size="A4" style={styles.page}>
-        <ChromeHeader />
-        <View style={styles.body}>
-          <Text style={styles.h1}>Category Dashboard</Text>
-          <Text style={[styles.muted, { marginBottom: 14 }]}>All 20 assessed categories, grouped by business function.</Text>
-          {report.groups.map((g) => {
-            const memberIds = categoryIdsForGroup(g.name);
-            return (
-              <View key={g.name} style={styles.card} wrap={false}>
-                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                  <Text style={{ fontSize: 12, fontFamily: "Helvetica-Bold", color: NAVY }}>{g.name}</Text>
-                  <Text
-                    style={[
-                      styles.badge,
-                      { backgroundColor: g.score >= 90 ? GREEN : g.score >= 60 ? ORANGE : g.score >= 40 ? "#c26a1a" : RED },
-                    ]}
-                  >
-                    {g.score}%
-                  </Text>
-                </View>
-                <Text style={[styles.muted, { marginBottom: 8 }]}>{g.description}</Text>
-                {report.categoryScores
-                  .filter((c) => memberIds.includes(c.id))
-                  .map((c) => (
-                    <View key={c.id} style={{ flexDirection: "row", alignItems: "center", marginBottom: 5, gap: 8 }}>
-                      <Text style={{ fontSize: 8.5, width: 170 }}>{c.name}</Text>
-                      <View style={{ flex: 1, height: 5, backgroundColor: "#e4e1d9", borderRadius: 3 }}>
-                        <View
-                          style={{
-                            width: `${Math.round(c.score)}%`,
-                            height: 5,
-                            backgroundColor: c.score >= 60 ? GREEN : RED,
-                            borderRadius: 3,
-                          }}
-                        />
-                      </View>
-                      <Text style={{ fontSize: 8, width: 30, textAlign: "right", color: c.score >= 60 ? GREEN : RED }}>
-                        {Math.round(c.score)}%
-                      </Text>
-                    </View>
-                  ))}
-              </View>
-            );
-          })}
-        </View>
-        <Footer />
-      </Page>
-
-      {/* Page 5 — Top Business Risks */}
-      <Page size="A4" style={styles.page}>
-        <ChromeHeader />
-        <View style={styles.body}>
-          <Text style={styles.h1}>Top Business Risks</Text>
-          {report.topRisks.length === 0 ? (
-            <Text style={[styles.muted, { marginTop: 8 }]}>No material risks were identified in this assessment — every assessed area scored at or above the healthy threshold.</Text>
-          ) : (
-            report.topRisks.map((f) => <FindingCard key={f.id} f={f} />)
-          )}
-        </View>
-        <Footer />
-      </Page>
-
-      {/* Page 6 — Quick Wins + Recommendations (part 1) */}
-      <Page size="A4" style={styles.page}>
-        <ChromeHeader />
-        <View style={styles.body}>
-          <Text style={styles.h2}>Quick Wins</Text>
-          <Text style={[styles.muted, { marginBottom: 8 }]}>Low-effort changes with immediate risk reduction.</Text>
-          {report.quickWins.length === 0 ? (
-            <Text style={[styles.muted, { marginBottom: 14 }]}>No low-effort items outstanding right now.</Text>
-          ) : (
-            report.quickWins.map((f) => (
-              <View key={f.id} style={{ borderWidth: 1, borderColor: GREEN, borderRadius: 6, backgroundColor: "#eef7ee", padding: 10, marginBottom: 8 }} wrap={false}>
-                <Text style={{ fontSize: 10, fontFamily: "Helvetica-Bold", color: INK, marginBottom: 2 }}>{f.title}</Text>
-                <Text style={{ fontSize: 8, color: MUTED }}>
-                  Business Benefit: Reduces risk with minimal disruption · Time Required: {f.timeRequired} · Priority: {f.severity === "Critical" || f.severity === "High" ? "High" : "Medium"}
-                </Text>
-              </View>
-            ))
-          )}
-
-          <Text style={[styles.h2, { marginTop: 10 }]}>Recommendations</Text>
-          {report.allFindings.map((f) => (
-            <View key={f.id} style={styles.card} wrap={false}>
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <Text style={{ fontSize: 9.5, color: INK, maxWidth: 400 }}>{f.action}</Text>
-                <SeverityBadge severity={f.severity} />
-              </View>
-              <View style={{ flexDirection: "row", gap: 16, marginTop: 6 }}>
-                <Text style={styles.muted}>LIKELIHOOD {f.likelihood}</Text>
-                <Text style={styles.muted}>EFFORT {f.effort}</Text>
-              </View>
-            </View>
-          ))}
-        </View>
-        <Footer />
-      </Page>
-
-      {/* Page 7 — 90-Day Roadmap + Next Assessment + Package */}
-      <Page size="A4" style={styles.page}>
-        <ChromeHeader />
-        <View style={styles.body}>
-          <Text style={styles.h1}>90-Day Cyber Roadmap</Text>
-          <Text style={[styles.muted, { marginBottom: 10 }]}>A phased path from assessment to measurable improvement.</Text>
-          <View style={{ flexDirection: "row", gap: 8, marginBottom: 16 }}>
-            {report.roadmap.map((phase, i) => (
-              <View
-                key={phase.label}
-                style={{
-                  flex: 1,
-                  borderWidth: 1,
-                  borderColor: i === 0 ? RED : i === 1 ? ORANGE : GREEN,
-                  borderRadius: 6,
-                  padding: 10,
-                }}
-              >
-                <Text style={{ fontSize: 9, fontFamily: "Helvetica-Bold", color: i === 0 ? RED : i === 1 ? ORANGE : GREEN, marginBottom: 6 }}>
-                  {phase.label}
-                </Text>
-                {phase.items.length === 0 ? (
-                  <Text style={{ fontSize: 7.5, color: MUTED }}>Nothing outstanding for this window.</Text>
-                ) : (
-                  phase.items.map((f) => (
-                    <Text key={f.id} style={{ fontSize: 7.5, color: INK, marginBottom: 4 }}>
-                      {f.action}
-                    </Text>
-                  ))
-                )}
-              </View>
-            ))}
-          </View>
-
-          <Text style={styles.h2}>Next Assessment Recommendation</Text>
-          <View style={[styles.card, { marginTop: 8 }]}>
-            <Text style={{ fontSize: 8, color: MUTED, letterSpacing: 1 }}>RECOMMENDED REASSESSMENT</Text>
-            <Text style={{ fontSize: 16, fontFamily: "Helvetica-Bold", color: NAVY, marginVertical: 4 }}>{nextDateStr}</Text>
-            <Text style={styles.muted}>Cybersecurity is an ongoing process. We recommend reassessing every six months, or sooner after major technology or business changes.</Text>
-          </View>
-
-          <Text style={[styles.h2, { marginTop: 10 }]}>Recommended Next Step</Text>
-          <View style={[styles.card, { borderColor: NAVY, marginTop: 8 }]}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
-              <Text style={{ fontSize: 16, fontFamily: "Helvetica-Bold", color: NAVY }}>{report.nextStep.label}</Text>
-              <View style={{ alignItems: "flex-end" }}>
-                <Text style={{ fontSize: 7.5, color: MUTED }}>TIMELINE</Text>
-                <Text style={{ fontSize: 10, fontFamily: "Helvetica-Bold" }}>{report.nextStep.timeline}</Text>
-              </View>
-            </View>
-            <Text style={{ fontSize: 7.5, color: MUTED, marginBottom: 2 }}>WHY THIS STEP</Text>
-            <Text style={{ fontSize: 9, marginBottom: 8 }}>{report.nextStep.why}</Text>
-            <Text style={{ fontSize: 7.5, color: MUTED, marginBottom: 2 }}>WHAT&apos;S INCLUDED</Text>
-            {report.nextStep.included.map((item) => (
-              <Text key={item} style={{ fontSize: 9, marginBottom: 2 }}>• {item}</Text>
-            ))}
-            <Text style={{ fontSize: 7.5, color: MUTED, marginTop: 6, marginBottom: 2 }}>EXPECTED OUTCOME</Text>
-            <Text style={{ fontSize: 9 }}>{report.nextStep.outcome}</Text>
-          </View>
-        </View>
-        <Footer />
-      </Page>
-
-      {/* Page 8 — Why Oragrol + CTA */}
-      <Page size="A4" style={styles.page}>
-        <ChromeHeader />
-        <View style={styles.body}>
-          <Text style={styles.h1}>Why Oragrol</Text>
-          <View style={[styles.card, { marginTop: 8 }]}>
-            {[
-              ["Business-first approach", "We translate technical risk into plain-language business decisions."],
-              ["Canadian-focused", "Built around the realities of Canadian small and mid-sized businesses."],
-              ["Adaptive assessment", "The assessment adapts in real time to your actual answers — faster, consistent analysis."],
-              ["SMB specialists", "We work exclusively with businesses your size, not enterprise IT departments."],
-              ["Long-term partnership", "This report is a starting point, not a one-time transaction."],
-            ].map(([k, v]) => (
-              <View key={k} style={{ flexDirection: "row", paddingVertical: 6, borderTopWidth: 1, borderTopColor: BORDER }}>
-                <Text style={{ fontSize: 9, fontFamily: "Helvetica-Bold", width: 150 }}>{k}</Text>
-                <Text style={{ fontSize: 9, flex: 1, color: MUTED }}>{v}</Text>
-              </View>
-            ))}
-          </View>
-
-          <Text style={[styles.h1, { marginTop: 16 }]}>Ready to Strengthen Your Cyber Health?</Text>
-          <View style={[styles.card, { borderColor: NAVY, marginTop: 8 }]}>
-            <View
-              style={{
-                borderWidth: 1,
-                borderColor: NAVY,
-                borderRadius: 6,
-                paddingVertical: 10,
-                alignItems: "center",
-                marginBottom: 10,
-              }}
-            >
-              <Text style={{ fontSize: 12, fontFamily: "Helvetica-Bold", color: NAVY }}>Start a Conversation {"->"}</Text>
-            </View>
-            <Text style={[styles.muted, { textAlign: "center", marginBottom: 10 }]}>
-              A short, no-obligation conversation with the Oragrol team.
-            </Text>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-              <View style={{ gap: 4, maxWidth: 320 }}>
-                <Text style={{ fontSize: 9, marginBottom: 4 }}>
-                  Your assessment highlights clear opportunities to reduce risk. The Oragrol team can walk you through these findings and help you build a practical plan tailored to {report.profile.company}.
-                </Text>
-                <Text style={{ fontSize: 8.5 }}>{bookingUrl}</Text>
-              </View>
-              {qrDataUri ? (
-                <View style={{ alignItems: "center" }}>
-                  {/* eslint-disable-next-line jsx-a11y/alt-text -- @react-pdf/renderer's Image is a PDF-embed primitive, not an HTML <img>; it has no alt prop */}
-                  <Image src={qrDataUri} style={{ width: 70, height: 70 }} />
-                  <Text style={{ fontSize: 7, color: MUTED, marginTop: 3 }}>Scan to start a conversation</Text>
-                </View>
-              ) : null}
-            </View>
-          </View>
-
-          <View style={[styles.card, { marginTop: 10, backgroundColor: PAPER }]}>
-            <Text style={{ fontSize: 8, color: MUTED, lineHeight: 1.5 }}>
-              This Cyber Health Assessment Report is a high-level business assessment generated from questionnaire responses. It provides general cybersecurity guidance and should not be interpreted as a technical security audit, penetration test, compliance certification, or guarantee of security.
-            </Text>
-          </View>
-          <Text style={{ fontSize: 7.5, color: MUTED, textAlign: "center", marginTop: 8 }}>
-            Oragrol Global Inc. · CONFIDENTIAL · Report ID: {report.reportId} · {dateStr}
-          </Text>
-        </View>
-        <Footer />
-      </Page>
-    </Document>
-  );
+function validate(d: CyberHealthReportData) {
+  for (const key of ["companyName", "businessSector", "employeeCount", "assessmentDate", "contactName", "phoneNumber", "clientReference"] as const) {
+    if (!d[key]?.trim()) throw new Error(`Missing report field: ${key}`);
+  }
+  const percent = (v: number) => Number.isFinite(v) && v >= 0 && v <= 100;
+  if (!percent(d.score)) throw new Error("Invalid overall score");
+  const ids = new Set<string>();
+  for (const g of d.groups) {
+    if (!percent(g.score)) throw new Error("Invalid group score");
+    for (const c of g.categories) {
+      if (!percent(c.score) || ids.has(c.id)) throw new Error("Invalid or duplicate category");
+      ids.add(c.id);
+    }
+  }
+  for (const f of d.findings) if (!f.categoryIds.length || f.categoryIds.some(id => !ids.has(id))) throw new Error(`Unmapped finding: ${f.title}`);
 }

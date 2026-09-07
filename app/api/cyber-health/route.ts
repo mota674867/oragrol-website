@@ -2,7 +2,8 @@ import { renderToBuffer } from "@react-pdf/renderer";
 import { NextResponse } from "next/server";
 import QRCode from "qrcode";
 import { Resend } from "resend";
-import { CyberHealthPdf } from "../../cyber-health/pdf-report";
+import CyberHealthPdfReport from "../../cyber-health/pdf-report";
+import { buildPdfReportData } from "../../cyber-health/pdf-report-adapter";
 import { getClientIp, rateLimit } from "../../lib/rate-limit";
 import { buildCyberHealthReport } from "../../lib/cyber-health-report";
 import { cyberHealthSubmissionSchema } from "../../lib/cyber-health-schema";
@@ -104,7 +105,10 @@ export async function POST(request: Request) {
 
   let pdfBuffer: Buffer;
   try {
-    pdfBuffer = await renderToBuffer(CyberHealthPdf({ report, qrDataUri, bookingUrl: BOOKING_URL }));
+    const pdfData = buildPdfReportData(report);
+    pdfBuffer = await renderToBuffer(
+      CyberHealthPdfReport({ data: pdfData, contactQrSrc: qrDataUri ?? undefined }),
+    );
   } catch (err) {
     console.error("[/api/cyber-health] PDF generation failed:", err);
     return NextResponse.json({ ok: false, error: "Could not generate your report. Please try again." }, { status: 500 });
