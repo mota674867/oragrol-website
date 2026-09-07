@@ -154,7 +154,7 @@ export async function POST(request: Request) {
         <p><strong>Company:</strong> ${escapeHtml(profile.company)}</p>
         <p><strong>Contact:</strong> ${escapeHtml(profile.name)} — ${escapeHtml(profile.email)} — ${escapeHtml(profile.phone)}</p>
         <p><strong>Industry:</strong> ${escapeHtml(profile.industry)} · <strong>Size:</strong> ${escapeHtml(profile.employees)} · <strong>Platform:</strong> ${escapeHtml(profile.platform)}</p>
-        <p><strong>Score:</strong> ${report.score}/100 — <strong>Risk tier:</strong> ${escapeHtml(report.tier)} — <strong>Recommended package:</strong> ${escapeHtml(report.recommendedPackage)}</p>
+        <p><strong>Score:</strong> ${report.score}/100 — <strong>Risk tier:</strong> ${escapeHtml(report.tier)} — <strong>Recommended next step:</strong> ${escapeHtml(report.nextStep.label)}</p>
         <p><strong>Client reference:</strong> ${escapeHtml(report.clientReference)} — <strong>Report ID:</strong> ${escapeHtml(report.reportId)}</p>
         <p><strong>Top risks:</strong></p>
         <ul>${report.topRisks.map((f) => `<li>[${escapeHtml(f.severity)}] ${escapeHtml(f.title)}</li>`).join("") || "<li>None — all areas scored above the healthy threshold.</li>"}</ul>

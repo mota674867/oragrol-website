@@ -483,49 +483,21 @@ export function riskTier(score: number): "Low" | "Medium" | "High" | "Critical" 
   return score >= 80 ? "Low" : score >= 60 ? "Medium" : score >= 40 ? "High" : "Critical";
 }
 
-export type PackageTier = "Essential" | "Growth" | "Enterprise";
-
-export function recommendedPackage(score: number): PackageTier {
-  return score >= 80 ? "Essential" : score >= 60 ? "Growth" : "Enterprise";
-}
-
-export const PACKAGE_CONTENT: Record<
-  PackageTier,
-  { timeline: string; why: string; included: string[]; outcome: string; idealFor: string }
-> = {
-  Essential: {
-    timeline: "30-60 Days",
-    why: "Your foundation is solid — the Essential package closes the remaining gaps without over-building.",
-    included: [
-      "A tailored remediation plan for the specific gaps found",
-      "Guided setup for the highest-priority items",
-      "A follow-up check-in once changes are in place",
-    ],
-    outcome: "A confirmed, fully closed baseline with no material gaps left open.",
-    idealFor: "Businesses at your current risk tier and maturity level.",
-  },
-  Growth: {
-    timeline: "60-90 Days",
-    why: "Based on your assessment results, the Growth package is the recommended starting point for your current risk profile.",
-    included: [
-      "A tailored remediation plan",
-      "Ongoing monitoring and support",
-      "Regular check-ins with your advisor",
-    ],
-    outcome: "A measurable reduction in risk exposure and a clearer path toward stronger cyber resilience.",
-    idealFor: "Businesses at your current risk tier and maturity level.",
-  },
-  Enterprise: {
-    timeline: "90-120 Days",
-    why: "Several core areas need attention at once — the Enterprise package addresses them together rather than one at a time.",
-    included: [
-      "A full remediation roadmap across every flagged category",
-      "Active monitoring and incident response coverage",
-      "A dedicated advisor with regular strategic reviews",
-    ],
-    outcome: "A structured path from your current risk tier to a defensible, audited baseline.",
-    idealFor: "Businesses at your current risk tier and maturity level.",
-  },
+// Services are sold individually / as custom scope — there is no fixed
+// package to recommend, at any score. Cyber Health's output is a single,
+// honest next step instead of an invented tier name (Starter/Standard/
+// Premium and Essential/Growth/Enterprise were both retired for this —
+// see claude/ORAGROL_CyberHealth_Package_Removal_Note_for_GPT.md).
+export const NEXT_STEP_CONTENT = {
+  label: "Private Scope Review",
+  timeline: "Confirmed after discussing your requirements",
+  why: "To validate the gaps identified in this assessment and determine which services are the right fit for your business.",
+  included: [
+    "A walkthrough of your findings and existing controls",
+    "A discussion of priorities and proposed next steps",
+    "A tailored proposal — scope, deliverables, responsibilities and pricing",
+  ],
+  outcome: "A tailored proposal defining scope, responsibilities, deliverables and pricing.",
 };
 
 export function generateClientReference(): string {

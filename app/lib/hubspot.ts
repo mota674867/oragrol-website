@@ -163,7 +163,7 @@ export async function syncCyberHealthLeadToHubSpot(report: CyberHealthReport): P
       ``,
       `Score: ${report.score}/100 — Risk tier: ${report.tier} — Maturity: ${report.maturity}`,
       `Industry: ${profile.industry} — Company size: ${profile.employees} — Cloud platform: ${profile.platform}`,
-      `Recommended package: ${report.recommendedPackage}`,
+      `Recommended next step: ${report.nextStep.label}`,
       ``,
       `Category groups:`,
       ...report.groups.map((g) => `  - ${g.name}: ${g.score}%`),

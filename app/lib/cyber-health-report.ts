@@ -11,16 +11,14 @@ import { categories, questions, sections } from "../cyber-health/assessment-data
 import {
   CATEGORY_GROUPS,
   FINDINGS,
-  PACKAGE_CONTENT,
+  NEXT_STEP_CONTENT,
   SNAPSHOT_CATEGORIES,
   generateClientReference,
   generateReportId,
   groupDescription,
   maturityLabel,
-  recommendedPackage,
   riskTier,
   type Finding,
-  type PackageTier,
   type Severity,
 } from "../cyber-health/report-data";
 
@@ -78,8 +76,7 @@ export interface CyberHealthReport {
   topRisks: Finding[];
   quickWins: Finding[];
   roadmap: { label: string; items: Finding[] }[];
-  recommendedPackage: PackageTier;
-  packageContent: (typeof PACKAGE_CONTENT)[PackageTier];
+  nextStep: typeof NEXT_STEP_CONTENT;
 }
 
 const SEVERITY_RANK: Record<Severity, number> = { Critical: 4, High: 3, Medium: 2, Low: 1 };
@@ -152,7 +149,6 @@ export function buildCyberHealthReport(submission: CyberHealthSubmission): Cyber
     { label: "Days 61-90", items: allFindings.filter((f) => f.severity === "Low") },
   ];
 
-  const pkg = recommendedPackage(score);
   const generatedAt = new Date();
   const nextAssessmentAt = new Date(generatedAt);
   nextAssessmentAt.setMonth(nextAssessmentAt.getMonth() + 6);
@@ -173,8 +169,7 @@ export function buildCyberHealthReport(submission: CyberHealthSubmission): Cyber
     topRisks,
     quickWins,
     roadmap,
-    recommendedPackage: pkg,
-    packageContent: PACKAGE_CONTENT[pkg],
+    nextStep: NEXT_STEP_CONTENT,
   };
 }
 

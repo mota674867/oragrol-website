@@ -466,23 +466,23 @@ export function CyberHealthPdf({ report, qrDataUri, bookingUrl }: { report: Cybe
             <Text style={styles.muted}>Cybersecurity is an ongoing process. We recommend reassessing every six months, or sooner after major technology or business changes.</Text>
           </View>
 
-          <Text style={[styles.h2, { marginTop: 10 }]}>Recommended Package</Text>
+          <Text style={[styles.h2, { marginTop: 10 }]}>Recommended Next Step</Text>
           <View style={[styles.card, { borderColor: NAVY, marginTop: 8 }]}>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
-              <Text style={{ fontSize: 16, fontFamily: "Helvetica-Bold", color: NAVY }}>{report.recommendedPackage}</Text>
+              <Text style={{ fontSize: 16, fontFamily: "Helvetica-Bold", color: NAVY }}>{report.nextStep.label}</Text>
               <View style={{ alignItems: "flex-end" }}>
-                <Text style={{ fontSize: 7.5, color: MUTED }}>ESTIMATED TIMELINE</Text>
-                <Text style={{ fontSize: 10, fontFamily: "Helvetica-Bold" }}>{report.packageContent.timeline}</Text>
+                <Text style={{ fontSize: 7.5, color: MUTED }}>TIMELINE</Text>
+                <Text style={{ fontSize: 10, fontFamily: "Helvetica-Bold" }}>{report.nextStep.timeline}</Text>
               </View>
             </View>
-            <Text style={{ fontSize: 7.5, color: MUTED, marginBottom: 2 }}>WHY THIS PACKAGE</Text>
-            <Text style={{ fontSize: 9, marginBottom: 8 }}>{report.packageContent.why}</Text>
+            <Text style={{ fontSize: 7.5, color: MUTED, marginBottom: 2 }}>WHY THIS STEP</Text>
+            <Text style={{ fontSize: 9, marginBottom: 8 }}>{report.nextStep.why}</Text>
             <Text style={{ fontSize: 7.5, color: MUTED, marginBottom: 2 }}>WHAT&apos;S INCLUDED</Text>
-            {report.packageContent.included.map((item) => (
+            {report.nextStep.included.map((item) => (
               <Text key={item} style={{ fontSize: 9, marginBottom: 2 }}>• {item}</Text>
             ))}
             <Text style={{ fontSize: 7.5, color: MUTED, marginTop: 6, marginBottom: 2 }}>EXPECTED OUTCOME</Text>
-            <Text style={{ fontSize: 9 }}>{report.packageContent.outcome}</Text>
+            <Text style={{ fontSize: 9 }}>{report.nextStep.outcome}</Text>
           </View>
         </View>
         <Footer />
