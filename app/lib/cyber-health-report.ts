@@ -115,12 +115,6 @@ export function buildCyberHealthReport(submission: CyberHealthSubmission): Cyber
     return { name: g.name, score: Math.round(avg), description: `${g.name} is ${groupDescription(avg)}` };
   });
 
-  const snapshot: SnapshotItem[] = SNAPSHOT_CATEGORIES.map((s) => {
-    const members = s.categoryIds.map((id) => byId.get(id)).filter((c): c is CategoryScore => !!c);
-    const avg = members.length ? members.reduce((n, c) => n + c.score, 0) / members.length : 0;
-    return { label: s.label, score: Math.round(avg), status: avg >= 60 ? "GOOD" : "CRITICAL" };
-  });
-
   const allFindings: Finding[] = visible
     .filter((q) => answers[q.id] && answers[q.id] !== "Yes")
     .map((q) => {
@@ -132,6 +126,22 @@ export function buildCyberHealthReport(submission: CyberHealthSubmission): Cyber
       return { id: q.id, ...entry };
     })
     .sort((a, b) => SEVERITY_RANK[b.severity] - SEVERITY_RANK[a.severity]);
+
+  // A category can average >=60 (mostly "Yes" answers) while still
+  // containing one specific Critical-severity finding underneath — e.g.
+  // "Backup: GOOD" next to a Critical "backup restore never tested"
+  // finding. The average alone would call that GOOD, which contradicts
+  // the finding shown elsewhere in the same report. Any Critical finding
+  // in a snapshot category's questions forces that category to CRITICAL
+  // regardless of its average score.
+  const snapshot: SnapshotItem[] = SNAPSHOT_CATEGORIES.map((s) => {
+    const members = s.categoryIds.map((id) => byId.get(id)).filter((c): c is CategoryScore => !!c);
+    const avg = members.length ? members.reduce((n, c) => n + c.score, 0) / members.length : 0;
+    const hasCritical = allFindings.some(
+      (f) => f.severity === "Critical" && s.categoryIds.some((id) => f.id.startsWith(`Q${id}-`)),
+    );
+    return { label: s.label, score: Math.round(avg), status: hasCritical || avg < 60 ? "CRITICAL" : "GOOD" };
+  });
 
   const topRisks = allFindings.slice(0, 5);
   const quickWins = allFindings.filter((f) => f.effort === "Low").slice(0, 4);
