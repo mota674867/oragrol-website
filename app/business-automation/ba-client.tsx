@@ -25,8 +25,8 @@ const jobs: Job[] = [
   {
     id: "sales-flow",
     index: "01",
-    name: "Lead-to-Close Automation",
-    short: "Lead to close",
+    name: "Sales",
+    short: "Sales",
     outcome:
       "Capture, qualify and follow every opportunity—from first enquiry to a clean handoff and close.",
     fit: "Teams losing leads between inboxes, spreadsheets and CRM follow-up.",
@@ -38,8 +38,8 @@ const jobs: Job[] = [
   {
     id: "customer-support",
     index: "02",
-    name: "Always-On Customer Support",
-    short: "Always on",
+    name: "Customer Service",
+    short: "Customer Service",
     outcome:
       "Respond faster, route requests correctly and keep every customer conversation moving.",
     fit: "Teams handling repeat questions, slow routing or inconsistent support across channels.",
@@ -51,8 +51,8 @@ const jobs: Job[] = [
   {
     id: "operational-intelligence",
     index: "03",
-    name: "Know Your Numbers",
-    short: "Know your numbers",
+    name: "Finance",
+    short: "Finance",
     outcome:
       "Bring scattered business data into one dependable view for reporting, alerts and decisions.",
     fit: "Leaders waiting on manual reports or making decisions from disconnected systems.",
@@ -64,8 +64,8 @@ const jobs: Job[] = [
   {
     id: "managed-it",
     index: "04",
-    name: "Outsourced IT Operations",
-    short: "Operate reliably",
+    name: "IT",
+    short: "IT",
     outcome:
       "Add an AI-driven IT operations and monitoring layer for routine device, account, ticket and infrastructure work.",
     fit: "Growing businesses that need operational coordination and monitoring, not a full break-fix helpdesk MSP.",
@@ -77,8 +77,8 @@ const jobs: Job[] = [
   {
     id: "customer-growth",
     index: "05",
-    name: "Grow & Retain",
-    short: "Grow and retain",
+    name: "Marketing",
+    short: "Marketing",
     outcome:
       "Strengthen onboarding, retention, reactivation and revenue opportunities across the customer lifecycle.",
     fit: "Businesses with valuable customers but inconsistent follow-up after the first sale.",
@@ -129,6 +129,39 @@ function BusinessAutomationClient() {
     detail: j.outcome,
     commercial: `Build Fee ${j.build} / Monthly Management ${j.monthly}`,
   });
+
+  // Reconcile stale cart data: a returning visitor may have an
+  // `automation:<id>` item added under the pre-2026-09-08 job names
+  // (e.g. "Lead-to-Close Automation" is now "Sales"). Same id — job.id is
+  // unchanged, so this still correctly reads as "already added", no
+  // duplicate — but the stored title/detail/commercial were frozen at
+  // add-time and won't update on their own. Patch them in place on mount
+  // so the ScopeTray, any submitted enquiry and the downloaded PDF show
+  // the current name rather than a stale one. Same pattern as the
+  // /services Virtual CISO reconciliation.
+  useEffect(() => {
+    const canonical = new Map(jobs.map((j) => [`automation:${j.id}`, j]));
+    let changed = false;
+    const next = scope.items.map((item) => {
+      const current = canonical.get(item.id);
+      if (!current) return item;
+      const fresh = scopeItem(current);
+      if (
+        item.title === fresh.title &&
+        item.detail === fresh.detail &&
+        item.commercial === fresh.commercial
+      ) {
+        return item;
+      }
+      changed = true;
+      return { ...item, ...fresh };
+    });
+    if (changed) {
+      scope.setItems(next);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scope.items.length]);
+
   const toggleScope = (j: Job) => {
     scope.toggle(scopeItem(j));
     setTrayOpen(true);

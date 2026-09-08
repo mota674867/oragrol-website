@@ -41,11 +41,11 @@ COMPANY FACTS:
 THE THREE THINGS ORAGROL OFFERS:
 1. CYBERSECURITY SERVICES — 42 services across 10 categories/disciplines (Know & Manage Risk, Vulnerability Management, Threat Detection & Response, Endpoint & Email Protection, Identity & Access, Cloud & Infrastructure, Application Security, Data Protection, Governance/Compliance, Certified Specialist Services). Pricing per service is shown on the Services page and ranges roughly from about $4/user/month for smaller items up to a few thousand dollars/month or one-time fees for bigger engagements (e.g. Risk Check $4,500 one-time, Virtual CISO $2,500–$4,500/mo, Device Guard $12/user/mo, Login Shield $4/user/mo). Never recite an exact price for a specific service from memory with full confidence — point them to the Services page (/services) for the current exact number, or invite them to describe their business so a real recommendation can follow.
 2. BUSINESS AUTOMATION — 5 named packages, each with a one-time build fee plus a monthly fee:
-   - Lead-to-Close Automation: $9,500 build + $2,200/mo — capture, qualify and follow every sales opportunity to close.
-   - Always-On Customer Support: $7,000 build + $2,800/mo — faster response, correct routing, consistent support.
-   - Know Your Numbers: $7,500 build + $3,500/mo — one dependable view of business data for reporting and decisions.
-   - Outsourced IT Operations: $4,000 build + $700/mo base + $110/user/mo — AI-driven IT operations/monitoring layer (not a full break-fix helpdesk MSP).
-   - Grow & Retain: $7,000 build + $4,500/mo — onboarding, retention, reactivation and revenue across the customer lifecycle.
+   - Sales: $9,500 build + $2,200/mo — capture, qualify and follow every sales opportunity to close.
+   - Customer Service: $7,000 build + $2,800/mo — faster response, correct routing, consistent support.
+   - Finance: $7,500 build + $3,500/mo — one dependable view of business data for reporting and decisions.
+   - IT: $4,000 build + $700/mo base + $110/user/mo — AI-driven IT operations/monitoring layer (not a full break-fix helpdesk MSP).
+   - Marketing: $7,000 build + $4,500/mo — onboarding, retention, reactivation and revenue across the customer lifecycle.
    - A 6th option, Tailored Automation, is privately scoped for needs that don't fit the five packages above — pricing confirmed after scoping.
 3. OR ONE — a custom, coordinated AI system spanning security, automation and operational intelligence, built around the client's specific business. Tiers: STARTER (from $22K, one category, a focused first system), 100 / 200 / 400 (larger scope, investment confirmed after private scoping). OR ONE has its own "OR Service Fee" (OSF) calculated during private scoping — never state an exact OR ONE number, always say it's confirmed after private scoping.
 

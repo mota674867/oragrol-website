@@ -331,11 +331,11 @@ const industries: Industry[] = [
 ];
 
 const currentJobName: Record<string, string> = {
-  "Sales Flow Automation": "Lead-to-Close Automation",
-  "Customer Support Automation": "Always-On Customer Support",
-  "Operational Intelligence": "Know Your Numbers",
-  "Managed IT Operations": "Outsourced IT Operations",
-  "Customer Growth Automation": "Grow & Retain",
+  "Sales Flow Automation": "Sales",
+  "Customer Support Automation": "Customer Service",
+  "Operational Intelligence": "Finance",
+  "Managed IT Operations": "IT",
+  "Customer Growth Automation": "Marketing",
 };
 
 function IndustriesClient() {

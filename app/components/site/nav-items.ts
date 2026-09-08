@@ -57,11 +57,11 @@ export const NAV_ITEMS: NavItem[] = [
     groups: [
       {
         links: [
-          { label: "Lead-to-Close Automation", href: "/business-automation#ba-job-sales-flow" },
-          { label: "Always-On Customer Support", href: "/business-automation#ba-job-customer-support" },
-          { label: "Know Your Numbers", href: "/business-automation#ba-job-operational-intelligence" },
-          { label: "Outsourced IT Operations", href: "/business-automation#ba-job-managed-it" },
-          { label: "Grow & Retain", href: "/business-automation#ba-job-customer-growth" },
+          { label: "Sales", href: "/business-automation#ba-job-sales-flow" },
+          { label: "Customer Service", href: "/business-automation#ba-job-customer-support" },
+          { label: "Finance", href: "/business-automation#ba-job-operational-intelligence" },
+          { label: "IT", href: "/business-automation#ba-job-managed-it" },
+          { label: "Marketing", href: "/business-automation#ba-job-customer-growth" },
           { label: "Tailored Automation", href: "/business-automation#ba-job-tailored" },
         ],
       },
