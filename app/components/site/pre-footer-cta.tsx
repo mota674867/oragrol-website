@@ -48,7 +48,10 @@ const CTA_CONTENT: Record<CTAKey, CTAContent> = {
     headline:
       "The right protection begins with understanding what matters most.",
     secondaryLabel: "Build Your Scope",
-    secondaryHref: "/services#or10-index",
+    // Was #or10-index (the old radial category index) — that anchor no
+    // longer exists after the 2026-09-08 rebuild. Points at the new
+    // page's real first buyable section instead.
+    secondaryHref: "/services#service-packages",
   },
   "business-automation": {
     eyebrow: "Your clearest next step",

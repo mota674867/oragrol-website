@@ -8,8 +8,12 @@ import type { NavItem } from "./oragrol-mega-nav";
  * top-level items added, none renamed.
  *
  * Group links point at real, existing destinations only:
- * - Services: the 10 real category tabs on /services (radial selector),
- *   each given a real `id="or10-cat-N"` anchor + hash-select effect.
+ * - Services: the 3 real sections on the rebuilt /services page (2026-09-08
+ *   — four packages, twelve à-la-carte services, four specialist
+ *   engagements), using that page's own real `id="service-packages"` /
+ *   `id="individual-services"` / `id="specialist-engagements"` anchors.
+ *   Replaces the old 10-category radial index's `#or10-cat-N` anchors,
+ *   which no longer exist on the page after that rebuild.
  * - Business Automation: the 6 real job tabs on /business-automation, each
  *   given a real `id="ba-job-<slug>"` anchor + hash-select effect (slugs
  *   are the jobs' own existing `id` field, not invented).
@@ -40,16 +44,9 @@ export const NAV_ITEMS: NavItem[] = [
     groups: [
       {
         links: [
-          { label: "Know & manage your risk", href: "/services#or10-cat-1" },
-          { label: "Find & fix weaknesses", href: "/services#or10-cat-2" },
-          { label: "Detect & stop threats", href: "/services#or10-cat-3" },
-          { label: "Protect your people & devices", href: "/services#or10-cat-4" },
-          { label: "Control who gets in", href: "/services#or10-cat-5" },
-          { label: "Secure your cloud & systems", href: "/services#or10-cat-6" },
-          { label: "Secure your apps & websites", href: "/services#or10-cat-7" },
-          { label: "Protect your data", href: "/services#or10-cat-8" },
-          { label: "Secure your AI systems", href: "/services#or10-cat-9" },
-          { label: "Get certified proof", href: "/services#or10-cat-10" },
+          { label: "Four Packages", href: "/services#service-packages" },
+          { label: "Individual Services", href: "/services#individual-services" },
+          { label: "Specialist Engagements", href: "/services#specialist-engagements" },
         ],
       },
     ],
