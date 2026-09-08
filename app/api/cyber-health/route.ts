@@ -6,6 +6,7 @@ import CyberHealthPdfReport from "../../cyber-health/pdf-report";
 import { buildPdfReportData } from "../../cyber-health/pdf-report-adapter";
 import { getClientIp, rateLimit } from "../../lib/rate-limit";
 import { buildCyberHealthReport } from "../../lib/cyber-health-report";
+import { getCyberHealthReportPhotos } from "../../lib/cyber-health-photos";
 import { cyberHealthSubmissionSchema } from "../../lib/cyber-health-schema";
 import { syncCyberHealthLeadToHubSpot } from "../../lib/hubspot";
 import { SITE_URL } from "../../lib/site-config";
@@ -96,18 +97,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Could not process your assessment. Please try again." }, { status: 500 });
   }
 
-  let qrDataUri: string | null = null;
-  try {
-    qrDataUri = await QRCode.toDataURL(BOOKING_URL, { margin: 1, width: 200 });
-  } catch (err) {
-    console.error("[/api/cyber-health] QR code generation failed (non-fatal):", err);
-  }
-
+  // The six-page renderer requires a real QR (encoding BOOKING_URL) and
+  // both approved photos — it throws rather than silently rendering
+  // without them (see pdf-report.tsx), so a failure here must fail the
+  // whole request rather than fall back to `undefined`.
   let pdfBuffer: Buffer;
   try {
+    const qrDataUri = await QRCode.toDataURL(BOOKING_URL, { margin: 1, width: 200 });
+    const { cover, closing } = getCyberHealthReportPhotos();
     const pdfData = buildPdfReportData(report);
     pdfBuffer = await renderToBuffer(
-      CyberHealthPdfReport({ data: pdfData, contactQrSrc: qrDataUri ?? undefined }),
+      CyberHealthPdfReport({ data: pdfData, contactQrSrc: qrDataUri, coverPhotoSrc: cover, closingPhotoSrc: closing }),
     );
   } catch (err) {
     console.error("[/api/cyber-health] PDF generation failed:", err);
