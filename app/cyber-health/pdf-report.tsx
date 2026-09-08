@@ -54,18 +54,6 @@ const SEVERITY_ORDER: Severity[] = ["Critical", "High", "Medium", "Low"];
 // full cards regardless of count — they're always few.
 const COMPACT_THRESHOLD = 6;
 const CONTACT = "https://orgro.ca/contact";
-// Design system (updated — Figma-validated white-dominant direction, see
-// ORAGROL_Handover_Note for the design rationale): white page ground,
-// graphite (#111315) reserved for a small number of bold accent panels
-// (cover caption, score box, specialist-support callout, booking panel,
-// closing caption), burnt orange (#EF4D00) used sparingly for eyebrow
-// tags and urgency flags only, and light hairline dividers/borders
-// (#E4E3DE) replacing the old mid-grey chrome that was tuned for the
-// previous titanium-grey page background. No icons; structure carries
-// the hierarchy instead.
-const HAIRLINE = "#E4E3DE";
-const TRACK_BG = "#ECEAE4";
-const MUTED = "#5B5B56";
 const s = StyleSheet.create({
   // NOTE: no lineHeight on `page` (deliberately). A page-level lineHeight,
   // inherited by the fixed absolute-positioned footer (which has a
@@ -83,58 +71,53 @@ const s = StyleSheet.create({
   // (visually confirmed) — so instead, every text style/element below
   // that needs the readable 1.4 rhythm declares it directly on itself
   // (identical resolved value, no extra ancestor, no pagination drift).
-  page: { backgroundColor: "#FFFFFF", color: "#111315", fontFamily: "Helvetica", padding: 40, paddingBottom: 60, fontSize: 10 },
-  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderBottom: `0.5 solid ${HAIRLINE}`, paddingBottom: 12, marginBottom: 22 },
+  page: { backgroundColor: "#B8B7B2", color: "#111315", fontFamily: "Helvetica", padding: 40, paddingBottom: 60, fontSize: 10 },
+  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderBottom: "0.5 solid #96958F", paddingBottom: 12, marginBottom: 22 },
   logo: { width: 108, height: 30, objectFit: "contain", objectPosition: "left" },
-  small: { fontSize: 8, color: MUTED, lineHeight: 1.4 },
-  sectionLabel: { fontSize: 8, color: MUTED, letterSpacing: 1.2, lineHeight: 1.4 },
+  small: { fontSize: 8, color: "#4B4B47", lineHeight: 1.4 },
   brand: { fontSize: 12, letterSpacing: 2.2, fontFamily: "Helvetica-Bold", lineHeight: 1.4 },
   title: { fontSize: 23, lineHeight: 1.15, marginBottom: 10, fontFamily: "Helvetica-Bold" },
-  subtitle: { fontSize: 10, color: MUTED, marginBottom: 13, lineHeight: 1.4 },
-  rule: { borderTop: `0.5 solid ${HAIRLINE}`, marginVertical: 10 },
+  subtitle: { fontSize: 10, color: "#4B4B47", marginBottom: 13, lineHeight: 1.4 },
+  rule: { borderTop: "0.5 solid #96958F", marginVertical: 10 },
   h2: { fontFamily: "Helvetica-Bold", fontSize: 12, marginBottom: 6, lineHeight: 1.4 },
   paragraph: { marginBottom: 7, lineHeight: 1.4 },
   scoreBox: { backgroundColor: "#111315", color: "#F2F2EE", padding: 12, flexDirection: "row", gap: 24, marginVertical: 10 },
   score: { fontSize: 32, lineHeight: 1.1 },
-  orange: { color: "#EF4D00", fontSize: 8, letterSpacing: 0.8, marginBottom: 7, lineHeight: 1.4 },
+  orange: { color: "#EF4D00", fontSize: 8, marginBottom: 7, lineHeight: 1.4 },
   prepared: { marginTop: 10 },
-  detail: { flexDirection: "row", borderBottom: `0.5 solid ${HAIRLINE}`, paddingVertical: 4 },
-  label: { width: "40%", fontSize: 9, color: MUTED, lineHeight: 1.4 },
-  value: { width: "60%", fontSize: 10, fontFamily: "Helvetica-Bold", lineHeight: 1.4 },
-  // Page 2: dividers, not filled panels. Groups sit directly on the white
-  // page with a bold rule under each header and hairline dividers between
-  // category rows.
+  detail: { flexDirection: "row", borderBottom: "0.5 solid #96958F", paddingVertical: 4 },
+  label: { width: "40%", fontSize: 9, color: "#4B4B47", lineHeight: 1.4 },
+  value: { width: "60%", fontSize: 10, lineHeight: 1.4 },
+  // Page 2: dividers, not white panels. Groups sit directly on the page
+  // grey with a rule under the header and hairline dividers between rows.
   groupBlock: { marginBottom: 12 },
   groupHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", borderBottom: "0.75 solid #111315", paddingBottom: 4, marginBottom: 5 },
   groupHeaderName: { fontFamily: "Helvetica-Bold", fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.4, lineHeight: 1.4 },
   groupHeaderScore: { fontFamily: "Helvetica-Bold", fontSize: 10.5, lineHeight: 1.4 },
-  category: { flexDirection: "row", alignItems: "center", paddingVertical: 3, borderBottom: `0.5 solid ${HAIRLINE}` },
+  category: { flexDirection: "row", alignItems: "center", paddingVertical: 3, borderBottom: "0.5 solid #A8A7A1" },
   categoryName: { width: "58%", fontSize: 8.5, lineHeight: 1.4 },
-  track: { width: "27%", height: 4, backgroundColor: TRACK_BG },
+  track: { width: "27%", height: 4, backgroundColor: "#A8A7A1" },
   bar: { height: 4, backgroundColor: "#111315" },
   percent: { width: "9%", textAlign: "right", fontSize: 8.5, lineHeight: 1.4 },
-  // Page 3: full cards for Critical/High and small-finding-count reports —
-  // a hairline-bordered white card with a severity-colored left accent bar
-  // (set per-instance, see FindingCard) rather than a filled block.
-  finding: { border: `0.5 solid ${HAIRLINE}`, padding: 8, marginBottom: 6 },
+  // Page 3: full cards for Critical/High and small-finding-count reports.
+  finding: { border: "0.5 solid #96958F", padding: 8, marginBottom: 6 },
   findingTitle: { fontFamily: "Helvetica-Bold", fontSize: 11, marginBottom: 4, lineHeight: 1.4 },
   findingLine: { fontSize: 8.75, marginBottom: 2, lineHeight: 1.4 },
-  compactRow: { flexDirection: "row", paddingVertical: 4, borderBottom: `0.5 solid ${HAIRLINE}` },
+  compactRow: { flexDirection: "row", paddingVertical: 4, borderBottom: "0.5 solid #A8A7A1" },
   compactTitle: { width: "44%", fontSize: 8.5, fontFamily: "Helvetica-Bold", paddingRight: 8, lineHeight: 1.4 },
   compactAction: { flex: 1, fontSize: 8.5, lineHeight: 1.4 },
-  quickCol: { flex: 1, borderLeft: `0.5 solid ${HAIRLINE}`, paddingLeft: 12 },
+  quickCol: { flex: 1, borderLeft: "0.5 solid #4B4B47", paddingLeft: 12 },
   action: { marginBottom: 8, lineHeight: 1.4 },
   contact: { backgroundColor: "#111315", padding: 16, marginVertical: 14, flexDirection: "row", justifyContent: "space-between", color: "#F2F2EE" },
   contactLink: { color: "#F2F2EE", fontSize: 13, marginTop: 8, lineHeight: 1.4 },
   qr: { width: 85, height: 85, backgroundColor: "#FFFFFF", padding: 4 },
-  footer: { position: "absolute", bottom: 22, left: 40, right: 40, borderTop: `0.5 solid ${HAIRLINE}`, paddingTop: 8, fontSize: 7.5, color: MUTED, flexDirection: "row", justifyContent: "space-between" },
+  footer: { position: "absolute", bottom: 22, left: 40, right: 40, borderTop: "0.5 solid #96958F", paddingTop: 8, fontSize: 7.5, color: "#111315", flexDirection: "row", justifyContent: "space-between" },
 });
-const SEVERITY_ACCENT: Record<Severity, string> = { Critical: "#EF4D00", High: "#111315", Medium: "#B9B8B2", Low: "#B9B8B2" };
 
 function FindingCard({ f }: { f: Finding }) {
   return (
-    <View style={[s.finding, { borderLeft: `3 solid ${SEVERITY_ACCENT[f.severity]}` }]} wrap={false}>
-      <Text style={[s.orange, f.severity !== "Critical" && f.severity !== "High" ? { color: MUTED } : f.severity === "High" ? { color: "#111315" } : undefined]}>{f.severity.toUpperCase()}</Text>
+    <View style={s.finding} wrap={false}>
+      <Text style={s.orange}>{f.severity.toUpperCase()}</Text>
       <Text style={s.findingTitle}>{f.title}</Text>
       <Text style={s.findingLine}><Text style={{ fontFamily: "Helvetica-Bold" }}>Reported gap: </Text>{f.reportedGap}</Text>
       <Text style={s.findingLine}><Text style={{ fontFamily: "Helvetica-Bold" }}>Business impact: </Text>{f.impact}</Text>
@@ -145,7 +128,7 @@ function FindingCard({ f }: { f: Finding }) {
 
 function CompactRow({ f }: { f: Finding }) {
   return (
-    <View style={[s.compactRow, { borderLeft: `2 solid ${SEVERITY_ACCENT[f.severity]}`, paddingLeft: 6 }]} wrap={false}>
+    <View style={s.compactRow} wrap={false}>
       <Text style={s.compactTitle}>{f.title}</Text>
       <Text style={s.compactAction}>{f.action}</Text>
     </View>
@@ -166,7 +149,7 @@ export default function CyberHealthPdfReport({ data: d, logoSrc, contactQrSrc, c
   const mediumLowCount = d.findings.filter((f) => f.severity === "Medium" || f.severity === "Low").length;
   const useCompactMediumLow = mediumLowCount > COMPACT_THRESHOLD;
 
-  const header = (section: string) => <View style={s.header}><View>{logoSrc ? <Image src={logoSrc} style={s.logo} /> : <Text style={s.brand}>ORAGROL GLOBAL</Text>}</View><Text style={s.sectionLabel}>{section.toUpperCase()}</Text></View>;
+  const header = (section: string) => <View style={s.header}><View>{logoSrc ? <Image src={logoSrc} style={s.logo} /> : <Text style={s.brand}>ORAGROL GLOBAL</Text>}</View><Text style={s.small}>{section.toUpperCase()}</Text></View>;
   // A fresh element per call — react-pdf's layout engine walks the tree
   // per Page, and reusing one JSX element instance as a child of six
   // different <Page>s (the previous bug) left the footer absent on every
@@ -181,7 +164,7 @@ export default function CyberHealthPdfReport({ data: d, logoSrc, contactQrSrc, c
         <Image src={coverPhotoSrc} style={{ width: "100%", height: 210, objectFit: "cover" }} />
         <View style={{ position: "absolute", bottom: 0, left: 0, width: "72%", backgroundColor: "#111315", padding: 13 }}><Text style={{ fontFamily: "Helvetica-Bold", fontSize: 24, lineHeight: 1.08, color: "#FFFFFF" }}>CYBER HEALTH{"\n"}ASSESSMENT{"\n"}REPORT</Text></View>
       </View>
-      <Text style={[s.orange, { fontSize: 10, marginBottom: 10 }]}>PROTECT · AUTOMATE · UNIFY</Text>
+      <Text style={[s.h2, { fontSize: 13 }]}>PROTECT / AUTOMATE / UNIFY</Text>
       <Text style={{ lineHeight: 1.4 }}>Cybersecurity, intelligent automation and coordinated operations{"\n"}for Canadian businesses.</Text>
       <View style={s.scoreBox} wrap={false}><View style={{ width: "35%" }}><Text style={s.score}>{d.score}<Text style={{ fontSize: 15 }}> / 100</Text></Text><Text style={{ fontSize: 7, marginTop: 5 }}>CYBER HEALTH SCORE</Text></View><View style={{ flex: 1 }}><Text style={s.orange}>{critical.length ? `${critical.length} CRITICAL FINDING${critical.length === 1 ? "" : "S"}` : "ASSESSMENT SUMMARY"}</Text><Text style={{ lineHeight: 1.4 }}>{d.scoreInterpretation}</Text>{d.riskTier && <Text style={{ fontSize: 8, marginTop: 8, lineHeight: 1.4 }}>Reported risk tier: {d.riskTier}. Individual findings take priority over the average.</Text>}</View></View>
 
@@ -206,8 +189,8 @@ export default function CyberHealthPdfReport({ data: d, logoSrc, contactQrSrc, c
       <Text style={s.title}>The gaps that need attention first</Text><Text style={s.subtitle}>Reported findings require validation, in the order they should be worked.</Text>
       <View style={{ flexDirection: "row", marginBottom: 9 }}>{SEVERITY_ORDER.map((level) => {
         const count = d.findings.filter((f) => f.severity === level).length;
-        return <View key={level} style={{ width: "24%", marginRight: "1.33%", padding: 8, border: `0.5 solid ${HAIRLINE}`, borderLeft: `3 solid ${level === "Critical" && count > 0 ? "#EF4D00" : "#111315"}` }}>
-          <Text style={[s.small, { letterSpacing: 0.8 }]}>{level.toUpperCase()}</Text><Text style={{ fontSize: 20, fontFamily: "Helvetica-Bold", marginTop: 2 }}>{count}</Text>
+        return <View key={level} style={{ width: "25%", padding: 6, backgroundColor: "#C7C6C1", borderLeft: level === "Critical" && count > 0 ? "3 solid #EF4D00" : undefined }}>
+          <Text style={s.small}>{level.toUpperCase()}</Text><Text style={{ fontSize: 18 }}>{count}</Text>
         </View>;
       })}</View>
 
@@ -248,7 +231,7 @@ export default function CyberHealthPdfReport({ data: d, logoSrc, contactQrSrc, c
     {page("Action roadmap", <>
       <Text style={s.title}>ACTION ROADMAP</Text>
       <Text style={s.subtitle}>Sequenced by urgency and effort, not automatically by severity alone.</Text>
-      <View style={{ gap: 14, marginVertical: 16 }}>{d.roadmap.map((r, i) => <View key={i} style={{ backgroundColor: "#FFFFFF", border: `0.5 solid ${HAIRLINE}`, borderLeft: "3 solid #111315", padding: 16 }} wrap={false}>
+      <View style={{ gap: 14, marginVertical: 16 }}>{d.roadmap.map((r, i) => <View key={i} style={{ backgroundColor: "#C7C6C1", padding: 16 }} wrap={false}>
         <Text style={s.orange}>{r.period}</Text>
         <Text style={{ fontSize: 10, lineHeight: 1.4 }}>{r.action}</Text>
         <Text style={[s.small, { marginTop: 10 }]}>Suggested owner</Text>
