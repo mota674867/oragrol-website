@@ -205,3 +205,185 @@ export async function syncCyberHealthLeadToHubSpot(report: CyberHealthReport): P
     return { ok: false, error: `HubSpot sync threw: ${err instanceof Error ? err.message : String(err)}` };
   }
 }
+
+/**
+ * My Scope's HubSpot sync (2026-09-09) — deliberately a NEW function with
+ * its own result type, not a change to HubSpotSyncResult or the two
+ * functions above. Per My_Scope_Final_Ready_For_Claude.md Section E:
+ * "Prefer a scope-specific structured result (contact state / note
+ * state) over changing a shared ok flag without adapting Cyber Health
+ * and chat... Do not add unsolicited behavioural changes to those flows."
+ *
+ * The bug this avoids repeating: both functions above return `ok: true`
+ * even when the Note attach fails ("Contact synced, but the note failed
+ * to attach" gets folded into ok:true) — a caller checking `.ok` alone
+ * cannot tell a full success from a half-failure. Fixing that for Cyber
+ * Health/chat is explicitly out of scope here; this function just
+ * doesn't repeat the mistake in new code.
+ *
+ * Contact + Note only, per Section 1 — no Deal, no pipeline stage, no
+ * marketing enrollment, no Company object. Company is saved as a plain
+ * Contact property (HubSpot's default `company`), same as Cyber Health.
+ */
+
+export type ScopeArea = "Cybersecurity" | "Automation" | "OR ONE";
+
+export type ScopeResolvedItem = {
+  area: ScopeArea;
+  code: string;
+  name: string;
+};
+
+export interface ScopeHubSpotSyncResult {
+  contact: { state: "synced" | "failed"; contactId?: string; error?: string };
+  note: { state: "created" | "failed" | "skipped"; error?: string };
+}
+
+// "Automation" internally -> "Business Automation" in any client-facing
+// text (note body, emails), matching Section 4's mapping requirement.
+const AREA_LABEL: Record<ScopeArea, string> = {
+  Cybersecurity: "Cybersecurity",
+  Automation: "Business Automation",
+  "OR ONE": "OR ONE",
+};
+// Fixed display order for the note's "Selected items" section and its
+// "Selected areas" summary line, independent of selection order.
+const AREA_ORDER: ScopeArea[] = ["Cybersecurity", "Automation", "OR ONE"];
+
+export async function syncScopeLeadToHubSpot(params: {
+  actionId: string;
+  reference: string;
+  intent: "pdf_download" | "review_requested";
+  submittedAt: string; // ISO timestamp, server-generated
+  sourcePath: string;
+  client: { name: string; email: string; phone: string; company: string };
+  items: ScopeResolvedItem[]; // already server-resolved — see scope-schema.ts's header comment
+  context?: string;
+  timeframe?: string;
+  disclosureVersion: string;
+  acknowledgedAt: string; // ISO timestamp
+}): Promise<ScopeHubSpotSyncResult> {
+  const token = process.env.HUBSPOT_ACCESS_TOKEN;
+  if (!token) {
+    return {
+      contact: { state: "failed", error: "HUBSPOT_ACCESS_TOKEN is not set — skipping CRM sync." },
+      note: { state: "skipped", error: "Contact sync did not run." },
+    };
+  }
+
+  const { firstName, lastName } = splitName(params.client.name);
+
+  let contactId: string | undefined;
+  try {
+    const upsertRes = await fetch(`${HUBSPOT_API_BASE}/crm/v3/objects/contacts/batch/upsert`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        inputs: [
+          {
+            idProperty: "email",
+            id: params.client.email,
+            properties: {
+              email: params.client.email,
+              firstname: firstName,
+              lastname: lastName,
+              phone: params.client.phone,
+              company: params.client.company,
+            },
+          },
+        ],
+      }),
+    });
+
+    if (!upsertRes.ok) {
+      const text = await upsertRes.text().catch(() => "");
+      return {
+        contact: { state: "failed", error: `HubSpot contact upsert failed: ${upsertRes.status} ${text}`.slice(0, 500) },
+        note: { state: "skipped", error: "Contact sync failed." },
+      };
+    }
+
+    const upsertData = await upsertRes.json();
+    contactId = upsertData?.results?.[0]?.id;
+    if (!contactId) {
+      return {
+        contact: { state: "failed", error: "HubSpot contact upsert returned no contact id." },
+        note: { state: "skipped", error: "Contact sync failed." },
+      };
+    }
+  } catch (err) {
+    return {
+      contact: { state: "failed", error: `HubSpot contact sync threw: ${err instanceof Error ? err.message : String(err)}` },
+      note: { state: "skipped", error: "Contact sync failed." },
+    };
+  }
+
+  // Section 7's exact note template.
+  const areasPresent = AREA_ORDER.filter((a) => params.items.some((i) => i.area === a));
+  const intentLabel = params.intent === "pdf_download" ? "PDF Download Only" : "Review Requested";
+  const priorityLabel =
+    params.intent === "pdf_download" ? "LOW - gentle follow-up" : "HIGH - prompt personal follow-up";
+
+  const noteLines: string[] = [
+    "Lead source: My Scope",
+    `Intent: ${intentLabel}`,
+    `Follow-up priority: ${priorityLabel}`,
+    `Scope reference: ${params.reference}`,
+    `Action ID: ${params.actionId}`,
+    `Submitted at: ${params.submittedAt}`,
+    `Source page: ${params.sourcePath}`,
+    `Selected areas: ${areasPresent.map((a) => AREA_LABEL[a]).join(", ")}`,
+    "",
+    "Client",
+    `Full name: ${params.client.name}`,
+    `Email: ${params.client.email}`,
+    `Phone: ${params.client.phone}`,
+    `Company: ${params.client.company}`,
+    "",
+    "Selected items",
+  ];
+  for (const area of areasPresent) {
+    noteLines.push(AREA_LABEL[area]);
+    for (const item of params.items.filter((i) => i.area === area)) {
+      noteLines.push(`- ${item.code} | ${item.name}`);
+    }
+  }
+  noteLines.push(
+    "",
+    `Context: ${params.context?.trim() || "Not provided"}`,
+    `Timeframe: ${params.timeframe?.trim() || "Not provided"}`,
+    `Disclosure: ${params.disclosureVersion} (acknowledged ${params.acknowledgedAt})`,
+  );
+  const noteBody = noteLines.join("\n");
+
+  try {
+    const noteRes = await fetch(`${HUBSPOT_API_BASE}/crm/v3/objects/notes`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        properties: { hs_note_body: noteBody, hs_timestamp: Date.now() },
+        associations: [
+          { to: { id: contactId }, types: [{ associationCategory: "HUBSPOT_DEFINED", associationTypeId: 202 }] },
+        ],
+      }),
+    });
+
+    if (!noteRes.ok) {
+      const text = await noteRes.text().catch(() => "");
+      return {
+        contact: { state: "synced", contactId },
+        note: { state: "failed", error: `HubSpot note create failed: ${noteRes.status} ${text}`.slice(0, 500) },
+      };
+    }
+
+    return {
+      contact: { state: "synced", contactId },
+      note: { state: "created" },
+    };
+  } catch (err) {
+    return {
+      contact: { state: "synced", contactId },
+      note: { state: "failed", error: `HubSpot note sync threw: ${err instanceof Error ? err.message : String(err)}` },
+    };
+  }
+}
