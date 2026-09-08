@@ -3,6 +3,7 @@ import Link from "next/link";
 import {useState} from "react";
 import {usePathname} from "next/navigation";
 import CanadaCoverageStudy from "./canada-coverage-study/page";
+import HomeCybersecurity from "./home-section-04";
 import PreFooterCta from "./components/site/pre-footer-cta";
 import SiteFooter from "./components/site/footer";
 import OragrolMegaNav from "./components/site/oragrol-mega-nav";
@@ -21,11 +22,14 @@ const stages=[
  {number:"04",name:"Automate",line:"Improve defined work through practical, responsible automation."},
  {number:"05",name:"Evolve",line:"Strengthen the system as the business changes."},
 ] as const;
-const security=["Risk","Weaknesses","Threats","People","Access","Cloud","Data","Apps","AI","Testing"] as const;
+// Note: the old `security` array (10 category names) and `category` state
+// used by the pre-2026-09-08 orbit section 04 were removed entirely along
+// with that section — see home-section-04.tsx for the replacement.
+
 function Arrow(){return <span aria-hidden="true">↗</span>}
 
 function HomeClient(){
- const[capability,setCapability]=useState(0),[stage,setStage]=useState(0),[category,setCategory]=useState(0);
+ const[capability,setCapability]=useState(0),[stage,setStage]=useState(0);
  const activeCapability=capabilities[capability],activeStage=stages[stage];
  const pathname=usePathname();
  return <main className="home-v3">
@@ -34,7 +38,7 @@ function HomeClient(){
   <section className="reality"><div><p className="section-label">01 / The business reality</p><h2>Growth creates capability.<br/><span>It also creates exposure.</span></h2></div><div className="reality-copy"><p>More systems, vendors, data and AI can move a business forward while making its operating environment harder to see and protect.</p><p>ORAGROL connects what is too often managed separately, giving leaders a clearer way to protect, improve and coordinate the business.</p></div><p className="reality-line">Less noise. Fewer disconnected tools. <strong>More useful action.</strong></p></section>
   <section className="capabilities"><header><p className="section-label">02 / Protect. Automate. Unify.</p><h2>Three capabilities.<br/>One business direction.</h2></header><div className="capability-stage"><nav aria-label="Select capability">{capabilities.map((item,index)=><button className={capability===index?"active":""} onMouseEnter={()=>setCapability(index)} onFocus={()=>setCapability(index)} onClick={()=>setCapability(index)} key={item.name}><span>{item.code}</span>{item.name}</button>)}</nav><article><span>{activeCapability.code}</span><p>{activeCapability.name}</p><h3>{activeCapability.title}</h3><p>{activeCapability.text}</p><Link href={activeCapability.href}>{activeCapability.link} <Arrow/></Link></article><div className="capability-or" aria-hidden="true">OR</div></div></section>
   <section className="method"><header><p className="section-label">03 / How ORAGROL works</p><h2>Clarity first.<br/>Then coordinated action.</h2><p>Move across the sequence to see how ORAGROL turns business context into practical progress.</p></header><div className="method-number" aria-hidden="true">{activeStage.number}</div><article><span>{activeStage.name}</span><h3>{activeStage.line}</h3></article><nav aria-label="ORAGROL working method">{stages.map((item,index)=><button className={stage===index?"active":""} onMouseEnter={()=>setStage(index)} onFocus={()=>setStage(index)} onClick={()=>setStage(index)} key={item.name}><span>{item.number}</span>{item.name}</button>)}</nav></section>
-  <section className="security-index"><header><p className="section-label">04 / Cybersecurity</p><h2>Ten categories.<br/><span>One coordinated approach.</span></h2><p>Every service answers one question: what does this business need to protect, and what is the most direct way to protect it?</p><Link href="/services">View all cybersecurity services <Arrow/></Link></header><div className="security-orbit"><div className="orbit-ring" aria-hidden="true"/><div className="orbit-core"><strong>{String(category+1).padStart(2,"0")}</strong><span>{security[category]}</span></div>{security.map((item,index)=><button style={{"--i":index} as React.CSSProperties} className={category===index?"active":""} onMouseEnter={()=>setCategory(index)} onFocus={()=>setCategory(index)} onClick={()=>setCategory(index)} key={item}><span>{String(index+1).padStart(2,"0")}</span>{item}</button>)}</div></section>
+  <HomeCybersecurity/>
   <section className="cyber-health-home"><div className="health-copy"><p className="section-label">05 / Start with clarity</p><h2>Know where you stand.<br/><span>Know what to do next.</span></h2><p>A guided assessment gives you a practical view of your cybersecurity position, priorities and next steps.</p><Link href="/cyber-health">Get Your Cyber Health Score <Arrow/></Link></div><div className="health-score"><span>CYBER HEALTH / ILLUSTRATIVE</span><strong>78</strong><small>/100</small><div><i style={{width:"78%"}}/><p><span>Current position</span><b>Clearer next priorities</b></p></div></div></section>
   <section className="industries-wrap"><CanadaCoverageStudy/></section>
   <PreFooterCta page="home"/>
