@@ -7,6 +7,12 @@ import PreFooterCta from "../components/site/pre-footer-cta";
 import SiteFooter from "../components/site/footer";
 import OragrolMegaNav from "../components/site/oragrol-mega-nav";
 import { NAV_ITEMS } from "../components/site/nav-items";
+import {
+  RevisedProcess,
+  RevisedPricing,
+  RevisedResponsibility,
+  RevisedManagement,
+} from "./review-sections";
 import "../gpt-pages.css";
 type Risk = "Standard" | "Controlled" | "Critical";
 type Item = { name: string; points: number; risk: Risk };
@@ -199,32 +205,13 @@ const groups: Group[] = [
     ],
   },
 ];
-const tiers = [
-  {
-    name: "STARTER",
-    range: "1–30 / one category",
-    investment: "From $22K",
-    note: "A focused first system",
-  },
-  {
-    name: "100",
-    range: "31–100",
-    investment: "Investment confirmed after private scoping",
-    note: "Approximately 1–2 roles",
-  },
-  {
-    name: "200",
-    range: "101–200",
-    investment: "Investment confirmed after private scoping",
-    note: "Approximately 3–4 roles",
-  },
-  {
-    name: "400",
-    range: "201–400",
-    investment: "Investment confirmed after private scoping",
-    note: "Approximately 6 roles",
-  },
-];
+// Note: the `tiers` array (STARTER/100/200/400 range+investment text) that
+// used to live here was removed — it was only ever consumed by the
+// <section className="orone-tiers"> below, which this 2026-09-08 handoff
+// replaces with <RevisedPricing/> (its own pricing data, approved fee
+// table). `tierFor` below is unrelated and still used live by the builder
+// (the "preliminary system" tier name shown as items are selected), so it
+// stays.
 const tierFor = (points: number, categoryCount: number) =>
   points === 0
     ? "Not estimated"
@@ -385,39 +372,7 @@ function OrOneClient() {
           <blockquote>Engineered by ORAGROL Global.</blockquote>
         </div>
       </section>
-      <section className="orone-process">
-        <p>How OR ONE becomes operational</p>
-        <div>
-          {[
-            [
-              "01",
-              "Select",
-              "Choose the functions that should become part of your system.",
-            ],
-            [
-              "02",
-              "Engineer",
-              "Design and build a dedicated architecture around your real workflows.",
-            ],
-            [
-              "03",
-              "Deploy",
-              "Connect the system to approved tools, data and operating controls.",
-            ],
-            [
-              "04",
-              "Operate",
-              "Monitor, maintain and improve it as your business changes.",
-            ],
-          ].map((x) => (
-            <article key={x[0]}>
-              <span>{x[0]}</span>
-              <h3>{x[1]}</h3>
-              <p>{x[2]}</p>
-            </article>
-          ))}
-        </div>
-      </section>
+      <RevisedProcess />
       <section className="team-builder" id="team-builder">
         <div className="builder-heading">
           <p>Interactive builder / 77 items</p>
@@ -514,99 +469,9 @@ function OrOneClient() {
           </div>
         </div>
       </section>
-      <section className="orone-tiers">
-        <div className="tier-heading">
-          <p>A system sized to the work</p>
-          <h2>
-            Start focused.
-            <br />
-            <span>Scale deliberately.</span>
-          </h2>
-          <p>
-            Points represent build complexity. Final scope, risk classification
-            and commercial terms are confirmed through private engineering
-            review.
-          </p>
-        </div>
-        <div className="tier-stairs">
-          {tiers.map((t, i) => (
-            <article
-              style={{ "--step": i } as React.CSSProperties}
-              key={t.name}
-            >
-              <span>OR/ONE</span>
-              <h3>{t.name}</h3>
-              <strong>{t.range} Points</strong>
-              <p>{t.note}</p>
-              <small>{t.investment}</small>
-            </article>
-          ))}
-        </div>
-      </section>
-      <section className="risk-system">
-        <div>
-          <p>Responsibility model</p>
-          <h2>
-            Built for action.
-            <br />
-            <span>Governed by consequence.</span>
-          </h2>
-          <p>
-            Risk reflects what the system is authorized to do—not simply the
-            client&apos;s industry.
-          </p>
-        </div>
-        <div className="risk-rings">
-          <article className="risk-standard">
-            <span>Standard</span>
-            <p>
-              Research, content, reporting, scheduling and reversible
-              administration.
-            </p>
-          </article>
-          <article className="risk-controlled">
-            <span>Controlled</span>
-            <p>
-              Customer communication, invoicing preparation, CRM and operational
-              integrations.
-            </p>
-          </article>
-          <article className="risk-critical">
-            <span>Critical</span>
-            <p>
-              Payments, payroll, refunds, hiring, filings, privileged access and
-              security changes.
-            </p>
-          </article>
-        </div>
-      </section>
-      <section className="osf-section">
-        <div>
-          <p>OR Service Fee / OSF</p>
-          <h2>
-            Ongoing responsibility
-            <br />
-            <span>priced to the system.</span>
-          </h2>
-        </div>
-        <div>
-          <p>
-            The build fee reflects what OR ONE takes to engineer. The monthly OR
-            Service Fee reflects the size of the live system and the
-            responsibility created by the actions it is authorized to perform.
-          </p>
-          <ul>
-            <li>More frequent testing for higher-risk workflows</li>
-            <li>Deeper audit-trail and access-review cadence</li>
-            <li>Faster incident-response commitments</li>
-            <li>More frequent reporting on critical operations</li>
-          </ul>
-          <small>
-            The final OSF is calculated during private scoping. It is not
-            generated by the website builder.
-          </small>
-        </div>
-      </section>
+      <RevisedPricing />
+      <RevisedResponsibility />
+      <RevisedManagement />
       <PreFooterCta page="or-one" />
       <SiteFooter/>
       <ScopeTray
