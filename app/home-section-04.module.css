@@ -1,264 +1,173 @@
-/* Homepage section 04 — circular cybersecurity selector.
-   Scoped CSS Module only; app/homepage-v3.css is untouched, per the
-   handoff ("Do not alter... existing global styles"). The old
-   .security-index / .security-orbit rules in that file simply go unused
-   now — nothing here references them. */
+/* Homepage section 04 — approved editorial layout, 2026-09-08.
+   Ported 1:1 from Homepage_04_Approved.html's #ored rules (the approved
+   preview's ID selector) into this CSS Module's .section class. Every
+   value below — colors, clamp()/cqw sizes, spacing, the 540px breakpoint —
+   is copied unchanged from the approved preview; nothing here is a
+   fresh design decision. Element selectors (h2, h3, a, article...) are
+   all nested under .section so nothing leaks globally — CSS Modules only
+   scope class selectors, not bare element selectors. */
 
 .section {
   background: #454a53;
-  color: #f2f2ef;
+  color: #f4f2ed;
   font-family: Arial, Helvetica, sans-serif;
-  padding: 44px 4%;
-  box-sizing: border-box;
+  padding: 28px 28px 24px;
+  container-type: inline-size;
 }
 .section * {
   box-sizing: border-box;
 }
 .eyebrow {
-  font-size: 11px;
-  letter-spacing: 2px;
-  margin: 0 0 22px;
-}
-.layout {
-  display: grid;
-  grid-template-columns: 1fr 1.12fr;
-  gap: 28px;
-  align-items: center;
-}
-.copy h2 {
-  font-size: clamp(30px, 3.2vw, 40px);
-  font-weight: 400;
-  letter-spacing: -1.4px;
-  line-height: 1.08;
-  margin: 0 0 14px;
-}
-.copy h2 span {
-  color: #c0c3c7;
-}
-.intro {
-  font-size: 14px;
-  line-height: 1.6;
-  color: #d5d6d8;
-  margin: 0;
-  max-width: 320px;
-}
-
-/* Reserved-height detail block: sized to the longest of the three
-   offering descriptions (Specialist Engagements' is longest) so
-   switching selection never shifts section height. All three panels
-   below are always in the DOM/HTML — only `hidden` toggles per panel —
-   so this is purely a visual floor, not a content-loading gate. */
-.detail {
-  border-top: 1px solid #737780;
-  margin-top: 26px;
-  padding-top: 18px;
-  min-height: 160px;
-}
-.detail small {
+  margin: 0 0 20px;
   font-size: 10px;
   letter-spacing: 1.7px;
-  color: #e6b49f;
 }
-.detail p {
-  font-size: 14px;
-  line-height: 1.6;
-  min-height: 67px;
-  margin: 12px 0;
+.header {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 30px;
+  align-items: end;
+  margin-bottom: 24px;
 }
-.detail a {
-  color: #f2f2ef;
-  text-decoration: none;
-  font-size: 12px;
-  border-bottom: 1px solid #a4a7ad;
-  padding-bottom: 8px;
-  display: inline-block;
+.section h2 {
+  font-size: clamp(40px, 7cqw, 100px);
+  font-weight: 400;
+  letter-spacing: -0.055em;
+  line-height: 1.01;
+  margin: 0;
 }
-.detail a:hover {
-  border-bottom-color: #f2f2ef;
+.intro {
+  font-size: clamp(13px, 1.3cqw, 18px);
+  line-height: 1.55;
+  margin: 0 0 3px;
+  color: #e1e2e4;
+  max-width: 310px;
 }
-
-/* The circle. Capped at 370px per the handoff's 340-380px guidance
-   (the reference left it unbounded, filling its whole grid column). */
-.wheel {
-  width: 100%;
-  max-width: 370px;
-  margin-left: auto;
-  aspect-ratio: 1;
-  position: relative;
-  border-radius: 50%;
-  border: 1px solid #93969d;
-  /* background is a dynamic conic-gradient set inline per selection */
+.offerings {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid #858a92;
 }
-.hub {
-  position: absolute;
-  inset: 33%;
-  border-radius: 50%;
-  border: 1px solid #93969d;
-  background: #ef4d00;
-  color: #fff;
+.section article {
+  padding: 14px 22px 0;
+  min-width: 0;
+  border-right: 1px solid #858a92;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  font-size: 10px;
+  flex-direction: column;
+}
+.section article:first-child {
+  padding-left: 0;
+}
+.section article:last-child {
+  border-right: 0;
+  padding-right: 0;
+}
+.count {
+  color: #ff681f;
+  font-size: clamp(100px, 20cqw, 280px);
+  letter-spacing: -0.08em;
+  font-weight: 400;
+  line-height: 0.94;
+  margin: 0 0 14px;
+  margin-left: -0.055em;
+}
+.section h3 {
+  font-size: clamp(23px, 3.6cqw, 48px);
+  letter-spacing: -0.045em;
+  font-weight: 400;
+  line-height: 1.06;
+  margin: 0 0 12px;
+  min-height: 2.12em;
+}
+.description {
+  font-size: clamp(13px, 1.3cqw, 18px);
   line-height: 1.5;
-  letter-spacing: 0.3px;
-  pointer-events: none;
+  color: #e1e2e4;
+  margin: 0 0 18px;
+  min-height: 4.5em;
+  max-width: 310px;
 }
-.hub span {
-  display: block;
-  color: #fff;
-  font-size: 9px;
-  margin-top: 5px;
-}
-.sectorButton {
-  position: absolute;
-  background: transparent;
-  color: #e2e3e5;
-  border: 0;
-  padding: 12px 4px;
-  cursor: pointer;
-  width: 38%;
-  font-family: inherit;
-  line-height: 1.3;
-  text-align: left;
-}
-.sectorButton strong {
-  font-size: 39px;
-  font-weight: 400;
-  letter-spacing: -2px;
-  display: block;
-  margin-bottom: 4px;
-}
-.sectorButton span {
-  font-size: 11px;
-  display: block;
-}
-.sectorButton[aria-pressed="true"] {
-  color: #fff;
-}
-.sectorButton[aria-pressed="true"] strong {
-  /* The one deliberate accent: a muted orange on the selected sector's
-     own number only, matching the approved reference exactly. This is
-     the "approved subtle selected treatment" — the sector background
-     itself stays graphite; nothing here fills a sector orange. */
-  color: #ff9d75;
-}
-.sectorButton:hover {
-  color: #fff;
-}
-.sectorButton:focus-visible {
-  outline: 2px solid #ef4d00;
-  outline-offset: 3px;
-}
-.sectorButton[data-index="0"] {
-  left: 59%;
-  top: 21%;
-}
-.sectorButton[data-index="1"] {
-  left: 31%;
-  top: 69%;
-}
-.sectorButton[data-index="2"] {
-  left: 3%;
-  top: 21%;
-}
-
-/* Narrow-phone fallback: hidden by default, swapped in for .wheel only
-   below 360px (see media query at the bottom of this file). */
-.compactButtons {
-  display: none;
-}
-.compactButtons button {
-  width: 100%;
-  text-align: left;
-  background: transparent;
-  color: #e2e3e5;
-  border: 1px solid #6c7075;
-  border-radius: 4px;
-  padding: 14px 16px;
-  font-family: inherit;
-  cursor: pointer;
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-}
-.compactButtons button + button {
-  margin-top: 10px;
-}
-.compactButtons strong {
-  font-size: 22px;
-  font-weight: 400;
-}
-.compactButtons span {
-  font-size: 13px;
-}
-.compactButtons button[aria-pressed="true"] {
-  border-color: #ef4d00;
-  color: #fff;
-}
-.compactButtons button[aria-pressed="true"] strong {
-  color: #ff9d75;
-}
-.compactButtons button:focus-visible {
-  outline: 2px solid #ef4d00;
-  outline-offset: 2px;
-}
-
-.base {
+.section a {
+  font-size: clamp(12px, 1.1cqw, 16px);
+  color: #f4f2ed;
+  text-decoration: none;
+  padding: 13px 0 9px;
+  border-top: 1px solid #858a92;
   display: flex;
   justify-content: space-between;
-  gap: 15px;
-  border-top: 1px solid #737780;
-  margin-top: 28px;
-  padding-top: 14px;
-  color: #c3c6cb;
-  font-size: 10px;
-  letter-spacing: 1px;
+  gap: 8px;
+  margin-top: auto;
+  align-items: center;
+}
+.section a span:last-child {
+  color: #ff8549;
+  font-size: 20px;
+  transition: transform 0.2s;
+}
+.section a:hover {
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+.section a:hover span:last-child {
+  transform: translate(2px, -2px);
 }
 
-@media (max-width: 1000px) {
-  .layout {
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-  }
-}
-
-@media (max-width: 700px) {
+@media (max-width: 540px) {
   .section {
-    padding: 34px 22px;
+    padding: 28px 22px;
   }
-  .layout {
+  .header {
     grid-template-columns: 1fr;
+    gap: 18px;
+    margin-bottom: 28px;
   }
-  .copy h2 {
-    font-size: 34px;
+  .section h2 {
+    font-size: 46px;
   }
   .intro {
+    font-size: 15px;
     max-width: none;
   }
-  .detail {
-    min-height: 145px;
+  .offerings {
+    grid-template-columns: 1fr;
   }
-  .wheel {
-    max-width: 360px;
-    margin: 0 auto;
+  .section article,
+  .section article:first-child,
+  .section article:last-child {
+    padding: 24px 0;
+    border-right: 0;
+    border-bottom: 1px solid #858a92;
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 0 20px;
   }
-  .base {
-    font-size: 9px;
+  .section article:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+  .count {
+    font-size: 102px;
+    grid-row: 1 / 4;
+    margin: 0;
+  }
+  .section h3 {
+    font-size: 31px;
+    min-height: 0;
+    margin-bottom: 13px;
+  }
+  .description {
+    font-size: 14px;
+    min-height: 0;
+    margin-bottom: 18px;
+  }
+  .section a {
+    font-size: 13px;
+    grid-column: 2;
   }
 }
 
-/* Judgment call (flagged to Mohammad): below this, the circle's own
-   sector text ("Specialist Engagements" wrapped inside a ~38%-wide arc
-   of an already-shrunk <360px circle) gets tight enough to justify the
-   plain-button fallback the handoff asks for. Everything 360px and up
-   keeps the circle. Move this number if it looks wrong on a real phone. */
-@media (max-width: 359px) {
-  .wheel {
-    display: none;
-  }
-  .compactButtons {
-    display: block;
+@media (prefers-reduced-motion: reduce) {
+  .section a span:last-child {
+    transition: none;
   }
 }
