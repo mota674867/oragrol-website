@@ -45,21 +45,15 @@ function billingCategory(billing: "monthly" | "one-time" | "per-application") {
   return "One-time";
 }
 
-// Specialist engagement prices are indicative ranges ("$7,500–$18,000"),
-// not fixed figures — final scope and fees are agreed in a proposal, per
-// the handoff's explicit instruction not to imply a guaranteed number.
-// Pulls the two numeric bounds out of the display string into a real
-// schema.org PriceSpecification instead of a single misleading `price`.
-function priceRange(amount: string) {
-  const [minRaw, maxRaw] = amount.split("–");
-  const min = Number(minRaw.replace(/[^0-9.]/g, ""));
-  const maxDigits = maxRaw?.replace(/[^0-9.]/g, "");
-  const max = maxDigits ? Number(maxDigits) : undefined;
+// Specialist engagement prices are "from" starting fees (updated
+// 2026-09-08) — open-ended, not ranges, since final scope/fees are agreed
+// in a proposal. Represented as a PriceSpecification with only minPrice
+// set, which is the correct schema.org shape for a starting-from price.
+function fromPrice(minPrice: number) {
   return {
     "@type": "PriceSpecification",
     priceCurrency: "CAD",
-    minPrice: min,
-    ...(max !== undefined ? { maxPrice: max } : {}),
+    minPrice,
   };
 }
 
@@ -102,10 +96,10 @@ const servicesJsonLd = {
       ...SPECIALIST_ENGAGEMENTS.flatMap((s) =>
         s.prices.map((p) => ({
           "@type": "Offer",
-          name: `${s.name} — ${p.model}`,
+          name: `${s.name} — ${p.label}`,
           description: s.line,
           category: "Specialist Engagement",
-          priceSpecification: priceRange(p.amount),
+          priceSpecification: fromPrice(p.minPrice),
         })),
       ),
     ],

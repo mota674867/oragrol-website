@@ -44,9 +44,52 @@ export const INDIVIDUAL_SERVICES = [
   { code: "C07-S05", name: "Application Security Testing", price: 3500, billing: "per-application", line: "Test an application's security and prioritize the findings." },
 ] as const;
 
+// Specialist engagement pricing (updated 2026-09-08 per Mohammad's review):
+// display as "From $X" starting fees, not ranges — these are ORAGROL's
+// starting fees for a defined scope, not claimed market minimums. `prices`
+// is kept (label + minPrice, open-ended — no maxPrice) for the
+// Service/OfferCatalog JSON-LD in page.tsx; `priceLine`/`secondaryPriceLine`
+// are the display strings shown on the card.
 export const SPECIALIST_ENGAGEMENTS = [
-  { code: "C10-S01", name: "Penetration Testing", line: "A scoped engagement to test for exploitable weaknesses and prioritize remediation.", prices: [{ amount: "$7,500–$18,000", model: "Per engagement · one-time" }] },
-  { code: "C10-S02", name: "SOC 2 Type II Attestation", line: "An engagement with a qualified CPA audit partner, scoped to your organization and reporting needs.", prices: [{ amount: "$8,000–$15,000", model: "One-time setup" }, { amount: "$12,000–$20,000", model: "Annual engagement" }] },
-  { code: "C10-S03", name: "PCI-DSS QSA Assessment", line: "A scoped assessment with a qualified QSA for your payment environment.", prices: [{ amount: "$10,000–$25,000", model: "Annual engagement" }] },
-  { code: "C10-S04", name: "Certified Forensic IR", line: "Specialist forensic investigation and incident response, with scope agreed for the incident.", prices: [{ amount: "$12,000–$30,000", model: "Per incident" }, { amount: "$500–$1,500/mo", model: "Optional retainer · separately scoped" }] },
+  {
+    code: "C10-S01",
+    name: "Penetration Testing",
+    line: "A scoped engagement to test for exploitable weaknesses and prioritize remediation.",
+    priceLine: "From $7,500 per engagement",
+    secondaryPriceLine: undefined as string | undefined,
+    prices: [{ label: "Per engagement", minPrice: 7500 }],
+  },
+  {
+    code: "C10-S02",
+    name: "SOC 2 Type II Attestation",
+    line: "An engagement with a qualified CPA audit partner, scoped to your organization and reporting needs.",
+    // Both fees apply — the "+" is deliberately visible so it reads as
+    // setup ($8,000) plus annual ($12,000), starting at $20,000 in year one,
+    // not a choice between the two.
+    priceLine: "Setup from $8,000 + annual engagement from $12,000",
+    secondaryPriceLine: undefined as string | undefined,
+    prices: [
+      { label: "One-time setup", minPrice: 8000 },
+      { label: "Annual engagement", minPrice: 12000 },
+    ],
+  },
+  {
+    code: "C10-S03",
+    name: "PCI-DSS QSA Assessment",
+    line: "A scoped assessment with a qualified QSA for your payment environment.",
+    priceLine: "From $10,000 per annual engagement",
+    secondaryPriceLine: undefined as string | undefined,
+    prices: [{ label: "Annual engagement", minPrice: 10000 }],
+  },
+  {
+    code: "C10-S04",
+    name: "Certified Forensic IR",
+    line: "Specialist forensic investigation and incident response, with scope agreed for the incident.",
+    priceLine: "From $12,000 per incident",
+    secondaryPriceLine: "Optional retainer from $500/month · separately scoped." as string | undefined,
+    prices: [
+      { label: "Per incident", minPrice: 12000 },
+      { label: "Optional retainer · separately scoped", minPrice: 500 },
+    ],
+  },
 ] as const;
