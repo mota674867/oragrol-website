@@ -101,8 +101,11 @@ export default function OragrolMegaNav({ items, label = "Main navigation", activ
   }, [open, mobileOpen]);
 
   // Close on route change — every item click already calls close(), but
-  // this also covers browser back/forward and the logo link.
+  // this also covers browser back/forward and the logo link. A textbook
+  // "reset state when an external value changes" effect, not something
+  // to restructure away.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- see comment above
     setOpen(null);
     setMobileOpen(false);
   }, [activePath]);

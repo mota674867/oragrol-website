@@ -270,7 +270,7 @@ export default async function ResourceDetailPage({ params }: PageProps) {
             ))}
           </nav>
           <div>
-            <a href="/resources#resource-library">Back to Resources</a>
+            <Link href="/resources#resource-library">Back to Resources</Link>
             <button className="search" aria-label="Search">
               <span />
             </button>

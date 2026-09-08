@@ -346,10 +346,15 @@ function IndustriesClient() {
 
   // Deep-link support for the nav dropdown's per-industry links
   // (/industries#industry-tab-N) — selects the matching industry on load.
+  // Deliberately an effect, not a lazy useState initializer: window.location
+  // isn't available during SSR, and computing this eagerly on the client's
+  // first render would mismatch the server-rendered markup. Running it
+  // post-mount, after hydration, is the correct pattern here.
   useEffect(() => {
     const match = window.location.hash.match(/^#industry-tab-(\d+)$/);
     if (!match) return;
     const index = Number(match[1]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- see comment above
     if (index >= 0 && index < industries.length) setActive(index);
   }, []);
   const move = (e: KeyboardEvent<HTMLDivElement>) => {
