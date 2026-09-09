@@ -171,6 +171,7 @@ function ServicesClient() {
       <ScopeTray
         items={scope.items}
         remove={scope.remove}
+        clear={scope.clear}
         open={trayOpen}
         setOpen={setTrayOpen}
         activeArea="Cybersecurity"

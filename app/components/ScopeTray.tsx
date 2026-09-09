@@ -45,7 +45,12 @@ export function useScope() {
   const toggle = (item: ScopeItem) =>
     setItems((s) => (s.some((x) => x.id === item.id) ? s.filter((x) => x.id !== item.id) : [...s, item]));
   const remove = (id: string) => setItems((s) => s.filter((x) => x.id !== id));
-  return { items, setItems, has, toggle, remove };
+  // Called after a successful PDF download or review submission — the
+  // action is complete, so the scope shouldn't still be sitting there
+  // (and reappearing) on the next page load. The existing persistence
+  // effect above writes this empty array to localStorage automatically.
+  const clear = () => setItems([]);
+  return { items, setItems, has, toggle, remove, clear };
 }
 
 // Required before either action can proceed — name, a syntactically
@@ -160,12 +165,14 @@ type FlowState =
 export function ScopeTray({
   items,
   remove,
+  clear,
   open,
   setOpen,
   activeArea,
 }: {
   items: ScopeItem[];
   remove: (id: string) => void;
+  clear: () => void;
   open: boolean;
   setOpen: (v: boolean) => void;
   activeArea: ScopeArea;
@@ -203,6 +210,7 @@ export function ScopeTray({
       const blob = await pollForPdf(downloadToken);
       triggerBrowserDownload(blob, reference);
       setFlow({ status: "success", intent: "pdf_download", reference, downloadToken });
+      clear();
     } catch (err) {
       setFlow({ status: "error", message: err instanceof Error ? err.message : String(err) });
     }
@@ -215,6 +223,7 @@ export function ScopeTray({
     try {
       const { reference, downloadToken } = await submitScope("review_requested", items, client);
       setFlow({ status: "success", intent: "review_requested", reference, downloadToken });
+      clear();
     } catch (err) {
       setFlow({ status: "error", message: err instanceof Error ? err.message : String(err) });
     }
@@ -265,7 +274,24 @@ export function ScopeTray({
           ))}
         </div>
         <div className="scope-body">
-          {items.length === 0 ? (
+          {flow.status === "success" ? (
+            // Checked before the items.length branch below: items is
+            // cleared on a successful download/submit (see clear() calls
+            // in handleDownload/handleReviewSubmit), so this confirmation
+            // must not depend on items still being present to render.
+            <div className="scope-confirmation-block">
+              <p className="scope-confirmation">
+                {flow.intent === "pdf_download"
+                  ? `Your PDF has been downloaded. Reference: ${flow.reference}.`
+                  : `Your private review request has been received. Reference: ${flow.reference}.`}
+              </p>
+              {flow.intent === "review_requested" && (
+                <button type="button" className="scope-download-copy" onClick={handleDownloadCopyAfterReview}>
+                  Download a copy of your scope PDF
+                </button>
+              )}
+            </div>
+          ) : items.length === 0 ? (
             <div className="scope-empty">
               <span>Begin your scope</span>
               <h3>Choose what your business needs.</h3>
@@ -296,100 +322,85 @@ export function ScopeTray({
                 </section>
               ))}
 
-              {flow.status === "success" ? (
-                <div className="scope-confirmation-block">
-                  <p className="scope-confirmation">
-                    {flow.intent === "pdf_download"
-                      ? `Your PDF has been downloaded. Reference: ${flow.reference}.`
-                      : `Your private review request has been received. Reference: ${flow.reference}.`}
-                  </p>
-                  {flow.intent === "review_requested" && (
-                    <button type="button" className="scope-download-copy" onClick={handleDownloadCopyAfterReview}>
-                      Download a copy of your scope PDF
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <form onSubmit={handleReviewSubmit}>
+              <form onSubmit={handleReviewSubmit}>
+                <label>
+                  Priority or context
+                  <textarea
+                    value={client.context}
+                    onChange={(e) => update("context", e.target.value)}
+                    placeholder="What should improve first?"
+                    disabled={busy}
+                  />
+                </label>
+                <div>
                   <label>
-                    Priority or context
-                    <textarea
-                      value={client.context}
-                      onChange={(e) => update("context", e.target.value)}
-                      placeholder="What should improve first?"
+                    Name
+                    <input required value={client.name} onChange={(e) => update("name", e.target.value)} disabled={busy} />
+                  </label>
+                  <label>
+                    Business email
+                    <input
+                      required
+                      type="email"
+                      value={client.email}
+                      onChange={(e) => update("email", e.target.value)}
                       disabled={busy}
                     />
                   </label>
-                  <div>
-                    <label>
-                      Name
-                      <input required value={client.name} onChange={(e) => update("name", e.target.value)} disabled={busy} />
-                    </label>
-                    <label>
-                      Business email
-                      <input
-                        required
-                        type="email"
-                        value={client.email}
-                        onChange={(e) => update("email", e.target.value)}
-                        disabled={busy}
-                      />
-                    </label>
-                  </div>
-                  <label>
-                    Phone
-                    <input required type="tel" value={client.phone} onChange={(e) => update("phone", e.target.value)} disabled={busy} />
-                  </label>
-                  <label>
-                    Company
-                    <input required value={client.company} onChange={(e) => update("company", e.target.value)} disabled={busy} />
-                  </label>
-                  <label>
-                    Target timeframe <small>(optional)</small>
-                    <select value={client.timeframe} onChange={(e) => update("timeframe", e.target.value)} disabled={busy}>
-                      <option value="">Not specified</option>
-                      <option>Within 30 days</option>
-                      <option>1-3 months</option>
-                      <option>3-6 months</option>
-                      <option>Exploring options</option>
-                    </select>
-                  </label>
-                  <p className="scope-disclosure">{DISCLOSURE_TEXT}</p>
-                  <label className="scope-consent">
-                    <input
-                      required
-                      type="checkbox"
-                      checked={acknowledged}
-                      onChange={(e) => setAcknowledged(e.target.checked)}
-                      disabled={busy}
-                    />{" "}
-                    I have read the above and agree that ORAGROL may contact me about this scope.
-                  </label>
+                </div>
+                <label>
+                  Phone
+                  <input required type="tel" value={client.phone} onChange={(e) => update("phone", e.target.value)} disabled={busy} />
+                </label>
+                <label>
+                  Company
+                  <input required value={client.company} onChange={(e) => update("company", e.target.value)} disabled={busy} />
+                </label>
+                <label>
+                  Target timeframe <small>(optional)</small>
+                  <select value={client.timeframe} onChange={(e) => update("timeframe", e.target.value)} disabled={busy}>
+                    <option value="">Not specified</option>
+                    <option>Within 30 days</option>
+                    <option>1-3 months</option>
+                    <option>3-6 months</option>
+                    <option>Exploring options</option>
+                  </select>
+                </label>
+                <p className="scope-disclosure">{DISCLOSURE_TEXT}</p>
+                <label className="scope-consent">
+                  <input
+                    required
+                    type="checkbox"
+                    checked={acknowledged}
+                    onChange={(e) => setAcknowledged(e.target.checked)}
+                    disabled={busy}
+                  />{" "}
+                  I have read the above and agree that ORAGROL may contact me about this scope.
+                </label>
 
-                  {flow.status === "error" && <p className="scope-error">{flow.message}</p>}
+                {flow.status === "error" && <p className="scope-error">{flow.message}</p>}
 
-                  <div className="scope-actions">
-                    <button className="scope-download" type="button" disabled={!canSubmit || busy} onClick={handleDownload}>
-                      {flow.status === "submitting" && flow.intent === "pdf_download"
-                        ? "Submitting…"
-                        : flow.status === "preparing_pdf"
-                          ? "Preparing your PDF…"
-                          : "Download My Scope PDF"}
-                    </button>
-                    <button className="scope-submit" type="submit" disabled={!canSubmit || busy}>
-                      {flow.status === "submitting" && flow.intent === "review_requested"
-                        ? "Submitting…"
-                        : "Submit for Private Review"}{" "}
-                      <span aria-hidden="true">↗</span>
-                    </button>
-                  </div>
-                  {!ready && items.length > 0 && (
-                    <small className="scope-download-hint">
-                      Enter your name, business email, phone and company above to continue.
-                    </small>
-                  )}
-                </form>
-              )}
+                <div className="scope-actions">
+                  <button className="scope-download" type="button" disabled={!canSubmit || busy} onClick={handleDownload}>
+                    {flow.status === "submitting" && flow.intent === "pdf_download"
+                      ? "Submitting…"
+                      : flow.status === "preparing_pdf"
+                        ? "Preparing your PDF…"
+                        : "Download My Scope PDF"}
+                  </button>
+                  <button className="scope-submit" type="submit" disabled={!canSubmit || busy}>
+                    {flow.status === "submitting" && flow.intent === "review_requested"
+                      ? "Submitting…"
+                      : "Submit for Private Review"}{" "}
+                    <span aria-hidden="true">↗</span>
+                  </button>
+                </div>
+                {!ready && items.length > 0 && (
+                  <small className="scope-download-hint">
+                    Enter your name, business email, phone and company above to continue.
+                  </small>
+                )}
+              </form>
             </>
           )}
         </div>
