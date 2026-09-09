@@ -50,7 +50,13 @@ export async function POST(req: NextRequest) {
       skipped++;
       continue;
     }
-    await publishJobRetry(jobId, job.attempts).catch(() => null);
+    await publishJobRetry(jobId, job.attempts).catch((err) => {
+      console.error(
+        `[scope] QStash publish failed in recovery sweep for job ${jobId} (attempt ${job.attempts}):`,
+        err instanceof Error ? err.message : err,
+      );
+      return null;
+    });
     republished++;
   }
 

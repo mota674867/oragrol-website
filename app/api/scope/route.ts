@@ -100,7 +100,19 @@ export async function POST(req: NextRequest) {
   await Promise.allSettled(
     jobs
       .filter((j) => j.status === "pending")
-      .map((j) => publishJobRetry(j.jobId, j.attempts).catch(() => null)),
+      .map((j) =>
+        publishJobRetry(j.jobId, j.attempts).catch((err) => {
+          // Best-effort by design (see comment above) — the durable
+          // Redis record + recovery sweep is the real guarantee, so we
+          // still don't fail the request on a publish error. But a
+          // silently swallowed error here is undiagnosable, so log it.
+          console.error(
+            `[scope] QStash publish failed for job ${j.jobId} (attempt ${j.attempts}):`,
+            err instanceof Error ? err.message : err,
+          );
+          return null;
+        }),
+      ),
   );
 
   const downloadToken = await createDownloadToken(action.actionId, 60 * 60 * 24); // 24h, matches Resend's own idempotency window as a reasonable, non-arbitrary default — revisit under Section G's retention policy review
