@@ -9,32 +9,38 @@ import { createHash, randomUUID } from "crypto";
  * crash between persistence and publish is recoverable by the sweep in
  * app/api/scope/recover, not lost.
  *
- * Requires REDIS_URL / REDIS_TOKEN — a Vercel Marketplace Upstash Redis
- * REST URL/token (see Section G's provisioning checklist). Not
- * provisioned yet as of this writing; getRedis() below throws a clear,
- * specific error rather than silently no-op'ing if the env vars are
- * missing, so a misconfigured deploy fails loudly instead of pretending
- * to accept submissions it can't actually persist.
+ * Requires REDIS_KV_REST_API_URL / REDIS_KV_REST_API_TOKEN — the exact
+ * names Vercel's Upstash-for-Redis Marketplace integration auto-creates
+ * when connected with a "REDIS" custom prefix (confirmed against the
+ * real Vercel project on 2026-09-09: it also creates a bare REDIS_URL,
+ * but that's a raw rediss:// connection string for TCP clients, not the
+ * HTTPS URL + bearer token pair @upstash/redis's REST client needs —
+ * REDIS_KV_REST_API_URL/TOKEN is the correct pair, not REDIS_URL/TOKEN).
+ * getRedis() below throws a clear, specific error rather than silently
+ * no-op'ing if these are missing, so a misconfigured deploy fails
+ * loudly instead of pretending to accept submissions it can't actually
+ * persist.
  *
- * Honest status: this is real, intended production logic — every
- * operation reasoned through against the spec's crash-recovery
- * requirements — but has NOT been exercised against a live Redis
- * instance (none provisioned in this environment). Section H's
+ * Honest status: Redis itself is now provisioned (2026-09-09), but
+ * QStash is not yet, and no live traffic has exercised this file —
+ * every operation here is reasoned through against the spec's crash-
+ * recovery requirements and typechecks correctly, but Section H's
  * must-pass tests (crash-after-persist-before-publish, concurrent
- * workers, expired lease takeover, etc.) still need to run against the
- * real thing before this is a launch claim, not just a code-complete one.
+ * workers, expired lease takeover, etc.) still need to actually run
+ * before this is a launch claim, not just a code-complete one.
  */
 
 let redisClient: Redis | null = null;
 function getRedis(): Redis {
   if (redisClient) return redisClient;
-  const url = process.env.REDIS_URL;
-  const token = process.env.REDIS_TOKEN;
+  const url = process.env.REDIS_KV_REST_API_URL;
+  const token = process.env.REDIS_KV_REST_API_TOKEN;
   if (!url || !token) {
     throw new Error(
-      "REDIS_URL / REDIS_TOKEN are not configured. My Scope's submission storage cannot function without them — " +
-        "see My_Scope_Final_Ready_For_Claude.md Section G for provisioning. Not falling back to any in-memory " +
-        "substitute here: that would silently accept submissions this process can't actually recover after a crash.",
+      "REDIS_KV_REST_API_URL / REDIS_KV_REST_API_TOKEN are not configured. My Scope's submission storage cannot " +
+        "function without them — see My_Scope_Final_Ready_For_Claude.md Section G for provisioning. Not falling " +
+        "back to any in-memory substitute here: that would silently accept submissions this process can't " +
+        "actually recover after a crash.",
     );
   }
   redisClient = new Redis({ url, token });
