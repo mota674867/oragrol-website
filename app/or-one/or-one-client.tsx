@@ -7,6 +7,7 @@ import PreFooterCta from "../components/site/pre-footer-cta";
 import SiteFooter from "../components/site/footer";
 import OragrolMegaNav from "../components/site/oragrol-mega-nav";
 import { NAV_ITEMS } from "../components/site/nav-items";
+import { OR_ONE_CAPABILITY_BY_NAME } from "../lib/or-one-capability-registry";
 import {
   RevisedProcess,
   RevisedPricing,
@@ -274,12 +275,32 @@ function OrOneClient() {
           title: `${tierFor(points, selectedCategoryCount)} preliminary system`,
           detail: `${selected.size} capabilities selected across ${selectedCategoryCount} categories.`,
           commercial: `${points} / 400 points · ${risks.Standard} standard · ${risks.Controlled} controlled · ${risks.Critical} critical`,
+          // Server-side resolution (app/lib/scope-resolve.ts) reads
+          // this, not `detail`'s count or `title`'s tier name, to
+          // recover the actual selected capabilities — see
+          // My_Scope_Final_Ready_For_Claude.md Section 2's explicit
+          // finding: the old aggregate-count-only item lost the
+          // client's real choices. Unmatched names (should not happen —
+          // `selected` only ever holds names taken directly from
+          // `groups` below — but defensively filtered rather than
+          // trusted) are dropped here with a console warning rather
+          // than silently sent as a bad code the server would reject.
+          capabilityCodes: Array.from(selected)
+            .map((name) => {
+              const cap = OR_ONE_CAPABILITY_BY_NAME.get(name);
+              if (!cap) {
+                console.warn(`[OrOneClient] No registry entry for selected capability "${name}" — omitted from scope submission.`);
+                return null;
+              }
+              return cap.code;
+            })
+            .filter((code): code is string => !!code),
         },
       ];
     });
   }, [
     points,
-    selected.size,
+    selected,
     selectedCategoryCount,
     risks.Standard,
     risks.Controlled,

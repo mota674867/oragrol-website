@@ -234,11 +234,6 @@ export type ScopeResolvedItem = {
   name: string;
 };
 
-export interface ScopeHubSpotSyncResult {
-  contact: { state: "synced" | "failed"; contactId?: string; error?: string };
-  note: { state: "created" | "failed" | "skipped"; error?: string };
-}
-
 // "Automation" internally -> "Business Automation" in any client-facing
 // text (note body, emails), matching Section 4's mapping requirement.
 const AREA_LABEL: Record<ScopeArea, string> = {
@@ -250,30 +245,33 @@ const AREA_LABEL: Record<ScopeArea, string> = {
 // "Selected areas" summary line, independent of selection order.
 const AREA_ORDER: ScopeArea[] = ["Cybersecurity", "Automation", "OR ONE"];
 
-export async function syncScopeLeadToHubSpot(params: {
-  actionId: string;
-  reference: string;
-  intent: "pdf_download" | "review_requested";
-  submittedAt: string; // ISO timestamp, server-generated
-  sourcePath: string;
-  client: { name: string; email: string; phone: string; company: string };
-  items: ScopeResolvedItem[]; // already server-resolved — see scope-schema.ts's header comment
-  context?: string;
-  timeframe?: string;
-  disclosureVersion: string;
-  acknowledgedAt: string; // ISO timestamp
-}): Promise<ScopeHubSpotSyncResult> {
+/**
+ * Split into two independent functions (syncScopeContact / syncScopeNote
+ * + findScopeNoteByActionId) rather than one combined call, per
+ * My_Scope_Final_Ready_For_Claude.md Section C: "Model jobs separately:
+ * ... hubspot_contact, hubspot_note ... note depends on confirmed
+ * contact ID." The job worker (scope-worker.ts) only ever calls
+ * syncScopeNote once hubspot_contact has actually completed with a real
+ * stored contactId — never speculatively in the same call.
+ */
+
+export type ScopeContactSyncResult =
+  | { state: "synced"; contactId: string }
+  | { state: "failed"; error: string };
+
+export async function syncScopeContact(client: {
+  name: string;
+  email: string;
+  phone: string;
+  company: string;
+}): Promise<ScopeContactSyncResult> {
   const token = process.env.HUBSPOT_ACCESS_TOKEN;
   if (!token) {
-    return {
-      contact: { state: "failed", error: "HUBSPOT_ACCESS_TOKEN is not set — skipping CRM sync." },
-      note: { state: "skipped", error: "Contact sync did not run." },
-    };
+    return { state: "failed", error: "HUBSPOT_ACCESS_TOKEN is not set — skipping CRM sync." };
   }
 
-  const { firstName, lastName } = splitName(params.client.name);
+  const { firstName, lastName } = splitName(client.name);
 
-  let contactId: string | undefined;
   try {
     const upsertRes = await fetch(`${HUBSPOT_API_BASE}/crm/v3/objects/contacts/batch/upsert`, {
       method: "POST",
@@ -282,13 +280,13 @@ export async function syncScopeLeadToHubSpot(params: {
         inputs: [
           {
             idProperty: "email",
-            id: params.client.email,
+            id: client.email,
             properties: {
-              email: params.client.email,
+              email: client.email,
               firstname: firstName,
               lastname: lastName,
-              phone: params.client.phone,
-              company: params.client.company,
+              phone: client.phone,
+              company: client.company,
             },
           },
         ],
@@ -297,28 +295,33 @@ export async function syncScopeLeadToHubSpot(params: {
 
     if (!upsertRes.ok) {
       const text = await upsertRes.text().catch(() => "");
-      return {
-        contact: { state: "failed", error: `HubSpot contact upsert failed: ${upsertRes.status} ${text}`.slice(0, 500) },
-        note: { state: "skipped", error: "Contact sync failed." },
-      };
+      return { state: "failed", error: `HubSpot contact upsert failed: ${upsertRes.status} ${text}`.slice(0, 500) };
     }
 
     const upsertData = await upsertRes.json();
-    contactId = upsertData?.results?.[0]?.id;
+    const contactId = upsertData?.results?.[0]?.id;
     if (!contactId) {
-      return {
-        contact: { state: "failed", error: "HubSpot contact upsert returned no contact id." },
-        note: { state: "skipped", error: "Contact sync failed." },
-      };
+      return { state: "failed", error: "HubSpot contact upsert returned no contact id." };
     }
+    return { state: "synced", contactId };
   } catch (err) {
-    return {
-      contact: { state: "failed", error: `HubSpot contact sync threw: ${err instanceof Error ? err.message : String(err)}` },
-      note: { state: "skipped", error: "Contact sync failed." },
-    };
+    return { state: "failed", error: `HubSpot contact sync threw: ${err instanceof Error ? err.message : String(err)}` };
   }
+}
 
-  // Section 7's exact note template.
+export function buildScopeNoteBody(params: {
+  actionId: string;
+  reference: string;
+  intent: "pdf_download" | "review_requested";
+  submittedAt: string;
+  sourcePath: string;
+  client: { name: string; email: string; phone: string; company: string };
+  items: ScopeResolvedItem[];
+  context?: string;
+  timeframe?: string;
+  disclosureVersion: string;
+  acknowledgedAt: string;
+}): string {
   const areasPresent = AREA_ORDER.filter((a) => params.items.some((i) => i.area === a));
   const intentLabel = params.intent === "pdf_download" ? "PDF Download Only" : "Review Requested";
   const priorityLabel =
@@ -354,8 +357,24 @@ export async function syncScopeLeadToHubSpot(params: {
     `Timeframe: ${params.timeframe?.trim() || "Not provided"}`,
     `Disclosure: ${params.disclosureVersion} (acknowledged ${params.acknowledgedAt})`,
   );
-  const noteBody = noteLines.join("\n");
+  return noteLines.join("\n");
+}
 
+export type ScopeNoteSyncResult =
+  | { state: "created"; noteId: string }
+  | { state: "failed"; error: string };
+
+/**
+ * Section E: "embed a stable Action ID in the note body" — done by
+ * buildScopeNoteBody always including "Action ID: {actionId}" as its
+ * own line, which findScopeNoteByActionId (below) greps for during
+ * recovery.
+ */
+export async function syncScopeNote(contactId: string, noteBody: string): Promise<ScopeNoteSyncResult> {
+  const token = process.env.HUBSPOT_ACCESS_TOKEN;
+  if (!token) {
+    return { state: "failed", error: "HUBSPOT_ACCESS_TOKEN is not set — skipping CRM sync." };
+  }
   try {
     const noteRes = await fetch(`${HUBSPOT_API_BASE}/crm/v3/objects/notes`, {
       method: "POST",
@@ -367,23 +386,56 @@ export async function syncScopeLeadToHubSpot(params: {
         ],
       }),
     });
-
     if (!noteRes.ok) {
       const text = await noteRes.text().catch(() => "");
-      return {
-        contact: { state: "synced", contactId },
-        note: { state: "failed", error: `HubSpot note create failed: ${noteRes.status} ${text}`.slice(0, 500) },
-      };
+      return { state: "failed", error: `HubSpot note create failed: ${noteRes.status} ${text}`.slice(0, 500) };
     }
-
-    return {
-      contact: { state: "synced", contactId },
-      note: { state: "created" },
-    };
+    const data = await noteRes.json();
+    const noteId = data?.id;
+    if (!noteId) return { state: "failed", error: "HubSpot note create returned no note id." };
+    return { state: "created", noteId };
   } catch (err) {
-    return {
-      contact: { state: "synced", contactId },
-      note: { state: "failed", error: `HubSpot note sync threw: ${err instanceof Error ? err.message : String(err)}` },
-    };
+    return { state: "failed", error: `HubSpot note sync threw: ${err instanceof Error ? err.message : String(err)}` };
   }
+}
+
+/**
+ * Section E's recovery path: "If the response is lost after possible
+ * creation, first inspect the known contact's associated notes and
+ * match the exact Action ID, paginating as necessary." Returns the
+ * note's real ID if a note containing this exact actionId already
+ * exists on this contact, so the worker can record it as already-done
+ * instead of creating a duplicate. Returns null (not an error) when no
+ * matching note is found — the caller decides what that means (a
+ * genuinely fresh attempt vs. reconciliation_required) based on whether
+ * this is being called after a real ambiguous-response event.
+ */
+export async function findScopeNoteByActionId(contactId: string, actionId: string): Promise<string | null> {
+  const token = process.env.HUBSPOT_ACCESS_TOKEN;
+  if (!token) return null;
+  const needle = `Action ID: ${actionId}`;
+  let after: string | undefined;
+  // Bounded pagination — a contact accumulating unbounded notes over
+  // time shouldn't turn a reconciliation check into an unbounded scan.
+  for (let page = 0; page < 10; page++) {
+    const url = new URL(`${HUBSPOT_API_BASE}/crm/v3/objects/contacts/${contactId}/associations/notes`);
+    if (after) url.searchParams.set("after", after);
+    const assocRes = await fetch(url.toString(), { headers: { Authorization: `Bearer ${token}` } });
+    if (!assocRes.ok) return null;
+    const assocData = await assocRes.json();
+    const noteIds: string[] = (assocData?.results ?? []).map((r: { toObjectId?: string; id?: string }) => r.toObjectId ?? r.id).filter(Boolean);
+    for (const noteId of noteIds) {
+      const noteRes = await fetch(
+        `${HUBSPOT_API_BASE}/crm/v3/objects/notes/${noteId}?properties=hs_note_body`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      if (!noteRes.ok) continue;
+      const noteData = await noteRes.json();
+      const body: string = noteData?.properties?.hs_note_body ?? "";
+      if (body.includes(needle)) return noteId;
+    }
+    after = assocData?.paging?.next?.after;
+    if (!after) break;
+  }
+  return null;
 }

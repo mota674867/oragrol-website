@@ -1,61 +1,402 @@
 "use client";
 
-import {FormEvent,useEffect,useMemo,useState} from "react";
+import { FormEvent, useMemo, useState, useEffect } from "react";
 
-export type ScopeArea="Cybersecurity"|"Automation"|"OR ONE";
-export type ScopeItem={id:string;area:ScopeArea;code:string;title:string;detail:string;commercial?:string};
-const key="oragrol-scope-v2";
+export type ScopeArea = "Cybersecurity" | "Automation" | "OR ONE";
+export type ScopeItem = {
+  id: string;
+  area: ScopeArea;
+  code: string;
+  title: string;
+  detail: string;
+  commercial?: string;
+  /**
+   * OR ONE only: the individual capability codes selected within this
+   * one aggregate scope entry (see app/lib/or-one-capability-registry.ts).
+   * Populated by or-one-client.tsx so the server can resolve real
+   * per-capability identities instead of just a count — see
+   * app/lib/scope-resolve.ts, which is what actually reads this.
+   */
+  capabilityCodes?: string[];
+};
 
-export function useScope(){
- const[items,setItems]=useState<ScopeItem[]>([]);
- // Hydrate from localStorage after mount (client-only; SSR/first paint stays
- // empty on purpose to avoid a hydration mismatch). Kept as GPT built it —
- // infra-only lint suppression, no behavior change.
- // eslint-disable-next-line react-hooks/set-state-in-effect
- useEffect(()=>{try{setItems(JSON.parse(localStorage.getItem(key)||"[]"))}catch{}},[]);
- useEffect(()=>{try{localStorage.setItem(key,JSON.stringify(items))}catch{}},[items]);
- const has=(id:string)=>items.some(x=>x.id===id);
- const toggle=(item:ScopeItem)=>setItems(s=>s.some(x=>x.id===item.id)?s.filter(x=>x.id!==item.id):[...s,item]);
- const remove=(id:string)=>setItems(s=>s.filter(x=>x.id!==id));
- return{items,setItems,has,toggle,remove};
+const key = "oragrol-scope-v2";
+
+export function useScope() {
+  const [items, setItems] = useState<ScopeItem[]>([]);
+  // Hydrate from localStorage after mount (client-only; SSR/first paint stays
+  // empty on purpose to avoid a hydration mismatch).
+  useEffect(() => {
+    try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time localStorage hydration on mount, not a reactive sync loop
+      setItems(JSON.parse(localStorage.getItem(key) || "[]"));
+    } catch {
+      /* ignore malformed localStorage content */
+    }
+  }, []);
+  useEffect(() => {
+    try {
+      localStorage.setItem(key, JSON.stringify(items));
+    } catch {
+      /* storage may be unavailable (private browsing, quota) — non-fatal */
+    }
+  }, [items]);
+  const has = (id: string) => items.some((x) => x.id === id);
+  const toggle = (item: ScopeItem) =>
+    setItems((s) => (s.some((x) => x.id === item.id) ? s.filter((x) => x.id !== item.id) : [...s, item]));
+  const remove = (id: string) => setItems((s) => s.filter((x) => x.id !== id));
+  return { items, setItems, has, toggle, remove };
 }
 
-const clean=(s:string)=>s.replace(/[\u2018\u2019]/g,"'").replace(/[\u2013\u2014]/g,"-").replace(/[^\x20-\x7E]/g," ");
-const esc=(s:string)=>clean(s).replace(/\\/g,"\\\\").replace(/\(/g,"\\(").replace(/\)/g,"\\)");
-function wrap(text:string,max=72){const words=clean(text).split(/\s+/);const lines:string[]=[];let line="";for(const word of words){const next=line?`${line} ${word}`:word;if(next.length>max&&line){lines.push(line);line=word}else line=next}if(line)lines.push(line);return lines}
-// Required before a PDF can be issued at all — name, a syntactically
-// valid email, and a phone number. Company/timeframe/notes stay
-// optional context, same as the CRM submission (see scope-schema.ts on
-// the API side, which enforces the same three fields server-side too —
-// this client check is a UX gate, not the source of truth).
-const emailPattern=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-function isClientReady(client:{name:string;email:string;phone:string}){
- return client.name.trim().length>0 && emailPattern.test(client.email.trim()) && client.phone.trim().length>0;
+// Required before either action can proceed — name, a syntactically
+// valid email, phone, AND company (per My_Scope_Final_Ready_For_Claude.md
+// Section 1: "Both actions collect four REQUIRED fields"). This is a UX
+// gate only; scope-schema.ts enforces the same four fields server-side,
+// which is the actual source of truth.
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+function isClientReady(client: { name: string; email: string; phone: string; company: string }) {
+  return (
+    client.name.trim().length > 0 &&
+    emailPattern.test(client.email.trim()) &&
+    client.phone.trim().length > 0 &&
+    client.company.trim().length > 0
+  );
 }
 
-function premiumPdf(items:ScopeItem[],client:{name:string;email:string;phone:string;company:string;timeframe:string;notes:string}){
- const date=new Date();const ref=`OR-${date.toISOString().slice(0,10).replace(/-/g,"")}-${String(date.getTime()).slice(-5)}`;
- const pages:string[][]=[[]];let page=0,y=720;const add=(line:string)=>pages[page].push(line);const next=()=>{pages.push([]);page++;y=720};
- const text=(value:string,x:number,size=10,color="0.08 0.09 0.10",font="F1")=>add(`${color} rg BT /${font} ${size} Tf ${x} ${y} Td (${esc(value)}) Tj ET`);
- const rule=(yy:number,color="0.82 0.82 0.80")=>add(`${color} RG 0.6 w 44 ${yy} m 551 ${yy} l S`);
- const header=()=>{add("0.08 0.09 0.10 rg 0 760 595 82 re f");add("0.94 0.28 0 rg 0 754 595 6 re f");y=790;text("ORAGROL",44,19,"1 1 1","F2");text("GLOBAL",147,7,"1 1 1","F2");y=774;text("PRIVATE SCOPE BRIEF",420,8,"0.72 0.73 0.74","F2");y=720;};
- header();text("A clearer first conversation.",44,25,"0.08 0.09 0.10","F2");y-=28;text("Preliminary scope prepared from your ORAGROL selections.",44,10,"0.35 0.36 0.37");y-=30;rule(y);y-=25;
- [["SCOPE REFERENCE",ref],["PREPARED",date.toLocaleDateString("en-CA")],["CLIENT",client.name||"Not provided"],["COMPANY",client.company||"Not provided"],["EMAIL",client.email||"Not provided"],["PHONE",client.phone||"Not provided"],["TIMEFRAME",client.timeframe||"Not provided"]].forEach(([a,b])=>{text(a,44,7,"0.94 0.28 0","F2");text(b,180,10);y-=20});
- y-=8;rule(y);y-=28;text("SELECTED SCOPE",44,9,"0.08 0.09 0.10","F2");y-=26;
- items.forEach((item,i)=>{if(y<125){next();header();text("SELECTED SCOPE / CONTINUED",44,9,"0.08 0.09 0.10","F2");y-=28}text(String(i+1).padStart(2,"0"),44,8,"0.94 0.28 0","F2");text(item.area.toUpperCase(),80,7,"0.42 0.43 0.44","F2");text(item.title,180,12,"0.08 0.09 0.10","F2");y-=18;for(const line of wrap(item.detail,62)){text(line,180,8,"0.35 0.36 0.37");y-=11}if(item.commercial){text(item.commercial,180,8,"0.94 0.28 0","F2");y-=14}rule(y);y-=22});
- if(y<190){next();header()}text("CLIENT CONTEXT",44,9,"0.08 0.09 0.10","F2");y-=22;for(const line of wrap(client.notes||"No additional context supplied.",82)){text(line,44,9,"0.30 0.31 0.32");y-=13}y-=18;rule(y);y-=24;text("NEXT STEP",44,8,"0.94 0.28 0","F2");text("ORAGROL will review this preliminary scope before any recommendation or proposal.",135,9);y-=28;text("This document is not a quote or contract. Final scope, feasibility, risk and fees require private review.",44,7,"0.42 0.43 0.44");
- const objects:string[]=[];const pageIds:number[]=[];const contentIds:number[]=[];const font1=3,font2=4;let id=5;pages.forEach(()=>{pageIds.push(id++);contentIds.push(id++)});
- objects[1]="<< /Type /Catalog /Pages 2 0 R >>";objects[2]=`<< /Type /Pages /Kids [${pageIds.map(x=>`${x} 0 R`).join(" ")}] /Count ${pages.length} >>`;objects[3]="<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>";objects[4]="<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>";
- pages.forEach((lines,i)=>{const content=lines.join("\n");objects[pageIds[i]]=`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 ${font1} 0 R /F2 ${font2} 0 R >> >> /Contents ${contentIds[i]} 0 R >>`;objects[contentIds[i]]=`<< /Length ${content.length} >>\nstream\n${content}\nendstream`});
- let pdf="%PDF-1.4\n";const offsets=[0];for(let i=1;i<objects.length;i++){offsets[i]=pdf.length;pdf+=`${i} 0 obj\n${objects[i]}\nendobj\n`}const xref=pdf.length;pdf+=`xref\n0 ${objects.length}\n0000000000 65535 f \n`;for(let i=1;i<objects.length;i++)pdf+=`${String(offsets[i]).padStart(10,"0")} 00000 n \n`;pdf+=`trailer << /Size ${objects.length} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
- const blob=new Blob([pdf],{type:"application/pdf"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`ORAGROL_SCOPE_${ref}.pdf`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+type ClientInfo = {
+  name: string;
+  email: string;
+  phone: string;
+  company: string;
+  timeframe: string; // optional field — never required, per Section 1
+  context: string; // optional field — never required
+};
+
+// Bumps only if the disclosure text below actually changes; recorded
+// server-side per action so a future copy change doesn't retroactively
+// misdescribe what an earlier submitter actually saw and agreed to.
+const DISCLOSURE_VERSION = "2026-09-09";
+const DISCLOSURE_TEXT =
+  "Your name, contact details and selected scope will be shared with ORAGROL to prepare your document and, " +
+  "if you request a review, to follow up with you. This is not a quotation, contract or confirmation of services.";
+
+type SelectionPayload = { id: string; capabilityCodes?: string[] };
+function toSelectionPayload(item: ScopeItem): SelectionPayload {
+  return item.capabilityCodes && item.capabilityCodes.length > 0
+    ? { id: item.id, capabilityCodes: item.capabilityCodes }
+    : { id: item.id };
 }
 
-export function ScopeTray({items,remove,open,setOpen,activeArea}:{items:ScopeItem[];remove:(id:string)=>void;open:boolean;setOpen:(v:boolean)=>void;activeArea:ScopeArea}){
- const[submitted,setSubmitted]=useState(false);const[client,setClient]=useState({name:"",email:"",phone:"",company:"",timeframe:"",notes:""});
- const ready=isClientReady(client);
- const grouped=useMemo(()=>["Cybersecurity","Automation","OR ONE"].map(area=>({area,items:items.filter(x=>x.area===area)})).filter(x=>x.items.length),[items]);
- const update=(name:string,value:string)=>setClient(s=>({...s,[name]:value}));
- const submit=(e:FormEvent)=>{e.preventDefault();setSubmitted(true)};
- return <><button className="scope-launcher" onClick={()=>setOpen(true)}><span>MY SCOPE</span><b>{String(items.length).padStart(2,"0")}</b></button>{open&&<div className="scope-scrim" onClick={()=>setOpen(false)}/>}<aside className={open?"scope-tray open":"scope-tray"} aria-hidden={!open}><div className="scope-or" aria-hidden="true">OR</div><header><div><span>ORAGROL / PRIVATE SCOPE</span><strong>{String(items.length).padStart(2,"0")} SELECTED</strong></div><button onClick={()=>setOpen(false)} aria-label="Close scope tray">×</button></header><div className="scope-rail">{(["Cybersecurity","Automation","OR ONE"] as ScopeArea[]).map((a,i)=><span className={a===activeArea?"current":""} key={a}>{i>0&&<i/>}{a.toUpperCase()}</span>)}</div><div className="scope-body">{items.length===0?<div className="scope-empty"><span>Begin your scope</span><h3>Choose what your business needs.</h3><p>Your selections stay together across Services, Business Automation and OR ONE.</p></div>:<><section className="scope-summary"><span>PRELIMINARY SCOPE</span><h3>A clearer first conversation.</h3><p>Review your selections, add context, then save a branded PDF or submit for private review.</p></section>{grouped.map(group=><section className="scope-group" key={group.area}><h4>{group.area}</h4>{group.items.map(item=><article key={item.id}><span>{item.code}</span><div><b>{item.title}</b><small>{item.commercial||item.detail}</small></div><button onClick={()=>remove(item.id)}>Remove</button></article>)}</section>)}<form onSubmit={submit}><label>Priority or context<textarea value={client.notes} onChange={e=>update("notes",e.target.value)} placeholder="What should improve first?"/></label><div><label>Name<input required value={client.name} onChange={e=>update("name",e.target.value)}/></label><label>Business email<input required type="email" value={client.email} onChange={e=>update("email",e.target.value)}/></label></div><label>Phone<input required type="tel" value={client.phone} onChange={e=>update("phone",e.target.value)}/></label><label>Company<input required value={client.company} onChange={e=>update("company",e.target.value)}/></label><label>Target timeframe<select required value={client.timeframe} onChange={e=>update("timeframe",e.target.value)}><option value="" disabled>Select</option><option>Within 30 days</option><option>1-3 months</option><option>3-6 months</option><option>Exploring options</option></select></label><label className="scope-consent"><input required type="checkbox"/> I agree that ORAGROL may contact me about this scope.</label><button className="scope-submit" type="submit">Submit for Private Review <span>↗</span></button>{submitted&&<p className="scope-confirmation">Scope prepared. A live CRM and email connection will be activated before launch.</p>}</form></>}</div><footer><div className="scope-download"><button disabled={!items.length||!ready} title={!items.length?"Select at least one item first":!ready?"Enter your name, business email and phone number first":undefined} onClick={()=>premiumPdf(items,client)}>Download Branded PDF</button>{items.length>0&&!ready&&<small className="scope-download-hint">Enter your name, email and phone above to unlock the PDF.</small>}</div><button onClick={()=>setOpen(false)}>Continue browsing</button></footer></aside></>;
+type ScopeApiResponse = { reference: string; actionId: string; downloadToken: string };
+
+async function submitScope(
+  intent: "pdf_download" | "review_requested",
+  items: ScopeItem[],
+  client: ClientInfo,
+): Promise<ScopeApiResponse> {
+  const requestId = crypto.randomUUID();
+  const res = await fetch("/api/scope", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      requestId,
+      intent,
+      name: client.name.trim(),
+      email: client.email.trim(),
+      phone: client.phone.trim(),
+      company: client.company.trim(),
+      timeframe: client.timeframe.trim() || undefined,
+      context: client.context.trim() || undefined,
+      selections: items.map(toSelectionPayload),
+      sourcePath: window.location.pathname,
+      disclosureVersion: DISCLOSURE_VERSION,
+      acknowledged: true, // this function is only ever called after the checkbox is confirmed checked — see the two handlers below
+    }),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body?.error || `Request failed (${res.status}).`);
+  }
+  return res.json();
+}
+
+/**
+ * The PDF is generated by an async job (scope-worker.ts's
+ * pdf_generation handler), not synchronously in the POST response —
+ * poll the protected download endpoint until it's ready. 202 = still
+ * generating, 200 = ready, anything else = a real error worth stopping
+ * on rather than retrying forever.
+ */
+async function pollForPdf(downloadToken: string, maxAttempts = 20, intervalMs = 1500): Promise<Blob> {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const res = await fetch(`/api/scope/download?token=${encodeURIComponent(downloadToken)}`);
+    if (res.status === 200) return res.blob();
+    if (res.status !== 202) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body?.error || `Download failed (${res.status}).`);
+    }
+    await new Promise((r) => setTimeout(r, intervalMs));
+  }
+  throw new Error("Your PDF is taking longer than expected to prepare. Please try again shortly.");
+}
+
+function triggerBrowserDownload(blob: Blob, reference: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `ORAGROL_My_Scope_${reference}.pdf`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+type FlowState =
+  | { status: "idle" }
+  | { status: "submitting"; intent: "pdf_download" | "review_requested" }
+  | { status: "preparing_pdf" }
+  | { status: "success"; intent: "pdf_download" | "review_requested"; reference: string; downloadToken: string }
+  | { status: "error"; message: string };
+
+export function ScopeTray({
+  items,
+  remove,
+  open,
+  setOpen,
+  activeArea,
+}: {
+  items: ScopeItem[];
+  remove: (id: string) => void;
+  open: boolean;
+  setOpen: (v: boolean) => void;
+  activeArea: ScopeArea;
+}) {
+  const [client, setClient] = useState<ClientInfo>({
+    name: "",
+    email: "",
+    phone: "",
+    company: "",
+    timeframe: "",
+    context: "",
+  });
+  const [acknowledged, setAcknowledged] = useState(false);
+  const [flow, setFlow] = useState<FlowState>({ status: "idle" });
+
+  const ready = isClientReady(client);
+  const canSubmit = ready && acknowledged && items.length > 0;
+
+  const grouped = useMemo(
+    () =>
+      (["Cybersecurity", "Automation", "OR ONE"] as ScopeArea[])
+        .map((area) => ({ area, items: items.filter((x) => x.area === area) }))
+        .filter((x) => x.items.length),
+    [items],
+  );
+
+  const update = (name: keyof ClientInfo, value: string) => setClient((s) => ({ ...s, [name]: value }));
+
+  const handleDownload = async () => {
+    if (!canSubmit) return;
+    setFlow({ status: "submitting", intent: "pdf_download" });
+    try {
+      const { reference, downloadToken } = await submitScope("pdf_download", items, client);
+      setFlow({ status: "preparing_pdf" });
+      const blob = await pollForPdf(downloadToken);
+      triggerBrowserDownload(blob, reference);
+      setFlow({ status: "success", intent: "pdf_download", reference, downloadToken });
+    } catch (err) {
+      setFlow({ status: "error", message: err instanceof Error ? err.message : String(err) });
+    }
+  };
+
+  const handleReviewSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!canSubmit) return;
+    setFlow({ status: "submitting", intent: "review_requested" });
+    try {
+      const { reference, downloadToken } = await submitScope("review_requested", items, client);
+      setFlow({ status: "success", intent: "review_requested", reference, downloadToken });
+    } catch (err) {
+      setFlow({ status: "error", message: err instanceof Error ? err.message : String(err) });
+    }
+  };
+
+  // Section 1: "a review after a download creates a distinct review
+  // event" — a fresh requestId is generated inside submitScope() on
+  // every call, so a review submitted after an earlier download is
+  // never mistaken by the server for a retry of that download.
+  const handleDownloadCopyAfterReview = async () => {
+    if (flow.status !== "success") return;
+    try {
+      const blob = await pollForPdf(flow.downloadToken);
+      triggerBrowserDownload(blob, flow.reference);
+    } catch (err) {
+      setFlow({ status: "error", message: err instanceof Error ? err.message : String(err) });
+    }
+  };
+
+  const busy = flow.status === "submitting" || flow.status === "preparing_pdf";
+
+  return (
+    <>
+      <button className="scope-launcher" onClick={() => setOpen(true)}>
+        <span>MY SCOPE</span>
+        <b>{String(items.length).padStart(2, "0")}</b>
+      </button>
+      {open && <div className="scope-scrim" onClick={() => setOpen(false)} />}
+      <aside className={open ? "scope-tray open" : "scope-tray"} aria-hidden={!open}>
+        <div className="scope-or" aria-hidden="true">
+          OR
+        </div>
+        <header>
+          <div>
+            <span>ORAGROL / PRIVATE SCOPE</span>
+            <strong>{String(items.length).padStart(2, "0")} SELECTED</strong>
+          </div>
+          <button onClick={() => setOpen(false)} aria-label="Close scope tray">
+            ×
+          </button>
+        </header>
+        <div className="scope-rail">
+          {(["Cybersecurity", "Automation", "OR ONE"] as ScopeArea[]).map((a, i) => (
+            <span className={a === activeArea ? "current" : ""} key={a}>
+              {i > 0 && <i />}
+              {a.toUpperCase()}
+            </span>
+          ))}
+        </div>
+        <div className="scope-body">
+          {items.length === 0 ? (
+            <div className="scope-empty">
+              <span>Begin your scope</span>
+              <h3>Choose what your business needs.</h3>
+              <p>Your selections stay together across Services, Business Automation and OR ONE.</p>
+            </div>
+          ) : (
+            <>
+              <section className="scope-summary">
+                <span>PRELIMINARY SCOPE</span>
+                <h3>A clearer first conversation.</h3>
+                <p>Review your selections, add context, then download a PDF or submit for private review.</p>
+              </section>
+              {grouped.map((group) => (
+                <section className="scope-group" key={group.area}>
+                  <h4>{group.area}</h4>
+                  {group.items.map((item) => (
+                    <article key={item.id}>
+                      <span>{item.code}</span>
+                      <div>
+                        <b>{item.title}</b>
+                        <small>{item.commercial || item.detail}</small>
+                      </div>
+                      <button onClick={() => remove(item.id)} disabled={busy}>
+                        Remove
+                      </button>
+                    </article>
+                  ))}
+                </section>
+              ))}
+
+              {flow.status === "success" ? (
+                <div className="scope-confirmation-block">
+                  <p className="scope-confirmation">
+                    {flow.intent === "pdf_download"
+                      ? `Your PDF has been downloaded. Reference: ${flow.reference}.`
+                      : `Your private review request has been received. Reference: ${flow.reference}.`}
+                  </p>
+                  {flow.intent === "review_requested" && (
+                    <button type="button" className="scope-download-copy" onClick={handleDownloadCopyAfterReview}>
+                      Download a copy of your scope PDF
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <form onSubmit={handleReviewSubmit}>
+                  <label>
+                    Priority or context
+                    <textarea
+                      value={client.context}
+                      onChange={(e) => update("context", e.target.value)}
+                      placeholder="What should improve first?"
+                      disabled={busy}
+                    />
+                  </label>
+                  <div>
+                    <label>
+                      Name
+                      <input required value={client.name} onChange={(e) => update("name", e.target.value)} disabled={busy} />
+                    </label>
+                    <label>
+                      Business email
+                      <input
+                        required
+                        type="email"
+                        value={client.email}
+                        onChange={(e) => update("email", e.target.value)}
+                        disabled={busy}
+                      />
+                    </label>
+                  </div>
+                  <label>
+                    Phone
+                    <input required type="tel" value={client.phone} onChange={(e) => update("phone", e.target.value)} disabled={busy} />
+                  </label>
+                  <label>
+                    Company
+                    <input required value={client.company} onChange={(e) => update("company", e.target.value)} disabled={busy} />
+                  </label>
+                  <label>
+                    Target timeframe <small>(optional)</small>
+                    <select value={client.timeframe} onChange={(e) => update("timeframe", e.target.value)} disabled={busy}>
+                      <option value="">Not specified</option>
+                      <option>Within 30 days</option>
+                      <option>1-3 months</option>
+                      <option>3-6 months</option>
+                      <option>Exploring options</option>
+                    </select>
+                  </label>
+                  <p className="scope-disclosure">{DISCLOSURE_TEXT}</p>
+                  <label className="scope-consent">
+                    <input
+                      required
+                      type="checkbox"
+                      checked={acknowledged}
+                      onChange={(e) => setAcknowledged(e.target.checked)}
+                      disabled={busy}
+                    />{" "}
+                    I have read the above and agree that ORAGROL may contact me about this scope.
+                  </label>
+
+                  {flow.status === "error" && <p className="scope-error">{flow.message}</p>}
+
+                  <div className="scope-actions">
+                    <button className="scope-download" type="button" disabled={!canSubmit || busy} onClick={handleDownload}>
+                      {flow.status === "submitting" && flow.intent === "pdf_download"
+                        ? "Submitting…"
+                        : flow.status === "preparing_pdf"
+                          ? "Preparing your PDF…"
+                          : "Download My Scope PDF"}
+                    </button>
+                    <button className="scope-submit" type="submit" disabled={!canSubmit || busy}>
+                      {flow.status === "submitting" && flow.intent === "review_requested"
+                        ? "Submitting…"
+                        : "Submit for Private Review"}{" "}
+                      <span aria-hidden="true">↗</span>
+                    </button>
+                  </div>
+                  {!ready && items.length > 0 && (
+                    <small className="scope-download-hint">
+                      Enter your name, business email, phone and company above to continue.
+                    </small>
+                  )}
+                </form>
+              )}
+            </>
+          )}
+        </div>
+        <footer>
+          <button onClick={() => setOpen(false)}>Continue browsing</button>
+        </footer>
+      </aside>
+    </>
+  );
 }
