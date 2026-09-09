@@ -126,8 +126,27 @@ const kEmailIdempotency = (actionId: string, role: "client" | "internal") =>
   `${PREFIX}email:${actionId}:${role}`;
 const kDownloadToken = (token: string) => `${PREFIX}download:${token}`;
 
-export function hashPayload(payload: unknown): string {
-  return createHash("sha256").update(JSON.stringify(payload)).digest("hex");
+/**
+ * Real bug, found via a live test against the actual deployed Redis:
+ * @upstash/redis's HSET rejects any field with an `undefined` value
+ * ("ERR null args are not supported") — and every record type here
+ * (ScopeActionRecord's timeframe/context/pdfChecksum, ScopeJobRecord's
+ * leaseOwner/leaseExpiresAt/lastError/providerId/firstAttemptAt) has
+ * legitimately-optional fields that start out undefined. Every single
+ * hset call site below needs this, not just the one the live test
+ * happened to hit first — swept all of them together rather than
+ * patching one call site and finding the next one via another failed
+ * live request.
+ */
+function stripUndefined<T extends Record<string, unknown>>(obj: T): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (v !== undefined) out[k] = v;
+  }
+  return out;
+}
+
+export function hashPayload(payload: unknown): string {  return createHash("sha256").update(JSON.stringify(payload)).digest("hex");
 }
 
 export function newReference(): string {
@@ -202,9 +221,9 @@ export async function createActionAtomically(
 
   const tx = redis.multi();
   tx.set(kRequestId(input.requestId), actionId);
-  tx.hset(kAction(actionId), action as unknown as Record<string, unknown>);
+  tx.hset(kAction(actionId), stripUndefined(action as unknown as Record<string, unknown>));
   for (const job of jobs) {
-    tx.hset(kJob(job.jobId), job as unknown as Record<string, unknown>);
+    tx.hset(kJob(job.jobId), stripUndefined(job as unknown as Record<string, unknown>));
     tx.sadd(kActionJobs(actionId), job.jobId);
     tx.zadd(kDueIndex, { score: job.nextAttemptAt, member: job.jobId });
   }
@@ -266,7 +285,7 @@ export async function claimJob(
     leaseExpiresAt: now + leaseMs,
     firstAttemptAt: job.firstAttemptAt ?? now,
   };
-  await redis.hset(kJob(jobId), updated as unknown as Record<string, unknown>);
+  await redis.hset(kJob(jobId), stripUndefined(updated as unknown as Record<string, unknown>));
   return { claimed: true, owner, job: updated };
 }
 
@@ -291,7 +310,7 @@ export async function completeJob(jobId: string, owner: string, providerId?: str
     providerId: providerId ?? job.providerId,
   };
   const tx = redis.multi();
-  tx.hset(kJob(jobId), updated as unknown as Record<string, unknown>);
+  tx.hset(kJob(jobId), stripUndefined(updated as unknown as Record<string, unknown>));
   tx.zrem(kDueIndex, jobId);
   await tx.exec();
 }
@@ -317,7 +336,7 @@ export async function scheduleRetry(jobId: string, owner: string, error: string)
       lastError: error.slice(0, 500),
     };
     const tx = redis.multi();
-    tx.hset(kJob(jobId), updated as unknown as Record<string, unknown>);
+    tx.hset(kJob(jobId), stripUndefined(updated as unknown as Record<string, unknown>));
     tx.zrem(kDueIndex, jobId); // stop scheduling — needs a human
     await tx.exec();
     return updated;
@@ -335,7 +354,7 @@ export async function scheduleRetry(jobId: string, owner: string, error: string)
     lastError: error.slice(0, 500),
   };
   const tx = redis.multi();
-  tx.hset(kJob(jobId), updated as unknown as Record<string, unknown>);
+  tx.hset(kJob(jobId), stripUndefined(updated as unknown as Record<string, unknown>));
   tx.zadd(kDueIndex, { score: nextAttemptAt, member: jobId });
   await tx.exec();
   return updated;
@@ -352,7 +371,7 @@ export async function markReconciliationRequired(jobId: string, owner: string, r
     lastError: reason.slice(0, 500),
   };
   const tx = redis.multi();
-  tx.hset(kJob(jobId), updated as unknown as Record<string, unknown>);
+  tx.hset(kJob(jobId), stripUndefined(updated as unknown as Record<string, unknown>));
   tx.zrem(kDueIndex, jobId); // needs a human look, not another automatic attempt
   await tx.exec();
 }
@@ -388,7 +407,7 @@ export async function addFollowUpJob(actionId: string, type: ScopeJobType): Prom
     nextAttemptAt: Date.now(),
   };
   const tx = redis.multi();
-  tx.hset(kJob(job.jobId), job as unknown as Record<string, unknown>);
+  tx.hset(kJob(job.jobId), stripUndefined(job as unknown as Record<string, unknown>));
   tx.sadd(kActionJobs(actionId), job.jobId);
   tx.zadd(kDueIndex, { score: job.nextAttemptAt, member: job.jobId });
   await tx.exec();
@@ -397,7 +416,7 @@ export async function addFollowUpJob(actionId: string, type: ScopeJobType): Prom
 
 export async function updateAction(actionId: string, patch: Partial<ScopeActionRecord>): Promise<void> {
   const redis = getRedis();
-  await redis.hset(kAction(actionId), patch as unknown as Record<string, unknown>);
+  await redis.hset(kAction(actionId), stripUndefined(patch as unknown as Record<string, unknown>));
 }
 
 // --- PDF artifact storage ---------------------------------------------
@@ -446,7 +465,7 @@ export async function getOrCreateEmailIdempotency(
     payloadHash,
     firstAttemptAt: Date.now(),
   };
-  await redis.hset(key, record as unknown as Record<string, unknown>);
+  await redis.hset(key, stripUndefined(record as unknown as Record<string, unknown>));
   return record;
 }
 
