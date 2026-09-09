@@ -248,7 +248,12 @@ export async function getActionJobs(actionId: string): Promise<ScopeJobRecord[]>
   const redis = getRedis();
   const jobIds = await redis.smembers(kActionJobs(actionId));
   if (!jobIds.length) return [];
-  const jobs = await redis.mget<ScopeJobRecord[]>(...jobIds.map((id) => kJob(id)));
+  // Job records are Hashes (see getJob/addFollowUpJob's hset calls) —
+  // MGET only works on String-type keys and silently returns nil for
+  // every Hash key rather than erroring, which meant this function
+  // always returned an empty array no matter what. Fetch each job the
+  // same way getJob() does.
+  const jobs = await Promise.all(jobIds.map((id) => getJob(id)));
   return jobs.filter((j): j is ScopeJobRecord => !!j);
 }
 
