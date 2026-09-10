@@ -81,7 +81,14 @@ export interface CyberHealthReport {
 
 const SEVERITY_RANK: Record<Severity, number> = { Critical: 4, High: 3, Medium: 2, Low: 1 };
 
-function visibleQuestions(platform: string) {
+// Bumped manually whenever the scoring formula/weights/FINDINGS content
+// changes in a way that would make an older report's numbers not
+// reproducible from current rules. Used only for record-keeping (the
+// HubSpot amendment stamps this on each assessment snapshot) — never
+// invent a historical value for a report generated before this existed.
+export const SCORING_VERSION = "2026-09-10-v1";
+
+export function visibleQuestions(platform: string) {
   return questions.filter((q) =>
     platform === "Google Workspace" ? !/^Q08-[12]$/.test(q.id) : !q.id.includes("-GWS"),
   );

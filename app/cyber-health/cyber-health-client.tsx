@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import {useMemo,useRef,useState} from "react";
-import {categories,questions,sections} from "./assessment-data";
+import {categories,questions,sections,qualification} from "./assessment-data";
 import SiteFooter from "../components/site/footer";
 import "../gpt-pages.css";
 
@@ -10,12 +10,6 @@ type Stage="intro"|"profile"|"qualify"|"assessment"|"result";
 type Profile={company:string;industry:string;province:string;employees:string;platform:string;name:string;email:string;phone:string};
 const industries=["Retail","Professional Services","Healthcare","Construction","Manufacturing","Hospitality","Non-Profit","Other"];
 const provinces=["Alberta","British Columbia","Manitoba","New Brunswick","Newfoundland and Labrador","Northwest Territories","Nova Scotia","Nunavut","Ontario","Prince Edward Island","Quebec","Saskatchewan","Yukon","Other"];
-const qualification=[
-  {id:"business",label:"Do you represent a business?",choices:["Yes","No","Not sure"]},
-  {id:"decision",label:"Are you responsible for IT or cybersecurity decisions at your business?",choices:["Yes","No","Not sure"]},
-  {id:"budget",label:"What's your rough budget range for improving cybersecurity in the next 12 months?",choices:["Under $2,000","$2,000–$10,000","$10,000+","Not sure yet"]},
-  {id:"timing",label:"When are you looking to make security improvements?",choices:["Immediately","Within 3 months","Within 6 months","Just researching"]},
-] as const;
 
 type ReportStatus="idle"|"sending"|"sent"|"error";
 
