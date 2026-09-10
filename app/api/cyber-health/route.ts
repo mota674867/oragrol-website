@@ -2,14 +2,22 @@ import { renderToBuffer } from "@react-pdf/renderer";
 import { NextResponse } from "next/server";
 import QRCode from "qrcode";
 import { Resend } from "resend";
+import { randomUUID } from "crypto";
 import CyberHealthPdfReport from "../../cyber-health/pdf-report";
 import { buildPdfReportData } from "../../cyber-health/pdf-report-adapter";
 import { getClientIp, rateLimit } from "../../lib/rate-limit";
 import { buildCyberHealthReport } from "../../lib/cyber-health-report";
 import { getCyberHealthReportPhotos } from "../../lib/cyber-health-photos";
 import { cyberHealthSubmissionSchema } from "../../lib/cyber-health-schema";
-import { syncCyberHealthLeadToHubSpot } from "../../lib/hubspot";
 import { SITE_URL } from "../../lib/site-config";
+import { buildAssessmentSnapshot } from "../../lib/cyber-health-hubspot-snapshot";
+import {
+  storeAssessmentSnapshot,
+  recordAssessmentInLedger,
+  createContactJob,
+  normalizeContactIdentity,
+} from "../../lib/cyber-health-hubspot-store";
+import { publishCyberHealthJobRetry } from "../../lib/cyber-health-hubspot-qstash";
 
 /**
  * POST /api/cyber-health — the Cyber Health assessment's real completion
@@ -173,17 +181,34 @@ export async function POST(request: Request) {
     console.error("[/api/cyber-health] Unexpected error sending lead notification (client report already sent successfully):", err);
   }
 
-  // 3) HubSpot sync — best-effort, never blocks the response's success.
-  // Awaited (not fire-and-forget): a serverless function can be frozen
-  // the instant it returns, so an un-awaited call here risks never
-  // actually completing.
+  // 3) HubSpot sync — durable job queue, per
+  // Cyber_Health_HubSpot_Claude_Handoff.md. Persist the full validated
+  // snapshot and record the assessment ledger entry BEFORE creating
+  // any job or attempting a publish — a crash right here is then
+  // recoverable by the recovery sweep, not lost. Best-effort from the
+  // response's point of view (never blocks/fails the request, same as
+  // before), but no longer silently reports success on a partial
+  // failure — a genuine CRM outage now leaves a visible pending job in
+  // Redis instead of pretending the sync happened.
   try {
-    const hubspotResult = await syncCyberHealthLeadToHubSpot(report);
-    if (!hubspotResult.ok || hubspotResult.error) {
-      console.error("[/api/cyber-health] HubSpot sync issue:", hubspotResult.error);
-    }
+    const assessmentId = randomUUID();
+    const snapshot = buildAssessmentSnapshot(assessmentId, report, parsed.data, "/cyber-health");
+    await storeAssessmentSnapshot(assessmentId, JSON.stringify(snapshot));
+    await recordAssessmentInLedger(
+      normalizeContactIdentity(profile.email),
+      assessmentId,
+      Date.parse(snapshot.completedAt),
+    );
+    const job = await createContactJob(assessmentId);
+    await publishCyberHealthJobRetry(job.jobId, job.attempts).catch((err) => {
+      console.error(
+        `[/api/cyber-health] QStash publish failed for cha_contact job ${job.jobId} (assessment ${assessmentId}):`,
+        err instanceof Error ? err.message : err,
+      );
+      return null;
+    });
   } catch (err) {
-    console.error("[/api/cyber-health] HubSpot sync threw unexpectedly:", err);
+    console.error("[/api/cyber-health] HubSpot job creation failed unexpectedly:", err);
   }
 
   return NextResponse.json({ ok: true, reportId: report.reportId, clientReference: report.clientReference });

@@ -259,6 +259,285 @@ export type ScopeContactSyncResult =
   | { state: "synced"; contactId: string }
   | { state: "failed"; error: string };
 
+// --- Cyber Health HubSpot amendment ------------------------------------
+// Per Cyber_Health_HubSpot_Claude_Handoff.md. Deliberately separate from
+// syncCyberHealthLeadToHubSpot above (left in place, unused by the new
+// durable-job path in cyber-health-hubspot-worker.ts) rather than
+// modified in place — the old function's ok:true-on-note-failure
+// behavior is exactly what this amendment exists to fix, and touching
+// it risks the working PDF/email flow this amendment must not disturb.
+// Same upsert-by-email + note-with-embedded-marker + search-to-
+// reconcile pattern as syncScopeContact/syncScopeNote/
+// findScopeNoteByActionId above — proven against real My Scope traffic.
+
+export type CyberHealthContactSyncResult =
+  | { state: "synced"; contactId: string }
+  | { state: "failed"; error: string };
+
+export async function syncCyberHealthContact(profile: {
+  name: string;
+  email: string;
+  phone: string;
+  company: string;
+}): Promise<CyberHealthContactSyncResult> {
+  const token = process.env.HUBSPOT_ACCESS_TOKEN;
+  if (!token) {
+    return { state: "failed", error: "HUBSPOT_ACCESS_TOKEN is not set — skipping CRM sync." };
+  }
+  const { firstName, lastName } = splitName(profile.name);
+  try {
+    const upsertRes = await fetch(`${HUBSPOT_API_BASE}/crm/v3/objects/contacts/batch/upsert`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        inputs: [
+          {
+            idProperty: "email",
+            id: profile.email,
+            properties: {
+              email: profile.email,
+              firstname: firstName,
+              lastname: lastName,
+              phone: profile.phone,
+              company: profile.company,
+            },
+          },
+        ],
+      }),
+    });
+    if (!upsertRes.ok) {
+      const text = await upsertRes.text().catch(() => "");
+      return { state: "failed", error: `HubSpot contact upsert failed: ${upsertRes.status} ${text}`.slice(0, 500) };
+    }
+    const upsertData = await upsertRes.json();
+    const contactId = upsertData?.results?.[0]?.id;
+    if (!contactId) return { state: "failed", error: "HubSpot contact upsert returned no contact id." };
+    return { state: "synced", contactId };
+  } catch (err) {
+    return { state: "failed", error: `HubSpot contact sync threw: ${err instanceof Error ? err.message : String(err)}` };
+  }
+}
+
+export type CyberHealthNoteSyncResult =
+  | { state: "created"; noteId: string }
+  | { state: "failed"; error: string };
+
+/**
+ * Creates ONE note part. html/plainText/marker come from
+ * formatAssessmentNotes() in cyber-health-hubspot-note.ts — this
+ * function does no formatting itself, only the HubSpot call. The
+ * marker is embedded in hs_note_body (inside the HTML) so
+ * findCyberHealthNoteByMarker can grep for it during reconciliation,
+ * same principle as My Scope's "Action ID: {actionId}" line.
+ */
+export async function createCyberHealthNote(
+  contactId: string,
+  html: string,
+  timestampMs: number,
+): Promise<CyberHealthNoteSyncResult> {
+  const token = process.env.HUBSPOT_ACCESS_TOKEN;
+  if (!token) {
+    return { state: "failed", error: "HUBSPOT_ACCESS_TOKEN is not set — skipping CRM sync." };
+  }
+  try {
+    const noteRes = await fetch(`${HUBSPOT_API_BASE}/crm/v3/objects/notes`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        properties: { hs_note_body: html, hs_timestamp: timestampMs },
+        associations: [
+          { to: { id: contactId }, types: [{ associationCategory: "HUBSPOT_DEFINED", associationTypeId: 202 }] },
+        ],
+      }),
+    });
+    if (!noteRes.ok) {
+      const text = await noteRes.text().catch(() => "");
+      return { state: "failed", error: `HubSpot note create failed: ${noteRes.status} ${text}`.slice(0, 500) };
+    }
+    const data = await noteRes.json();
+    const noteId = data?.id;
+    if (!noteId) return { state: "failed", error: "HubSpot note create returned no note id." };
+    return { state: "created", noteId };
+  } catch (err) {
+    return { state: "failed", error: `HubSpot note sync threw: ${err instanceof Error ? err.message : String(err)}` };
+  }
+}
+
+/**
+ * Reconciliation lookup for a lost/ambiguous note-create response —
+ * same bounded-pagination search-by-embedded-marker pattern as
+ * findScopeNoteByActionId above, searching for CHA:{assessmentId}:
+ * part:{n} instead of "Action ID: {actionId}".
+ */
+export async function findCyberHealthNoteByMarker(contactId: string, marker: string): Promise<string | null> {
+  const token = process.env.HUBSPOT_ACCESS_TOKEN;
+  if (!token) return null;
+  let after: string | undefined;
+  for (let page = 0; page < 10; page++) {
+    const url = new URL(`${HUBSPOT_API_BASE}/crm/v3/objects/contacts/${contactId}/associations/notes`);
+    if (after) url.searchParams.set("after", after);
+    const assocRes = await fetch(url.toString(), { headers: { Authorization: `Bearer ${token}` } });
+    if (!assocRes.ok) return null;
+    const assocData = await assocRes.json();
+    const noteIds: string[] = (assocData?.results ?? []).map((r: { toObjectId?: string; id?: string }) => r.toObjectId ?? r.id).filter(Boolean);
+    for (const noteId of noteIds) {
+      const noteRes = await fetch(
+        `${HUBSPOT_API_BASE}/crm/v3/objects/notes/${noteId}?properties=hs_note_body`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      if (!noteRes.ok) continue;
+      const noteData = await noteRes.json();
+      const body: string = noteData?.properties?.hs_note_body ?? "";
+      if (body.includes(marker)) return noteId;
+    }
+    after = assocData?.paging?.next?.after;
+    if (!after) break;
+  }
+  return null;
+}
+
+export type CyberHealthPropertyWriteResult =
+  | { state: "written" }
+  | { state: "failed"; error: string };
+
+/**
+ * PATCHes the oragrol_cha_* "latest assessment" properties (see
+ * latestAssessmentProperties() in cyber-health-hubspot-note.ts) onto
+ * the Contact card. This function only writes what it's given — the
+ * concurrency-safe decision of WHAT to write (reading the ledger's
+ * current top entry under a per-contact lock) lives in
+ * cyber-health-hubspot-store.ts's projectLatestProperties, not here.
+ */
+export async function writeCyberHealthLatestProperties(
+  contactId: string,
+  properties: Record<string, string>,
+): Promise<CyberHealthPropertyWriteResult> {
+  const token = process.env.HUBSPOT_ACCESS_TOKEN;
+  if (!token) return { state: "failed", error: "HUBSPOT_ACCESS_TOKEN is not set — skipping CRM sync." };
+  try {
+    const res = await fetch(`${HUBSPOT_API_BASE}/crm/v3/objects/contacts/${contactId}`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ properties }),
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      return { state: "failed", error: `HubSpot latest-properties write failed: ${res.status} ${text}`.slice(0, 500) };
+    }
+    return { state: "written" };
+  } catch (err) {
+    return { state: "failed", error: `HubSpot latest-properties write threw: ${err instanceof Error ? err.message : String(err)}` };
+  }
+}
+
+/** Exact schema from the handoff doc — Internal name / type / fieldType. */
+const CYBER_HEALTH_PROPERTY_GROUP = "oragrol_cyber_health";
+const CYBER_HEALTH_PROPERTIES: Array<{ name: string; label: string; type: "string" | "number" | "datetime"; fieldType: "text" | "number" | "date" }> = [
+  { name: "oragrol_cha_count", label: "Completed assessments", type: "number", fieldType: "number" },
+  { name: "oragrol_cha_latest_id", label: "Latest assessment ID", type: "string", fieldType: "text" },
+  { name: "oragrol_cha_latest_report_id", label: "Latest report ID", type: "string", fieldType: "text" },
+  { name: "oragrol_cha_latest_reference", label: "Latest client reference", type: "string", fieldType: "text" },
+  { name: "oragrol_cha_latest_at", label: "Latest assessment date", type: "datetime", fieldType: "date" },
+  { name: "oragrol_cha_score", label: "Latest score (out of 100)", type: "number", fieldType: "number" },
+  { name: "oragrol_cha_band", label: "Latest overall score band", type: "string", fieldType: "text" },
+  { name: "oragrol_cha_maturity", label: "Latest maturity", type: "string", fieldType: "text" },
+  { name: "oragrol_cha_findings", label: "Latest finding count", type: "number", fieldType: "number" },
+  { name: "oragrol_cha_critical", label: "Latest Critical finding count", type: "number", fieldType: "number" },
+  { name: "oragrol_cha_sector", label: "Assessed business sector", type: "string", fieldType: "text" },
+  { name: "oragrol_cha_province", label: "Assessed province", type: "string", fieldType: "text" },
+  { name: "oragrol_cha_employees", label: "Assessed employee range", type: "string", fieldType: "text" },
+  { name: "oragrol_cha_platform", label: "Assessed platform", type: "string", fieldType: "text" },
+  { name: "oragrol_cha_recommendation", label: "Report recommendation (not requested action)", type: "string", fieldType: "text" },
+];
+
+export type SchemaBootstrapResult = {
+  groupCreated: boolean;
+  propertiesCreated: string[];
+  propertiesAlreadyExisted: string[];
+  conflicts: Array<{ name: string; reason: string }>;
+};
+
+/**
+ * Idempotent: reads existing schema first, creates only what's
+ * missing, and reports (never silently ignores) any existing property
+ * whose type doesn't match what this amendment expects — per the
+ * handoff's explicit "never delete/recreate a property containing
+ * data to resolve a mismatch." Creates the property GROUP only; the
+ * visible Contact CARD itself still requires a human with
+ * record-layout rights to save it in the HubSpot UI — this function
+ * cannot and does not claim to do that part.
+ */
+export async function ensureCyberHealthPropertySchema(): Promise<SchemaBootstrapResult> {
+  const token = process.env.HUBSPOT_ACCESS_TOKEN;
+  if (!token) throw new Error("HUBSPOT_ACCESS_TOKEN is not set — cannot bootstrap schema.");
+
+  const result: SchemaBootstrapResult = {
+    groupCreated: false,
+    propertiesCreated: [],
+    propertiesAlreadyExisted: [],
+    conflicts: [],
+  };
+
+  const groupRes = await fetch(`${HUBSPOT_API_BASE}/crm/v3/properties/contacts/groups/${CYBER_HEALTH_PROPERTY_GROUP}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (groupRes.status === 404) {
+    const createGroupRes = await fetch(`${HUBSPOT_API_BASE}/crm/v3/properties/contacts/groups`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ name: CYBER_HEALTH_PROPERTY_GROUP, label: "Cyber Health Assessment" }),
+    });
+    if (!createGroupRes.ok) {
+      const text = await createGroupRes.text().catch(() => "");
+      throw new Error(`Failed to create property group: ${createGroupRes.status} ${text}`.slice(0, 500));
+    }
+    result.groupCreated = true;
+  } else if (!groupRes.ok) {
+    const text = await groupRes.text().catch(() => "");
+    throw new Error(`Failed to read property group: ${groupRes.status} ${text}`.slice(0, 500));
+  }
+
+  for (const prop of CYBER_HEALTH_PROPERTIES) {
+    const existingRes = await fetch(`${HUBSPOT_API_BASE}/crm/v3/properties/contacts/${prop.name}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (existingRes.status === 404) {
+      const createRes = await fetch(`${HUBSPOT_API_BASE}/crm/v3/properties/contacts`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: prop.name,
+          label: prop.label,
+          type: prop.type,
+          fieldType: prop.fieldType,
+          groupName: CYBER_HEALTH_PROPERTY_GROUP,
+        }),
+      });
+      if (!createRes.ok) {
+        const text = await createRes.text().catch(() => "");
+        result.conflicts.push({ name: prop.name, reason: `create failed: ${createRes.status} ${text}`.slice(0, 300) });
+        continue;
+      }
+      result.propertiesCreated.push(prop.name);
+    } else if (existingRes.ok) {
+      const existing = await existingRes.json();
+      if (existing.type !== prop.type || existing.fieldType !== prop.fieldType) {
+        result.conflicts.push({
+          name: prop.name,
+          reason: `existing type/fieldType (${existing.type}/${existing.fieldType}) does not match expected (${prop.type}/${prop.fieldType}) — not modified, needs manual review`,
+        });
+      } else {
+        result.propertiesAlreadyExisted.push(prop.name);
+      }
+    } else {
+      const text = await existingRes.text().catch(() => "");
+      result.conflicts.push({ name: prop.name, reason: `read failed: ${existingRes.status} ${text}`.slice(0, 300) });
+    }
+  }
+
+  return result;
+}
+
 export async function syncScopeContact(client: {
   name: string;
   email: string;
