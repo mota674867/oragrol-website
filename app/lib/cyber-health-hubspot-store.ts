@@ -1,5 +1,6 @@
 import { Redis } from "@upstash/redis";
 import { randomUUID } from "crypto";
+import type { AssessmentSnapshot } from "./cyber-health-hubspot-note";
 
 /**
  * Durable outbox + assessment ledger for the Cyber Health HubSpot
@@ -102,14 +103,23 @@ export function normalizeContactIdentity(email: string): string {
 // and job creation is recoverable — same "durable outbox" principle
 // as My Scope's action record) -------------------------------------
 
-export async function storeAssessmentSnapshot(assessmentId: string, snapshotJson: string): Promise<void> {
+export async function storeAssessmentSnapshot(assessmentId: string, snapshot: AssessmentSnapshot): Promise<void> {
   const redis = getRedis();
-  await redis.set(kSnapshot(assessmentId), snapshotJson);
+  // Pass the object directly — @upstash/redis serializes it and, on
+  // get(), auto-deserializes any JSON-shaped value back into an
+  // object regardless of a <string> type parameter. Manually
+  // JSON.stringify-ing here (as an earlier version of this function
+  // did) meant getAssessmentSnapshot got back an ALREADY-PARSED
+  // object, and JSON.parse()-ing an object coerces it to the literal
+  // string "[object Object]" before failing — the real bug found
+  // during tonight's live test, confirmed via Upstash's own docs and
+  // a matching GitHub issue on the client's automatic deserialization.
+  await redis.set(kSnapshot(assessmentId), snapshot);
 }
 
-export async function getAssessmentSnapshotJson(assessmentId: string): Promise<string | null> {
+export async function getAssessmentSnapshot(assessmentId: string): Promise<AssessmentSnapshot | null> {
   const redis = getRedis();
-  return (await redis.get<string>(kSnapshot(assessmentId))) ?? null;
+  return (await redis.get<AssessmentSnapshot>(kSnapshot(assessmentId))) ?? null;
 }
 
 // --- Job creation -----------------------------------------------------

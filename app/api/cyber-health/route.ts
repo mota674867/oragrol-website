@@ -193,7 +193,7 @@ export async function POST(request: Request) {
   try {
     const assessmentId = randomUUID();
     const snapshot = buildAssessmentSnapshot(assessmentId, report, parsed.data, "/cyber-health");
-    await storeAssessmentSnapshot(assessmentId, JSON.stringify(snapshot));
+    await storeAssessmentSnapshot(assessmentId, snapshot);
     await recordAssessmentInLedger(
       normalizeContactIdentity(profile.email),
       assessmentId,

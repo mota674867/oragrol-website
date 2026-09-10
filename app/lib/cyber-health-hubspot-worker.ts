@@ -3,7 +3,7 @@ import {
   completeJob,
   scheduleRetry,
   getAssessmentJobs,
-  getAssessmentSnapshotJson,
+  getAssessmentSnapshot,
   recordAssessmentInLedger,
   getLatestLedgerAssessmentId,
   getLedgerDistinctCount,
@@ -61,9 +61,9 @@ export async function processCyberHealthJob(jobId: string): Promise<{ outcome: s
 }
 
 async function loadSnapshot(assessmentId: string): Promise<AssessmentSnapshot> {
-  const json = await getAssessmentSnapshotJson(assessmentId);
-  if (!json) throw new Error(`No stored snapshot for assessment ${assessmentId}`);
-  return JSON.parse(json) as AssessmentSnapshot;
+  const snapshot = await getAssessmentSnapshot(assessmentId);
+  if (!snapshot) throw new Error(`No stored snapshot for assessment ${assessmentId}`);
+  return snapshot;
 }
 
 async function runContactJob(job: CyberHealthJobRecord, owner: string): Promise<void> {
