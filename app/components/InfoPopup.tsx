@@ -1,37 +1,36 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { Info, X } from "lucide-react";
 import { Icon } from "./ui/icon-wrapper";
 
 /**
- * InfoPopup — the site-wide ⓘ info icon + content card, per
- * Info_Icon_System_Design_Brief.md.
+ * InfoPopup — real fix: the modal now renders through a React portal
+ * directly onto document.body, escaping this page's own CSS (every
+ * direct child of the containing <article> gets position:relative;
+ * z-index:1 applied to it, trapping the modal's stacking inside a
+ * nested context instead of actually painting on top of the page).
+ * Standard, proven technique for this exact class of bug.
  *
- * Two variants, matched to content length:
- * - "modal": BA, Services, Specialist Engagements, OR ONE (19 items) —
- *   longer content, centered, scrolls internally if it overflows.
- * - "popover": À La Carte (12 items) — short content, anchored beside
- *   the icon, no scroll needed.
- *
- * Visual spec (locked, corrected from the original orange-background
- * proposal after a real WCAG contrast check): white text directly on
- * Burnt Orange only reaches 4.0:1, below the 4.5:1 AA minimum for body
- * text. Reuses the site's own existing `.env-light` environment
- * (Warm Off-White background, Deep Ink text, 15.55:1 — verified) instead
- * of inventing new colors, with Burnt Orange kept to what the token file
- * itself documents it for: "signature accent ONLY, never dominant" — a
- * thin top border here, plus the icon and tooltip.
- *
- * SEO/GEO (non-negotiable per the design brief): `content` is ALWAYS
- * rendered into the DOM — visibility is toggled with a CSS class, not by
- * conditionally mounting/unmounting the JSX. A crawler or AI answer
- * engine reading the page's initial HTML sees the full content whether
- * or not a visitor has ever clicked the icon. `plainText` feeds a
- * FAQPage/Question JSON-LD block for the same reason: structured data is
- * specifically what AI search/answer systems look for when deciding
- * what to cite.
+ * SEO/GEO: portals only exist client-side, so a separate, always
+ * server-rendered, visually-hidden (not display:none) text block
+ * carries the full content for crawlers/AI, independent of the portal.
  */
+
+// Correct SSR-hydration-safe "is this running client-side yet" check —
+// returns false during server rendering (getServerSnapshot), true once
+// hydrated (getSnapshot). Needed because createPortal requires
+// document.body, which doesn't exist during Next.js's server render.
+function subscribeNoop() {
+  return () => {};
+}
+function getClientSnapshot() {
+  return true;
+}
+function getServerSnapshot() {
+  return false;
+}
 
 export function InfoPopup({
   id,
@@ -47,6 +46,7 @@ export function InfoPopup({
   plainText: string;
 }) {
   const [open, setOpen] = useState(false);
+  const mounted = useSyncExternalStore(subscribeNoop, getClientSnapshot, getServerSnapshot);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -65,9 +65,6 @@ export function InfoPopup({
         close();
         return;
       }
-      // Minimal focus trap between the close button and the panel's
-      // last focusable element (there's no interactive content inside
-      // the info body itself, so this wraps Tab back to close).
       if (event.key === "Tab" && panelRef.current) {
         const focusable = panelRef.current.querySelectorAll<HTMLElement>(
           'button, [href], input, [tabindex]:not([tabindex="-1"])',
@@ -90,8 +87,6 @@ export function InfoPopup({
       }
     };
     window.addEventListener("keydown", onKeyDown);
-    // Delay attaching the outside-click listener by a tick so the same
-    // click that opened the popup doesn't immediately close it again.
     const t = setTimeout(() => document.addEventListener("mousedown", onClickOutside), 0);
     if (variant === "modal") {
       const previousOverflow = document.body.style.overflow;
@@ -112,7 +107,54 @@ export function InfoPopup({
 
   const panelId = `info-panel-${id}`;
   const titleId = `info-title-${id}`;
-  const [iconHover, setIconHover] = useState(false);
+
+  const panel = (
+    <div
+      aria-hidden={!open}
+      style={variant === "modal" ? { position: "fixed", inset: 0, zIndex: 9999 } : undefined}
+      className={variant === "modal" ? (open ? "" : "hidden") : "relative inline-block"}
+    >
+      {variant === "modal" && (
+        <div aria-hidden="true" className="absolute inset-0" style={{ backgroundColor: "rgba(10,12,18,0.95)" }} />
+      )}
+      <div
+        ref={panelRef}
+        id={panelId}
+        role="dialog"
+        aria-modal={variant === "modal"}
+        aria-labelledby={titleId}
+        className={
+          variant === "modal"
+            ? "relative mx-auto my-8 max-h-[calc(100vh-4rem)] w-[min(600px,calc(100vw-2rem))] overflow-y-auto rounded-2xl p-6 shadow-2xl md:p-8"
+            : `absolute z-20 mt-2 w-[min(300px,calc(100vw-2rem))] rounded-xl p-4 shadow-xl ${open ? "block" : "hidden"}`
+        }
+        style={{ backgroundColor: "#e9e5dc", borderTop: "4px solid #db5227" }}
+      >
+        <div className="mb-3 flex items-start justify-between gap-3">
+          <h3 id={titleId} className="font-heading text-lg font-bold md:text-xl" style={{ color: "#0a0c12" }}>
+            {title}
+          </h3>
+          <button
+            ref={closeRef}
+            type="button"
+            onClick={close}
+            aria-label="Close"
+            tabIndex={open ? 0 : -1}
+            className="shrink-0 rounded-full p-1 transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            style={{ color: "#50545c", outlineColor: "#db5227" }}
+          >
+            <Icon icon={X} size="sm" />
+          </button>
+        </div>
+        <div
+          className="font-body text-sm leading-relaxed [&_a]:underline [&_strong]:font-semibold [&_sub]:text-xs [&_table]:w-full"
+          style={{ color: "#0a0c12" }}
+        >
+          {content}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <span className="relative inline-flex" style={{ marginLeft: "10px", verticalAlign: "middle" }}>
@@ -124,42 +166,12 @@ export function InfoPopup({
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
-        onMouseEnter={() => setIconHover(true)}
-        onMouseLeave={() => setIconHover(false)}
-        className="group relative inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-        style={{
-          // Inline, not a Tailwind utility class: confirmed via live
-          // inspection that a plain utility class (0,1,0 specificity)
-          // loses to this page's own .job-stage h3 rule and silently
-          // inherits the surrounding heading's white color instead.
-          // Inline styles always win regardless of a given page's
-          // unknown ambient CSS — needed since this component gets
-          // reused on 4 more pages next, each with its own legacy CSS.
-          color: iconHover ? "#a43e1d" : "#db5227",
-          outlineColor: "#db5227",
-        }}
+        className="relative inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+        style={{ color: "#db5227", outlineColor: "#db5227" }}
       >
         <Icon icon={Info} size="sm" className="h-4 w-4" />
-        {/* Hover tooltip — desktop only (:hover has no effect on touch).
-            Reuses the same env-light/Deep-Ink pairing as the panel itself,
-            same reason: white text on plain Burnt Orange fails contrast
-            at this size. Visibility is driven by iconHover state, not
-            CSS :hover/group-hover — the same specificity risk that broke
-            the icon's own color applies here too, and this tooltip only
-            needs to work on desktop anyway (no touch equivalent). */}
-        {iconHover && (
-          <span
-            role="tooltip"
-            className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-md px-2 py-1 text-xs font-medium shadow-md md:block"
-            style={{ backgroundColor: "#ffffff", color: "#0a0c12", border: "1px solid #d6d3c9" }}
-          >
-            What&apos;s included
-          </span>
-        )}
       </button>
 
-      {/* Structured data — always present, for AI/search citation,
-          independent of whether the popup has ever been opened. */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -172,67 +184,24 @@ export function InfoPopup({
         }}
       />
 
-      <div
-        aria-hidden={!open}
-        className={
-          variant === "modal"
-            ? open
-              ? "fixed inset-0 z-[70]"
-              : "hidden"
-            : "contents"
-        }
+      <span
+        style={{
+          position: "absolute",
+          width: "1px",
+          height: "1px",
+          padding: 0,
+          margin: "-1px",
+          overflow: "hidden",
+          clip: "rect(0,0,0,0)",
+          whiteSpace: "nowrap",
+          border: 0,
+        }}
       >
-        {variant === "modal" && (
-          <div aria-hidden="true" className="absolute inset-0" style={{ backgroundColor: "rgba(10,12,18,0.95)" }} />
-        )}
-        <div
-          ref={panelRef}
-          id={panelId}
-          role="dialog"
-          aria-modal={variant === "modal"}
-          aria-labelledby={titleId}
-          className={
-            variant === "modal"
-              ? "relative mx-auto my-8 max-h-[calc(100vh-4rem)] w-[min(600px,calc(100vw-2rem))] overflow-y-auto rounded-2xl p-6 shadow-2xl md:p-8"
-              : `absolute z-20 mt-2 w-[min(300px,calc(100vw-2rem))] rounded-xl p-4 shadow-xl ${open ? "block" : "hidden"}`
-          }
-          style={{
-            backgroundColor: "#e9e5dc",
-            borderTop: "4px solid #db5227",
-          }}
-          // Content stays in the DOM at all times for SEO/GEO — only
-          // this wrapper's own display toggles via the ternary above.
-          // The content node itself is never conditionally unmounted.
-          // Colors are inline, not Tailwind/.env-light utility classes:
-          // confirmed via live inspection on the BA page that a plain
-          // utility class loses to that page's own ambient CSS rules —
-          // inline styles are the only approach guaranteed to render
-          // correctly regardless of which page this reuses on next.
-        >
-          <div className="mb-3 flex items-start justify-between gap-3">
-            <h3 id={titleId} className="font-heading text-lg font-bold md:text-xl" style={{ color: "#0a0c12" }}>
-              {title}
-            </h3>
-            <button
-              ref={closeRef}
-              type="button"
-              onClick={close}
-              aria-label="Close"
-              tabIndex={open ? 0 : -1}
-              className="shrink-0 rounded-full p-1 transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-              style={{ color: "#50545c", outlineColor: "#db5227" }}
-            >
-              <Icon icon={X} size="sm" />
-            </button>
-          </div>
-          <div
-            className="font-body text-sm leading-relaxed [&_a]:underline [&_strong]:font-semibold [&_sub]:text-xs [&_table]:w-full"
-            style={{ color: "#0a0c12" }}
-          >
-            {content}
-          </div>
-        </div>
-      </div>
+        {content}
+      </span>
+
+      {variant === "popover" && panel}
+      {variant === "modal" && mounted && createPortal(panel, document.body)}
     </span>
   );
 }
