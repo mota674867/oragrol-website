@@ -7,10 +7,13 @@ import PreFooterCta from "../components/site/pre-footer-cta";
 import SiteFooter from "../components/site/footer";
 import OragrolMegaNav from "../components/site/oragrol-mega-nav";
 import { NAV_ITEMS } from "../components/site/nav-items";
+import { InfoPopup } from "../components/InfoPopup";
+import { baInfoItems } from "../lib/ba-info-content";
 import "../gpt-pages.css";
 
 type Job = {
   id: string;
+  infoId: string;
   index: string;
   name: string;
   short: string;
@@ -24,6 +27,7 @@ type Job = {
 const jobs: Job[] = [
   {
     id: "sales-flow",
+    infoId: "ba-sales",
     index: "01",
     name: "Sales",
     short: "Sales",
@@ -37,6 +41,7 @@ const jobs: Job[] = [
   },
   {
     id: "customer-support",
+    infoId: "ba-customer-service",
     index: "02",
     name: "Customer Service",
     short: "Customer Service",
@@ -50,6 +55,7 @@ const jobs: Job[] = [
   },
   {
     id: "operational-intelligence",
+    infoId: "ba-finance",
     index: "03",
     name: "Finance",
     short: "Finance",
@@ -63,6 +69,7 @@ const jobs: Job[] = [
   },
   {
     id: "managed-it",
+    infoId: "ba-it",
     index: "04",
     name: "IT",
     short: "IT",
@@ -76,6 +83,7 @@ const jobs: Job[] = [
   },
   {
     id: "customer-growth",
+    infoId: "ba-marketing",
     index: "05",
     name: "Marketing",
     short: "Marketing",
@@ -89,6 +97,7 @@ const jobs: Job[] = [
   },
   {
     id: "tailored",
+    infoId: "ba-tailored-automation",
     index: "06",
     name: "Tailored Automation",
     short: "One bounded outcome",
@@ -107,6 +116,7 @@ function BusinessAutomationClient() {
   const [trayOpen, setTrayOpen] = useState(false);
   const scope = useScope();
   const job = jobs[active];
+  const activeInfo = baInfoItems.find((it) => it.id === job.infoId);
 
   // Deep-link support for the nav dropdown's per-job links
   // (/business-automation#ba-job-<id>) — selects the matching job on load.
@@ -267,7 +277,18 @@ function BusinessAutomationClient() {
                   : "Defined automation job"}
               </small>
             </div>
-            <h3>{job.name}</h3>
+            <h3>
+              {job.name}
+              {activeInfo && (
+                <InfoPopup
+                  id={`ba-detail-${job.id}`}
+                  variant="modal"
+                  title={activeInfo.title}
+                  content={activeInfo.content}
+                  plainText={activeInfo.plainText}
+                />
+              )}
+            </h3>
             <p className="job-outcome">{job.outcome}</p>
             <div className="job-facts">
               <div>
@@ -311,6 +332,39 @@ function BusinessAutomationClient() {
           and third-party infrastructure remain the client&apos;s responsibility and
           are not included.
         </p>
+      </section>
+      <section className="ba-full-reference env-dark bg-background px-6 py-16 md:px-12 md:py-24">
+        <div className="mx-auto max-w-4xl">
+          <p className="mb-2 font-body text-xs uppercase tracking-widest text-text-secondary">
+            OR6 / Full details
+          </p>
+          <h2 className="mb-10 font-heading text-3xl font-normal text-text-primary md:text-5xl">
+            Every job,
+            <br />
+            <span className="text-text-secondary">in full.</span>
+          </h2>
+          <div className="divide-y divide-border">
+            {jobs.map((j) => {
+              const info = baInfoItems.find((it) => it.id === j.infoId);
+              if (!info) return null;
+              return (
+                <div key={j.id} className="flex items-center justify-between gap-4 py-5">
+                  <div>
+                    <span className="mr-2 font-data text-xs text-text-secondary">{j.index}</span>
+                    <span className="font-heading text-lg text-text-primary md:text-xl">{info.title}</span>
+                  </div>
+                  <InfoPopup
+                    id={`ba-ref-${j.id}`}
+                    variant="modal"
+                    title={info.title}
+                    content={info.content}
+                    plainText={info.plainText}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </section>
       <section className="existing-tools">
         <div>
