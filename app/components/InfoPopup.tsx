@@ -163,7 +163,7 @@ export function InfoPopup({
         }
       >
         {variant === "modal" && (
-          <div aria-hidden="true" className="absolute inset-0 bg-background/90 backdrop-blur-sm" />
+          <div aria-hidden="true" className="absolute inset-0 bg-background/95" />
         )}
         <div
           ref={panelRef}
