@@ -46,6 +46,7 @@ export function InfoPopup({
   plainText: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [iconHover, setIconHover] = useState(false);
   const mounted = useSyncExternalStore(subscribeNoop, getClientSnapshot, getServerSnapshot);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -166,10 +167,27 @@ export function InfoPopup({
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
+        onMouseEnter={() => setIconHover(true)}
+        onMouseLeave={() => setIconHover(false)}
         className="relative inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
         style={{ color: "#db5227", outlineColor: "#db5227" }}
       >
         <Icon icon={Info} size="sm" className="h-4 w-4" />
+        {/* Hover tooltip — desktop only (no hover on touch). Visibility
+            driven by iconHover state, not CSS :hover — the same
+            specificity risk that broke the icon's own color earlier
+            applies here too. Not portaled: unlike the full-viewport
+            modal, this stays anchored right beside its own trigger and
+            doesn't need to escape the page's DOM structure. */}
+        {iconHover && (
+          <span
+            role="tooltip"
+            className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-md px-2 py-1 text-xs font-medium shadow-md md:block"
+            style={{ backgroundColor: "#ffffff", color: "#0a0c12", border: "1px solid #d6d3c9" }}
+          >
+            What&apos;s included
+          </span>
+        )}
       </button>
 
       <script
