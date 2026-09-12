@@ -115,7 +115,7 @@ export function InfoPopup({
   const [iconHover, setIconHover] = useState(false);
 
   return (
-    <span className="relative inline-flex" style={{ marginLeft: "0.5em", verticalAlign: "middle" }}>
+    <span className="relative inline-flex" style={{ marginLeft: "10px", verticalAlign: "middle" }}>
       <button
         ref={triggerRef}
         type="button"
