@@ -112,9 +112,10 @@ export function InfoPopup({
 
   const panelId = `info-panel-${id}`;
   const titleId = `info-title-${id}`;
+  const [iconHover, setIconHover] = useState(false);
 
   return (
-    <span className="relative inline-flex">
+    <span className="relative inline-flex" style={{ marginLeft: "0.5em", verticalAlign: "middle" }}>
       <button
         ref={triggerRef}
         type="button"
@@ -123,19 +124,38 @@ export function InfoPopup({
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
-        className="group relative inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-accent-on-light transition-colors duration-150 hover:text-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        onMouseEnter={() => setIconHover(true)}
+        onMouseLeave={() => setIconHover(false)}
+        className="group relative inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+        style={{
+          // Inline, not a Tailwind utility class: confirmed via live
+          // inspection that a plain utility class (0,1,0 specificity)
+          // loses to this page's own .job-stage h3 rule and silently
+          // inherits the surrounding heading's white color instead.
+          // Inline styles always win regardless of a given page's
+          // unknown ambient CSS — needed since this component gets
+          // reused on 4 more pages next, each with its own legacy CSS.
+          color: iconHover ? "#a43e1d" : "#db5227",
+          outlineColor: "#db5227",
+        }}
       >
         <Icon icon={Info} size="sm" className="h-4 w-4" />
         {/* Hover tooltip — desktop only (:hover has no effect on touch).
             Reuses the same env-light/Deep-Ink pairing as the panel itself,
             same reason: white text on plain Burnt Orange fails contrast
-            at this size. */}
-        <span
-          role="tooltip"
-          className="env-light pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-md border border-border bg-background px-2 py-1 text-xs font-medium text-text-primary opacity-0 shadow-md transition-opacity duration-150 group-hover:opacity-100 md:group-hover:block"
-        >
-          What&apos;s included
-        </span>
+            at this size. Visibility is driven by iconHover state, not
+            CSS :hover/group-hover — the same specificity risk that broke
+            the icon's own color applies here too, and this tooltip only
+            needs to work on desktop anyway (no touch equivalent). */}
+        {iconHover && (
+          <span
+            role="tooltip"
+            className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-md px-2 py-1 text-xs font-medium shadow-md md:block"
+            style={{ backgroundColor: "#ffffff", color: "#0a0c12", border: "1px solid #d6d3c9" }}
+          >
+            What&apos;s included
+          </span>
+        )}
       </button>
 
       {/* Structured data — always present, for AI/search citation,
@@ -163,7 +183,7 @@ export function InfoPopup({
         }
       >
         {variant === "modal" && (
-          <div aria-hidden="true" className="absolute inset-0 bg-background/95" />
+          <div aria-hidden="true" className="absolute inset-0" style={{ backgroundColor: "rgba(10,12,18,0.95)" }} />
         )}
         <div
           ref={panelRef}
@@ -173,15 +193,24 @@ export function InfoPopup({
           aria-labelledby={titleId}
           className={
             variant === "modal"
-              ? "env-light relative mx-auto my-8 max-h-[calc(100vh-4rem)] w-[min(600px,calc(100vw-2rem))] overflow-y-auto rounded-2xl border-t-4 border-accent bg-background p-6 shadow-2xl md:p-8"
-              : `env-light absolute z-20 mt-2 w-[min(300px,calc(100vw-2rem))] rounded-xl border-t-4 border-accent bg-background p-4 shadow-xl ${open ? "block" : "hidden"}`
+              ? "relative mx-auto my-8 max-h-[calc(100vh-4rem)] w-[min(600px,calc(100vw-2rem))] overflow-y-auto rounded-2xl p-6 shadow-2xl md:p-8"
+              : `absolute z-20 mt-2 w-[min(300px,calc(100vw-2rem))] rounded-xl p-4 shadow-xl ${open ? "block" : "hidden"}`
           }
+          style={{
+            backgroundColor: "#e9e5dc",
+            borderTop: "4px solid #db5227",
+          }}
           // Content stays in the DOM at all times for SEO/GEO — only
           // this wrapper's own display toggles via the ternary above.
           // The content node itself is never conditionally unmounted.
+          // Colors are inline, not Tailwind/.env-light utility classes:
+          // confirmed via live inspection on the BA page that a plain
+          // utility class loses to that page's own ambient CSS rules —
+          // inline styles are the only approach guaranteed to render
+          // correctly regardless of which page this reuses on next.
         >
           <div className="mb-3 flex items-start justify-between gap-3">
-            <h3 id={titleId} className="font-heading text-lg font-bold text-text-primary md:text-xl">
+            <h3 id={titleId} className="font-heading text-lg font-bold md:text-xl" style={{ color: "#0a0c12" }}>
               {title}
             </h3>
             <button
@@ -190,12 +219,16 @@ export function InfoPopup({
               onClick={close}
               aria-label="Close"
               tabIndex={open ? 0 : -1}
-              className="shrink-0 rounded-full p-1 text-text-secondary transition-colors duration-150 hover:text-text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="shrink-0 rounded-full p-1 transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+              style={{ color: "#50545c", outlineColor: "#db5227" }}
             >
               <Icon icon={X} size="sm" />
             </button>
           </div>
-          <div className="font-body text-sm leading-relaxed text-text-primary [&_a]:text-accent [&_a]:underline [&_strong]:font-semibold [&_sub]:text-xs [&_sub]:text-text-secondary [&_table]:w-full">
+          <div
+            className="font-body text-sm leading-relaxed [&_a]:underline [&_strong]:font-semibold [&_sub]:text-xs [&_table]:w-full"
+            style={{ color: "#0a0c12" }}
+          >
             {content}
           </div>
         </div>
