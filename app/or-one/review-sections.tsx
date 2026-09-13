@@ -1,6 +1,4 @@
 import s from './review-sections.module.css';
-import { InfoPopup } from "../components/InfoPopup";
-import { orOneInfoItems } from "../lib/or-one-info-content";
 
 export function RevisedProcess(){return <section className={`${s.section} ${s.process}`}><div className={s.heading}><p className={s.eyebrow}>FROM SCOPE TO OPERATION</p><h2>A clear path.<br/><span>A working system.</span></h2><p>Define the work, connect the right tools and agree the controls before launch.</p></div><div className={s.steps}>{[
 ['01','Define scope','Agree the workflows, tools, access and outcomes your system needs to support.','A defined scope'],
@@ -14,7 +12,7 @@ export function RevisedPricing(){return <section className={`${s.section} ${s.pr
 ['100','Up to 100 Points','$75,000','$3,999','A broader connected scope.'],
 ['200','Up to 200 Points','$150,000','$5,999','More workflows working together.'],
 ['400','Up to 400 Points','$220,000','$8,999','An extensive operating scope.'],
-].map(([name,points,build,monthly,line])=>{ const info = orOneInfoItems[name as string]; return <article key={name}><span className={s.eyebrow}>OR / ONE</span><h3>{name}{info ? <InfoPopup id={`or-one-${info.id}`} variant="modal" title={info.title} content={info.content} plainText={info.plainText} /> : null}</h3><p className={s.fit}>{line}</p><p className={s.points}>{points}</p><div className={s.fee}><span>BUILD FEE</span><strong>{build}</strong></div><div className={s.monthly}><span>BASE MONTHLY OR SERVICE FEE</span><strong>{monthly}<small>/mo</small></strong></div></article>; })}</div><div className={s.pricingNote}><p>All fees in CAD. Points measure the complexity of your selected capabilities and help determine your system tier. Final scope and monthly fee are confirmed through private review.</p><p>The builder provides a preliminary tier, not a binding quote.</p></div></section>}
+].map(([name,points,build,monthly,line])=><article key={name}><span className={s.eyebrow}>OR / ONE</span><h3>{name}</h3><p className={s.fit}>{line}</p><p className={s.points}>{points}</p><div className={s.fee}><span>BUILD FEE</span><strong>{build}</strong></div><div className={s.monthly}><span>BASE MONTHLY OR SERVICE FEE</span><strong>{monthly}<small>/mo</small></strong></div></article>)}</div><div className={s.pricingNote}><p>All fees in CAD. Points measure the complexity of your selected capabilities and help determine your system tier. Final scope and monthly fee are confirmed through private review.</p><p>The builder provides a preliminary tier, not a binding quote.</p></div></section>}
 
 export function RevisedResponsibility(){return <section className={`${s.section} ${s.control}`}><div className={s.heading}><p className={s.eyebrow}>RESPONSIBILITY / AUTHORIZED ACTION</p><h2>You stay<br/><span>in control.</span></h2><p>Agree what the system may do, where your team reviews its work and which actions remain restricted.</p></div><div className={s.controlRows}>{[
 ['01','Routine work','Within agreed boundaries','Research, reporting and reversible administration can be configured to run within approved access and rules.'],

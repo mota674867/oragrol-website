@@ -7,13 +7,10 @@ import PreFooterCta from "../components/site/pre-footer-cta";
 import SiteFooter from "../components/site/footer";
 import OragrolMegaNav from "../components/site/oragrol-mega-nav";
 import { NAV_ITEMS } from "../components/site/nav-items";
-import { InfoPopup } from "../components/InfoPopup";
-import { baInfoItems } from "../lib/ba-info-content";
 import "../gpt-pages.css";
 
 type Job = {
   id: string;
-  infoId: string;
   index: string;
   name: string;
   short: string;
@@ -27,7 +24,6 @@ type Job = {
 const jobs: Job[] = [
   {
     id: "sales-flow",
-    infoId: "ba-sales",
     index: "01",
     name: "Sales",
     short: "Sales",
@@ -41,7 +37,6 @@ const jobs: Job[] = [
   },
   {
     id: "customer-support",
-    infoId: "ba-customer-service",
     index: "02",
     name: "Customer Service",
     short: "Customer Service",
@@ -55,7 +50,6 @@ const jobs: Job[] = [
   },
   {
     id: "operational-intelligence",
-    infoId: "ba-finance",
     index: "03",
     name: "Finance",
     short: "Finance",
@@ -69,7 +63,6 @@ const jobs: Job[] = [
   },
   {
     id: "managed-it",
-    infoId: "ba-it",
     index: "04",
     name: "IT",
     short: "IT",
@@ -83,7 +76,6 @@ const jobs: Job[] = [
   },
   {
     id: "customer-growth",
-    infoId: "ba-marketing",
     index: "05",
     name: "Marketing",
     short: "Marketing",
@@ -97,7 +89,6 @@ const jobs: Job[] = [
   },
   {
     id: "tailored",
-    infoId: "ba-tailored-automation",
     index: "06",
     name: "Tailored Automation",
     short: "One bounded outcome",
@@ -116,7 +107,6 @@ function BusinessAutomationClient() {
   const [trayOpen, setTrayOpen] = useState(false);
   const scope = useScope();
   const job = jobs[active];
-  const activeInfo = baInfoItems.find((it) => it.id === job.infoId);
 
   // Deep-link support for the nav dropdown's per-job links
   // (/business-automation#ba-job-<id>) — selects the matching job on load.
@@ -277,18 +267,7 @@ function BusinessAutomationClient() {
                   : "Defined automation job"}
               </small>
             </div>
-            <h3>
-              {job.name}
-              {activeInfo && (
-                <InfoPopup
-                  id={`ba-detail-${job.id}`}
-                  variant="modal"
-                  title={activeInfo.title}
-                  content={activeInfo.content}
-                  plainText={activeInfo.plainText}
-                />
-              )}
-            </h3>
+            <h3>{job.name}</h3>
             <p className="job-outcome">{job.outcome}</p>
             <div className="job-facts">
               <div>
@@ -333,37 +312,6 @@ function BusinessAutomationClient() {
           are not included.
         </p>
       </section>
-      {/* SEO/GEO only — invisible, no visible UI. The active job's own
-          InfoPopup above already covers itself; this covers the other 5
-          so all 6 jobs' content exists in the real page HTML regardless
-          of which one is interactively selected. Not a visible section —
-          per instruction, nothing new gets added to what the page shows. */}
-      {jobs
-        .filter((j) => j.id !== job.id)
-        .map((j) => {
-          const info = baInfoItems.find((it) => it.id === j.infoId);
-          if (!info) return null;
-          return (
-            <span
-              key={j.id}
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "1px",
-                height: "1px",
-                padding: 0,
-                margin: "-1px",
-                overflow: "hidden",
-                clipPath: "inset(50%)",
-                whiteSpace: "nowrap",
-                border: 0,
-              }}
-            >
-              {info.title}: {info.plainText}
-            </span>
-          );
-        })}
       <section className="existing-tools">
         <div>
           <p>Built around your reality</p>
