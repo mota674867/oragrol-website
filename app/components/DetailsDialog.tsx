@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef } from "react";
 
 /**
  * DetailsDialog — the ⓘ Details control and its content panel, per
@@ -78,9 +78,9 @@ export function DetailsDialog({
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const [hover, setHover] = useState(false);
   const reactId = useId();
   const headingId = `details-heading-${reactId}`;
+  const tooltipId = `details-tooltip-${reactId}`;
 
   const open = () => {
     // Single dialog open at a time: close any other open DetailsDialog
@@ -112,11 +112,9 @@ export function DetailsDialog({
           ref={triggerRef}
           type="button"
           onClick={open}
-          onMouseEnter={() => setHover(true)}
-          onMouseLeave={() => setHover(false)}
-          onFocus={() => setHover(true)}
-          onBlur={() => setHover(false)}
           aria-label={`View details for ${title}`}
+          aria-describedby={tooltipId}
+          title="View what's included"
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -152,26 +150,30 @@ export function DetailsDialog({
           </span>
           <span style={{ fontSize: "14px", fontWeight: 600 }}>Details</span>
         </button>
-        {hover && (
-          <span
-            role="tooltip"
-            style={{
-              position: "absolute",
-              bottom: "100%",
-              left: "50%",
-              transform: "translateX(-50%)",
-              marginBottom: "6px",
-              whiteSpace: "nowrap",
-              fontSize: "13px",
-              fontWeight: 600,
-              color: BURNT_ORANGE,
-              pointerEvents: "none",
-              zIndex: 1,
-            }}
-          >
-            View what&apos;s included
-          </span>
-        )}
+        {/* Screen-reader-only: the visible hover tooltip is the native
+            title attribute above (the browser positions it itself,
+            can never overlap page content — a hand-positioned custom
+            tooltip broke twice in a row before this). This span makes
+            the same text available to assistive tech on keyboard
+            focus too, via aria-describedby, satisfying the
+            hover-AND-focus requirement without repeating the same
+            custom-positioning risk. */}
+        <span
+          id={tooltipId}
+          style={{
+            position: "absolute",
+            width: "1px",
+            height: "1px",
+            padding: 0,
+            margin: "-1px",
+            overflow: "hidden",
+            clipPath: "inset(50%)",
+            whiteSpace: "nowrap",
+            border: 0,
+          }}
+        >
+          View what&apos;s included
+        </span>
       </span>
 
       <dialog
