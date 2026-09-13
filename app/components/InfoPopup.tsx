@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { Info, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Icon } from "./ui/icon-wrapper";
 
 /**
@@ -132,7 +132,7 @@ export function InfoPopup({
         style={{ backgroundColor: "#e9e5dc", borderTop: "4px solid #db5227" }}
       >
         <div className="mb-3 flex items-start justify-between gap-3">
-          <h3 id={titleId} className="font-heading text-lg font-bold md:text-xl" style={{ color: "#0a0c12" }}>
+          <h3 id={titleId} className="text-lg font-bold md:text-xl" style={{ color: "#0a0c12", fontFamily: "var(--font-heading)" }}>
             {title}
           </h3>
           <button
@@ -148,8 +148,8 @@ export function InfoPopup({
           </button>
         </div>
         <div
-          className="font-body text-sm leading-relaxed [&_a]:underline [&_strong]:font-semibold [&_sub]:text-xs [&_table]:w-full"
-          style={{ color: "#0a0c12" }}
+          className="text-sm leading-relaxed [&_a]:underline [&_strong]:font-semibold [&_sub]:text-xs [&_table]:w-full"
+          style={{ color: "#0a0c12", fontFamily: "var(--font-body)" }}
         >
           {content}
         </div>
@@ -169,10 +169,10 @@ export function InfoPopup({
         onClick={() => setOpen((v) => !v)}
         onMouseEnter={() => setIconHover(true)}
         onMouseLeave={() => setIconHover(false)}
-        className="relative inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-        style={{ color: "#db5227", outlineColor: "#db5227" }}
+        className="relative inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full text-[12px] font-bold leading-none transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+        style={{ backgroundColor: "#db5227", color: "#ffffff", outlineColor: "#db5227" }}
       >
-        <Icon icon={Info} size="sm" className="h-4 w-4" />
+        i
         {/* Hover tooltip — desktop only (no hover on touch). Visibility
             driven by iconHover state, not CSS :hover — the same
             specificity risk that broke the icon's own color earlier
@@ -182,8 +182,8 @@ export function InfoPopup({
         {iconHover && (
           <span
             role="tooltip"
-            className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-md px-2 py-1 text-xs font-medium shadow-md md:block"
-            style={{ backgroundColor: "#ffffff", color: "#0a0c12", border: "1px solid #d6d3c9" }}
+            className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 whitespace-nowrap text-sm font-semibold"
+            style={{ color: "#db5227" }}
           >
             What&apos;s included
           </span>
@@ -205,12 +205,15 @@ export function InfoPopup({
       <span
         style={{
           position: "absolute",
+          top: 0,
+          left: 0,
           width: "1px",
           height: "1px",
           padding: 0,
           margin: "-1px",
           overflow: "hidden",
           clip: "rect(0,0,0,0)",
+          clipPath: "inset(50%)",
           whiteSpace: "nowrap",
           border: 0,
         }}

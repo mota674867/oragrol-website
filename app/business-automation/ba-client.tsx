@@ -333,39 +333,37 @@ function BusinessAutomationClient() {
           are not included.
         </p>
       </section>
-      <section className="ba-full-reference env-dark bg-background px-6 py-16 md:px-12 md:py-24">
-        <div className="mx-auto max-w-4xl">
-          <p className="mb-2 font-body text-xs uppercase tracking-widest text-text-secondary">
-            OR6 / Full details
-          </p>
-          <h2 className="mb-10 font-heading text-3xl font-normal text-text-primary md:text-5xl">
-            Every job,
-            <br />
-            <span className="text-text-secondary">in full.</span>
-          </h2>
-          <div className="divide-y divide-border">
-            {jobs.map((j) => {
-              const info = baInfoItems.find((it) => it.id === j.infoId);
-              if (!info) return null;
-              return (
-                <div key={j.id} className="flex items-center justify-between gap-4 py-5">
-                  <div>
-                    <span className="mr-2 font-data text-xs text-text-secondary">{j.index}</span>
-                    <span className="font-heading text-lg text-text-primary md:text-xl">{info.title}</span>
-                  </div>
-                  <InfoPopup
-                    id={`ba-ref-${j.id}`}
-                    variant="modal"
-                    title={info.title}
-                    content={info.content}
-                    plainText={info.plainText}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      {/* SEO/GEO only — invisible, no visible UI. The active job's own
+          InfoPopup above already covers itself; this covers the other 5
+          so all 6 jobs' content exists in the real page HTML regardless
+          of which one is interactively selected. Not a visible section —
+          per instruction, nothing new gets added to what the page shows. */}
+      {jobs
+        .filter((j) => j.id !== job.id)
+        .map((j) => {
+          const info = baInfoItems.find((it) => it.id === j.infoId);
+          if (!info) return null;
+          return (
+            <span
+              key={j.id}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "1px",
+                height: "1px",
+                padding: 0,
+                margin: "-1px",
+                overflow: "hidden",
+                clipPath: "inset(50%)",
+                whiteSpace: "nowrap",
+                border: 0,
+              }}
+            >
+              {info.title}: {info.plainText}
+            </span>
+          );
+        })}
       <section className="existing-tools">
         <div>
           <p>Built around your reality</p>
