@@ -7,6 +7,8 @@ import PreFooterCta from "../components/site/pre-footer-cta";
 import SiteFooter from "../components/site/footer";
 import OragrolMegaNav from "../components/site/oragrol-mega-nav";
 import { NAV_ITEMS } from "../components/site/nav-items";
+import { DetailsDialog } from "../components/DetailsDialog";
+import { baDetailsContent } from "../lib/ba-details-content";
 import "../gpt-pages.css";
 
 type Job = {
@@ -269,6 +271,17 @@ function BusinessAutomationClient() {
             </div>
             <h3>{job.name}</h3>
             <p className="job-outcome">{job.outcome}</p>
+            {baDetailsContent[job.id] && (
+              <DetailsDialog
+                category="BUSINESS AUTOMATION"
+                {...baDetailsContent[job.id]}
+                action={{
+                  label: scope.has(`automation:${job.id}`) ? "Added to My Scope ✓" : "Check My Fit · Add to Scope",
+                  onClick: () => toggleScope(job),
+                  disabled: false,
+                }}
+              />
+            )}
             <div className="job-facts">
               <div>
                 <span>Ideal fit</span>
@@ -305,6 +318,45 @@ function BusinessAutomationClient() {
               <span>↗</span>
             </button>
           </article>
+          {/* Off-screen Details controls for the jobs not currently
+              selected. Same real, functioning trigger+dialog as the
+              visible one above — not duplicated text, an actual
+              reachable control — just positioned with zero visual
+              footprint so nothing changes for a sighted user browsing
+              normally. Needed because this page only renders one
+              job's full detail panel at a time; without this, the
+              other 5 jobs' descriptions wouldn't exist in the page at
+              all unless that job is the active selection. */}
+          {jobs
+            .filter((j) => j.id !== job.id)
+            .map((j) =>
+              baDetailsContent[j.id] ? (
+                <span
+                  key={j.id}
+                  style={{
+                    position: "absolute",
+                    width: "1px",
+                    height: "1px",
+                    padding: 0,
+                    margin: "-1px",
+                    overflow: "hidden",
+                    clipPath: "inset(50%)",
+                    whiteSpace: "nowrap",
+                    border: 0,
+                  }}
+                >
+                  <DetailsDialog
+                    category="BUSINESS AUTOMATION"
+                    {...baDetailsContent[j.id]}
+                    action={{
+                      label: scope.has(`automation:${j.id}`) ? "Added to My Scope ✓" : "Check My Fit · Add to Scope",
+                      onClick: () => toggleScope(j),
+                      disabled: false,
+                    }}
+                  />
+                </span>
+              ) : null,
+            )}
         </div>
         <p className="commercial-note">
           Prices are shown in Canadian dollars. API usage, software subscriptions
