@@ -21,9 +21,23 @@ import { cn } from "../ui/cn";
  * whitespace around the mark is a minor, safe cosmetic issue; a bad crop
  * is not.
  *
- * Colors: the O and the wordmark use `--color-text-primary` (matches
- * the previous component's pattern, adapts if this ever needs to sit on
- * a dark surface) rather than the source's hardcoded #111. The
+ * Colors: the O and the wordmark are hardcoded to `#141719`, not a CSS
+ * theme variable. First version here used `var(--color-text-primary)`,
+ * assuming it would adapt correctly wherever this component gets
+ * reused. Real, live bug on the homepage instead: that variable
+ * resolved to `rgb(233,229,220)` — the page's own ivory background
+ * color, not a dark text color — because the homepage's header uses a
+ * separate, standalone CSS system (`.home-v3`, its own `--paper`/
+ * `--graphite` custom properties) that doesn't set up
+ * `--color-text-primary` the way the tokens.css system this component
+ * was written against does. Confirmed via live computed-style
+ * inspection: the O and wordmark were rendering in a color matching
+ * the page background almost exactly, invisible, while only the
+ * hardcoded orange bars stayed visible — exactly the small orange
+ * blob reported. `#141719` is that same homepage's own `--graphite`
+ * value, a deliberate match, not arbitrary — but it's now a fixed
+ * value rather than a variable, so it renders correctly regardless of
+ * which page's CSS system this component ends up inside next. The
  * equalizer bars keep the source's exact `#e86b1f` as a hardcoded
  * value, NOT mapped to this project's existing `--color-accent` /
  * `--palette-burnt-orange` token, because it is a different hex
@@ -53,7 +67,7 @@ export function OragrolLogo({ height = 36, className }: OragrolLogoProps) {
     >
       <g
         fill="none"
-        stroke="var(--color-text-primary)"
+        stroke="#141719"
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth={14}
@@ -78,7 +92,7 @@ export function OragrolLogo({ height = 36, className }: OragrolLogoProps) {
         <rect width={3.6} height={86} x={314} y={97} rx={1.8} />
         <rect width={3.6} height={56} x={322} y={112} rx={1.8} />
       </g>
-      <g fill="var(--color-text-primary)" fontFamily="'Helvetica Neue', Helvetica, Arial, sans-serif">
+      <g fill="#141719" fontFamily="'Helvetica Neue', Helvetica, Arial, sans-serif">
         <text x={365} y={155} fontSize={74} fontWeight={500} letterSpacing={4}>
           ORAGROL
         </text>
