@@ -1,55 +1,45 @@
 import { cn } from "../ui/cn";
 
 /**
- * OragrolLogo — Header Fix Pass 3 rebuild.
+ * OragrolLogo — swapped to the new approved mark, 13 Sept 2026.
  *
- * Pass 2 still rebuilt the lockup as two separately laid-out pieces (an
- * `OragrolRing` component + hand-typed text in a flex column with a
- * guessed `gap-2.5` and a guessed 0.6 font-size ratio) — CSS-approximated
- * spacing, not the source file. That's why the ring-to-wordmark gap and
- * the "GLOBAL" scale didn't match `Oragrol_Logo_Final.svg`. This version
- * inlines that file's own three graphic elements (ring `<circle>` + both
- * `<text>` nodes) with their exact source attributes untouched — same
- * cx/cy/r/stroke-width/dasharray/rotate on the ring, same x/y/font-size/
- * letter-spacing on both text nodes — so every position and gap is the
- * file's own coordinates, not a recreation of them.
+ * Replaces the earlier fused-O + wordmark design (the one built from
+ * Oragrol_Logo_Final.svg, a file whose own <title> called it a "concept
+ * demo") with the new mark: a stroke-drawn O, an orange equalizer/
+ * soundwave bar cluster, and "ORAGROL GLOBAL" set in Helvetica Neue.
+ * Source SVG supplied directly by the client, inlined here unmodified
+ * geometry-wise (same paths/rects/coordinates).
  *
- * The only two changes from the raw file, both non-compositional:
- *  1. `viewBox` is cropped from the source's full 900×300 authoring
- *     canvas down to just the logo's own bounding box (measured via
- *     getBBox in a headless render) — this only changes what window is
- *     visible, not any element's position within it.
- *  2. Fill/stroke swap from the source's fixed dark-on-white values to
- *     this file's theme tokens, so it stays legible on both the dark
- *     header and any future light surface: ring stroke #018ABE →
- *     `--color-accent` (the exact same hex, already a token), "ragrol"
- *     fill #1F2937 → `--color-text-primary`, "GLOBAL" fill #9CA3AF →
- *     `--color-text-secondary` (also already the same hex as the token).
- *  Dropped entirely: the source's white background rect and its
- *  "Concept only — gap size/position/weight all adjustable" debug
- *  caption — both authoring scaffolding, never part of the mark itself.
+ * viewBox kept at the source's full 920x280 authoring canvas rather than
+ * cropped to a tight bounding box the way the previous version was —
+ * that crop was measured with a real headless render (getBBox against
+ * the actual rendered logo, with the real web font loaded). No working
+ * browser was available to do the same here, and a wrong guessed crop
+ * risks clipping real content (the previous file's own comment
+ * documents exactly that mistake happening once already, from measuring
+ * against a bare-HTML copy without the brand font loaded). Extra
+ * whitespace around the mark is a minor, safe cosmetic issue; a bad crop
+ * is not.
  *
- * Font: the source specifies 'Epilogue','Inter',sans-serif — this project
- * already loads Epilogue as the confirmed brand typeface
- * (`font-brand` → `--font-epilogue`, see tokens.css), so the text nodes
- * use that Tailwind utility rather than a hardcoded font-family string.
+ * Colors: the O and the wordmark use `--color-text-primary` (matches
+ * the previous component's pattern, adapts if this ever needs to sit on
+ * a dark surface) rather than the source's hardcoded #111. The
+ * equalizer bars keep the source's exact `#e86b1f` as a hardcoded
+ * value, NOT mapped to this project's existing `--color-accent` /
+ * `--palette-burnt-orange` token, because it is a different hex
+ * (#e86b1f here vs #db5227 for the site's existing accent) — worth a
+ * real decision (new distinct brand orange vs. should match the site's
+ * accent exactly) rather than silently picking one.
  */
 export interface OragrolLogoProps {
   /** Rendered height in px. Width follows automatically from the source
-   *  file's own aspect ratio (~2.17:1) — never set independently. */
+   *  file's own aspect ratio (920:280). */
   height?: number;
   className?: string;
 }
 
-// Cropped from the source's 900x300 canvas to the measured bounding box of
-// the ring + "ragrol" + "GLOBAL" (excludes bg rect + debug caption), plus
-// ~20px padding on every side. Measured live via getBBox() against this
-// component actually rendered with the real Epilogue web font — an
-// earlier measurement against a bare-HTML copy of the source file (no
-// Epilogue loaded, so the browser substituted a narrower fallback sans)
-// undershot the real text width and clipped "ragrol"/"GLOBAL" in-browser.
-const VIEWBOX = "28 68 391 172";
-const ASPECT_RATIO = 391 / 172;
+const VIEWBOX = "0 0 920 280";
+const ASPECT_RATIO = 920 / 280;
 
 export function OragrolLogo({ height = 36, className }: OragrolLogoProps) {
   return (
@@ -61,40 +51,41 @@ export function OragrolLogo({ height = 36, className }: OragrolLogoProps) {
       aria-label="Oragrol Global"
       className={cn("shrink-0", className)}
     >
-      {/* fused O — exact source geometry, untouched */}
-      <circle
-        cx={110}
-        cy={150}
-        r={62}
+      <g
         fill="none"
-        stroke="var(--color-accent)"
-        strokeWidth={26}
-        strokeDasharray="365 24"
-        strokeDashoffset={0}
+        stroke="var(--color-text-primary)"
         strokeLinecap="round"
-        transform="rotate(35 110 150)"
-      />
-      <text
-        x={185}
-        y={172}
-        className="font-brand"
-        fontWeight={500}
-        fontSize={72}
-        fill="var(--color-text-primary)"
+        strokeLinejoin="round"
+        strokeWidth={14}
       >
-        ragrol
-      </text>
-      <text
-        x={187}
-        y={215}
-        className="font-brand"
-        fontWeight={500}
-        fontSize={20}
-        letterSpacing={7}
-        fill="var(--color-text-secondary)"
-      >
-        GLOBAL
-      </text>
+        <circle cx={100} cy={140} r={76} />
+        <path d="M62 85v110m0-110s56-3 73 35c15 32-10 45-37 45H62m36 0 47 30" />
+      </g>
+      <g fill="#e86b1f">
+        <rect width={3.6} height={56} x={210} y={112} rx={1.8} />
+        <rect width={3.6} height={86} x={218} y={97} rx={1.8} />
+        <rect width={3.6} height={112} x={226} y={84} rx={1.8} />
+        <rect width={3.6} height={134} x={234} y={73} rx={1.8} />
+        <rect width={3.6} height={150} x={242} y={65} rx={1.8} />
+        <rect width={3.6} height={160} x={250} y={60} rx={1.8} />
+        <rect width={3.6} height={166} x={258} y={57} rx={1.8} />
+        <rect width={3.6} height={168} x={266} y={56} rx={1.8} />
+        <rect width={3.6} height={166} x={274} y={57} rx={1.8} />
+        <rect width={3.6} height={160} x={282} y={60} rx={1.8} />
+        <rect width={3.6} height={150} x={290} y={65} rx={1.8} />
+        <rect width={3.6} height={134} x={298} y={73} rx={1.8} />
+        <rect width={3.6} height={112} x={306} y={84} rx={1.8} />
+        <rect width={3.6} height={86} x={314} y={97} rx={1.8} />
+        <rect width={3.6} height={56} x={322} y={112} rx={1.8} />
+      </g>
+      <g fill="var(--color-text-primary)" fontFamily="'Helvetica Neue', Helvetica, Arial, sans-serif">
+        <text x={365} y={155} fontSize={74} fontWeight={500} letterSpacing={4}>
+          ORAGROL
+        </text>
+        <text x={365} y={200} fontSize={21} fontWeight={400} letterSpacing={15.5}>
+          GLOBAL
+        </text>
+      </g>
     </svg>
   );
 }
