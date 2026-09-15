@@ -356,9 +356,10 @@ function OrOneClient() {
         </div>
         <div className="one-support">
           <p>
-            OR ONE unifies cybersecurity, AI automation and operational
-            intelligence into one secure system—built around how your business
-            actually works.
+            OR ONE connects your business systems and coordinates AI workers
+            across your organization through one secure operating layer. It
+            centralizes approvals, oversight and performance while keeping
+            every important decision under human authority.
           </p>
           <a href="#one-intro">
             Discover OR ONE <span>↘</span>

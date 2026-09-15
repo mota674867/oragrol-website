@@ -209,8 +209,10 @@ function BusinessAutomationClient() {
             </h1>
             <div className="ba-support">
               <p>
-                Five outcome-built automation systems, connected to the tools
-                your business already uses.
+                BA transforms individual business functions through focused,
+                tailored automation. It works with your existing software to
+                improve sales, marketing, customer service, finance or
+                IT—reducing manual work and delivering measurable results.
               </p>
               <a href="#job-selector">
                 Explore the five jobs <span>↘</span>

@@ -30,7 +30,7 @@ function HomeCybersecurity() {
       id="home-cybersecurity"
       aria-labelledby="home-cyber-heading"
     >
-      <p className={s.eyebrow}>04 / CYBERSECURITY</p>
+      <p className={s.eyebrow}>CYBERSECURITY</p>
       <header className={s.header}>
         <h2 id="home-cyber-heading">
           Protection built
