@@ -9,6 +9,7 @@ import OragrolMegaNav from "../components/site/oragrol-mega-nav";
 import { NAV_ITEMS } from "../components/site/nav-items";
 import { OR_ONE_CAPABILITY_BY_NAME } from "../lib/or-one-capability-registry";
 import {
+  RevisedSignature,
   RevisedProcess,
   RevisedPricing,
   RevisedResponsibility,
@@ -393,6 +394,7 @@ function OrOneClient() {
           <blockquote>Engineered by ORAGROL Global.</blockquote>
         </div>
       </section>
+      <RevisedSignature />
       <RevisedProcess />
       <section className="team-builder" id="team-builder">
         <div className="builder-heading">
