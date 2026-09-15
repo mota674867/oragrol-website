@@ -155,7 +155,10 @@ export async function POST(request: Request) {
   // 2) Lead notification, to CONTACT_TO_EMAIL — secondary to the client
   // delivery above, but never silently dropped: any failure here is
   // logged loudly server-side even though the client's request still
-  // succeeds (their report already sent).
+  // succeeds (their report already sent). leadNotified tracks the real
+  // outcome so the response below can say so, instead of the caller
+  // having no way to tell a real failure from a real success.
+  let leadNotified = false;
   try {
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
@@ -176,6 +179,8 @@ export async function POST(request: Request) {
     });
     if (error) {
       console.error("[/api/cyber-health] Resend error sending lead notification (client report already sent successfully):", error);
+    } else {
+      leadNotified = true;
     }
   } catch (err) {
     console.error("[/api/cyber-health] Unexpected error sending lead notification (client report already sent successfully):", err);
@@ -189,7 +194,16 @@ export async function POST(request: Request) {
   // response's point of view (never blocks/fails the request, same as
   // before), but no longer silently reports success on a partial
   // failure — a genuine CRM outage now leaves a visible pending job in
-  // Redis instead of pretending the sync happened.
+  // Redis instead of pretending the sync happened. hubspotSync tracks
+  // which of the three real outcomes actually happened, so the
+  // response can say so honestly instead of returning ok:true
+  // regardless of what happened here — "queued" (job created and
+  // handed to QStash), "queued_retry_pending" (job durably persisted,
+  // but the immediate publish failed — genuinely recoverable, the
+  // 5-minute recovery sweep will pick it up, not a real failure), or
+  // "failed" (nothing was persisted at all — the one case that is a
+  // real, unrecovered loss and worth knowing about).
+  let hubspotSync: "queued" | "queued_retry_pending" | "failed" = "failed";
   try {
     const assessmentId = randomUUID();
     const snapshot = buildAssessmentSnapshot(assessmentId, report, parsed.data, "/cyber-health");
@@ -200,16 +214,27 @@ export async function POST(request: Request) {
       Date.parse(snapshot.completedAt),
     );
     const job = await createContactJob(assessmentId);
-    await publishCyberHealthJobRetry(job.jobId, job.attempts).catch((err) => {
-      console.error(
-        `[/api/cyber-health] QStash publish failed for cha_contact job ${job.jobId} (assessment ${assessmentId}):`,
-        err instanceof Error ? err.message : err,
-      );
-      return null;
-    });
+    hubspotSync = "queued_retry_pending"; // job is durably persisted from this point on, even if the immediate publish below fails
+    await publishCyberHealthJobRetry(job.jobId, job.attempts).then(
+      () => {
+        hubspotSync = "queued";
+      },
+      (err) => {
+        console.error(
+          `[/api/cyber-health] QStash publish failed for cha_contact job ${job.jobId} (assessment ${assessmentId}):`,
+          err instanceof Error ? err.message : err,
+        );
+      },
+    );
   } catch (err) {
     console.error("[/api/cyber-health] HubSpot job creation failed unexpectedly:", err);
   }
 
-  return NextResponse.json({ ok: true, reportId: report.reportId, clientReference: report.clientReference });
+  return NextResponse.json({
+    ok: true,
+    reportId: report.reportId,
+    clientReference: report.clientReference,
+    leadNotified,
+    hubspotSync,
+  });
 }
