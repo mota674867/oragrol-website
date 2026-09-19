@@ -1690,4 +1690,32 @@ Fixed: `home/hero.tsx`'s content `Container` gets `pt-[var(--header-height)]`, r
 - Newsletter (Part B): wait for Mohammad to complete Part C (HubSpot private app token + list, Brevo list, integration decision) before building.
 
 ---
+
+### 2026-09-19 (later same day) — Newsletter signup backend built (Part B/C), once Mohammad finished HubSpot/Brevo account setup
+**Completed:**
+- Mohammad completed all Newsletter account setup this session (walked through step by step live): confirmed `HUBSPOT_ACCESS_TOKEN` was already set in Vercel (reused the existing "Oragrol n8n" Private App — already had the right scopes from the Cyber Health integration, no new app needed), created a HubSpot custom checkbox property (`newsletter_subscriber`, internal name confirmed) and an Active Segment ("Newsletter Subscribers," filtered on that property), created a Brevo list ("Newsletter," confirmed list id `3`), and generated + added a new `BREVO_API_KEY` to Vercel. With all four pieces confirmed, built the actual backend.
+- Found the real wiring point first (Section 2's "inspect before changing" rule): `footer.tsx`'s default-exported `SiteFooter` (NOT the older, unused `app/components/site/site-footer.tsx`) already had a complete `onSubscribe` prop contract and pending/success/error state machine built 2026-09-05, deliberately left unwired. It's rendered bare (`<SiteFooter/>`, no props) from 15 separate files — several Server Components that can't pass client closures as props — so rather than threading a handler through all 15 call sites (like the 3 per-page wrappers D-084 used), wired the real handler as `footer.tsx`'s own default: `await (onSubscribe ?? submitNewsletter)(...)`, importing `submitNewsletter` directly. `onSubscribe` stays as an optional override hook only.
+- New files: `app/lib/newsletter-schema.ts` (zod — only `email` required, matching the form's actual `required` attributes), `app/lib/brevo.ts` (first Brevo integration in this codebase — `POST /v3/contacts` with `updateEnabled:true`, upserts by email in one call), `app/api/newsletter/route.ts` (JSON body, not multipart — no file uploads here), `app/lib/submit-newsletter.ts` (client fetch wrapper, mirrors `submit-opportunity.ts`).
+- `app/lib/hubspot.ts` gained one new function, `syncNewsletterSubscriberToHubSpot` — existing functions in that file untouched, per that file's own established "new function, not a shared refactor" convention.
+- Deliberately asymmetric dual-write (see D-085 for the full reasoning): Brevo is mandatory (it's the actual send platform — a failure there is a real, reported signup failure), HubSpot is best-effort CRM visibility only (logged on failure, never blocks the response) — mirrors `/api/cyber-health`'s existing "deliverable mandatory, CRM sync best-effort" split.
+- Verified: `npx tsc --noEmit` and `npm run lint` both fully clean (0 errors, 0 new warnings — the 7 present are pre-existing/unrelated). `npm run build` blocked only by this sandbox's known Google-Fonts network restriction (not a code defect, confirmed the same way in D-084). `npm run dev` + curl against `POST /api/newsletter`: invalid email → correct rejection message, missing consent → correct rejection, missing `firstName` → accepted (optional by design), malformed JSON → correct 400, and a fully valid payload → the honest "isn't configured yet" failure (no real `BREVO_API_KEY` in this sandbox, same sandbox limitation pattern as D-084's Resend test) — confirms validation/rate-limiting/error-handling all work end to end.
+
+**Files changed:**
+- New: `app/lib/newsletter-schema.ts`, `app/lib/brevo.ts`, `app/api/newsletter/route.ts`, `app/lib/submit-newsletter.ts`
+- Edited: `app/lib/hubspot.ts` (added `syncNewsletterSubscriberToHubSpot`), `app/components/site/footer.tsx` (default `onSubscribe` to `submitNewsletter`, removed the old "isn't connected yet" fallback), `.env.local.example` (documented `BREVO_API_KEY`, noted `HUBSPOT_ACCESS_TOKEN` reuse)
+- `DECISIONS.md` (D-085), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- None new — same class of pre-existing/environmental build limitation as D-084 (Google Fonts fetch blocked in this sandbox only), confirmed not caused by this work.
+
+**Problems solved:**
+- The footer Newsletter form goes from "isn't connected yet — check back soon" (honest placeholder, live since 2026-09-05) to a fully wired, end-to-end-tested HubSpot+Brevo signup, without needing to touch any of the 15 pages that render the footer.
+
+**Still open / needs verification:**
+- Not yet shipped to production (pending the usual `git format-patch` → Mohammad's `git am` + `git push origin main` workflow) and not yet tested against a live Brevo/HubSpot account (no real API keys in this sandbox) — real verification is a live footer submission once deployed, confirming the contact lands correctly in both Brevo's "Newsletter" list and HubSpot's "Newsletter Subscribers" segment.
+
+**Next recommended step:**
+- Ship via the established patch workflow, then get Mohammad to run one real test submission on the live site (same pattern used to confirm Careers/Talent/Partnerships) and confirm it in both Brevo and HubSpot.
+
+---
 *(New sessions get added above this line, newest first. When this file passes ~10 sessions, move the oldest ones into PROJECT_MEMORY_ARCHIVE.md.)*

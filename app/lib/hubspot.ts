@@ -538,6 +538,60 @@ export async function ensureCyberHealthPropertySchema(): Promise<SchemaBootstrap
   return result;
 }
 
+// --- Newsletter signup HubSpot sync (2026-09-19) -----------------------
+// Per ORAGROL_Careers_Talent_Partnerships_Newsletter_Build_Spec.md, Part
+// C/D: the footer Newsletter form (app/components/site/footer.tsx) dual-
+// writes to HubSpot (CRM visibility) and Brevo (the actual send list —
+// see brevo.ts). Best-effort here, same as every other HubSpot sync in
+// this file — a CRM hiccup must never block someone actually getting
+// subscribed. Sets the custom `newsletter_subscriber` checkbox property
+// (internal name confirmed 2026-09-19 in Mohammad's HubSpot portal) so
+// the "Newsletter Subscribers" Active Segment there picks the contact up
+// automatically — no separate "add to list" call needed for HubSpot.
+
+export type NewsletterHubSpotSyncResult =
+  | { state: "synced"; contactId: string }
+  | { state: "failed"; error: string };
+
+export async function syncNewsletterSubscriberToHubSpot(params: {
+  email: string;
+  firstName: string;
+}): Promise<NewsletterHubSpotSyncResult> {
+  const token = process.env.HUBSPOT_ACCESS_TOKEN;
+  if (!token) {
+    return { state: "failed", error: "HUBSPOT_ACCESS_TOKEN is not set — skipping CRM sync." };
+  }
+  try {
+    const upsertRes = await fetch(`${HUBSPOT_API_BASE}/crm/v3/objects/contacts/batch/upsert`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        inputs: [
+          {
+            idProperty: "email",
+            id: params.email,
+            properties: {
+              email: params.email,
+              firstname: params.firstName,
+              newsletter_subscriber: "true",
+            },
+          },
+        ],
+      }),
+    });
+    if (!upsertRes.ok) {
+      const text = await upsertRes.text().catch(() => "");
+      return { state: "failed", error: `HubSpot contact upsert failed: ${upsertRes.status} ${text}`.slice(0, 500) };
+    }
+    const upsertData = await upsertRes.json();
+    const contactId = upsertData?.results?.[0]?.id;
+    if (!contactId) return { state: "failed", error: "HubSpot contact upsert returned no contact id." };
+    return { state: "synced", contactId };
+  } catch (err) {
+    return { state: "failed", error: `HubSpot newsletter sync threw: ${err instanceof Error ? err.message : String(err)}` };
+  }
+}
+
 export async function syncScopeContact(client: {
   name: string;
   email: string;

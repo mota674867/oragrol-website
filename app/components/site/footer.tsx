@@ -5,6 +5,7 @@ import { useId, useState } from "react";
 import type { CSSProperties, FormEvent, ReactNode } from "react";
 import styles from "./footer.module.css";
 import { LinkedInIcon, InstagramIcon } from "./social-icons";
+import { submitNewsletter } from "../../lib/submit-newsletter";
 
 /**
  * Shared site footer — one component, identical on every redesigned page.
@@ -34,7 +35,7 @@ export type SiteFooterProps = {
   logoStyle?: CSSProperties;
   /** Dashed "LOGO PENDING" box, for internal design review only — must stay false on a shipped page. */
   showLogoPlaceholder?: boolean;
-  /** Wire up a real subscription service once one exists; until then submissions honestly report as unavailable rather than faking success. */
+  /** Defaults to the real HubSpot+Brevo signup (submit-newsletter.ts, POST /api/newsletter) — see D-085. Override only for tests/storybook. */
   onSubscribe?: (submission: NewsletterSubmission) => Promise<void>;
   year?: number;
 };
@@ -93,18 +94,13 @@ export default function SiteFooter({
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (status === "pending") return;
-    if (!onSubscribe) {
-      setStatus("error");
-      setMessage("Newsletter signup isn't connected yet — check back soon.");
-      return;
-    }
     const form = event.currentTarget;
     const data = new FormData(form);
     if (data.get("consent") !== "on") return;
     setStatus("pending");
     setMessage("");
     try {
-      await onSubscribe({
+      await (onSubscribe ?? submitNewsletter)({
         firstName: String(data.get("firstName") || "").trim(),
         email: String(data.get("email") || "").trim(),
         consent: true,
