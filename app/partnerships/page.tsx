@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import OragrolOpportunityPage from "../components/site/oragrol-opportunity-page";
+import PartnershipsClient from "./partnerships-client";
 
 export const metadata: Metadata = {
   title: "Partnerships | ORAGROL Global",
@@ -21,16 +20,5 @@ export const metadata: Metadata = {
 };
 
 export default function PartnershipsPage() {
-  return (
-    <OragrolOpportunityPage
-      page="partnerships"
-      logo={
-        <Link className="op-wordmark" href="/" aria-label="ORAGROL Global home">
-          ORAGROL<span>GLOBAL</span>
-        </Link>
-      }
-      privacyUrl="/privacy-policy"
-      termsUrl="/terms-of-use"
-    />
-  );
+  return <PartnershipsClient />;
 }

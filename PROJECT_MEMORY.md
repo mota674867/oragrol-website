@@ -1659,4 +1659,34 @@ Fixed: `home/hero.tsx`'s content `Container` gets `pt-[var(--header-height)]`, r
 - Get Mohammad's go-ahead to push D-082, then confirm live on his actual monitor.
 
 ---
+
+### 2026-09-19 — Careers/Talent/Partnerships: direct-to-inbox submission backend built (Part A of the Sept 19 build spec); Newsletter (Part B) still blocked on Mohammad's HubSpot/Brevo account setup
+**Completed:**
+- Mohammad decided (2026-09-19, logged in the claude.ai project's `ORAGROL_Pending_Items_Register.md`) that Careers/Talent/Partnerships submissions go straight to his inbox — no CRM, no HubSpot pipeline — while Newsletter signups get stored in HubSpot (a "Newsletter" contact category) with actual sending done via Brevo. This session built Part A only (Part B needs Mohammad to create the HubSpot/Brevo accounts and lists first — nothing to build yet).
+- Investigated the actual current architecture before writing anything (per Section 2/5): `/careers`, `/talent`, `/partnerships` are three thin Server Component wrappers around ONE shared client component, `OragrolOpportunityPage` (`app/components/site/oragrol-opportunity-page.tsx`), which already has an `onSubmit`/`submissionsEnabled` prop contract built in but previously unwired (forms rendered the "Online submissions are not open yet" disabled state). Rather than the three-separate-API-routes plan sketched in the original spec doc, built ONE shared `/api/opportunity` route to match this existing shared-component pattern — less duplication, one source of truth for the email-building logic. (The saved spec doc in the claude.ai project still describes 3 routes; needs a follow-up edit to match this.)
+- New files: `app/lib/opportunity-schema.ts` (zod schema — validates only the universal required fields: name/email/country/city/phone/description; page-specific extras like `specialty`/`role`/`proposedRegion` pass through informational-only, unvalidated, never stored anywhere), `app/api/opportunity/route.ts` (mirrors `/api/contact`'s established pattern: Resend send, shared `rateLimit()` helper, PDF-only/2-file/8MB attachment limits re-checked server-side even though the form already enforces them client-side, never fakes success on missing `RESEND_API_KEY`/`CONTACT_TO_EMAIL` — returns a real 500 with an honest message instead), `app/lib/submit-opportunity.ts` (client-side fetch wrapper implementing the component's `onSubmit` contract), and one thin `"use client"` wrapper per page (`careers-client.tsx`, `talent-client.tsx`, `partnerships-client.tsx` — mirrors the existing `contact/contact-client.tsx` split, needed because Server Components can't pass function props to Client Components).
+- Edited: the three `page.tsx` files (now just render their new `*-client.tsx` wrapper, `metadata` export untouched), `.env.local.example` (documented that the new route reuses the same `RESEND_API_KEY`/`CONTACT_TO_EMAIL`/`CONTACT_FROM_EMAIL` vars — no new secrets needed).
+- Verified: `npx tsc --noEmit` — one pre-existing, unrelated error (`app/layout.tsx` `LayoutProps`) confirmed via `git stash`/`git stash pop` to exist identically on an unmodified checkout, not caused by this work. `npm run lint` — 0 errors, same pre-existing unrelated warnings only. `npm run build` — failed in this sandbox only, on the pre-existing `next/font/google` Google-Fonts-fetch block (this sandbox's network egress doesn't reach `fonts.googleapis.com`; same class of sandbox-only limitation noted in earlier sessions — Vercel's real production build has unrestricted internet access). `npm run dev` + curl confirmed all three pages still return 200. Direct curl of `POST /api/opportunity` with a sample multipart Talent submission returned the correct honest failure (`{"ok":false,"error":"Submissions aren't configured yet..."}`, HTTP 500) since no real `RESEND_API_KEY`/`CONTACT_TO_EMAIL` exists in this sandbox — confirms the route's parsing/validation/rate-limiting all work end to end; full email-send behavior can only be confirmed once real env vars are set (on Vercel, or in a local `.env.local`).
+
+**Files changed:**
+- New: `app/lib/opportunity-schema.ts`, `app/api/opportunity/route.ts`, `app/lib/submit-opportunity.ts`, `app/careers/careers-client.tsx`, `app/talent/talent-client.tsx`, `app/partnerships/partnerships-client.tsx`
+- Edited: `app/careers/page.tsx`, `app/talent/page.tsx`, `app/partnerships/page.tsx`, `.env.local.example`
+- `DECISIONS.md` (D-084), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- None new — the one TS error and the build's font-fetch failure are both pre-existing/environmental, not introduced by this work (confirmed empirically, not assumed).
+
+**Problems solved:**
+- Careers/Talent/Partnerships forms go from a permanently-disabled placeholder state to fully wired, end-to-end-tested submission handling, using the same battle-tested pattern (`/api/contact`) already in production rather than inventing a new one.
+
+**Still open / needs verification:**
+- Not yet committed/pushed as of writing this entry — see D-084 for the plan (this session cannot push directly; goes out as a patch for Mohammad to `git am`/push himself).
+- Once live, needs one real end-to-end test with actual `RESEND_API_KEY`/`CONTACT_TO_EMAIL` set (either locally or on Vercel) to confirm the email actually arrives — the sandbox curl test only confirms the code path up to the point Resend would be called.
+- Newsletter (Part B) is fully unbuilt — blocked on Mohammad creating the HubSpot private app token + "Newsletter Subscribers" list and a Brevo "Newsletter" list, and deciding on the native HubSpot–Brevo integration vs. a custom sync.
+- The claude.ai project's `ORAGROL_Careers_Talent_Partnerships_Newsletter_Build_Spec_2026-09-19.md` still documents Part A as 3 separate routes — needs updating to reflect the single shared `/api/opportunity` route actually built.
+
+**Next recommended step:**
+- Commit, patch, and walk Mohammad through `git am` + `git push origin main` from his newly re-cloned `C:\Users\user\Desktop\oragrol-website` folder. Once live, confirm one real test submission arrives by email before considering Part A fully done.
+
+---
 *(New sessions get added above this line, newest first. When this file passes ~10 sessions, move the oldest ones into PROJECT_MEMORY_ARCHIVE.md.)*

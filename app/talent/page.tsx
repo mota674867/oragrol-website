@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import OragrolOpportunityPage from "../components/site/oragrol-opportunity-page";
+import TalentClient from "./talent-client";
 
 export const metadata: Metadata = {
   title: "Talent | ORAGROL Global",
@@ -21,16 +20,5 @@ export const metadata: Metadata = {
 };
 
 export default function TalentPage() {
-  return (
-    <OragrolOpportunityPage
-      page="talent"
-      logo={
-        <Link className="op-wordmark" href="/" aria-label="ORAGROL Global home">
-          ORAGROL<span>GLOBAL</span>
-        </Link>
-      }
-      privacyUrl="/privacy-policy"
-      termsUrl="/terms-of-use"
-    />
-  );
+  return <TalentClient />;
 }

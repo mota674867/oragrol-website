@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import OragrolOpportunityPage from "../components/site/oragrol-opportunity-page";
+import CareersClient from "./careers-client";
 
 export const metadata: Metadata = {
   title: "Careers | ORAGROL Global",
@@ -20,24 +19,6 @@ export const metadata: Metadata = {
   },
 };
 
-// Real vacancies only — see ORAGROL_Opportunity_Pages_Guide.md: with no
-// confirmed openings, the component shows an honest empty state rather
-// than a misleading role application form. Update this list the moment a
-// real role opens; never add a placeholder entry.
-const VACANCIES: never[] = [];
-
 export default function CareersPage() {
-  return (
-    <OragrolOpportunityPage
-      page="careers"
-      logo={
-        <Link className="op-wordmark" href="/" aria-label="ORAGROL Global home">
-          ORAGROL<span>GLOBAL</span>
-        </Link>
-      }
-      privacyUrl="/privacy-policy"
-      termsUrl="/terms-of-use"
-      vacancies={VACANCIES}
-    />
-  );
+  return <CareersClient />;
 }
