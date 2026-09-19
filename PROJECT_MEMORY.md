@@ -1711,11 +1711,12 @@ Fixed: `home/hero.tsx`'s content `Container` gets `pt-[var(--header-height)]`, r
 **Problems solved:**
 - The footer Newsletter form goes from "isn't connected yet — check back soon" (honest placeholder, live since 2026-09-05) to a fully wired, end-to-end-tested HubSpot+Brevo signup, without needing to touch any of the 15 pages that render the footer.
 
-**Still open / needs verification:**
-- Not yet shipped to production (pending the usual `git format-patch` → Mohammad's `git am` + `git push origin main` workflow) and not yet tested against a live Brevo/HubSpot account (no real API keys in this sandbox) — real verification is a live footer submission once deployed, confirming the contact lands correctly in both Brevo's "Newsletter" list and HubSpot's "Newsletter Subscribers" segment.
+**Shipped and confirmed (update, same day):**
+- Committed locally, patched via `git format-patch`, patch verified to apply cleanly against a fresh clone of the real `origin/main` before handing it over. Mohammad applied it on his own machine (`git am` + `git push origin main`, pushed as `3a5a566`) and confirmed live on GitHub — sandbox synced to match (`git diff` against `origin/main` empty, confirming identical content under a different commit hash, same pattern as every prior ship).
+- Mohammad ran a real end-to-end test on the live site himself: submitted the footer newsletter form with his own name/email, got the real success message ("Thank you. You're subscribed to the monthly briefing."), then confirmed the contact landed correctly in both destinations — visible in Brevo's "Newsletter" list, and showing up in HubSpot's "Newsletter Subscribers" Active Segment (Size: 1, filter "Newsletter Subscriber is equal to True," contact listed by name/email). Confirms the full asymmetric dual-write (Brevo mandatory, HubSpot best-effort) works end to end in production. Part B/C is done — all three parts of the 2026-09-19 build spec (Careers/Talent/Partnerships + Newsletter) are now fully shipped and confirmed live.
 
 **Next recommended step:**
-- Ship via the established patch workflow, then get Mohammad to run one real test submission on the live site (same pattern used to confirm Careers/Talent/Partnerships) and confirm it in both Brevo and HubSpot.
+- No immediate follow-up needed on Newsletter — fully closed out. Next open items are whatever Mohammad wants to pick up next from the Pending Items Register (legal package review, Cyber Health native rebuild, live chat spec, or OR/ONE interactive selection page are the standing "next priority, no external blocker" candidates).
 
 ---
 *(New sessions get added above this line, newest first. When this file passes ~10 sessions, move the oldest ones into PROJECT_MEMORY_ARCHIVE.md.)*
