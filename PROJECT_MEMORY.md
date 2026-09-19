@@ -1680,13 +1680,14 @@ Fixed: `home/hero.tsx`'s content `Container` gets `pt-[var(--header-height)]`, r
 - Careers/Talent/Partnerships forms go from a permanently-disabled placeholder state to fully wired, end-to-end-tested submission handling, using the same battle-tested pattern (`/api/contact`) already in production rather than inventing a new one.
 
 **Still open / needs verification:**
-- Not yet committed/pushed as of writing this entry — see D-084 for the plan (this session cannot push directly; goes out as a patch for Mohammad to `git am`/push himself).
-- Once live, needs one real end-to-end test with actual `RESEND_API_KEY`/`CONTACT_TO_EMAIL` set (either locally or on Vercel) to confirm the email actually arrives — the sandbox curl test only confirms the code path up to the point Resend would be called.
 - Newsletter (Part B) is fully unbuilt — blocked on Mohammad creating the HubSpot private app token + "Newsletter Subscribers" list and a Brevo "Newsletter" list, and deciding on the native HubSpot–Brevo integration vs. a custom sync.
-- The claude.ai project's `ORAGROL_Careers_Talent_Partnerships_Newsletter_Build_Spec_2026-09-19.md` still documents Part A as 3 separate routes — needs updating to reflect the single shared `/api/opportunity` route actually built.
+
+**Shipped and confirmed (update, same day):**
+- Committed locally (`5687d86`), patched via `git format-patch`, patch verified to apply cleanly against a fresh clone of the real `origin/main` before handing it over. Mohammad applied it on his own machine (`git am` + `git push origin main`, pushed as `eb214b4` — same diff, different hash since it was re-committed on his machine) and confirmed live on GitHub.
+- Mohammad ran a real end-to-end test on the live site himself: submitted the Careers form with a PDF attached, and the email arrived correctly — confirms the full pipeline (Resend send, rate limiting, and the file-attachment path) works in production, not just in the sandbox. Part A is done.
 
 **Next recommended step:**
-- Commit, patch, and walk Mohammad through `git am` + `git push origin main` from his newly re-cloned `C:\Users\user\Desktop\oragrol-website` folder. Once live, confirm one real test submission arrives by email before considering Part A fully done.
+- Newsletter (Part B): wait for Mohammad to complete Part C (HubSpot private app token + list, Brevo list, integration decision) before building.
 
 ---
 *(New sessions get added above this line, newest first. When this file passes ~10 sessions, move the oldest ones into PROJECT_MEMORY_ARCHIVE.md.)*
