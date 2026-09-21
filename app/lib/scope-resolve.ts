@@ -1,4 +1,4 @@
-import { SERVICE_PACKAGES, INDIVIDUAL_SERVICES } from "../services/services-catalog";
+import { SERVICE_PACKAGES, INDIVIDUAL_SERVICES } from "@/app/[locale]/services/services-catalog";
 import { BUSINESS_AUTOMATION_JOB_REGISTRY } from "./business-automation-job-registry";
 import { OR_ONE_CAPABILITY_BY_CODE } from "./or-one-capability-registry";
 import type { ScopeResolvedItem, ScopeArea } from "./hubspot";

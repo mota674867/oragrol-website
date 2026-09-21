@@ -12,7 +12,7 @@
  */
 import type { CyberHealthReport, CyberHealthSubmission } from "./cyber-health-report";
 import { visibleQuestions, SCORING_VERSION } from "./cyber-health-report";
-import { qualification as qualificationQuestions } from "../cyber-health/assessment-data";
+import { qualification as qualificationQuestions } from "@/app/[locale]/cyber-health/assessment-data";
 import type { AssessmentSnapshot } from "./cyber-health-hubspot-note";
 
 export function buildAssessmentSnapshot(

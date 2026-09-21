@@ -7,7 +7,7 @@
  * the same principle applied to the Contact form (never trust/fake a
  * result the server didn't independently produce).
  */
-import { categories, questions, sections } from "../cyber-health/assessment-data";
+import { categories, questions, sections } from "@/app/[locale]/cyber-health/assessment-data";
 import {
   CATEGORY_GROUPS,
   FINDINGS,
@@ -20,7 +20,7 @@ import {
   riskTier,
   type Finding,
   type Severity,
-} from "../cyber-health/report-data";
+} from "@/app/[locale]/cyber-health/report-data";
 
 export type Answer = "Yes" | "No" | "Not Sure";
 

@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
 
 // Security-hardening pass (pre-launch). CSP/style-src and script-src use
 // 'unsafe-inline' pragmatically because Next.js emits inline hydration
@@ -58,4 +59,6 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
+
+export default withNextIntl(nextConfig);
