@@ -8,7 +8,7 @@
       "services": [
         {
           "code": "C01-S01",
-          "name": "Risk Check",
+          "name": "Cyber Health Check",
           "blurb": "Know where your real risk is, prioritized and clear.",
           "price": "$4,500",
           "unit": "one-time",
@@ -29,7 +29,7 @@
         },
         {
           "code": "C01-S02",
-          "name": "Compliance Ready",
+          "name": "Compliance Check",
           "blurb": "Know exactly what compliance requires, and how close you are.",
           "price": "$5,000",
           "unit": "+ $500/mo",
@@ -51,7 +51,7 @@
         },
         {
           "code": "C01-S03",
-          "name": "Policy Guard",
+          "name": "Security Rules Setup",
           "blurb": "Security policies that are current, approved, and actually followed.",
           "price": "$800",
           "unit": "/mo",
@@ -102,7 +102,7 @@
       "services": [
         {
           "code": "C02-S01",
-          "name": "Vuln Watch",
+          "name": "Security Weakness Check",
           "blurb": "Continuous scanning that finds and tracks weaknesses to closure.",
           "price": "$15",
           "unit": "/user/mo",
@@ -1153,15 +1153,15 @@
     },
     {
       "code": "C10",
-      "name": "Test your real defenses",
-      "tagline": "Certified specialists try to break in, safely.",
+      "name": "Certified Specialist Services",
+      "tagline": "Qualified specialist work for testing, attestation, assessment, and incident response.",
       "tier": "Tier 1 - Cybersecurity",
       "services": [
         {
           "code": "C10-S01",
           "name": "Real-World Test",
           "blurb": "Certified specialists try to break in, safely.",
-          "price": "$7,500-$18,000",
+          "price": "From $7,500",
           "unit": "per engagement",
           "problem": "You need proof that your defenses actually work, not just an assessment that says they might have gaps.",
           "what_we_do": "A certified human tester attempts authorized exploitation within an agreed scope, documents exactly what they were able to do, and gives you a prioritized plan to close it.",
@@ -1178,6 +1178,74 @@
           ],
           "process": "Scope & authorize → Test → Document → Report → Fix → Retest.",
           "outcome": "You know exactly what an attacker could actually do — and you've closed it."
+        },
+        {
+          "code": "C10-S02",
+          "name": "Audit-Ready",
+          "blurb": "Prepare controls and evidence for an independent SOC 2 Type II examination.",
+          "price": "$8,000 setup + $12,000 annual",
+          "unit": "starting fees",
+          "problem": "You need independent assurance over scoped controls, but your evidence and control operation are not yet organized for the examination period.",
+          "what_we_do": "ORAGROL coordinates readiness, control-gap review, and evidence preparation with a qualified CPA audit partner. The independent auditor performs the examination and determines the report and opinion.",
+          "deliverables": [
+            "A readiness review against the agreed examination scope",
+            "A control and evidence gap record",
+            "Organized evidence for the observation and examination process",
+            "Coordination with the independent CPA audit partner"
+          ],
+          "benefits": [
+            "Clear preparation for the agreed SOC 2 scope",
+            "Better organized control evidence",
+            "Defined responsibilities between your organization, ORAGROL, and the independent auditor"
+          ],
+          "process": "Define scope → Review readiness → Close gaps → Organize evidence → Support examination.",
+          "outcome": "Your organization and its evidence are prepared for the independently determined SOC 2 Type II examination."
+        },
+        {
+          "code": "C10-S03",
+          "name": "Payment-Ready",
+          "blurb": "Assess your card-payment environment with a qualified PCI QSA.",
+          "price": "From $10,000",
+          "unit": "per annual engagement",
+          "problem": "You need a qualified assessment of the card-payment environment and a clear record of gaps and required follow-up.",
+          "what_we_do": "ORAGROL helps confirm scope, map controls, and organize evidence for assessment by a qualified QSA against the applicable PCI DSS requirements.",
+          "deliverables": [
+            "Confirmed assessment scope and validation requirements",
+            "Control and evidence review",
+            "Organized evidence and identified gaps",
+            "Assessment by the qualified QSA",
+            "Agreed assessment documentation and findings"
+          ],
+          "benefits": [
+            "Clear visibility into payment-environment requirements",
+            "Evidence prepared for qualified assessment",
+            "Prioritized follow-up for identified gaps"
+          ],
+          "process": "Confirm scope → Map controls → Organize evidence → QSA assessment → Address findings.",
+          "outcome": "You receive the agreed qualified assessment documentation and a clear account of required follow-up."
+        },
+        {
+          "code": "C10-S04",
+          "name": "Proof After Breach",
+          "blurb": "Investigate a security incident and preserve its evidence.",
+          "price": "From $12,000",
+          "unit": "per incident; optional retainer from $500/month",
+          "problem": "After a security incident, you need qualified investigation, preserved evidence, and a defensible account of what can be established.",
+          "what_we_do": "Qualified specialists preserve and analyze relevant material within the agreed scope, develop an incident timeline, and document findings, limitations, and response recommendations.",
+          "deliverables": [
+            "Initial incident scope and evidence-preservation plan",
+            "Evidence-handling records and incident timeline",
+            "Documented findings and limitations",
+            "Relevant response recommendations",
+            "Specialist-reviewed final report"
+          ],
+          "benefits": [
+            "Evidence preserved through a defined process",
+            "A clear incident timeline and documented findings",
+            "Reviewed information to support recovery and adviser or insurer discussions"
+          ],
+          "process": "Authorize → Preserve → Collect → Analyze → Report → Support recovery.",
+          "outcome": "You receive a specialist-reviewed account of the incident evidence, findings, limitations, and next actions."
         }
       ]
     }

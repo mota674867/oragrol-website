@@ -23,7 +23,7 @@ import rawData from "../../../data/oragrol-services-data.json";
  *
  * Full replacement of the D-007/D-012/D-014 8-capability structure
  * (Virtual CISO, Risk Assessment & Compliance, ...) with the real 15-
- * category / 64-service taxonomy supplied in `oragrol-services-data.json`
+ * category / 67-service taxonomy supplied in `oragrol-services-data.json`
  * (moved from the repo root into `app/data/`, imported directly rather
  * than hand-transcribed — avoids the exact transcription-drift risk D-052
  * caught on Resources). The JSON has no `live`/`finalizing` status field
