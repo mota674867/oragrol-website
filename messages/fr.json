@@ -136,5 +136,137 @@
         "otherSmbs": { "name": "Autres PME canadiennes", "risk": "Adaptez la protection à la façon dont votre entreprise fonctionne." }
       }
     }
+  },
+  "Services": {
+    "nav": {
+      "myScope": "Ma portée",
+      "getCyberHealthScore": "Obtenez votre Cyber Health Score",
+      "search": "Rechercher",
+      "changeLanguage": "Changer de langue"
+    },
+    "money": {
+      "moSuffix": "/mois",
+      "appSuffix": "/application"
+    },
+    "hero": {
+      "kicker1": "SERVICES / CYBERSÉCURITÉ",
+      "kicker2": "PROTÉGER / AUTOMATISER / UNIFIER",
+      "headline1": "CYBERSÉCURITÉ.",
+      "headline2a": "CONÇUE AUTOUR",
+      "headline2b": "DE VOTRE ENTREPRISE.",
+      "sub1": "ORAGROL offre la cybersécurité sous forme de quatre forfaits fixes, de douze services individuels ou de mandats spécialisés.",
+      "sub2": "Choisissez la portée qui correspond réellement au fonctionnement de votre entreprise.",
+      "packagesCount": "04",
+      "packagesLabel": "Forfaits",
+      "packagesDetail": "De Foundation à Elite",
+      "alaCarteCount": "12",
+      "alaCarteLabel": "À La Carte",
+      "alaCarteDetail": "Offerts séparément",
+      "specialistCount": "04",
+      "specialistLabel": "Services spécialisés",
+      "specialistDetail": "Offerts sur mandat",
+      "footerKicker": "CONÇU POUR LES ENTREPRISES CANADIENNES",
+      "footerCta": "LA CLARTÉ AVANT LA COMPLEXITÉ"
+    },
+    "clarity": {
+      "eyebrow": "VOUS NE SAVEZ PAS PAR OÙ COMMENCER?",
+      "headline1": "La clarté avant",
+      "headline2": "la complexité.",
+      "body": "Commencez par vos priorités. Votre évaluation Cyber Health Score peut aider à cerner les points à examiner avant de choisir un forfait, un service individuel ou un mandat spécialisé.",
+      "step1": "Comprenez votre position",
+      "step2": "Priorisez ce qui mérite votre attention",
+      "step3": "Choisissez la portée qui vous convient"
+    },
+    "packages": {
+      "eyebrow": "04 / CHOISISSEZ VOTRE PROTECTION",
+      "headline1": "Quatre forfaits.",
+      "headline2": "Un point de départ clair.",
+      "sub": "Sélectionnez un forfait pour découvrir s'il vous convient et les services qu'il inclut. Ajoutez la portée souhaitée pour révision.",
+      "priceNote": "Prix en dollars canadiens. Les tarifs ci-dessous sont des tarifs mensuels pour un contrat de 12 mois.",
+      "servicesCount": "{n} SERVICES",
+      "includedServicesCount": "{n} SERVICES INCLUS",
+      "idealFit": "PROFIL IDÉAL",
+      "monthlyRateLabel": "TARIF MENSUEL · CONTRAT DE 12 MOIS",
+      "whatsIncluded": "CE QUI EST INCLUS",
+      "initialOption": "Option initiale de trois mois : {price}. Passe ensuite à un contrat standard de 12 mois.",
+      "addToScope": "Ajouter à ma portée",
+      "addedToScope": "Ajouté à ma portée",
+      "list": {
+        "foundation": { "value": "Établissez votre protection de base.", "fit": "Entreprises qui mettent en place des contrôles de sécurité essentiels autour de leur personnel, de leurs appareils et de leur travail quotidien." },
+        "advanced": { "value": "Étendez votre visibilité et renforcez vos accès.", "fit": "Entreprises ayant besoin d'une surveillance élargie, d'une gouvernance des accès et d'une supervision des fournisseurs et des exigences de conformité." },
+        "comprehensive": { "value": "Reliez la protection à l'ensemble de votre environnement.", "fit": "Entreprises dont les charges de travail infonuagiques, les applications et les données exigent une portée de protection plus large et coordonnée." },
+        "elite": { "value": "Réunissez protection et intervention.", "fit": "Entreprises recherchant la portée de forfait la plus large, incluant la réponse gérée aux menaces, la réponse en sécurité et la surveillance des données." }
+      }
+    },
+    "serviceNames": {
+      "Security Rules Setup": "Configuration des règles de sécurité",
+      "Security Weakness Check": "Analyse des vulnérabilités",
+      "Device Guard": "Protection des appareils",
+      "Mail Shield": "Bouclier courriel",
+      "Staff Security": "Sécurité du personnel",
+      "Login Shield": "Bouclier d'authentification",
+      "Compliance Check": "Vérification de conformité",
+      "Vendor Watch": "Surveillance des fournisseurs",
+      "AI Security Monitoring": "Surveillance de sécurité IA",
+      "Threat Watch": "Veille des menaces",
+      "Access Manager": "Gestion des accès",
+      "Access Governance": "Gouvernance des accès",
+      "Cloud Guard": "Protection infonuagique",
+      "Workload Shield": "Bouclier des charges de travail",
+      "Infra Guard": "Protection de l'infrastructure",
+      "Cloud Compliance": "Conformité infonuagique",
+      "App Shield": "Bouclier applicatif",
+      "Web Shield": "Bouclier Web",
+      "API Guard": "Protection API",
+      "Data Shield": "Bouclier des données",
+      "Data Guard": "Protection des données",
+      "Data Classifier": "Classification des données",
+      "Managed Threat Response": "Réponse gérée aux menaces",
+      "Security Response": "Réponse en sécurité",
+      "Data Watch": "Surveillance des données"
+    },
+    "individual": {
+      "eyebrow": "12 / À LA CARTE",
+      "headline1": "La capacité",
+      "headline2": "dont vous avez besoin.",
+      "sub": "Choisissez un service individuel, offert seul ou avec un forfait.",
+      "priceNote": "TARIF MENSUEL · CONTRAT DE 12 MOIS",
+      "monthlyService": "SERVICE MENSUEL",
+      "projectService": "SERVICE PROJET",
+      "monthlyBilling": "Tarif mensuel · contrat de 12 mois",
+      "oneTimeBilling": "Ponctuel / projet",
+      "perApplicationBilling": "Ponctuel / projet · par application",
+      "availableStandalone": "Offert séparément.",
+      "addToScope": "Ajouter à ma portée",
+      "addedToScope": "Ajouté à ma portée",
+      "list": {
+        "C01-S04": { "line": "Un leadership en sécurité pour orienter vos priorités, vos décisions et votre supervision." },
+        "C07-S04": { "line": "Intégrez des pratiques de sécurité à votre processus de développement logiciel." },
+        "C08-S03": { "line": "Coordonnez la façon dont les renseignements personnels sont traités et protégés." },
+        "C09-S01": { "line": "Évaluez les risques de sécurité liés à votre utilisation de l'IA et déterminez les prochaines étapes concrètes." },
+        "C09-S02": { "line": "Définissez les responsabilités et gérez les risques liés à l'utilisation de l'IA en entreprise." },
+        "C05-S03": { "line": "Renforcez la supervision des comptes disposant de droits d'accès élevés." },
+        "C05-S05": { "line": "Appliquez des vérifications d'identité et de contexte à vos décisions d'accès." },
+        "C06-S04": { "line": "Renforcez les contrôles réseau dans votre environnement infonuagique." },
+        "C09-S03": { "line": "Traitez les risques de sécurité touchant vos modèles d'IA et leur utilisation." },
+        "C09-S04": { "line": "Protégez les renseignements sensibles utilisés par vos systèmes et flux de travail en IA." },
+        "C09-S05": { "line": "Détectez et traitez les menaces touchant votre environnement d'IA." },
+        "C07-S05": { "line": "Testez la sécurité d'une application et priorisez les constats." }
+      }
+    },
+    "specialists": {
+      "eyebrow": "04 / MANDATS SPÉCIALISÉS",
+      "headline1": "Une expertise spécialisée.",
+      "headline2": "Des mandats définis.",
+      "sub": "Offerts sur mandat. Les exigences, les limites et le spécialiste approprié sont confirmés avant le début des travaux.",
+      "priceNote": "Tous les tarifs sont en dollars canadiens. Les tarifs de départ s'appliquent à une portée définie. La portée et les tarifs finaux sont confirmés dans votre proposition.",
+      "discussEngagement": "Discuter de votre mandat",
+      "list": {
+        "C10-S01": { "line": "Un mandat défini visant à tester les vulnérabilités exploitables et à prioriser les correctifs." },
+        "C10-S02": { "line": "Un mandat mené avec un partenaire d'audit CPA qualifié, adapté à votre organisation et à vos besoins de reddition de comptes." },
+        "C10-S03": { "line": "Une évaluation définie, menée par un QSA qualifié, pour votre environnement de paiement." },
+        "C10-S04": { "line": "Une enquête judiciaire spécialisée et une intervention en cas d'incident, avec une portée convenue pour l'incident." }
+      }
+    }
   }
 }

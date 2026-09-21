@@ -136,5 +136,137 @@
         "otherSmbs": { "name": "Other Canadian SMBs", "risk": "Shape protection around the way your business operates." }
       }
     }
+  },
+  "Services": {
+    "nav": {
+      "myScope": "My Scope",
+      "getCyberHealthScore": "Get Cyber Health Score",
+      "search": "Search",
+      "changeLanguage": "Change language"
+    },
+    "money": {
+      "moSuffix": "/mo",
+      "appSuffix": "/app"
+    },
+    "hero": {
+      "kicker1": "SERVICES / CYBERSECURITY",
+      "kicker2": "PROTECT / AUTOMATE / UNIFY",
+      "headline1": "CYBERSECURITY.",
+      "headline2a": "BUILT AROUND",
+      "headline2b": "YOUR BUSINESS.",
+      "sub1": "ORAGROL delivers cybersecurity as four fixed packages, twelve individual services or specialist engagements.",
+      "sub2": "Choose the scope that fits how your business actually operates.",
+      "packagesCount": "04",
+      "packagesLabel": "Packages",
+      "packagesDetail": "Foundation to Elite",
+      "alaCarteCount": "12",
+      "alaCarteLabel": "À La Carte",
+      "alaCarteDetail": "Available standalone",
+      "specialistCount": "04",
+      "specialistLabel": "Specialist Services",
+      "specialistDetail": "Available by engagement",
+      "footerKicker": "BUILT FOR CANADIAN BUSINESS",
+      "footerCta": "CLARITY BEFORE COMPLEXITY"
+    },
+    "clarity": {
+      "eyebrow": "NOT SURE WHERE TO START?",
+      "headline1": "Clarity before",
+      "headline2": "complexity.",
+      "body": "Start with your priorities. Your Cyber Health assessment can help identify areas to review before choosing a package, individual service or specialist engagement.",
+      "step1": "Understand your position",
+      "step2": "Prioritize what needs attention",
+      "step3": "Choose the scope that fits"
+    },
+    "packages": {
+      "eyebrow": "04 / CHOOSE YOUR PROTECTION",
+      "headline1": "Four packages.",
+      "headline2": "One clear starting point.",
+      "sub": "Select a package to explore its fit and included services. Add your preferred scope for review.",
+      "priceNote": "Prices in CAD. Package rates below are monthly rates for a 12-month contract.",
+      "servicesCount": "{n} SERVICES",
+      "includedServicesCount": "{n} INCLUDED SERVICES",
+      "idealFit": "IDEAL FIT",
+      "monthlyRateLabel": "MONTHLY RATE · 12-MONTH CONTRACT",
+      "whatsIncluded": "WHAT'S INCLUDED",
+      "initialOption": "Initial three-month option: {price}. Then moves into a 12-month standard contract.",
+      "addToScope": "Add to My Scope",
+      "addedToScope": "Added to My Scope",
+      "list": {
+        "foundation": { "value": "Establish your core protection.", "fit": "Businesses putting essential security controls around their people, devices and everyday work." },
+        "advanced": { "value": "Extend visibility and strengthen access.", "fit": "Businesses that need broader monitoring, access governance and oversight of vendors and compliance needs." },
+        "comprehensive": { "value": "Connect protection across your environment.", "fit": "Businesses with cloud workloads, applications and data that require a wider, coordinated scope of protection." },
+        "elite": { "value": "Bring protection and response together.", "fit": "Businesses seeking the broadest package scope, including managed threat response, security response and data monitoring." }
+      }
+    },
+    "serviceNames": {
+      "Security Rules Setup": "Security Rules Setup",
+      "Security Weakness Check": "Security Weakness Check",
+      "Device Guard": "Device Guard",
+      "Mail Shield": "Mail Shield",
+      "Staff Security": "Staff Security",
+      "Login Shield": "Login Shield",
+      "Compliance Check": "Compliance Check",
+      "Vendor Watch": "Vendor Watch",
+      "AI Security Monitoring": "AI Security Monitoring",
+      "Threat Watch": "Threat Watch",
+      "Access Manager": "Access Manager",
+      "Access Governance": "Access Governance",
+      "Cloud Guard": "Cloud Guard",
+      "Workload Shield": "Workload Shield",
+      "Infra Guard": "Infra Guard",
+      "Cloud Compliance": "Cloud Compliance",
+      "App Shield": "App Shield",
+      "Web Shield": "Web Shield",
+      "API Guard": "API Guard",
+      "Data Shield": "Data Shield",
+      "Data Guard": "Data Guard",
+      "Data Classifier": "Data Classifier",
+      "Managed Threat Response": "Managed Threat Response",
+      "Security Response": "Security Response",
+      "Data Watch": "Data Watch"
+    },
+    "individual": {
+      "eyebrow": "12 / À LA CARTE",
+      "headline1": "The capability",
+      "headline2": "you need.",
+      "sub": "Choose an individual service, available standalone or alongside a package.",
+      "priceNote": "MONTHLY RATE · 12-MONTH CONTRACT",
+      "monthlyService": "MONTHLY SERVICE",
+      "projectService": "PROJECT SERVICE",
+      "monthlyBilling": "Monthly rate · 12-month contract",
+      "oneTimeBilling": "One-time / project",
+      "perApplicationBilling": "One-time / project · per application",
+      "availableStandalone": "Available standalone.",
+      "addToScope": "Add to My Scope",
+      "addedToScope": "Added to My Scope",
+      "list": {
+        "C01-S04": { "line": "Security leadership to guide priorities, decisions and oversight." },
+        "C07-S04": { "line": "Bring security practices into your software delivery process." },
+        "C08-S03": { "line": "Coordinate how personal information is handled and protected." },
+        "C09-S01": { "line": "Assess security risks in your AI use and identify practical next steps." },
+        "C09-S02": { "line": "Define responsibilities and manage risks around business use of AI." },
+        "C05-S03": { "line": "Strengthen oversight of accounts with elevated permissions." },
+        "C05-S05": { "line": "Apply identity and context checks to access decisions." },
+        "C06-S04": { "line": "Strengthen network controls across your cloud environment." },
+        "C09-S03": { "line": "Address security risks affecting AI models and their use." },
+        "C09-S04": { "line": "Protect sensitive information used by AI systems and workflows." },
+        "C09-S05": { "line": "Identify and address threats involving your AI environment." },
+        "C07-S05": { "line": "Test an application's security and prioritize the findings." }
+      }
+    },
+    "specialists": {
+      "eyebrow": "04 / SPECIALIST ENGAGEMENTS",
+      "headline1": "Specialist expertise.",
+      "headline2": "Defined engagements.",
+      "sub": "Available by Engagement. Confirm requirements, boundaries and the appropriate specialist before work begins.",
+      "priceNote": "All fees in CAD. Starting fees apply to a defined scope. Final scope and fees are confirmed in your proposal.",
+      "discussEngagement": "Discuss Your Engagement",
+      "list": {
+        "C10-S01": { "line": "A scoped engagement to test for exploitable weaknesses and prioritize remediation." },
+        "C10-S02": { "line": "An engagement with a qualified CPA audit partner, scoped to your organization and reporting needs." },
+        "C10-S03": { "line": "A scoped assessment with a qualified QSA for your payment environment." },
+        "C10-S04": { "line": "Specialist forensic investigation and incident response, with scope agreed for the incident." }
+      }
+    }
   }
 }

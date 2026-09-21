@@ -1,7 +1,7 @@
 "use client";
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { ScopeTray, useScope, type ScopeItem } from "@/app/components/ScopeTray";
 import PreFooterCta from "@/app/components/site/pre-footer-cta";
 import SiteFooter from "@/app/components/site/footer";
@@ -59,6 +59,9 @@ function toScopeItem(selection: ServicesSelection): ScopeItem {
 }
 
 function ServicesClient() {
+  const t = useTranslations("Services");
+  const locale = useLocale();
+  const otherLocale = locale === "fr" ? "en" : "fr";
   const pathname = usePathname();
   const router = useRouter();
   const [trayOpen, setTrayOpen] = useState(false);
@@ -148,15 +151,17 @@ function ServicesClient() {
             className="scope-nav-button"
             onClick={() => setTrayOpen(true)}
           >
-            My Scope <b>{scope.items.length}</b>
+            {t("nav.myScope")} <b>{scope.items.length}</b>
           </button>
           <Link className="score-link" href="/cyber-health">
-            Get Cyber Health Score
+            {t("nav.getCyberHealthScore")}
           </Link>
-          <button className="search" aria-label="Search">
+          <button className="search" aria-label={t("nav.search")}>
             <span />
           </button>
-          <button className="language">EN / FR</button>
+          <Link className="language" href={pathname} locale={otherLocale} aria-label={t("nav.changeLanguage")}>
+            {locale.toUpperCase()} / {otherLocale.toUpperCase()}
+          </Link>
         </div>
       </header>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import {
   SERVICE_PACKAGES,
   INDIVIDUAL_SERVICES,
@@ -35,6 +36,24 @@ import { packagesDetailsContent, specialistDetailsContent, aLaCarteDetailsConten
  * imports of SERVICE_PACKAGES etc. from this file keep working, but the
  * data itself is defined where both this client component and the server
  * page.tsx (for JSON-LD) can safely import it. See that file's top comment.
+ *
+ * Bilingual (D-086, Task #21): SERVICE_PACKAGES/INDIVIDUAL_SERVICES/
+ * SPECIALIST_ENGAGEMENTS stay English-only in services-catalog.ts (used
+ * as-is for JSON-LD in page.tsx, same precedent as the Homepage's
+ * organizationJsonLd not being locale-branched). All *display* text below
+ * is resolved via useTranslations("Services") instead, keyed off each
+ * catalog entry's stable id/code — never off its English name/value/fit/
+ * line fields, which are ignored for rendering purposes. The 25 package
+ * "simple names" (e.g. "Mail Shield") are looked up in the `serviceNames`
+ * namespace by their exact English string as it appears in
+ * services-catalog.ts's `services` arrays.
+ *
+ * NOTE: the "Details / View what's included" accordion dialogs
+ * (packagesDetailsContent/aLaCarteDetailsContent/specialistDetailsContent,
+ * ~370 lines of descriptive prose from ORAGROL_Details_Claude_Complete.md)
+ * are NOT yet translated — deliberately deferred, flagged in
+ * PROJECT_MEMORY.md, not silently left English. They render English at
+ * both `/services` and `/fr/services` for now.
  */
 export { SERVICE_PACKAGES, INDIVIDUAL_SERVICES, SPECIALIST_ENGAGEMENTS };
 export type { ServicesSelection };
@@ -48,7 +67,13 @@ export type ServicesPageProps = {
   onDiscussEngagement: (engagement: { code: string; name: string }) => void | Promise<void>;
 };
 
-const money = (value: number) => `$${value.toLocaleString("en-CA")}`;
+// English keeps the exact previous format ($2,756) — byte-identical, never
+// touched. French Canadian currency convention puts the symbol after the
+// number with a space-grouped thousands separator (2 756 $), matching the
+// approved translation doc's own examples ("3 307 $/mois").
+const money = (value: number, locale: string) =>
+  locale === "fr" ? `${value.toLocaleString("fr-CA")} $` : `$${value.toLocaleString("en-CA")}`;
+
 const packageSelection = (p: typeof SERVICE_PACKAGES[number]): ServicesSelection => ({ kind: "package", id: p.id, name: p.name, priceCAD: p.price, billing: "monthly", includedServices: p.services });
 const serviceSelection = (s: typeof INDIVIDUAL_SERVICES[number]): ServicesSelection => ({ kind: "service", id: s.code, name: s.name, priceCAD: s.price, billing: s.billing });
 
@@ -59,44 +84,48 @@ function Action({ children, perform, disabled = false }: { children: React.React
 }
 
 export default function ServicesPage({ onAddToScope, isInScope, onDiscussEngagement }: ServicesPageProps) {
+  const t = useTranslations("Services");
+  const locale = useLocale();
   const [selected, setSelected] = useState(0);
   const uid = useId();
   const current = SERVICE_PACKAGES[selected];
   const selection = packageSelection(current);
+  const addLabel = (added: boolean) => (added ? t("packages.addedToScope") : `${t("packages.addToScope")} ↗`);
+  const addLabelIndividual = (added: boolean) => (added ? t("individual.addedToScope") : `${t("individual.addToScope")} ↗`);
   return <div className="oragrol-services">
     <style>{styles}</style>
     <section className="os-hero" aria-labelledby={`${uid}-title`}>
       <div className="os-watermark" aria-hidden="true">OR</div>
-      <div className="os-kicker"><span>SERVICES / CYBERSECURITY</span><span>PROTECT / AUTOMATE / UNIFY</span></div>
-      <div className="os-headline"><h1 id={`${uid}-title`}>CYBERSECURITY<span className="os-orange">.</span><br/><span>BUILT AROUND<br/>YOUR BUSINESS.</span></h1><p>ORAGROL delivers cybersecurity as four fixed packages, twelve individual services or specialist engagements.<br/><span>Choose the scope that fits how your business actually operates.</span></p></div>
-      <div className="os-hero-links">{[{ count: "04", label: "Packages", detail: "Foundation to Elite", href: "#service-packages" }, { count: "12", label: "À La Carte", detail: "Available standalone", href: "#individual-services" }, { count: "04", label: "Specialist Services", detail: "Available by engagement", href: "#specialist-engagements" }].map(item => <a key={item.href} href={item.href}><div><span className="os-orange">{item.count}</span><h2>{item.label}</h2><span aria-hidden="true">↘</span></div><p>{item.detail}</p></a>)}</div>
-      <div className="os-kicker os-hero-end"><span>BUILT FOR CANADIAN BUSINESS</span><a href="#services-clarity">CLARITY BEFORE COMPLEXITY ↓</a></div>
+      <div className="os-kicker"><span>{t("hero.kicker1")}</span><span>{t("hero.kicker2")}</span></div>
+      <div className="os-headline"><h1 id={`${uid}-title`}>{t("hero.headline1")}<span className="os-orange">.</span><br/><span>{t("hero.headline2a")}<br/>{t("hero.headline2b")}</span></h1><p>{t("hero.sub1")}<br/><span>{t("hero.sub2")}</span></p></div>
+      <div className="os-hero-links">{[{ count: t("hero.packagesCount"), label: t("hero.packagesLabel"), detail: t("hero.packagesDetail"), href: "#service-packages" }, { count: t("hero.alaCarteCount"), label: t("hero.alaCarteLabel"), detail: t("hero.alaCarteDetail"), href: "#individual-services" }, { count: t("hero.specialistCount"), label: t("hero.specialistLabel"), detail: t("hero.specialistDetail"), href: "#specialist-engagements" }].map(item => <a key={item.href} href={item.href}><div><span className="os-orange">{item.count}</span><h2>{item.label}</h2><span aria-hidden="true">↘</span></div><p>{item.detail}</p></a>)}</div>
+      <div className="os-kicker os-hero-end"><span>{t("hero.footerKicker")}</span><a href="#services-clarity">{t("hero.footerCta")} ↓</a></div>
     </section>
 
     <section className="os-clarity os-light" id="services-clarity" aria-labelledby={`${uid}-clarity`}>
-      <div><p className="os-eyebrow">NOT SURE WHERE TO START?</p><h2 id={`${uid}-clarity`}>Clarity before<br/>complexity.</h2></div>
-      <div className="os-clarity-copy"><p>Start with your priorities. Your Cyber Health assessment can help identify areas to review before choosing a package, individual service or specialist engagement.</p><ol><li>Understand your position</li><li>Prioritize what needs attention</li><li>Choose the scope that fits</li></ol></div>
+      <div><p className="os-eyebrow">{t("clarity.eyebrow")}</p><h2 id={`${uid}-clarity`}>{t("clarity.headline1")}<br/>{t("clarity.headline2")}</h2></div>
+      <div className="os-clarity-copy"><p>{t("clarity.body")}</p><ol><li>{t("clarity.step1")}</li><li>{t("clarity.step2")}</li><li>{t("clarity.step3")}</li></ol></div>
     </section>
 
     <section className="os-packages os-dark os-section" id="service-packages" aria-labelledby={`${uid}-packages`}>
-      <div className="os-section-head"><p className="os-eyebrow">04 / CHOOSE YOUR PROTECTION</p><h2 id={`${uid}-packages`}>Four packages.<br/><span>One clear starting point.</span></h2><p>Select a package to explore its fit and included services. Add your preferred scope for review.</p></div>
-      <p className="os-price-note">Prices in CAD. Package rates below are monthly rates for a 12-month contract.</p>
-      <div className="os-package-layout"><div className="os-selector" role="group" aria-label="Choose a cybersecurity package">{SERVICE_PACKAGES.map((p, i) => <button key={p.id} type="button" aria-pressed={selected === i} aria-controls={`${uid}-package-panel`} onClick={() => setSelected(i)}><span className="os-selector-top"><span>0{i + 1}</span><span>{p.services.length} SERVICES</span></span><span className="os-package-name">{p.name}</span><span className="os-selector-price">{money(p.price)}<small>/mo</small></span><span className="os-selector-value">{p.value}</span></button>)}</div>
-        <div id={`${uid}-package-panel`} className="os-package-panel" aria-live="polite" aria-atomic="true"><p className="os-eyebrow">{current.services.length} INCLUDED SERVICES</p><h3>{current.name}</h3><p className="os-package-value">{current.value}</p>{packagesDetailsContent[current.id] && <DetailsDialog category="CYBERSECURITY" {...packagesDetailsContent[current.id]} action={{ label: isInScope(selection) ? "Added to My Scope" : "Add to My Scope ↗", onClick: () => onAddToScope(selection), disabled: isInScope(selection) }} />}<div className="os-package-summary"><div><p className="os-eyebrow">IDEAL FIT</p><p>{current.fit}</p></div><div><p className="os-eyebrow">MONTHLY RATE · 12-MONTH CONTRACT</p><p className="os-main-price">{money(current.price)}<small>/mo</small></p></div></div><p className="os-eyebrow">WHAT&apos;S INCLUDED</p><ul className="os-inclusions">{current.services.map(name => <li key={name}>{name}</li>)}</ul><div className="os-package-bottom"><p>Initial three-month option: {money(current.initialPrice)}/mo. Then moves into a 12-month standard contract.</p><Action disabled={isInScope(selection)} perform={() => onAddToScope(selection)}>{isInScope(selection) ? "Added to My Scope" : "Add to My Scope ↗"}</Action></div></div>
+      <div className="os-section-head"><p className="os-eyebrow">{t("packages.eyebrow")}</p><h2 id={`${uid}-packages`}>{t("packages.headline1")}<br/><span>{t("packages.headline2")}</span></h2><p>{t("packages.sub")}</p></div>
+      <p className="os-price-note">{t("packages.priceNote")}</p>
+      <div className="os-package-layout"><div className="os-selector" role="group" aria-label="Choose a cybersecurity package">{SERVICE_PACKAGES.map((p, i) => <button key={p.id} type="button" aria-pressed={selected === i} aria-controls={`${uid}-package-panel`} onClick={() => setSelected(i)}><span className="os-selector-top"><span>0{i + 1}</span><span>{t("packages.servicesCount", { n: p.services.length })}</span></span><span className="os-package-name">{p.name}</span><span className="os-selector-price">{money(p.price, locale)}<small>{t("money.moSuffix")}</small></span><span className="os-selector-value">{t(`packages.list.${p.id}.value`)}</span></button>)}</div>
+        <div id={`${uid}-package-panel`} className="os-package-panel" aria-live="polite" aria-atomic="true"><p className="os-eyebrow">{t("packages.includedServicesCount", { n: current.services.length })}</p><h3>{current.name}</h3><p className="os-package-value">{t(`packages.list.${current.id}.value`)}</p>{packagesDetailsContent[current.id] && <DetailsDialog category="CYBERSECURITY" {...packagesDetailsContent[current.id]} action={{ label: addLabel(isInScope(selection)), onClick: () => onAddToScope(selection), disabled: isInScope(selection) }} />}<div className="os-package-summary"><div><p className="os-eyebrow">{t("packages.idealFit")}</p><p>{t(`packages.list.${current.id}.fit`)}</p></div><div><p className="os-eyebrow">{t("packages.monthlyRateLabel")}</p><p className="os-main-price">{money(current.price, locale)}<small>{t("money.moSuffix")}</small></p></div></div><p className="os-eyebrow">{t("packages.whatsIncluded")}</p><ul className="os-inclusions">{current.services.map(name => <li key={name}>{t(`serviceNames.${name}`)}</li>)}</ul><div className="os-package-bottom"><p>{t("packages.initialOption", { price: `${money(current.initialPrice, locale)}${t("money.moSuffix")}` })}</p><Action disabled={isInScope(selection)} perform={() => onAddToScope(selection)}>{addLabel(isInScope(selection))}</Action></div></div>
       </div>
-      {SERVICE_PACKAGES.filter(p => p.id !== current.id).map(p => packagesDetailsContent[p.id] ? <span key={p.id} style={{ position: "absolute", width: "1px", height: "1px", padding: 0, margin: "-1px", overflow: "hidden", clipPath: "inset(50%)", whiteSpace: "nowrap", border: 0 }}><DetailsDialog category="CYBERSECURITY" {...packagesDetailsContent[p.id]} action={{ label: isInScope(packageSelection(p)) ? "Added to My Scope" : "Add to My Scope ↗", onClick: () => onAddToScope(packageSelection(p)), disabled: isInScope(packageSelection(p)) }} /></span> : null)}
+      {SERVICE_PACKAGES.filter(p => p.id !== current.id).map(p => packagesDetailsContent[p.id] ? <span key={p.id} style={{ position: "absolute", width: "1px", height: "1px", padding: 0, margin: "-1px", overflow: "hidden", clipPath: "inset(50%)", whiteSpace: "nowrap", border: 0 }}><DetailsDialog category="CYBERSECURITY" {...packagesDetailsContent[p.id]} action={{ label: addLabel(isInScope(packageSelection(p))), onClick: () => onAddToScope(packageSelection(p)), disabled: isInScope(packageSelection(p)) }} /></span> : null)}
     </section>
 
     <section className="os-individual os-light os-section" id="individual-services" aria-labelledby={`${uid}-individual`}>
-      <div className="os-section-head"><p className="os-eyebrow">12 / À LA CARTE</p><h2 id={`${uid}-individual`}>The capability<br/>you need.</h2><p>Choose an individual service, available standalone or alongside a package.</p></div>
-      <p className="os-price-note">MONTHLY RATE · 12-MONTH CONTRACT</p>
-      <div className="os-service-grid">{INDIVIDUAL_SERVICES.map(s => { const item = serviceSelection(s); const added = isInScope(item); return <article key={s.code} className="os-service-card"><p className="os-eyebrow">{s.billing === "monthly" ? "MONTHLY SERVICE" : "PROJECT SERVICE"}</p><h3>{s.name}</h3><p className="os-description">{s.line}</p>{aLaCarteDetailsContent[s.code] && <DetailsDialog category="CYBERSECURITY" {...aLaCarteDetailsContent[s.code]} action={{ label: added ? "Added to My Scope" : "Add to My Scope ↗", onClick: () => onAddToScope(item), disabled: added }} />}<div className="os-card-price">{money(s.price)}<small>{s.billing === "monthly" ? "/mo" : s.billing === "per-application" ? "/app" : ""}</small></div><p className="os-billing">{s.billing === "monthly" ? "Monthly rate · 12-month contract" : s.billing === "per-application" ? "One-time / project · per application" : "One-time / project"}</p><p className="os-standalone">Available standalone.</p><Action disabled={added} perform={() => onAddToScope(item)}>{added ? "Added to My Scope" : "Add to My Scope ↗"}</Action></article>; })}</div>
+      <div className="os-section-head"><p className="os-eyebrow">{t("individual.eyebrow")}</p><h2 id={`${uid}-individual`}>{t("individual.headline1")}<br/>{t("individual.headline2")}</h2><p>{t("individual.sub")}</p></div>
+      <p className="os-price-note">{t("individual.priceNote")}</p>
+      <div className="os-service-grid">{INDIVIDUAL_SERVICES.map(s => { const item = serviceSelection(s); const added = isInScope(item); return <article key={s.code} className="os-service-card"><p className="os-eyebrow">{s.billing === "monthly" ? t("individual.monthlyService") : t("individual.projectService")}</p><h3>{s.name}</h3><p className="os-description">{t(`individual.list.${s.code}.line`)}</p>{aLaCarteDetailsContent[s.code] && <DetailsDialog category="CYBERSECURITY" {...aLaCarteDetailsContent[s.code]} action={{ label: addLabelIndividual(added), onClick: () => onAddToScope(item), disabled: added }} />}<div className="os-card-price">{money(s.price, locale)}<small>{s.billing === "monthly" ? t("money.moSuffix") : s.billing === "per-application" ? t("money.appSuffix") : ""}</small></div><p className="os-billing">{s.billing === "monthly" ? t("individual.monthlyBilling") : s.billing === "per-application" ? t("individual.perApplicationBilling") : t("individual.oneTimeBilling")}</p><p className="os-standalone">{t("individual.availableStandalone")}</p><Action disabled={added} perform={() => onAddToScope(item)}>{addLabelIndividual(added)}</Action></article>; })}</div>
     </section>
 
     <section className="os-specialists os-dark os-section" id="specialist-engagements" aria-labelledby={`${uid}-specialists`}>
-      <div className="os-section-head"><p className="os-eyebrow">04 / SPECIALIST ENGAGEMENTS</p><h2 id={`${uid}-specialists`}>Specialist expertise.<br/><span>Defined engagements.</span></h2><p>Available by Engagement. Confirm requirements, boundaries and the appropriate specialist before work begins.</p></div>
-      <p className="os-price-note">All fees in CAD. Starting fees apply to a defined scope. Final scope and fees are confirmed in your proposal.</p>
-      <div className="os-specialist-grid">{SPECIALIST_ENGAGEMENTS.map((s, i) => <article className="os-specialist-card" key={s.code}><p className="os-eyebrow">0{i + 1} / AVAILABLE BY ENGAGEMENT</p><h3>{s.name}</h3><p className="os-description">{s.line}</p>{specialistDetailsContent[s.code] && <DetailsDialog category="SPECIALIST ENGAGEMENT" {...specialistDetailsContent[s.code]} action={{ label: "Discuss Your Engagement ↗", onClick: () => onDiscussEngagement({ code: s.code, name: s.name }) }} />}<div className="os-engagement-prices"><p className="os-engagement-price-main">{s.priceLine}</p>{s.secondaryPriceLine ? <p className="os-engagement-price-secondary">{s.secondaryPriceLine}</p> : null}</div><Action perform={() => onDiscussEngagement({ code: s.code, name: s.name })}>Discuss Your Engagement ↗</Action></article>)}</div>
+      <div className="os-section-head"><p className="os-eyebrow">{t("specialists.eyebrow")}</p><h2 id={`${uid}-specialists`}>{t("specialists.headline1")}<br/><span>{t("specialists.headline2")}</span></h2><p>{t("specialists.sub")}</p></div>
+      <p className="os-price-note">{t("specialists.priceNote")}</p>
+      <div className="os-specialist-grid">{SPECIALIST_ENGAGEMENTS.map((s, i) => <article className="os-specialist-card" key={s.code}><p className="os-eyebrow">0{i + 1} / {t("specialists.eyebrow").split("/ ")[1] ?? t("specialists.eyebrow")}</p><h3>{s.name}</h3><p className="os-description">{t(`specialists.list.${s.code}.line`)}</p>{specialistDetailsContent[s.code] && <DetailsDialog category="SPECIALIST ENGAGEMENT" {...specialistDetailsContent[s.code]} action={{ label: `${t("specialists.discussEngagement")} ↗`, onClick: () => onDiscussEngagement({ code: s.code, name: s.name }) }} />}<div className="os-engagement-prices"><p className="os-engagement-price-main">{s.priceLine}</p>{s.secondaryPriceLine ? <p className="os-engagement-price-secondary">{s.secondaryPriceLine}</p> : null}</div><Action perform={() => onDiscussEngagement({ code: s.code, name: s.name })}>{t("specialists.discussEngagement")} ↗</Action></article>)}</div>
     </section>
   </div>;
 }

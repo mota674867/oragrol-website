@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ServicesClient from "./services-client";
 import { SITE_URL } from "@/app/lib/site-config";
+import { languageAlternates } from "@/app/lib/seo";
 import {
   SERVICE_PACKAGES,
   INDIVIDUAL_SERVICES,
@@ -15,29 +16,47 @@ import {
  * server component (this file, real metadata + JSON-LD) rendering the
  * interactive body (services-client.tsx), matching the pattern already used
  * by app/page.tsx, app/contact/page.tsx and app/business-automation/page.tsx.
+ *
+ * Bilingual (D-086, Task #21): converted from a static `metadata` export to
+ * `generateMetadata({params})`, same fix as the Homepage — a static export
+ * meant /fr/services got English-only title/description/canonical, which is
+ * wrong for a page every visitor's browser and every search engine reads as
+ * the actual content.
  */
 
-export const metadata: Metadata = {
-  // Root layout applies the "%s | ORAGROL Global" template to this, so the
-  // rendered <title> comes out as "Cybersecurity Services | ORAGROL Global"
-  // — don't append the suffix here too, or it doubles (confirmed via a live
-  // dev-server check before this fix).
-  title: "Cybersecurity Services",
-  description:
-    "Explore four cybersecurity packages, twelve individual services and specialist engagements tailored to your business.",
-  alternates: {
-    canonical: "/services",
-  },
-  openGraph: {
-    title: "Cybersecurity Services | ORAGROL Global",
-    description:
-      "Four defined packages, twelve individual services and specialist engagements — cybersecurity built around how your business operates.",
-    url: "/services",
-    siteName: "ORAGROL Global",
-    locale: "en_CA",
-    type: "website",
-  },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const isFr = locale === "fr";
+  const canonicalPath = isFr ? "/fr/services" : "/services";
+
+  return {
+    title: isFr ? "Services de cybersécurité" : "Cybersecurity Services",
+    description: isFr
+      ? "Découvrez quatre forfaits de cybersécurité, douze services individuels et des mandats spécialisés adaptés à votre entreprise."
+      : "Explore four cybersecurity packages, twelve individual services and specialist engagements tailored to your business.",
+    alternates: {
+      canonical: canonicalPath,
+      languages: languageAlternates("/services"),
+    },
+    openGraph: {
+      title: isFr
+        ? "Services de cybersécurité | ORAGROL Global"
+        : "Cybersecurity Services | ORAGROL Global",
+      description: isFr
+        ? "Quatre forfaits définis, douze services individuels et des mandats spécialisés — une cybersécurité conçue autour du fonctionnement de votre entreprise."
+        : "Four defined packages, twelve individual services and specialist engagements — cybersecurity built around how your business operates.",
+      url: canonicalPath,
+      siteName: "ORAGROL Global",
+      locale: isFr ? "fr_CA" : "en_CA",
+      alternateLocale: isFr ? "en_CA" : "fr_CA",
+      type: "website",
+    },
+  };
+}
 
 function billingCategory(billing: "monthly" | "one-time" | "per-application") {
   if (billing === "monthly") return "Monthly subscription";
