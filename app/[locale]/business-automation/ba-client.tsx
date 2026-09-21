@@ -215,7 +215,7 @@ function BusinessAutomationClient() {
                 IT—reducing manual work and delivering measurable results.
               </p>
               <a href="#job-selector">
-                Explore the five jobs <span>↘</span>
+                Explore five systems + tailored <span>↘</span>
               </a>
             </div>
           </div>
