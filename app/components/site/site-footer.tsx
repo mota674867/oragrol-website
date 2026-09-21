@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Container, Grid, NavLink, Section, Text } from "../ui";
 import { OragrolLogo } from "../brand/oragrol-logo";
 import { LinkedInIcon, InstagramIcon } from "./social-icons";

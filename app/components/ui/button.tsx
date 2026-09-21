@@ -1,7 +1,12 @@
 import { forwardRef } from "react";
-import type { ButtonHTMLAttributes } from "react";
-import Link, { type LinkProps } from "next/link";
+import type { ButtonHTMLAttributes, ComponentPropsWithoutRef } from "react";
+import { Link } from "@/i18n/navigation";
 import { cn } from "./cn";
+
+// Derived from next-intl's Link (not next/link's own `LinkProps`) — it adds
+// an optional `locale` prop on top of the usual href/replace/scroll/etc.,
+// and ButtonLink needs to accept that too so it works as a locale switch.
+type LinkProps = ComponentPropsWithoutRef<typeof Link>;
 
 /**
  * Button — Website Implementation Brief, Step 3.

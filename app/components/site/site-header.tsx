@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import { motion, useScroll, useTransform } from "motion/react";
 import { ButtonLink, MobileMenuTrigger, NavBar, NavLink } from "../ui";
 import { cn } from "../ui/cn";

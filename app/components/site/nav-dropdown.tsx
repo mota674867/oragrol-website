@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import { ChevronDown } from "lucide-react";
 import { Icon, NavLink } from "../ui";
 import { cn } from "../ui/cn";

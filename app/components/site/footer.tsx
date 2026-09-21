@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useId, useState } from "react";
 import type { CSSProperties, FormEvent, ReactNode } from "react";
 import styles from "./footer.module.css";
