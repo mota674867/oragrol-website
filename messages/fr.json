@@ -1,1 +1,140 @@
-{}
+{
+  "Home": {
+    "nav": {
+      "getCyberHealthScore": "Obtenez votre Cyber Health Score",
+      "search": "Rechercher",
+      "changeLanguage": "Changer de langue",
+      "homeAriaLabel": "Accueil ORAGROL Global"
+    },
+    "hero": {
+      "kicker": "LA CYBERSÉCURITÉ D'ABORD. GUIDÉE PAR L'INTELLIGENCE.",
+      "headline1": "Une cybersécurité qui agit.",
+      "headline2": "Une automatisation qui évolue.",
+      "headline3": "Un seul système qui réunit le tout.",
+      "sub": "Conçu pour faire le travail, pas seulement pour en rendre compte.",
+      "ariaCapabilities": "Capacités ORAGROL"
+    },
+    "entryPoints": {
+      "protectName": "Services",
+      "protectSub": "Protégez ce qui compte.",
+      "automateName": "Business Automation",
+      "automateSub": "Éliminez ce qui freine la croissance.",
+      "unifyName": "OR ONE",
+      "unifySub": "Une intelligence conçue autour de votre entreprise."
+    },
+    "reality": {
+      "label": "LA RÉALITÉ D'AFFAIRES",
+      "headline1": "La croissance crée des capacités.",
+      "headline2": "Elle crée aussi de l'exposition.",
+      "p1": "Un plus grand nombre de systèmes, de fournisseurs, de données et d'outils d'IA peut faire progresser une entreprise, tout en rendant son environnement opérationnel plus difficile à surveiller et à protéger.",
+      "p2": "ORAGROL relie ce qui est trop souvent géré de façon séparée, offrant aux dirigeants une façon plus claire de protéger, d'améliorer et de coordonner leur entreprise.",
+      "line": "Moins de bruit. Moins d'outils déconnectés.",
+      "lineStrong": "Plus d'actions utiles."
+    },
+    "capabilities": {
+      "label": "PROTÉGER. AUTOMATISER. UNIFIER.",
+      "headline1": "Trois capacités.",
+      "headline2": "Une seule direction d'affaires.",
+      "ariaSelect": "Sélectionner une capacité",
+      "protect": {
+        "name": "Protéger",
+        "title": "Une cybersécurité qui agit.",
+        "text": "Comprenez les risques, renforcez votre protection et intervenez grâce à des services choisis selon la façon dont votre entreprise fonctionne.",
+        "link": "Explorer les services"
+      },
+      "automate": {
+        "name": "Automatiser",
+        "title": "Une automatisation qui évolue.",
+        "text": "Éliminez les tâches répétitives, reliez les flux de travail importants et créez plus de capacité opérationnelle sans complexité inutile.",
+        "link": "Explorer Business Automation"
+      },
+      "unify": {
+        "name": "Unifier",
+        "title": "Un seul système qui réunit le tout.",
+        "text": "Coordonnez la sécurité, l'automatisation et l'intelligence opérationnelle grâce à OR ONE, conçu autour de votre entreprise.",
+        "link": "Explorer OR ONE"
+      }
+    },
+    "method": {
+      "label": "COMMENT ORAGROL FONCTIONNE",
+      "headline1": "La clarté d'abord.",
+      "headline2": "Puis une action coordonnée.",
+      "sub": "Parcourez les étapes pour voir comment ORAGROL transforme le contexte d'affaires en progrès concret.",
+      "ariaSelect": "Méthode de travail ORAGROL",
+      "understand": { "name": "Comprendre", "line": "Voir clairement l'entreprise avant de prescrire une technologie." },
+      "prioritize": { "name": "Prioriser", "line": "Concentrer l'attention et les investissements là où ils créent le plus de valeur." },
+      "protect": { "name": "Protéger", "line": "Appliquer les bons contrôles de sécurité, services et une supervision adéquate." },
+      "automate": { "name": "Automatiser", "line": "Améliorer le travail défini grâce à une automatisation pratique et responsable." },
+      "evolve": { "name": "Évoluer", "line": "Renforcer le système à mesure que l'entreprise évolue." }
+    },
+    "cybersecurity": {
+      "eyebrow": "CYBERSÉCURITÉ",
+      "headline1": "Une protection conçue",
+      "headline2": "autour de votre entreprise.",
+      "intro": "Choisissez un forfait, répondez à un besoin précis ou définissez le cadre d'un mandat spécialisé.",
+      "packages": {
+        "count": "04",
+        "title": "Forfaits",
+        "description1": "Quatre niveaux de protection.",
+        "description2": "Foundation, Advanced,",
+        "description3": "Comprehensive et Elite.",
+        "link": "Explorer les forfaits"
+      },
+      "alaCarte": {
+        "count": "12",
+        "title": "À La Carte",
+        "description": "Des services individuels pour des besoins précis. Offerts seuls ou avec un forfait.",
+        "link": "Explorer les services individuels"
+      },
+      "specialist": {
+        "count": "04",
+        "title1": "Mandats",
+        "title2": "spécialisés",
+        "description": "Test d'intrusion, attestation SOC 2, évaluation PCI-DSS et intervention judiciaire en cas d'incident.",
+        "link": "Discuter d'un mandat"
+      }
+    },
+    "cyberHealthCta": {
+      "label": "COMMENCEZ AVEC CLARTÉ",
+      "headline1": "Sachez où vous en êtes.",
+      "headline2": "Sachez quoi faire ensuite.",
+      "sub": "Une évaluation guidée vous donne un portrait concret de votre posture en cybersécurité, de vos priorités et des prochaines étapes.",
+      "link": "Obtenez votre Cyber Health Score",
+      "illustrativeLabel": "CYBER HEALTH / À TITRE ILLUSTRATIF",
+      "currentPosition": "Position actuelle",
+      "clearerPriorities": "Des priorités plus claires"
+    },
+    "industries": {
+      "eyebrow": "SECTEURS D'ACTIVITÉ + CANADA",
+      "returnHome": "Retour à la page d'accueil",
+      "label": "CONÇU AUTOUR DE VOTRE RÉALITÉ",
+      "headline1": "Des entreprises différentes.",
+      "headline2": "Des risques différents.",
+      "selectLabel": "CHOISISSEZ UN SECTEUR",
+      "canadaWide": "UNE PERSPECTIVE",
+      "canadaPerspective": "PANCANADIENNE",
+      "exploreIndustry": "Explorer ce secteur",
+      "ariaLabel": "Secteurs d'activité",
+      "west": "OUEST",
+      "central": "CENTRE",
+      "east": "EST",
+      "north": "NORD",
+      "footerEyebrow": "CYBERSÉCURITÉ D'ABORD",
+      "footerLine1": "L'entreprise d'abord.",
+      "footerLine2": "Pratique, pas compliqué.",
+      "footerLine3": "Conçu pour ce qui vient.",
+      "footerStrong": "D'UN OCÉAN À L'AUTRE, À L'AUTRE",
+      "list": {
+        "professionalServices": { "name": "Services professionnels", "risk": "Protégez les données, les communications et la confiance de vos clients." },
+        "healthcare": { "name": "Santé", "risk": "Renforcez la confidentialité, l'accès et la résilience opérationnelle." },
+        "financialServices": { "name": "Services financiers", "risk": "Réduisez l'exposition à la fraude, aux enjeux réglementaires et aux transactions." },
+        "retail": { "name": "Commerce de détail et commerce électronique", "risk": "Protégez les paiements, les clients et les revenus numériques." },
+        "manufacturing": { "name": "Fabrication", "risk": "Sécurisez les opérations connectées et la continuité de la production." },
+        "technology": { "name": "Technologie", "risk": "Protégez les environnements infonuagiques, les produits et la propriété intellectuelle." },
+        "construction": { "name": "Construction et immobilier", "risk": "Sécurisez les paiements, les équipes mobiles et l'accès des partenaires." },
+        "education": { "name": "Éducation", "risk": "Priorisez la protection des utilisateurs, des données et des systèmes partagés." },
+        "otherSmbs": { "name": "Autres PME canadiennes", "risk": "Adaptez la protection à la façon dont votre entreprise fonctionne." }
+      }
+    }
+  }
+}

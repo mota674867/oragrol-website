@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import HomeClient from "./home-client";
+import HomeCybersecurity from "./home-section-04";
 import { SITE_URL } from "@/app/lib/site-config";
 import { languageAlternates } from "@/app/lib/seo";
 
@@ -86,7 +87,7 @@ export default function Page() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
       />
-      <HomeClient />
+      <HomeClient cybersecuritySection={<HomeCybersecurity />} />
     </>
   );
 }

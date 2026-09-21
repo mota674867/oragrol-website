@@ -1,1 +1,140 @@
-{}
+{
+  "Home": {
+    "nav": {
+      "getCyberHealthScore": "Get Cyber Health Score",
+      "search": "Search",
+      "changeLanguage": "Change language",
+      "homeAriaLabel": "ORAGROL Global home"
+    },
+    "hero": {
+      "kicker": "Cybersecurity first. Intelligence led.",
+      "headline1": "Cybersecurity that acts.",
+      "headline2": "Automation that scales.",
+      "headline3": "One system that brings it together.",
+      "sub": "Built to do the work, not simply report on it.",
+      "ariaCapabilities": "ORAGROL capabilities"
+    },
+    "entryPoints": {
+      "protectName": "Services",
+      "protectSub": "Protect what matters.",
+      "automateName": "Business Automation",
+      "automateSub": "Remove what limits growth.",
+      "unifyName": "OR ONE",
+      "unifySub": "Intelligence built around your business."
+    },
+    "reality": {
+      "label": "The business reality",
+      "headline1": "Growth creates capability.",
+      "headline2": "It also creates exposure.",
+      "p1": "More systems, vendors, data and AI can move a business forward while making its operating environment harder to see and protect.",
+      "p2": "ORAGROL connects what is too often managed separately, giving leaders a clearer way to protect, improve and coordinate the business.",
+      "line": "Less noise. Fewer disconnected tools.",
+      "lineStrong": "More useful action."
+    },
+    "capabilities": {
+      "label": "Protect. Automate. Unify.",
+      "headline1": "Three capabilities.",
+      "headline2": "One business direction.",
+      "ariaSelect": "Select capability",
+      "protect": {
+        "name": "Protect",
+        "title": "Cybersecurity that acts.",
+        "text": "Understand risk, strengthen protection and respond with services selected around the way your business operates.",
+        "link": "Explore Services"
+      },
+      "automate": {
+        "name": "Automate",
+        "title": "Automation that scales.",
+        "text": "Remove repetitive work, connect important workflows and create more operating capacity without unnecessary complexity.",
+        "link": "Explore Business Automation"
+      },
+      "unify": {
+        "name": "Unify",
+        "title": "One system that brings it together.",
+        "text": "Coordinate security, automation and operational intelligence through OR ONE, built around your business.",
+        "link": "Explore OR ONE"
+      }
+    },
+    "method": {
+      "label": "How ORAGROL works",
+      "headline1": "Clarity first.",
+      "headline2": "Then coordinated action.",
+      "sub": "Move across the sequence to see how ORAGROL turns business context into practical progress.",
+      "ariaSelect": "ORAGROL working method",
+      "understand": { "name": "Understand", "line": "See the business clearly before prescribing technology." },
+      "prioritize": { "name": "Prioritize", "line": "Focus attention and investment where they create the greatest value." },
+      "protect": { "name": "Protect", "line": "Apply the right security controls, services and oversight." },
+      "automate": { "name": "Automate", "line": "Improve defined work through practical, responsible automation." },
+      "evolve": { "name": "Evolve", "line": "Strengthen the system as the business changes." }
+    },
+    "cybersecurity": {
+      "eyebrow": "Cybersecurity",
+      "headline1": "Protection built",
+      "headline2": "around your business.",
+      "intro": "Choose a package, address a specific need or scope a specialist engagement.",
+      "packages": {
+        "count": "04",
+        "title": "Packages",
+        "description1": "Four levels of protection.",
+        "description2": "Foundation, Advanced,",
+        "description3": "Comprehensive and Elite.",
+        "link": "Explore Packages"
+      },
+      "alaCarte": {
+        "count": "12",
+        "title": "À La Carte",
+        "description": "Individual services for specific needs. Available standalone or alongside a package.",
+        "link": "Explore Individual Services"
+      },
+      "specialist": {
+        "count": "04",
+        "title1": "Specialist",
+        "title2": "Engagements",
+        "description": "Penetration testing, SOC 2 attestation, PCI-DSS assessment and forensic incident response.",
+        "link": "Discuss an Engagement"
+      }
+    },
+    "cyberHealthCta": {
+      "label": "Start with clarity",
+      "headline1": "Know where you stand.",
+      "headline2": "Know what to do next.",
+      "sub": "A guided assessment gives you a practical view of your cybersecurity position, priorities and next steps.",
+      "link": "Get Your Cyber Health Score",
+      "illustrativeLabel": "Cyber Health / Illustrative",
+      "currentPosition": "Current position",
+      "clearerPriorities": "Clearer next priorities"
+    },
+    "industries": {
+      "eyebrow": "INDUSTRIES + CANADA",
+      "returnHome": "Return to homepage",
+      "label": "BUILT AROUND YOUR REALITY",
+      "headline1": "Different businesses.",
+      "headline2": "Different risks.",
+      "selectLabel": "SELECT AN INDUSTRY",
+      "canadaWide": "CANADA-WIDE",
+      "canadaPerspective": "PERSPECTIVE",
+      "exploreIndustry": "Explore this industry",
+      "ariaLabel": "Industries",
+      "west": "WEST",
+      "central": "CENTRAL",
+      "east": "EAST",
+      "north": "NORTH",
+      "footerEyebrow": "CYBERSECURITY FIRST",
+      "footerLine1": "Business first.",
+      "footerLine2": "Practical, not complicated.",
+      "footerLine3": "Built for what's next.",
+      "footerStrong": "COAST TO COAST TO COAST",
+      "list": {
+        "professionalServices": { "name": "Professional Services", "risk": "Protect client data, communication and trust." },
+        "healthcare": { "name": "Healthcare", "risk": "Strengthen privacy, access and operational resilience." },
+        "financialServices": { "name": "Financial Services", "risk": "Reduce fraud, regulatory and transaction exposure." },
+        "retail": { "name": "Retail & E-commerce", "risk": "Protect payments, customers and digital revenue." },
+        "manufacturing": { "name": "Manufacturing", "risk": "Secure connected operations and production continuity." },
+        "technology": { "name": "Technology", "risk": "Protect cloud environments, products and intellectual property." },
+        "construction": { "name": "Construction & Real Estate", "risk": "Secure payments, mobile teams and partner access." },
+        "education": { "name": "Education", "risk": "Prioritize protection across users, data and shared systems." },
+        "otherSmbs": { "name": "Other Canadian SMBs", "risk": "Shape protection around the way your business operates." }
+      }
+    }
+  }
+}

@@ -1,4 +1,5 @@
-import Link from "next/link";
+import {getTranslations} from "next-intl/server";
+import {Link} from "@/i18n/navigation";
 import s from "./home-section-04.module.css";
 
 /**
@@ -21,75 +22,74 @@ import s from "./home-section-04.module.css";
  * anchors, but never invent them") — re-confirmed both exist in
  * app/services/services-body.tsx before using them here, same as the
  * circle did.
+ *
+ * Bilingual (D-086): content is sourced from the Home.cybersecurity
+ * namespace via next-intl's server-side getTranslations, so this section
+ * renders correctly (and with the right hreflang-matching text) at both
+ * `/` and `/fr` with zero client JS added. Links use next-intl's Link so
+ * they stay on the current locale (e.g. /fr/services, not /services).
  */
 
-function HomeCybersecurity() {
+async function HomeCybersecurity() {
+  const t = await getTranslations("Home.cybersecurity");
+
   return (
     <section
       className={s.section}
       id="home-cybersecurity"
       aria-labelledby="home-cyber-heading"
     >
-      <p className={s.eyebrow}>CYBERSECURITY</p>
+      <p className={s.eyebrow}>{t("eyebrow")}</p>
       <header className={s.header}>
         <h2 id="home-cyber-heading">
-          Protection built
+          {t("headline1")}
           <br />
-          around your business.
+          {t("headline2")}
         </h2>
-        <p className={s.intro}>
-          Choose a package, address a specific need or scope a specialist
-          engagement.
-        </p>
+        <p className={s.intro}>{t("intro")}</p>
       </header>
 
       <div className={s.offerings}>
         <article>
           <p className={s.count} aria-label="4">
-            04
+            {t("packages.count")}
           </p>
-          <h3>Packages</h3>
+          <h3>{t("packages.title")}</h3>
           <p className={s.description}>
-            Four levels of protection.
+            {t("packages.description1")}
             <br />
-            Foundation, Advanced,
+            {t("packages.description2")}
             <br />
-            Comprehensive and Elite.
+            {t("packages.description3")}
           </p>
           <Link href="/services#service-packages">
-            <span>Explore Packages</span>
+            <span>{t("packages.link")}</span>
             <span aria-hidden="true">↗</span>
           </Link>
         </article>
 
         <article>
-          <p className={s.count}>12</p>
-          <h3>À La Carte</h3>
-          <p className={s.description}>
-            Individual services for specific needs. Available standalone or
-            alongside a package.
-          </p>
+          <p className={s.count}>{t("alaCarte.count")}</p>
+          <h3>{t("alaCarte.title")}</h3>
+          <p className={s.description}>{t("alaCarte.description")}</p>
           <Link href="/services#individual-services">
-            <span>Explore Individual Services</span>
+            <span>{t("alaCarte.link")}</span>
             <span aria-hidden="true">↗</span>
           </Link>
         </article>
 
         <article>
           <p className={s.count} aria-label="4">
-            04
+            {t("specialist.count")}
           </p>
           <h3>
-            Specialist
+            {t("specialist.title1")}
             <br />
-            Engagements
+            {t("specialist.title2")}
           </h3>
-          <p className={s.description}>
-            Penetration testing, SOC 2 attestation, PCI-DSS assessment and
-            forensic incident response.
-          </p>
+          <p className={s.description}>{t("specialist.description")}</p>
           <Link href="/contact">
-            <span>Discuss an Engagement</span>
+            <span>{t("specialist.link")}</span>
             <span aria-hidden="true">↗</span>
           </Link>
         </article>
