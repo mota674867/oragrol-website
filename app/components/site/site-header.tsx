@@ -195,14 +195,18 @@ export function SiteHeader() {
           <div className="flex h-9 items-center justify-between px-6 md:px-12">
             <div aria-hidden="true" />
             <div className="flex items-center gap-6">
-              <Link
-                href={pathname}
-                locale={otherLocale}
-                className="font-body text-xs text-text-secondary transition-colors duration-150 hover:text-accent"
-                aria-label={isFr ? "Changer de langue" : "Change language"}
-              >
-                {locale.toUpperCase()}&nbsp;|&nbsp;{otherLocale.toUpperCase()}
-              </Link>
+              <div className="font-body text-xs">
+                <span className="font-semibold text-accent">{locale.toUpperCase()}</span>
+                <span className="text-text-secondary">&nbsp;|&nbsp;</span>
+                <Link
+                  href={pathname}
+                  locale={otherLocale}
+                  className="text-text-secondary transition-colors duration-150 hover:text-accent"
+                  aria-label={isFr ? "Switch to English" : "Passer en français"}
+                >
+                  {otherLocale.toUpperCase()}
+                </Link>
+              </div>
             </div>
           </div>
         </div>

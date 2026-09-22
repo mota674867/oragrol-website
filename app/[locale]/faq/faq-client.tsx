@@ -44,9 +44,9 @@ function FAQPageClient() {
         </Link>
         <OragrolMegaNav items={NAV_ITEMS} activePath={pathname} />
         <Link href="/contact">{t("nav.contactLink")}</Link>
-        <Link href={pathname} locale={otherLocale}>
-          {locale.toUpperCase()} / {otherLocale.toUpperCase()}
-        </Link>
+        <span className="language">
+          <span className="language-current">{locale.toUpperCase()}</span> / <Link href={pathname} locale={otherLocale}>{otherLocale.toUpperCase()}</Link>
+        </span>
       </header>
       <section className="faq-hero">
         <span>OR</span>

@@ -319,14 +319,9 @@ export default async function ResourceDetailPage({ params }: PageProps) {
             <button className="search" aria-label={isFr ? "Rechercher" : "Search"}>
               <span />
             </button>
-            <Link
-              className="language"
-              href={`/resources/${slug}`}
-              locale={otherLocale}
-              aria-label={isFr ? "Changer de langue" : "Change language"}
-            >
-              {locale.toUpperCase()} / {otherLocale.toUpperCase()}
-            </Link>
+            <span className="language">
+              <span className="language-current">{locale.toUpperCase()}</span> / <Link href={`/resources/${slug}`} locale={otherLocale} aria-label={isFr ? "Changer de langue" : "Change language"}>{otherLocale.toUpperCase()}</Link>
+            </span>
           </div>
         </header>
 

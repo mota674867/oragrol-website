@@ -126,9 +126,9 @@ function ContactPageClient() {
           <button className="search" aria-label={t("nav.search")}>
             <span />
           </button>
-          <Link href={pathname} locale={otherLocale} className="language" aria-label={t("nav.changeLanguage")}>
-            {locale.toUpperCase()} / {otherLocale.toUpperCase()}
-          </Link>
+          <span className="language">
+            <span className="language-current">{locale.toUpperCase()}</span> / <Link href={pathname} locale={otherLocale} aria-label={t("nav.changeLanguage")}>{otherLocale.toUpperCase()}</Link>
+          </span>
         </div>
       </header>
 

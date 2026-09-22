@@ -113,14 +113,18 @@ export function SiteFooter() {
               >
                 <InstagramIcon className="h-5 w-5" />
               </a>
-              <Link
-                href={pathname}
-                locale={otherLocale}
-                className="font-body text-sm text-text-secondary transition-colors duration-150 hover:text-accent"
-                aria-label={isFr ? "Changer de langue" : "Change language"}
-              >
-                {locale.toUpperCase()} | {otherLocale.toUpperCase()}
-              </Link>
+              <div className="font-body text-sm">
+                <span className="font-semibold text-accent">{locale.toUpperCase()}</span>
+                <span className="text-text-secondary"> | </span>
+                <Link
+                  href={pathname}
+                  locale={otherLocale}
+                  className="text-text-secondary transition-colors duration-150 hover:text-accent"
+                  aria-label={isFr ? "Switch to English" : "Passer en français"}
+                >
+                  {otherLocale.toUpperCase()}
+                </Link>
+              </div>
             </div>
           </div>
 

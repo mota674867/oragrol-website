@@ -123,14 +123,9 @@ export default async function AccessibilityPage({
           <button className="search" aria-label={isFr ? "Recherche" : "Search"}>
             <span />
           </button>
-          <Link
-            className="language"
-            href="/accessibility"
-            locale={otherLocale}
-            aria-label={isFr ? "Changer de langue" : "Change language"}
-          >
-            {locale.toUpperCase()} / {otherLocale.toUpperCase()}
-          </Link>
+          <span className="language">
+            <span className="language-current">{locale.toUpperCase()}</span> / <Link href="/accessibility" locale={otherLocale} aria-label={isFr ? "Changer de langue" : "Change language"}>{otherLocale.toUpperCase()}</Link>
+          </span>
         </div>
       </header>
 
