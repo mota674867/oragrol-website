@@ -4,6 +4,24 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 
 ---
 
+## Session — Post-launch fix: nav dropdowns open on hover, not click — 2026-09-23
+
+**Context:** Mohammad's second piece of live-site feedback: "when we push on services or all any of header nav, the window open for their sub details, but it need to push on nav page to open the sub details window, i need with mouse movment it will open not with push" — the Services/Business Automation/Industries-style mega-nav dropdowns required a click to open; he wants hover-to-open, matching normal desktop-nav UX expectations.
+
+**Investigation — two parallel nav-dropdown implementations found (same architecture split documented in the EN/FR toggle entry above):**
+- `app/components/site/nav-dropdown.tsx` (`NavItemDropdown`, used by the shared Tailwind `SiteHeader` — How We Work, Careers/Talent/Partnerships) **already had both click and hover handlers wired** (`onMouseEnter`/`onMouseLeave` with a 150ms close-debounce, `CLOSE_DELAY_MS`). Left untouched. Re-verified behaviorally this session (not just by reading the code) via Playwright on `/how-we-work`: hovering the visible "Services" trigger opens the panel (`visibility: visible`) with no click, moving the mouse away closes it after the debounce, and moving into the panel itself keeps it open — 0 failures. This component was not the source of the complaint.
+- `app/components/site/oragrol-mega-nav.tsx` (`OragrolMegaNav`, used by every GPT-redesigned page's own header — Home, Services, Business Automation, Industries, Company, FAQ, OR ONE, Resources, Contact, the 3 legal pages, `resources/[slug]`) **only had `onClick` toggle behavior, no hover at all.** This is the actual component behind Mohammad's complaint — it's what renders the "Services" nav dropdown he was pointing at.
+
+**Fix:** added the same debounced-hover pattern already established in `nav-dropdown.tsx` (`HOVER_CLOSE_DELAY_MS = 150`, a `useRef`-held `setTimeout` with `cancelHoverClose`/`scheduleHoverClose` helpers, cleared on unmount) to `oragrol-mega-nav.tsx`. `onMouseEnter`/`onMouseLeave` added to each `<li className="om-item">` wrapper that actually has a dropdown (`groups.length` truthy) — enter cancels any pending close and opens that item's panel, leave schedules a debounced close so moving from the trigger down into the panel doesn't flicker-close it. The existing `onClick={() => setOpen(expanded ? null : index)}` on the trigger button was left completely untouched, since it's still needed for mobile/touch accordion behavior and keyboard activation (Enter/Space) — this is a pure addition, not a replacement.
+
+**Verification:** `tsc --noEmit` clean, `npm run lint` clean (same 7 pre-existing unrelated warnings as every prior phase — `jsx-a11y/alt-text` ×5, `react-hooks/exhaustive-deps` ×2, none touching this file). Playwright behavioral test on `/services` (representative `OragrolMegaNav` route): hovering the "Services" trigger with no click opens the panel (`hidden` attribute removed), moving the mouse to a neutral point closes it again after the debounce, re-hovering then moving the mouse down into the panel's own bounding box keeps it open (confirms the debounce/re-entry logic works, not just open-on-enter) — 0 failures. Since Mohammad's wording ("or all any of header nav") was ambiguous about scope, also re-verified the *other* nav system (`nav-dropdown.tsx` on `/how-we-work`) behaved correctly with the same three checks — 0 failures there too, confirming it didn't need touching.
+
+**Files changed:** `app/components/site/oragrol-mega-nav.tsx` only.
+
+**Not done / flagged:** no other issues found. This is an additive UX change — no existing click/touch/keyboard behavior was removed or altered.
+
+---
+
 ## Session — Post-launch fix: EN/FR header toggle now highlights the active language — 2026-09-23
 
 **Context:** The full bilingual build (Phases 2a-2m) was merged to `main` and deployed live this session. Mohammad's first live-site feedback: the header's "EN / FR" toggle didn't visually mark which language you were actually on — both letters were plain text inside one link, only their left-to-right order swapped ("EN / FR" vs "FR / EN"), so the active language wasn't obvious to a visitor. Requested fix: highlight the current language in orange (the brand's `--orange`/`--accent` burnt-orange).

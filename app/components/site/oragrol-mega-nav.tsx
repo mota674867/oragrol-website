@@ -59,9 +59,31 @@ export type OragrolMegaNavProps = {
  *    component's own mobile accordion is the first working mobile nav
  *    these pages have had, not a duplicate of an existing drawer.
  */
+// Same debounced-close delay as the other nav dropdown (nav-dropdown.tsx's
+// CLOSE_DELAY_MS) -- long enough to survive the gap between the trigger and
+// the panel below it without feeling laggy when the mouse actually leaves.
+const HOVER_CLOSE_DELAY_MS = 150;
+
 export default function OragrolMegaNav({ items, label = "Main navigation", activePath = null }: OragrolMegaNavProps) {
   const [open, setOpen] = useState<number | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  // Desktop hover-to-open (2026-09-23): panels used to open only on click.
+  // Only one item can be open at a time (`open` is a single index), so one
+  // shared timeout is enough -- no per-item bookkeeping needed. Touch
+  // devices never fire mouseenter/mouseleave at all, so this is additive:
+  // the existing onClick toggle below still drives the mobile accordion.
+  const hoverCloseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cancelHoverClose = () => {
+    if (hoverCloseTimeoutRef.current) {
+      clearTimeout(hoverCloseTimeoutRef.current);
+      hoverCloseTimeoutRef.current = null;
+    }
+  };
+  const scheduleHoverClose = () => {
+    cancelHoverClose();
+    hoverCloseTimeoutRef.current = setTimeout(() => setOpen(null), HOVER_CLOSE_DELAY_MS);
+  };
+  useEffect(() => cancelHoverClose, []);
   // Measured, not guessed: every page's actual header height differs
   // (88px normally, 70/72px past its own smaller breakpoint) and none of
   // that matches the reference component's own hardcoded mobile-panel
@@ -163,7 +185,15 @@ export default function OragrolMegaNav({ items, label = "Main navigation", activ
           const triggerId = `${uid}-trigger-${index}`;
           const isActive = !!(activePath && item.href && activePath === item.href);
           return (
-            <li className="om-item" key={`${item.label}-${index}`}>
+            <li
+              className="om-item"
+              key={`${item.label}-${index}`}
+              onMouseEnter={groups.length ? () => {
+                cancelHoverClose();
+                setOpen(index);
+              } : undefined}
+              onMouseLeave={groups.length ? scheduleHoverClose : undefined}
+            >
               {groups.length ? (
                 <>
                   <button
