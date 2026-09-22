@@ -4,6 +4,40 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 
 ---
 
+### 2026-09-22 — Bilingual EN/FR build, Phase 2d: Industries page fully wired (incl. full detail-accordion translation)
+
+**Completed:**
+- Confirmed patch `0009` (Business Automation) applied and pushed by Mohammad — verified via `git fetch` against `origin/feat/fr-locale` directly, then `git reset --hard` to sync this sandbox to the real pushed tip before starting new work (same discipline as every prior phase).
+- Built out Task #21's next page: `/industries` and `/fr/industries`, sourced from `ORAGROL_Industries_FR_Translation.md` (largest translation doc used so far, fully complete with no truncation). New `Industries` messages namespace covers the shared hero/navigator/journey/evidence-drawer/full-profile chrome plus all 9 industries' full content.
+- **Fully translated the "Industry detail" accordion this time too** (Risk and Canadian context / Protect / Automate / FAQ, for all 9 industries) — previously sourced from `industry-details.ts`, an English-only data file. That file's content was transcribed into `messages.Industries.list.*.detail` and the component now reads from there instead; `industry-details.ts` itself is left in place, untouched, purely as the English reference it was transcribed from, no longer imported by the page.
+- Reused the same 9 camelCase industry keys already established for `Home.industries.list` (professionalServices/healthcare/financialServices/retail/manufacturing/technology/construction/education/otherSmbs) so the same industry is addressed identically everywhere on the site, and the same 5 canonical automation-job ids Business Automation uses (sales-flow/customer-support/operational-intelligence/managed-it/customer-growth) for the "Automate the right jobs" panel's job references — kept self-contained in `Industries.jobShortNames` rather than cross-referencing the `BusinessAutomation` namespace.
+- Confirmed via grep that `categories`, `path`, `cta`, `href` and `secondary` — five fields defined on every industry in the original data — were never actually read anywhere in the component (dead data from an earlier design). Dropped rather than carried forward/translated; nothing user-facing was lost.
+- Self-translated a handful of items the doc didn't need to cover because the live page never renders them: Professional Services' 4th/5th `risks` and 3rd–5th `priorities` entries (the component only ever displays `risks.slice(0,3)`/`priorities.slice(0,2)`; all 8 other industries' arrays are already exactly 3 items each, matching what's shown). Kept for data-shape consistency with the English source, not because they're currently visible.
+- Verified, not assumed: `npx tsc --noEmit` clean, `npm run lint` 0 errors (same 7 pre-existing warnings), live dev-server diff of `/industries` vs `/fr/industries` — title/meta, hero, all 9 industry names in the ring-key nav, the evidence drawer's 3 stats + source citations (RCMP → GRC, OPC guidance → Lignes directrices du CPVP, correctly localized not just literal-translated), the full detail accordion's context/protect/automate/FAQ content, and per-industry job short names (e.g. Professional Services → Ventes/Finances vs Sales/Finance). Re-confirmed header/footer counts match 1:1 between EN and FR (no chrome-duplication regression) and no missing-message errors.
+
+**Files changed:**
+- Content: `messages/en.json`, `messages/fr.json` (new `Industries` namespace)
+- `app/[locale]/industries/page.tsx`, `industries-client.tsx`
+- `industry-details.ts` unchanged (superseded as a data source for this component, left in place as English reference)
+- `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- None new this phase — no site-wide bugs surfaced this time (the two prior phases' fixes, `SiteChrome`'s locale-aware pathname and `PreFooterCta`'s translation, already cover everything this page touches).
+
+**Problems solved:**
+- Industries is now the third fully bilingual page, and — like Business Automation but unlike Services — its deep accordion content is translated in full, not deferred.
+
+**Still open / needs verification:**
+- Not yet delivered to Mohammad as a patch — immediate next step.
+- Task #21 otherwise fully pending: OR ONE, Company, Contact+FAQ, Cyber Health quiz, Resources, Careers/Talent/Partnerships, How We Work, chat widget.
+- Services' own Details-accordion content (`services-details-content.tsx`) and `SharedCta`'s 6 placeholder-English keys remain the two known, previously-flagged gaps — unchanged this phase.
+
+**Next recommended step:**
+1. Commit, generate patch `0010` against the current pushed branch tip, verify via fresh-clone `git am`, deliver to Mohammad.
+2. Once applied and pushed, continue with the next Task #21 page.
+
+---
+
 ### 2026-09-22 — Bilingual EN/FR build, Phase 2c: Business Automation fully wired (incl. Details dialogs) + a second shared-chrome gap found and fixed (PreFooterCta)
 
 **Completed:**

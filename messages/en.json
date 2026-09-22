@@ -671,5 +671,476 @@
         "scope": "Custom quotation. A request spanning a broader connected operation may be better suited to OR ONE; this is assessed before committing to a build."
       }
     }
+  },
+  "Industries": {
+    "nav": {
+      "getCyberHealthScore": "Get Cyber Health Score",
+      "search": "Search",
+      "changeLanguage": "Change language"
+    },
+    "hero": {
+      "eyebrow": "Industries / Canada",
+      "title1": "Every industry operates differently.",
+      "title2": "Its protection should too.",
+      "sub": "Explore how ORAGROL aligns cybersecurity, intelligent automation and OR ONE with the risks, workflows and priorities of your industry.",
+      "pillarProtect": "Protect",
+      "pillarAutomate": "Automate",
+      "pillarUnify": "Unify",
+      "pillarsAriaLabel": "ORAGROL approach",
+      "chooseIndustry": "Choose your industry"
+    },
+    "navigator": {
+      "eyebrow": "01 / Select an industry",
+      "selectedLabel": "Selected industry",
+      "ringAriaLabel": "Industries"
+    },
+    "editorial": {
+      "heading": "The operating reality.",
+      "viewPath": "View the coordinated path"
+    },
+    "journey": {
+      "eyebrow": "02 / One coordinated path",
+      "protectLabel": "01 / Protect",
+      "protectHeading": "Protect what matters.",
+      "automateLabel": "02 / Automate",
+      "automateHeading": "Automate the right jobs.",
+      "unifyLabel": "03 / Unify",
+      "unifyHeading": "Know when it becomes OR ONE."
+    },
+    "evidence": {
+      "labelPrefix": "Flagship evidence / Accounting & bookkeeping",
+      "openDrawer": "Open evidence drawer",
+      "stat1": {
+        "value": "28.1%",
+        "prefix": "of sampled Canadian domains in a 2026 vendor study enforced DMARC at ",
+        "suffix": "."
+      },
+      "stat1Source": "PowerDMARC · 2026",
+      "stat2": {
+        "value": "$26B+",
+        "prefix": "stolen globally through business email compromise, including Canadian businesses.",
+        "suffix": ""
+      },
+      "stat2Source": "RCMP · Updated 2025",
+      "stat3": {
+        "value": "2 years",
+        "prefix": "minimum record-retention period for breaches under federal PIPEDA guidance.",
+        "suffix": ""
+      },
+      "stat3Source": "OPC guidance",
+      "disclaimer": "Controls support a stronger insurance-renewal conversation, but do not guarantee coverage, approval or lower premiums."
+    },
+    "fullProfile": {
+      "eyebrow": "03 / Industry detail",
+      "heading": "What leaders need to know.",
+      "sub": "Open only the detail relevant to your decision.",
+      "accordionRisk": "Risk and Canadian context",
+      "accordionProtect": "Protect",
+      "accordionAutomate": "Automate",
+      "accordionUnify": "Unify with OR ONE",
+      "detailsAriaSuffix": "details",
+      "scopeNote": "Applicable laws, standards and contractual duties vary by province, activity, regulator and data handled. ORAGROL confirms scope before recommending controls or automation."
+    },
+    "jobShortNames": {
+      "sales-flow": "Sales",
+      "customer-support": "Customer Service",
+      "operational-intelligence": "Finance",
+      "managed-it": "IT",
+      "customer-growth": "Marketing"
+    },
+    "list": {
+      "professionalServices": {
+        "name": "Professional Services",
+        "subBrand": "Accounting & bookkeeping firms",
+        "overview": "Accounting and bookkeeping firms sit at the centre of their clients’ financial lives—tax filings, payroll records, banking details and, often, authority to move client money. That concentration of sensitive data and payment authority makes firms a high-value target, independent of size.",
+        "risks": [
+          "Business email compromise and fraudulent banking-detail changes",
+          "Account takeover across email and cloud-accounting platforms",
+          "Unmanaged remote devices and unreviewed third-party access",
+          "Backup and recovery gaps affecting client financial records",
+          "Weak SPF, DKIM or DMARC enforcement"
+        ],
+        "priorities": [
+          "MFA on every email and cloud-accounting account",
+          "Independent verification for payment-detail changes",
+          "DMARC moved from monitoring to full enforcement",
+          "Regular staff and vendor access reviews",
+          "Tested backups and documented security awareness"
+        ],
+        "jobs": [
+          {
+            "jobKind": "sales-flow",
+            "why": "Keep every referral, enquiry, proposal and engagement-letter follow-up moving—even through busy season."
+          },
+          {
+            "jobKind": "operational-intelligence",
+            "why": "Turn scattered firm data into a current view of capacity, realization and client profitability."
+          }
+        ],
+        "unify": "When new-client intake, engagement and billing, staff capacity and client communication must move as one coordinated system—not as separate automations—that is OR ONE territory.",
+        "detail": {
+          "context": "PIPEDA may require safeguards appropriate to the sensitivity of personal information, breach reporting where there is a real risk of significant harm, notification, and breach records. Provincial privacy and professional rules may also apply. Accounting, legal and advisory firms should confirm their exact obligations during scoping.",
+          "protect": [
+            "Enforce MFA across email, cloud, accounting and privileged accounts.",
+            "Validate legitimate senders before moving SPF, DKIM and DMARC toward enforcement.",
+            "Independently verify payment instructions and banking-detail changes.",
+            "Review staff, contractor and vendor access at departures and on a defined schedule.",
+            "Protect client-document exchange, test backup restoration and document incident response."
+          ],
+          "automate": [
+            "Sales for referrals, proposals and engagement follow-up.",
+            "Secure client intake with document-status tracking and approved onboarding steps.",
+            "Finance for capacity, work in progress, billing and client-service visibility."
+          ],
+          "question": "What is the most common practical cyber risk for a professional-services firm?",
+          "answer": "Compromised email and identity are high-leverage risks because they can expose confidential information and enable convincing payment or account-change fraud."
+        }
+      },
+      "healthcare": {
+        "name": "Healthcare",
+        "subBrand": "Clinics & healthcare SMBs",
+        "overview": "Clinics work across scheduling, EMR, billing and communication systems maintained by several vendors, while staff turnover creates recurring access-control work around highly sensitive patient information.",
+        "risks": [
+          "Phishing aimed at front-desk and billing teams",
+          "Weak separation between clinical and administrative access",
+          "Unmanaged devices touching patient information"
+        ],
+        "priorities": [
+          "MFA across clinical and billing systems",
+          "Access reviews during every staff change",
+          "Managed protection for every connected endpoint"
+        ],
+        "jobs": [
+          {
+            "jobKind": "customer-support",
+            "why": "Improve high-volume scheduling, intake and follow-up communication."
+          },
+          {
+            "jobKind": "managed-it",
+            "why": "Keep scheduling and records systems dependable without building a full internal IT team."
+          }
+        ],
+        "unify": "When patient intake, billing, staff scheduling and communication must coordinate across providers or locations, the need has moved into OR ONE territory.",
+        "detail": {
+          "context": "In Ontario, PHIPA governs health information custodians and their agents. Custodians remain responsible when third-party providers are used, and breach notification and annual statistical reporting duties can apply. Other provinces have their own health-privacy regimes.",
+          "protect": [
+            "Enforce MFA for clinical, billing, remote and privileged accounts.",
+            "Use role-based access and review it after every staffing change.",
+            "Manage and patch every endpoint that touches patient information.",
+            "Test restoration of critical systems and maintain downtime procedures.",
+            "Review vendor safeguards, access, breach notice and data-disposition terms."
+          ],
+          "automate": [
+            "Approved reminders, intake status and non-clinical follow-up with staff escalation.",
+            "Administrative intake that checks completeness without automating clinical decisions.",
+            "IT for endpoint health, tickets, device lifecycle and recurring access work."
+          ],
+          "question": "Does a cloud healthcare vendor take privacy responsibility away from an Ontario clinic?",
+          "answer": "No. Ontario guidance makes clear that a custodian remains responsible for personal health information in its custody or control, including when providers are involved."
+        }
+      },
+      "financialServices": {
+        "name": "Financial Services",
+        "subBrand": "Advisors, brokers & lenders",
+        "overview": "Financial firms handle regulated data, high-value transactions and third-party platforms while maintaining evidence and audit trails as part of everyday operations.",
+        "risks": [
+          "Credential-based account takeover",
+          "Regulated financial-data exposure",
+          "Custodian, lender and CRM vendor risk"
+        ],
+        "priorities": [
+          "Strict identity and privileged-access controls",
+          "Continuous compliance evidence",
+          "Ongoing vendor-risk monitoring"
+        ],
+        "jobs": [
+          {
+            "jobKind": "operational-intelligence",
+            "why": "Create dependable visibility across reporting, portfolio and pipeline data."
+          },
+          {
+            "jobKind": "managed-it",
+            "why": "Maintain monitored, dependable infrastructure around critical workflows."
+          }
+        ],
+        "unify": "When compliance reporting, client communication and advisor operations need one coordinated, auditable system, that becomes OR ONE territory.",
+        "detail": {
+          "context": "The applicable framework depends on the activity. OSFI B-13 and B-10 apply to federally regulated financial institutions, not every financial SMB. FINTRAC applies to defined reporting entities and covered activities. Provincial, contractual and professional rules may also apply.",
+          "protect": [
+            "Use strong MFA for privileged, email, financial and remote accounts.",
+            "Separate and monitor administrative privilege.",
+            "Require independent verification for payment and account-detail changes.",
+            "Maintain vendor inventories, risk assessments, contract controls and exit plans.",
+            "Test incident response, continuity and recovery around critical workflows."
+          ],
+          "automate": [
+            "Compliance workflow support for evidence, review, exceptions and approvals.",
+            "Controlled client onboarding with required human review.",
+            "Finance for authorized pipeline, service, exception and risk views."
+          ],
+          "question": "Does OSFI Guideline B-13 apply to every Canadian financial business?",
+          "answer": "No. B-13 applies to federally regulated financial institutions. Other financial businesses may face different federal, provincial, contractual or professional obligations."
+        }
+      },
+      "retail": {
+        "name": "Retail & E-commerce",
+        "subBrand": "Commerce across channels",
+        "overview": "Retail and e-commerce operators manage payment data, seasonal demand and an always-on customer journey across marketing, checkout, fulfilment and support.",
+        "risks": [
+          "Payment and checkout compromise",
+          "Web and API exposure",
+          "Customer-data loss or misuse"
+        ],
+        "priorities": [
+          "Application and API security",
+          "PCI-relevant security hygiene",
+          "Continuous visibility into public systems"
+        ],
+        "jobs": [
+          {
+            "jobKind": "customer-growth",
+            "why": "Strengthen repeat purchases, retention and reactivation at scale."
+          },
+          {
+            "jobKind": "sales-flow",
+            "why": "Keep leads and abandonment follow-up moving without manual effort."
+          }
+        ],
+        "unify": "When marketing, sales, fulfilment and customer support must operate as one connected system across channels, that is OR ONE territory.",
+        "detail": {
+          "context": "Canadian privacy law may govern customer information. PCI DSS is a payment-card industry standard, not Canadian legislation. PCI DSS v4.0.1 includes e-commerce attention to payment-page scripts and change or tamper detection.",
+          "protect": [
+            "Enforce MFA for store administration, email, payments and remote access.",
+            "Minimize storage and exposure of payment and personal information.",
+            "Control plug-ins, scripts, integrations and updates.",
+            "Monitor payment-page changes, public applications, APIs and availability.",
+            "Review third-party access and test restoration before peak periods."
+          ],
+          "automate": [
+            "Customer Service for approved answers, routing and human escalation.",
+            "Marketing for consent-aware post-purchase, loyalty and reactivation journeys.",
+            "Finance for inventory, fulfilment, returns and campaign visibility."
+          ],
+          "question": "Is PCI DSS a Canadian privacy law?",
+          "answer": "No. PCI DSS is a payment-card industry security standard. Canadian privacy laws may separately govern the personal information a retailer handles."
+        }
+      },
+      "manufacturing": {
+        "name": "Manufacturing",
+        "subBrand": "Production & supply continuity",
+        "overview": "Manufacturers combine office IT, production-adjacent systems, legacy equipment and supplier access—where an ordinary technology incident can become measurable production downtime.",
+        "risks": [
+          "Supplier and vendor access exposure",
+          "Aging or unmanaged endpoints",
+          "Weak separation between office and production systems"
+        ],
+        "priorities": [
+          "Vendor access review",
+          "Complete endpoint coverage",
+          "Network segmentation around critical operations"
+        ],
+        "jobs": [
+          {
+            "jobKind": "managed-it",
+            "why": "Tie infrastructure reliability directly to production continuity."
+          },
+          {
+            "jobKind": "operational-intelligence",
+            "why": "Replace delayed inventory, supplier and production reporting with a current view."
+          }
+        ],
+        "unify": "When supply-chain, inventory and operating data need one coordinated planning-and-execution system, the requirement becomes OR ONE.",
+        "detail": {
+          "context": "Canadian cyber guidance highlights supply-chain threats, ransomware and risk-based security for smaller organizations. Exact duties depend on products, customers, safety, export controls, critical-infrastructure role and the information handled.",
+          "protect": [
+            "Inventory IT, OT, connected equipment, remote paths and critical dependencies.",
+            "Separate business and production environments where feasible.",
+            "Use approved, time-limited and monitored vendor access.",
+            "Prioritize vulnerabilities by exposure, exploitability, safety and production impact.",
+            "Test recovery for business systems and production-critical configurations."
+          ],
+          "automate": [
+            "IT for endpoints, access, service requests and recurring evidence.",
+            "Finance for authorized inventory, quality, downtime and supplier indicators.",
+            "Supplier workflows for approvals, evidence, expiry dates and exceptions."
+          ],
+          "question": "Why is vendor access a major manufacturing cyber risk?",
+          "answer": "Permanent, excessive or unmonitored supplier access can create a path into business or production environments when a vendor identity or system is compromised."
+        }
+      },
+      "technology": {
+        "name": "Technology",
+        "subBrand": "Growth-stage companies",
+        "overview": "Technology companies often scale revenue and headcount faster than internal process, accumulating SaaS tools, integrations and inconsistent access governance along the way.",
+        "risks": [
+          "SaaS sprawl and weak offboarding",
+          "API and integration exposure",
+          "Uncontrolled use of AI tools"
+        ],
+        "priorities": [
+          "Identity governance across the stack",
+          "Application and API security",
+          "Practical AI governance"
+        ],
+        "jobs": [
+          {
+            "jobKind": "sales-flow",
+            "why": "Scale pipeline execution without scaling administration at the same rate."
+          },
+          {
+            "jobKind": "operational-intelligence",
+            "why": "Connect product, customer and revenue information into current decisions."
+          }
+        ],
+        "unify": "When sales, product data and customer operations require one system rather than a growing collection of tools, that is OR ONE territory.",
+        "detail": {
+          "context": "Privacy, customer contracts, insurer conditions and supply-chain requirements all matter. Canada's proposed Artificial Intelligence and Data Act should not be described as enacted law; current advice should focus on privacy, security, approved use, human oversight and accountability.",
+          "protect": [
+            "Centralize identity, enforce MFA and control joiner, mover and leaver events.",
+            "Protect cloud administration, source code, CI/CD and secrets.",
+            "Establish secure development, dependency, vulnerability and release practices.",
+            "Inventory APIs, integrations, data flows and third-party components.",
+            "Define approved AI uses, prohibited data and human-review requirements."
+          ],
+          "automate": [
+            "Sales for demand, qualification, proposals and handoff.",
+            "Customer Service for approved knowledge, routing and escalation.",
+            "Finance for product, service, customer and revenue indicators."
+          ],
+          "question": "Is Canada's proposed Artificial Intelligence and Data Act currently law?",
+          "answer": "No. Technology companies should still establish practical AI governance around privacy, security, approved use, human oversight and accountability."
+        }
+      },
+      "construction": {
+        "name": "Construction & Real Estate",
+        "subBrand": "Distributed teams & projects",
+        "overview": "Construction and real-estate businesses coordinate office, field and site teams through email, mobile devices and a mix of project, transaction and client-management systems.",
+        "risks": [
+          "Field and mobile-device exposure",
+          "Invoice and payment-change fraud",
+          "Inconsistent access across sites and teams"
+        ],
+        "priorities": [
+          "Managed mobile devices",
+          "Independent payment verification",
+          "Enforced email authentication"
+        ],
+        "jobs": [
+          {
+            "jobKind": "managed-it",
+            "why": "Support a distributed workforce and its devices reliably."
+          },
+          {
+            "jobKind": "customer-growth",
+            "why": "Maintain disciplined follow-up across long buyer, tenant and client cycles."
+          }
+        ],
+        "unify": "When project management, client communication and back-office finance need to coordinate across multiple sites or listings, that is OR ONE territory.",
+        "detail": {
+          "context": "Real-estate brokers, representatives and developers can have FINTRAC duties when performing covered activities. Obligations differ by entity and activity. Privacy and contract requirements may also apply.",
+          "protect": [
+            "Enforce MFA across email, project, property, finance and remote systems.",
+            "Independently verify payment and banking-detail changes.",
+            "Manage mobile devices and protect business information.",
+            "Give contractors time-bound, least-privilege access.",
+            "Review access at project completion and retain required records."
+          ],
+          "automate": [
+            "Sales for enquiries, appointments, proposals and long-cycle follow-up.",
+            "Project intake for approved documents, missing items, routing and status.",
+            "IT for distributed devices, accounts and recurring service work."
+          ],
+          "question": "Do all Canadian construction and real-estate businesses have the same FINTRAC obligations?",
+          "answer": "No. Obligations depend on the entity and activities performed; covered businesses must assess the current guidance specific to them."
+        }
+      },
+      "education": {
+        "name": "Education",
+        "subBrand": "Schools & education providers",
+        "overview": "Education providers hold student and family data across administrative and learning systems while handling a constant volume of communication with parents, students and staff.",
+        "risks": [
+          "Phishing targeting administrative staff",
+          "Student-data exposure",
+          "Inconsistent access across learning and admin systems"
+        ],
+        "priorities": [
+          "Security awareness for staff",
+          "Governed access across platforms",
+          "Clear data-handling policy"
+        ],
+        "jobs": [
+          {
+            "jobKind": "customer-support",
+            "why": "Handle repeat parent and student enquiries more consistently."
+          },
+          {
+            "jobKind": "managed-it",
+            "why": "Support administrative and learning systems as one dependable environment."
+          }
+        ],
+        "unify": "When admissions, communication and administration must coordinate across programs or campuses, the operating need becomes OR ONE.",
+        "detail": {
+          "context": "Privacy duties depend on province and whether the institution is public or private. Ontario regulator findings on PowerSchool emphasize vendor oversight, contractual safeguards and continued responsibility for information in an institution's custody or control.",
+          "protect": [
+            "Enforce MFA for staff, administrators, remote and privileged accounts.",
+            "Review roles as students, staff and contractors enter or leave.",
+            "Protect endpoints, especially administrator and shared devices.",
+            "Assess education-technology vendors, contracts, access and data disposition.",
+            "Test restoration and maintain learning-continuity and incident plans."
+          ],
+          "automate": [
+            "Approved routine information and support with escalation to staff.",
+            "Admissions administration for document status, reminders and authorized handoffs.",
+            "IT for devices, accounts, tickets and access work."
+          ],
+          "question": "Does an education organization transfer privacy responsibility to its software provider?",
+          "answer": "Not automatically. Applicable law and organization type matter, but recent Ontario findings emphasize active vendor oversight and continued responsibility."
+        }
+      },
+      "otherSmbs": {
+        "name": "Other Canadian SMBs",
+        "subBrand": "A clear place to begin",
+        "overview": "Businesses that do not fit a named vertical still rely on the same essentials: email, cloud tools, a handful of vendors and operating work that is often more manual than it needs to be.",
+        "risks": [
+          "Phishing and account takeover",
+          "Incomplete MFA coverage",
+          "Unmanaged vendor access"
+        ],
+        "priorities": [
+          "MFA across every critical account",
+          "A documented risk baseline",
+          "Basic vendor and access review"
+        ],
+        "jobs": [
+          {
+            "jobKind": "sales-flow",
+            "why": "Create a dependable path from enquiry to close."
+          },
+          {
+            "jobKind": "customer-support",
+            "why": "Respond, route and follow up consistently as demand grows."
+          }
+        ],
+        "unify": "When sales, support and operations genuinely need to run as one coordinated system rather than separate functions, that is OR ONE territory.",
+        "detail": {
+          "context": "PIPEDA can apply to personal information handled in commercial activity. Alberta, British Columbia and Quebec have substantially similar private-sector laws, while sector and provincial duties may also apply. Canadian baseline controls offer a practical risk-based starting point.",
+          "protect": [
+            "Document critical assets, accounts, data and vendors.",
+            "Enforce MFA across email, cloud, finance and administration.",
+            "Manage endpoints, updates, backups and privileged access.",
+            "Protect email and train staff around phishing and payment fraud.",
+            "Test recovery and define incident decision ownership."
+          ],
+          "automate": [
+            "Sales workflows so enquiries and proposals do not go cold.",
+            "Customer Service for consistent routing, answers and escalation.",
+            "Finance for governed, current reporting.",
+            "IT for routine devices, accounts, tickets and access."
+          ],
+          "question": "Where should a Canadian SMB begin with cybersecurity?",
+          "answer": "Begin with a risk baseline covering critical accounts, devices, data, vendors, backups and business processes, then prioritize MFA, email protection, managed updates and tested recovery."
+        }
+      }
+    }
   }
 }

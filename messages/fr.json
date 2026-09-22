@@ -671,5 +671,476 @@
         "scope": "Soumission personnalisée. Une demande couvrant une opération connectée plus large pourrait mieux convenir à OR ONE; cela est évalué avant de s'engager dans une construction."
       }
     }
+  },
+  "Industries": {
+    "nav": {
+      "getCyberHealthScore": "Obtenez votre Cyber Health Score",
+      "search": "Rechercher",
+      "changeLanguage": "Changer de langue"
+    },
+    "hero": {
+      "eyebrow": "Secteurs d'activité / Canada",
+      "title1": "Chaque secteur fonctionne différemment.",
+      "title2": "Sa protection aussi devrait l'être.",
+      "sub": "Découvrez comment ORAGROL harmonise la cybersécurité, l'automatisation intelligente et OR ONE avec les risques, les flux de travail et les priorités de votre secteur.",
+      "pillarProtect": "Protéger",
+      "pillarAutomate": "Automatiser",
+      "pillarUnify": "Unifier",
+      "pillarsAriaLabel": "Approche ORAGROL",
+      "chooseIndustry": "Choisissez votre secteur"
+    },
+    "navigator": {
+      "eyebrow": "01 / Choisissez un secteur",
+      "selectedLabel": "Secteur sélectionné",
+      "ringAriaLabel": "Secteurs d'activité"
+    },
+    "editorial": {
+      "heading": "La réalité opérationnelle.",
+      "viewPath": "Voir la voie coordonnée"
+    },
+    "journey": {
+      "eyebrow": "02 / Une voie coordonnée",
+      "protectLabel": "01 / Protéger",
+      "protectHeading": "Protégez ce qui compte.",
+      "automateLabel": "02 / Automatiser",
+      "automateHeading": "Automatisez les bonnes tâches.",
+      "unifyLabel": "03 / Unifier",
+      "unifyHeading": "Sachez quand cela devient OR ONE."
+    },
+    "evidence": {
+      "labelPrefix": "Preuve phare / Comptabilité et tenue de livres",
+      "openDrawer": "Ouvrir le tiroir de preuves",
+      "stat1": {
+        "value": "28,1 %",
+        "prefix": "des domaines canadiens échantillonnés dans une étude de fournisseur de 2026 appliquaient le DMARC en mode ",
+        "suffix": "."
+      },
+      "stat1Source": "PowerDMARC · 2026",
+      "stat2": {
+        "value": "26 milliards $+",
+        "prefix": "volés à l'échelle mondiale par la compromission de courriels d'affaires, y compris des entreprises canadiennes.",
+        "suffix": ""
+      },
+      "stat2Source": "GRC · Mis à jour en 2025",
+      "stat3": {
+        "value": "2 ans",
+        "prefix": "période minimale de conservation des dossiers en cas d'atteinte, selon les lignes directrices fédérales de la LPRPDE.",
+        "suffix": ""
+      },
+      "stat3Source": "Lignes directrices du CPVP",
+      "disclaimer": "Les contrôles renforcent la conversation lors du renouvellement de l'assurance, mais ne garantissent pas la couverture, l'approbation ni des primes réduites."
+    },
+    "fullProfile": {
+      "eyebrow": "03 / Détails du secteur",
+      "heading": "Ce que les dirigeants doivent savoir.",
+      "sub": "N'ouvrez que les détails pertinents à votre décision.",
+      "accordionRisk": "Risques et contexte canadien",
+      "accordionProtect": "Protéger",
+      "accordionAutomate": "Automatiser",
+      "accordionUnify": "Unifier avec OR ONE",
+      "detailsAriaSuffix": "détails",
+      "scopeNote": "Les lois, normes et obligations contractuelles applicables varient selon la province, l'activité, l'organisme de réglementation et les données traitées. ORAGROL confirme la portée avant de recommander des contrôles ou de l'automatisation."
+    },
+    "jobShortNames": {
+      "sales-flow": "Ventes",
+      "customer-support": "Service à la clientèle",
+      "operational-intelligence": "Finances",
+      "managed-it": "TI",
+      "customer-growth": "Marketing"
+    },
+    "list": {
+      "professionalServices": {
+        "name": "Services professionnels",
+        "subBrand": "Cabinets de comptabilité et de tenue de livres",
+        "overview": "Les cabinets de comptabilité et de tenue de livres se trouvent au cœur de la vie financière de leurs clients — déclarations fiscales, dossiers de paie, coordonnées bancaires et, souvent, l'autorité de déplacer les fonds des clients. Cette concentration de données sensibles et d'autorité de paiement fait des cabinets une cible de grande valeur, peu importe leur taille.",
+        "risks": [
+          "Compromission de courriels d'affaires et modifications frauduleuses de coordonnées bancaires",
+          "Prise de contrôle de comptes sur les plateformes de courriel et de comptabilité infonuagique",
+          "Appareils à distance non gérés et accès de tiers non révisés",
+          "Lacunes de sauvegarde et de restauration touchant les dossiers financiers des clients",
+          "Application insuffisante de SPF, DKIM ou DMARC"
+        ],
+        "priorities": [
+          "AMF sur chaque compte de courriel et de comptabilité infonuagique",
+          "Vérification indépendante des modifications de coordonnées de paiement",
+          "DMARC passé du mode de surveillance à l'application stricte",
+          "Révisions régulières de l'accès du personnel et des fournisseurs",
+          "Sauvegardes testées et sensibilisation à la sécurité documentée"
+        ],
+        "jobs": [
+          {
+            "jobKind": "sales-flow",
+            "why": "Faites avancer chaque référence, demande, proposition et suivi de lettre de mission — même pendant la haute saison."
+          },
+          {
+            "jobKind": "operational-intelligence",
+            "why": "Transformez les données dispersées du cabinet en une vue à jour de la capacité, de la réalisation et de la rentabilité des clients."
+          }
+        ],
+        "unify": "Lorsque l'accueil de nouveaux clients, la mission et la facturation, la capacité du personnel et les communications avec les clients doivent fonctionner comme un système coordonné — et non comme des automatisations distinctes — c'est le territoire d'OR ONE.",
+        "detail": {
+          "context": "La LPRPDE peut exiger des mesures de protection adaptées à la sensibilité des renseignements personnels, la déclaration des atteintes lorsqu'il existe un risque réel de préjudice grave, la notification et la tenue de dossiers sur les atteintes. Des règles provinciales en matière de protection de la vie privée et des règles professionnelles peuvent également s'appliquer. Les cabinets de comptabilité, juridiques et de conseil devraient confirmer leurs obligations exactes lors de la définition de la portée.",
+          "protect": [
+            "Appliquez l'AMF sur tous les comptes de courriel, infonuagiques, comptables et privilégiés.",
+            "Validez les expéditeurs légitimes avant de faire progresser SPF, DKIM et DMARC vers l'application stricte.",
+            "Vérifiez de façon indépendante les instructions de paiement et les modifications de coordonnées bancaires.",
+            "Révisez l'accès du personnel, des sous-traitants et des fournisseurs lors des départs et selon un calendrier défini.",
+            "Protégez l'échange de documents avec les clients, testez la restauration des sauvegardes et documentez la réponse aux incidents."
+          ],
+          "automate": [
+            "Ventes pour les références, les propositions et le suivi des mandats.",
+            "Accueil sécurisé des clients avec suivi de l'état des documents et étapes d'intégration approuvées.",
+            "Finances pour la capacité, les travaux en cours, la facturation et la visibilité du service à la clientèle."
+          ],
+          "question": "Quel est le risque cybernétique pratique le plus courant pour un cabinet de services professionnels?",
+          "answer": "Le courriel et l'identité compromis représentent des risques à fort impact, car ils peuvent exposer des renseignements confidentiels et permettre une fraude convaincante liée aux paiements ou aux modifications de compte."
+        }
+      },
+      "healthcare": {
+        "name": "Santé",
+        "subBrand": "Cliniques et PME de santé",
+        "overview": "Les cliniques travaillent avec des systèmes de rendez-vous, de dossiers médicaux électroniques, de facturation et de communication maintenus par plusieurs fournisseurs, tandis que le roulement du personnel crée un travail récurrent de contrôle d'accès autour de renseignements de patients hautement sensibles.",
+        "risks": [
+          "Hameçonnage ciblant les équipes de réception et de facturation",
+          "Séparation insuffisante entre l'accès clinique et administratif",
+          "Appareils non gérés ayant accès aux renseignements des patients"
+        ],
+        "priorities": [
+          "AMF sur les systèmes cliniques et de facturation",
+          "Révisions d'accès à chaque changement de personnel",
+          "Protection gérée pour chaque point d'accès connecté"
+        ],
+        "jobs": [
+          {
+            "jobKind": "customer-support",
+            "why": "Améliorez la prise de rendez-vous à volume élevé, l'accueil et les communications de suivi."
+          },
+          {
+            "jobKind": "managed-it",
+            "why": "Gardez les systèmes de rendez-vous et de dossiers fiables sans bâtir une équipe TI interne complète."
+          }
+        ],
+        "unify": "Lorsque l'accueil des patients, la facturation, les horaires du personnel et les communications doivent se coordonner entre plusieurs fournisseurs ou emplacements, le besoin est passé dans le territoire d'OR ONE.",
+        "detail": {
+          "context": "En Ontario, la LPRPS régit les dépositaires de renseignements sur la santé et leurs agents. Les dépositaires demeurent responsables lorsque des fournisseurs tiers sont utilisés, et des obligations de notification d'atteinte et de déclaration statistique annuelle peuvent s'appliquer. Les autres provinces ont leurs propres régimes de protection de la vie privée en matière de santé.",
+          "protect": [
+            "Appliquez l'AMF pour les comptes cliniques, de facturation, à distance et privilégiés.",
+            "Utilisez un accès basé sur les rôles et révisez-le après chaque changement de personnel.",
+            "Gérez et corrigez chaque point d'accès ayant contact avec les renseignements des patients.",
+            "Testez la restauration des systèmes critiques et maintenez des procédures en cas d'interruption.",
+            "Révisez les mesures de protection, l'accès, l'avis d'atteinte et les conditions d'élimination des données des fournisseurs."
+          ],
+          "automate": [
+            "Rappels approuvés, état de l'accueil et suivi non clinique avec escalade au personnel.",
+            "Accueil administratif qui vérifie l'exhaustivité sans automatiser les décisions cliniques.",
+            "TI pour la santé des points d'accès, les billets, le cycle de vie des appareils et le travail d'accès récurrent."
+          ],
+          "question": "Un fournisseur infonuagique de soins de santé retire-t-il la responsabilité de la protection de la vie privée à une clinique ontarienne?",
+          "answer": "Non. Les lignes directrices ontariennes précisent clairement qu'un dépositaire demeure responsable des renseignements personnels sur la santé sous sa garde ou son contrôle, même lorsque des fournisseurs sont impliqués."
+        }
+      },
+      "financialServices": {
+        "name": "Services financiers",
+        "subBrand": "Conseillers, courtiers et prêteurs",
+        "overview": "Les entreprises financières traitent des données réglementées, des transactions de grande valeur et des plateformes tierces, tout en maintenant des preuves et des pistes de vérification dans le cadre de leurs opérations quotidiennes.",
+        "risks": [
+          "Prise de contrôle de comptes par identifiants compromis",
+          "Exposition de données financières réglementées",
+          "Risque lié aux fournisseurs de garde, de prêt et de CRM"
+        ],
+        "priorities": [
+          "Contrôles stricts de l'identité et des accès privilégiés",
+          "Preuves de conformité continues",
+          "Surveillance continue du risque fournisseur"
+        ],
+        "jobs": [
+          {
+            "jobKind": "operational-intelligence",
+            "why": "Créez une visibilité fiable sur les données de rapports, de portefeuille et de pipeline."
+          },
+          {
+            "jobKind": "managed-it",
+            "why": "Maintenez une infrastructure surveillée et fiable autour des flux de travail critiques."
+          }
+        ],
+        "unify": "Lorsque les rapports de conformité, les communications avec les clients et les opérations des conseillers nécessitent un système coordonné et vérifiable, cela devient le territoire d'OR ONE.",
+        "detail": {
+          "context": "Le cadre applicable dépend de l'activité. Les lignes directrices B-13 et B-10 du BSIF s'appliquent aux institutions financières sous réglementation fédérale, et non à toutes les PME financières. CANAFE s'applique aux entités déclarantes définies et aux activités visées. Des règles provinciales, contractuelles et professionnelles peuvent également s'appliquer.",
+          "protect": [
+            "Utilisez une AMF robuste pour les comptes privilégiés, de courriel, financiers et à distance.",
+            "Séparez et surveillez les privilèges administratifs.",
+            "Exigez une vérification indépendante pour les modifications de paiement et de coordonnées de compte.",
+            "Maintenez des inventaires de fournisseurs, des évaluations de risques, des contrôles contractuels et des plans de sortie.",
+            "Testez la réponse aux incidents, la continuité et la reprise autour des flux de travail critiques."
+          ],
+          "automate": [
+            "Soutien aux flux de conformité pour les preuves, les révisions, les exceptions et les approbations.",
+            "Intégration contrôlée des clients avec révision humaine obligatoire.",
+            "Finances pour les vues autorisées du pipeline, du service, des exceptions et des risques."
+          ],
+          "question": "La ligne directrice B-13 du BSIF s'applique-t-elle à toutes les entreprises financières canadiennes?",
+          "answer": "Non. La B-13 s'applique aux institutions financières sous réglementation fédérale. Les autres entreprises financières peuvent être soumises à des obligations fédérales, provinciales, contractuelles ou professionnelles différentes."
+        }
+      },
+      "retail": {
+        "name": "Commerce de détail et commerce électronique",
+        "subBrand": "Commerce multicanal",
+        "overview": "Les détaillants et commerçants en ligne gèrent des données de paiement, une demande saisonnière et un parcours client toujours actif, couvrant le marketing, le paiement, l'exécution des commandes et le soutien.",
+        "risks": [
+          "Compromission des paiements et du processus de paiement",
+          "Exposition Web et API",
+          "Perte ou utilisation abusive de données clients"
+        ],
+        "priorities": [
+          "Sécurité des applications et des API",
+          "Hygiène de sécurité pertinente pour la PCI",
+          "Visibilité continue sur les systèmes publics"
+        ],
+        "jobs": [
+          {
+            "jobKind": "customer-growth",
+            "why": "Renforcez les achats répétés, la rétention et la réactivation à grande échelle."
+          },
+          {
+            "jobKind": "sales-flow",
+            "why": "Faites avancer les prospects et le suivi des paniers abandonnés sans effort manuel."
+          }
+        ],
+        "unify": "Lorsque le marketing, les ventes, l'exécution des commandes et le service à la clientèle doivent fonctionner comme un système connecté unique entre les canaux, c'est le territoire d'OR ONE.",
+        "detail": {
+          "context": "La loi canadienne sur la protection de la vie privée peut régir les renseignements sur les clients. La norme PCI DSS est une norme de l'industrie des cartes de paiement, et non une loi canadienne. La version PCI DSS v4.0.1 accorde une attention particulière, pour le commerce électronique, aux scripts des pages de paiement et à la détection des modifications ou altérations.",
+          "protect": [
+            "Appliquez l'AMF pour l'administration de la boutique, le courriel, les paiements et l'accès à distance.",
+            "Minimisez le stockage et l'exposition des renseignements de paiement et personnels.",
+            "Contrôlez les modules complémentaires, les scripts, les intégrations et les mises à jour.",
+            "Surveillez les modifications des pages de paiement, les applications publiques, les API et la disponibilité.",
+            "Révisez l'accès des tiers et testez la restauration avant les périodes de pointe."
+          ],
+          "automate": [
+            "Service à la clientèle pour les réponses approuvées, l'acheminement et l'escalade humaine.",
+            "Marketing pour les parcours post-achat, de fidélisation et de réactivation respectueux du consentement.",
+            "Finances pour la visibilité des stocks, de l'exécution des commandes, des retours et des campagnes."
+          ],
+          "question": "La norme PCI DSS est-elle une loi canadienne sur la protection de la vie privée?",
+          "answer": "Non. La PCI DSS est une norme de sécurité de l'industrie des cartes de paiement. Les lois canadiennes sur la protection de la vie privée peuvent séparément régir les renseignements personnels traités par un détaillant."
+        }
+      },
+      "manufacturing": {
+        "name": "Fabrication",
+        "subBrand": "Continuité de la production et de l'approvisionnement",
+        "overview": "Les fabricants combinent la TI de bureau, des systèmes liés à la production, des équipements hérités et l'accès des fournisseurs — où un incident technologique ordinaire peut se traduire par un temps d'arrêt de production mesurable.",
+        "risks": [
+          "Exposition liée à l'accès des fournisseurs",
+          "Points d'accès vieillissants ou non gérés",
+          "Séparation insuffisante entre les systèmes de bureau et de production"
+        ],
+        "priorities": [
+          "Révision de l'accès des fournisseurs",
+          "Couverture complète des points d'accès",
+          "Segmentation réseau autour des opérations critiques"
+        ],
+        "jobs": [
+          {
+            "jobKind": "managed-it",
+            "why": "Reliez directement la fiabilité de l'infrastructure à la continuité de la production."
+          },
+          {
+            "jobKind": "operational-intelligence",
+            "why": "Remplacez les rapports d'inventaire, de fournisseurs et de production tardifs par une vue à jour."
+          }
+        ],
+        "unify": "Lorsque les données de chaîne d'approvisionnement, d'inventaire et d'exploitation nécessitent un système coordonné de planification et d'exécution, le besoin devient OR ONE.",
+        "detail": {
+          "context": "Les lignes directrices canadiennes en cybersécurité mettent en évidence les menaces liées à la chaîne d'approvisionnement, les rançongiciels et une sécurité basée sur les risques pour les petites organisations. Les obligations exactes dépendent des produits, des clients, de la sécurité, des contrôles à l'exportation, du rôle d'infrastructure essentielle et des renseignements traités.",
+          "protect": [
+            "Inventoriez la TI, la TO, les équipements connectés, les voies d'accès à distance et les dépendances critiques.",
+            "Séparez les environnements d'affaires et de production lorsque possible.",
+            "Utilisez un accès fournisseur approuvé, limité dans le temps et surveillé.",
+            "Priorisez les vulnérabilités selon l'exposition, l'exploitabilité, la sécurité et l'impact sur la production.",
+            "Testez la reprise des systèmes d'affaires et des configurations critiques pour la production."
+          ],
+          "automate": [
+            "TI pour les points d'accès, l'accès, les demandes de service et les preuves récurrentes.",
+            "Finances pour les indicateurs autorisés d'inventaire, de qualité, de temps d'arrêt et de fournisseurs.",
+            "Flux de travail fournisseurs pour les approbations, les preuves, les dates d'expiration et les exceptions."
+          ],
+          "question": "Pourquoi l'accès des fournisseurs constitue-t-il un risque cybernétique majeur en fabrication?",
+          "answer": "Un accès fournisseur permanent, excessif ou non surveillé peut créer une voie d'accès aux environnements d'affaires ou de production lorsqu'une identité ou un système fournisseur est compromis."
+        }
+      },
+      "technology": {
+        "name": "Technologie",
+        "subBrand": "Entreprises en croissance",
+        "overview": "Les entreprises technologiques font souvent croître leurs revenus et leurs effectifs plus rapidement que leurs processus internes, accumulant au passage des outils SaaS, des intégrations et une gouvernance d'accès incohérente.",
+        "risks": [
+          "Prolifération SaaS et départ du personnel mal géré",
+          "Exposition liée aux API et aux intégrations",
+          "Utilisation incontrôlée d'outils d'IA"
+        ],
+        "priorities": [
+          "Gouvernance de l'identité sur l'ensemble de la pile technologique",
+          "Sécurité des applications et des API",
+          "Gouvernance pratique de l'IA"
+        ],
+        "jobs": [
+          {
+            "jobKind": "sales-flow",
+            "why": "Faites croître l'exécution du pipeline sans faire croître l'administration au même rythme."
+          },
+          {
+            "jobKind": "operational-intelligence",
+            "why": "Reliez les renseignements sur les produits, les clients et les revenus à des décisions à jour."
+          }
+        ],
+        "unify": "Lorsque les ventes, les données produits et les opérations clients nécessitent un seul système plutôt qu'une collection grandissante d'outils, c'est le territoire d'OR ONE.",
+        "detail": {
+          "context": "La protection de la vie privée, les contrats clients, les conditions des assureurs et les exigences de la chaîne d'approvisionnement comptent tous. La Loi sur l'intelligence artificielle et les données proposée au Canada ne doit pas être présentée comme une loi en vigueur; les conseils actuels devraient porter sur la protection de la vie privée, la sécurité, l'utilisation approuvée, la supervision humaine et la reddition de comptes.",
+          "protect": [
+            "Centralisez l'identité, appliquez l'AMF et contrôlez les événements d'arrivée, de mutation et de départ du personnel.",
+            "Protégez l'administration infonuagique, le code source, l'intégration/déploiement continus et les secrets.",
+            "Établissez des pratiques sécurisées de développement, de gestion des dépendances, des vulnérabilités et des mises en production.",
+            "Inventoriez les API, les intégrations, les flux de données et les composants tiers.",
+            "Définissez les utilisations approuvées de l'IA, les données interdites et les exigences de révision humaine."
+          ],
+          "automate": [
+            "Ventes pour la demande, la qualification, les propositions et le transfert.",
+            "Service à la clientèle pour les connaissances approuvées, l'acheminement et l'escalade.",
+            "Finances pour les indicateurs de produits, de services, de clients et de revenus."
+          ],
+          "question": "La Loi sur l'intelligence artificielle et les données proposée au Canada est-elle actuellement en vigueur?",
+          "answer": "Non. Les entreprises technologiques devraient tout de même établir une gouvernance pratique de l'IA autour de la protection de la vie privée, de la sécurité, de l'utilisation approuvée, de la supervision humaine et de la reddition de comptes."
+        }
+      },
+      "construction": {
+        "name": "Construction et immobilier",
+        "subBrand": "Équipes et projets répartis",
+        "overview": "Les entreprises de construction et d'immobilier coordonnent les équipes de bureau, de terrain et de chantier par courriel, appareils mobiles et un ensemble de systèmes de gestion de projets, de transactions et de clients.",
+        "risks": [
+          "Exposition liée au terrain et aux appareils mobiles",
+          "Fraude liée aux factures et aux modifications de paiement",
+          "Accès incohérent entre les chantiers et les équipes"
+        ],
+        "priorities": [
+          "Appareils mobiles gérés",
+          "Vérification indépendante des paiements",
+          "Authentification du courriel appliquée"
+        ],
+        "jobs": [
+          {
+            "jobKind": "managed-it",
+            "why": "Soutenez de façon fiable une main-d'œuvre répartie et ses appareils."
+          },
+          {
+            "jobKind": "customer-growth",
+            "why": "Maintenez un suivi rigoureux tout au long des longs cycles d'acheteurs, de locataires et de clients."
+          }
+        ],
+        "unify": "Lorsque la gestion de projet, les communications avec les clients et les finances administratives doivent se coordonner entre plusieurs chantiers ou inscriptions, c'est le territoire d'OR ONE.",
+        "detail": {
+          "context": "Les courtiers, représentants et promoteurs immobiliers peuvent avoir des obligations envers CANAFE lorsqu'ils exercent des activités visées. Les obligations diffèrent selon l'entité et l'activité. Des exigences en matière de protection de la vie privée et de contrats peuvent également s'appliquer.",
+          "protect": [
+            "Appliquez l'AMF sur les systèmes de courriel, de projets, immobiliers, financiers et à distance.",
+            "Vérifiez de façon indépendante les modifications de paiement et de coordonnées bancaires.",
+            "Gérez les appareils mobiles et protégez les renseignements d'affaires.",
+            "Accordez aux sous-traitants un accès limité dans le temps et au moindre privilège.",
+            "Révisez l'accès à la fin des projets et conservez les dossiers requis."
+          ],
+          "automate": [
+            "Ventes pour les demandes, les rendez-vous, les propositions et le suivi des cycles longs.",
+            "Accueil de projets pour les documents approuvés, les éléments manquants, l'acheminement et l'état.",
+            "TI pour les appareils répartis, les comptes et le travail de service récurrent."
+          ],
+          "question": "Toutes les entreprises canadiennes de construction et d'immobilier ont-elles les mêmes obligations envers CANAFE?",
+          "answer": "Non. Les obligations dépendent de l'entité et des activités exercées; les entreprises visées doivent évaluer les lignes directrices actuelles qui leur sont propres."
+        }
+      },
+      "education": {
+        "name": "Éducation",
+        "subBrand": "Écoles et fournisseurs de services éducatifs",
+        "overview": "Les fournisseurs de services éducatifs détiennent des données sur les élèves et les familles dans des systèmes administratifs et d'apprentissage, tout en gérant un volume constant de communications avec les parents, les élèves et le personnel.",
+        "risks": [
+          "Hameçonnage ciblant le personnel administratif",
+          "Exposition des données des élèves",
+          "Accès incohérent entre les systèmes d'apprentissage et administratifs"
+        ],
+        "priorities": [
+          "Sensibilisation à la sécurité pour le personnel",
+          "Accès régi sur toutes les plateformes",
+          "Politique claire de gestion des données"
+        ],
+        "jobs": [
+          {
+            "jobKind": "customer-support",
+            "why": "Gérez les demandes répétées des parents et des élèves de façon plus cohérente."
+          },
+          {
+            "jobKind": "managed-it",
+            "why": "Soutenez les systèmes administratifs et d'apprentissage comme un seul environnement fiable."
+          }
+        ],
+        "unify": "Lorsque les admissions, les communications et l'administration doivent se coordonner entre plusieurs programmes ou campus, le besoin opérationnel devient OR ONE.",
+        "detail": {
+          "context": "Les obligations en matière de protection de la vie privée dépendent de la province et du caractère public ou privé de l'établissement. Les conclusions du régulateur ontarien concernant PowerSchool soulignent la surveillance des fournisseurs, les mesures de protection contractuelles et la responsabilité continue des renseignements sous la garde ou le contrôle d'un établissement.",
+          "protect": [
+            "Appliquez l'AMF pour les comptes du personnel, des administrateurs, à distance et privilégiés.",
+            "Révisez les rôles à l'arrivée et au départ des élèves, du personnel et des sous-traitants.",
+            "Protégez les points d'accès, particulièrement les appareils administratifs et partagés.",
+            "Évaluez les fournisseurs de technologie éducative, les contrats, l'accès et l'élimination des données.",
+            "Testez la restauration et maintenez des plans de continuité de l'apprentissage et d'incident."
+          ],
+          "automate": [
+            "Renseignements et soutien courants approuvés, avec escalade au personnel.",
+            "Administration des admissions pour l'état des documents, les rappels et les transferts autorisés.",
+            "TI pour les appareils, les comptes, les billets et le travail d'accès."
+          ],
+          "question": "Un établissement d'enseignement transfère-t-il sa responsabilité en matière de protection de la vie privée à son fournisseur de logiciels?",
+          "answer": "Pas automatiquement. La loi applicable et le type d'organisation comptent, mais des conclusions récentes de l'Ontario soulignent une surveillance active des fournisseurs et une responsabilité continue."
+        }
+      },
+      "otherSmbs": {
+        "name": "Autres PME canadiennes",
+        "subBrand": "Un point de départ clair",
+        "overview": "Les entreprises qui ne correspondent à aucun secteur nommé dépendent tout de même des mêmes éléments essentiels : le courriel, les outils infonuagiques, une poignée de fournisseurs et un travail opérationnel souvent plus manuel qu'il ne devrait l'être.",
+        "risks": [
+          "Hameçonnage et prise de contrôle de comptes",
+          "Couverture AMF incomplète",
+          "Accès fournisseur non géré"
+        ],
+        "priorities": [
+          "AMF sur chaque compte critique",
+          "Une base de référence des risques documentée",
+          "Révision de base des fournisseurs et des accès"
+        ],
+        "jobs": [
+          {
+            "jobKind": "sales-flow",
+            "why": "Créez un parcours fiable, de la demande jusqu'à la conclusion."
+          },
+          {
+            "jobKind": "customer-support",
+            "why": "Répondez, acheminez et assurez un suivi de façon cohérente à mesure que la demande augmente."
+          }
+        ],
+        "unify": "Lorsque les ventes, le soutien et les opérations doivent véritablement fonctionner comme un système coordonné plutôt que comme des fonctions distinctes, c'est le territoire d'OR ONE.",
+        "detail": {
+          "context": "La LPRPDE peut s'appliquer aux renseignements personnels traités dans le cadre d'une activité commerciale. L'Alberta, la Colombie-Britannique et le Québec ont des lois du secteur privé essentiellement similaires, tandis que des obligations sectorielles et provinciales peuvent également s'appliquer. Les contrôles de base canadiens offrent un point de départ pratique fondé sur les risques.",
+          "protect": [
+            "Documentez les actifs, comptes, données et fournisseurs critiques.",
+            "Appliquez l'AMF sur le courriel, l'infonuagique, les finances et l'administration.",
+            "Gérez les points d'accès, les mises à jour, les sauvegardes et l'accès privilégié.",
+            "Protégez le courriel et formez le personnel contre l'hameçonnage et la fraude liée aux paiements.",
+            "Testez la reprise et définissez la responsabilité décisionnelle en cas d'incident."
+          ],
+          "automate": [
+            "Flux de travail de vente pour que les demandes et les propositions ne restent pas sans suite.",
+            "Service à la clientèle pour un acheminement, des réponses et une escalade cohérents.",
+            "Finances pour des rapports régis et à jour.",
+            "TI pour les appareils, comptes, billets et accès courants."
+          ],
+          "question": "Par où une PME canadienne devrait-elle commencer en cybersécurité?",
+          "answer": "Commencez par une base de référence des risques couvrant les comptes, appareils, données, fournisseurs, sauvegardes et processus d'affaires critiques, puis priorisez l'AMF, la protection du courriel, les mises à jour gérées et une reprise testée."
+        }
+      }
+    }
   }
 }
