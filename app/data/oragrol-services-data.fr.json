@@ -1,0 +1,2120 @@
+{
+  "services_tier1": [
+    {
+      "code": "C01",
+      "name": "Connaître et gérer votre risque",
+      "tagline": "Une vue claire et priorisée de ce qui met réellement votre entreprise à risque.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C01-S01",
+          "name": "Cyber Health Check",
+          "blurb": "Connaissez précisément où se situe votre risque réel, de façon claire et priorisée.",
+          "price": "$4,500",
+          "unit": "ponctuel",
+          "problem": "Vous n'avez pas de vue claire et consolidée de l'endroit où se situe réellement votre risque cybernétique, ce qui vous empêche d'avoir la certitude que vos dépenses et vos efforts en sécurité ciblent les bons enjeux.",
+          "what_we_do": "ORAGROL examine d'abord votre environnement à l'aide des intégrations et des documents existants, ne pose que les questions dont elle a réellement besoin, puis évalue et priorise chaque risque relevé.",
+          "deliverables": [
+            "Un résumé exécutif que vous pouvez présenter à la direction",
+            "Un registre des risques détaillé",
+            "Un plan d'action priorisé"
+          ],
+          "benefits": [
+            "Un point de départ clair plutôt que des suppositions",
+            "La certitude que les dépenses et les efforts ciblent d'abord les risques les plus importants",
+            "Un dossier défendable pour l'assurance, les prêteurs ou la diligence raisonnable des clients"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Produire le rapport → Réviser ensemble.",
+          "outcome": "Vous savez exactement quels sont vos principaux risques et par où commencer pour les traiter."
+        },
+        {
+          "code": "C01-S02",
+          "name": "Vérification de conformité",
+          "blurb": "Sachez exactement ce que la conformité exige, et où vous en êtes.",
+          "price": "$5,000",
+          "unit": "+ 500 $/mois",
+          "problem": "On vous demande de prouver votre conformité — par un client, un assureur ou un organisme réglementaire — et vous n'avez pas une image claire de votre situation réelle.",
+          "what_we_do": "ORAGROL détermine quels cadres normatifs s'appliquent à vous, compare votre situation actuelle à ceux-ci, puis élabore un plan priorisé pour combler chaque lacune.",
+          "deliverables": [
+            "Un rapport d'écarts en langage clair",
+            "Une feuille de route de remédiation avec responsables désignés",
+            "Des échéances",
+            "Un dossier de preuves appuyant votre statut de conformité"
+          ],
+          "benefits": [
+            "Une réponse claire à « sommes-nous conformes? » plutôt que des suppositions",
+            "Une démarche réaliste et priorisée pour combler les lacunes",
+            "Des preuves prêtes lorsqu'un client, un assureur ou un auditeur les demande"
+          ],
+          "process": "Déterminer les cadres normatifs → Comparer la situation actuelle → Signaler les écarts → Bâtir la feuille de route → Suivre la fermeture des écarts.",
+          "outcome": "Vous savez exactement ce qu'exige la « conformité » et à quel point vous en êtes proche."
+        },
+        {
+          "code": "C01-S03",
+          "name": "Mise en place des règles de sécurité",
+          "blurb": "Des politiques de sécurité à jour, approuvées et réellement suivies.",
+          "price": "$800",
+          "unit": "/mois",
+          "problem": "Vous n'avez pas de politiques de sécurité formelles et à jour, ce qui vous coûte cher au moment d'un audit, du renouvellement d'assurance ou lorsqu'un client demande à voir votre programme de gouvernance.",
+          "what_we_do": "ORAGROL détermine quelles politiques vous manquent ou doivent être mises à jour, les rédige en fonction du contexte réel de votre entreprise, puis les maintient à jour par la suite.",
+          "deliverables": [
+            "Un ensemble complet de politiques",
+            "Une charte de gouvernance définissant qui est responsable de quoi",
+            "Un calendrier de révision pour qu'aucune politique ne devienne désuète"
+          ],
+          "benefits": [
+            "Un ensemble de politiques défendable et à jour, prêt pour un audit ou une assurance",
+            "Une responsabilité claire quant à qui prend les décisions de sécurité",
+            "Des politiques qui reflètent la façon dont votre entreprise fonctionne réellement"
+          ],
+          "process": "Cerner les lacunes → Rédiger la politique → Réviser et approuver → Publier → Maintenir selon le calendrier établi.",
+          "outcome": "Votre programme de gouvernance est documenté, approuvé et maintenu à jour."
+        },
+        {
+          "code": "C01-S04",
+          "name": "RSSI virtuel",
+          "blurb": "Un leadership stratégique en sécurité, sans embauche à temps plein.",
+          "price": "$2,500-$4,500",
+          "unit": "/mois",
+          "problem": "Vous n'avez personne d'assez expérimenté pour définir la stratégie de sécurité, prioriser la feuille de route et être responsable du programme — pas un technicien, un leader.",
+          "what_we_do": "Un directeur de cybersécurité désigné établit vos priorités stratégiques, coordonne le reste de vos services ORAGROL, rend des comptes à votre direction et est responsable de la feuille de route.",
+          "deliverables": [
+            "Révision stratégique trimestrielle",
+            "Rapport de risque destiné à la direction",
+            "Feuille de route de sécurité priorisée",
+            "Des rapports prêts pour la direction"
+          ],
+          "benefits": [
+            "Un leadership de sécurité expérimenté sans embauche à temps plein",
+            "Un seul responsable imputable pour l'ensemble du programme",
+            "Une priorisation claire plutôt que des correctifs dispersés"
+          ],
+          "process": "Comprendre votre entreprise → Établir les priorités → Diriger le programme → Rendre compte à la direction → Ajuster",
+          "outcome": "Vous avez un leader expérimenté et imputable qui fait progresser votre programme de sécurité."
+        }
+      ]
+    },
+    {
+      "code": "C02",
+      "name": "Trouver et corriger les failles",
+      "tagline": "Les failles exploitables sont repérées et suivies jusqu'à leur résolution.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C02-S01",
+          "name": "Vérification des failles de sécurité",
+          "blurb": "Une analyse continue qui repère les failles et en assure le suivi jusqu'à leur résolution.",
+          "price": "$15",
+          "unit": "/utilisateur/mois",
+          "problem": "Vous n'avez pas de méthode systématique pour trouver et corriger les vulnérabilités avant que quelqu'un d'autre ne les découvre.",
+          "what_we_do": "ORAGROL effectue des analyses de vulnérabilité régulières, élimine le bruit pour vous montrer ce qui est réellement exploitable, et assure le suivi de chaque constat jusqu'à sa fermeture confirmée.",
+          "deliverables": [
+            "Un rapport de vulnérabilités priorisé",
+            "Un tableau de bord de suivi de la remédiation",
+            "Une confirmation de fermeture vérifiée"
+          ],
+          "benefits": [
+            "Moins de failles exploitables laissées ouvertes",
+            "Une priorisation claire pour que les efforts ciblent ce qui compte le plus",
+            "Un dossier vérifié confirmant que les problèmes ont réellement été corrigés"
+          ],
+          "process": "Analyser → Filtrer le bruit → Prioriser → Acheminer pour correction → Vérifier la fermeture → Répéter.",
+          "outcome": "Les vulnérabilités connues sont repérées et corrigées selon un calendrier prévisible, plutôt que de s'accumuler sans gestion."
+        },
+        {
+          "code": "C02-S02",
+          "name": "Surveillance des fournisseurs",
+          "blurb": "Sachez quels fournisseurs mettent votre entreprise à risque.",
+          "price": "$400",
+          "unit": "/mois",
+          "problem": "Vous dépendez de dizaines de fournisseurs externes et n'avez aucun moyen réel de savoir lesquels représentent un risque de sécurité pour votre entreprise.",
+          "what_we_do": "ORAGROL dresse un portrait complet de vos fournisseurs, détermine lesquels comptent le plus selon les données ou les accès dont ils disposent, vérifie leurs preuves de sécurité, puis continue de surveiller l'apparition de nouveaux risques.",
+          "deliverables": [
+            "Un rapport de risque fournisseurs",
+            "Une liste d'actions priorisée",
+            "Des alertes continues lorsque le risque d'un fournisseur change"
+          ],
+          "benefits": [
+            "Une visibilité sur des risques que vous ne pouvez pas voir de l'intérieur de vos propres systèmes",
+            "Une réponse défendable lorsqu'un client, un assureur ou un auditeur s'informe sur la gestion des fournisseurs",
+            "Une alerte rapide si un fournisseur dont vous dépendez subit une brèche"
+          ],
+          "process": "Recenser les fournisseurs → Classer par criticité → Évaluer les preuves → Produire le rapport → Surveiller en continu.",
+          "outcome": "Vous savez quels fournisseurs représentent votre plus grand risque, et vous le découvrez rapidement si cela change."
+        }
+      ]
+    },
+    {
+      "code": "C03",
+      "name": "Détecter et arrêter les menaces",
+      "tagline": "Une surveillance de votre environnement 24 heures sur 24.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C03-S01",
+          "name": "Surveillance de sécurité par IA",
+          "blurb": "Une visibilité continue sur l'ensemble de votre environnement.",
+          "price": "$20",
+          "unit": "/utilisateur/mois",
+          "problem": "La plupart des entreprises génèrent plus d'alertes de sécurité que quiconque n'a le temps d'examiner — les vraies menaces se noient dans le bruit.",
+          "what_we_do": "Nous surveillons votre environnement en continu, filtrons le bruit et signalons ce qui compte vraiment à votre équipe de sécurité.",
+          "deliverables": [
+            "Une couverture de surveillance continue",
+            "Un triage priorisé des alertes",
+            "Un rapport de sécurité mensuel"
+          ],
+          "benefits": [
+            "Une visibilité de sécurité continue",
+            "Une détection plus rapide des activités suspectes",
+            "Une réduction du bruit d'alertes",
+            "Une réponse plus rapide aux menaces réelles"
+          ],
+          "process": "Surveiller en continu → Filtrer le bruit → Prioriser → Alerter → Produire le rapport",
+          "outcome": "Les vraies menaces sont repérées et traitées, plutôt que noyées dans le bruit."
+        },
+        {
+          "code": "C03-S02",
+          "name": "Réponse gérée aux menaces",
+          "blurb": "Les vraies menaces, triées et arrêtées avant qu'elles ne se propagent.",
+          "price": "$25",
+          "unit": "/utilisateur/mois",
+          "problem": "Connaître une menace n'équivaut pas à l'arrêter — la plupart des entreprises n'ont personne capable d'intervenir réellement à temps.",
+          "what_we_do": "Nous détectons, enquêtons et intervenons directement face aux menaces réelles, en les confinant avant qu'elles ne se propagent.",
+          "deliverables": [
+            "Une surveillance des menaces 24 heures sur 24, 7 jours sur 7",
+            "L'enquête et le triage",
+            "Le confinement et l'intervention actifs",
+            "Des rapports sommaires d'incidents"
+          ],
+          "benefits": [
+            "Des menaces confinées, pas seulement détectées",
+            "Une intervention plus rapide qu'une équipe interne ne pourrait gérer seule",
+            "Une couverture en dehors des heures d'ouverture"
+          ],
+          "process": "Détecter → Enquêter → Confiner → Intervenir → Produire le rapport",
+          "outcome": "Les menaces sont arrêtées, pas seulement signalées."
+        },
+        {
+          "code": "C03-S03",
+          "name": "Veille des menaces",
+          "blurb": "Du renseignement sur les menaces qui ciblent réellement votre secteur.",
+          "price": "$8",
+          "unit": "/utilisateur/mois",
+          "problem": "Les flux de menaces génériques ne vous disent pas ce qui cible réellement des entreprises comme la vôtre.",
+          "what_we_do": "Nous suivons les menaces pertinentes pour votre secteur et votre taille d'entreprise, et en tirons un renseignement que vous pouvez réellement utiliser.",
+          "deliverables": [
+            "Un bulletin mensuel de renseignement sur les menaces",
+            "Des alertes pertinentes dès qu'elles surviennent",
+            "Des demandes de renseignement ciblées"
+          ],
+          "benefits": [
+            "Une connaissance des menaces réellement pertinentes pour vous",
+            "Moins de surprises causées par des attaques propres à votre secteur",
+            "Un renseignement qui alimente vos autres mesures de défense"
+          ],
+          "process": "Recueillir → Analyser → Filtrer par pertinence → Informer → Alerter",
+          "outcome": "Vous savez ce qui s'en vient avant que cela ne vous cible."
+        },
+        {
+          "code": "C03-S04",
+          "name": "Intervention en sécurité",
+          "blurb": "Un plan d'intervention coordonné pour quand les choses tournent mal.",
+          "price": "$600",
+          "unit": "/mois",
+          "problem": "Lorsque quelque chose tourne réellement mal, la plupart des entreprises n'ont ni plan ni personnel pour intervenir rapidement.",
+          "what_we_do": "Nous vous fournissons un plan d'intervention en cas d'incident et une équipe prêts à agir, afin que vous n'ayez pas à tout improviser lorsque quelque chose survient.",
+          "deliverables": [
+            "Un contrat de rétention pour l'intervention en cas d'incident",
+            "Un guide d'intervention",
+            "Une révision annuelle de l'état de préparation ou un exercice de simulation"
+          ],
+          "benefits": [
+            "Un plan d'intervention prêt avant même d'en avoir besoin",
+            "Une gestion des incidents plus rapide et plus posée",
+            "Une équipe coordonnée plutôt que la panique"
+          ],
+          "process": "Préparer → Détecter → Intervenir → Rétablir → Réviser",
+          "outcome": "Lorsque quelque chose survient, vous avez un plan et une équipe, pas la panique."
+        }
+      ]
+    },
+    {
+      "code": "C04",
+      "name": "Protégez vos employés et vos appareils",
+      "tagline": "La surface d'attaque de tous les jours, celle que les pirates testent toujours en premier.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C04-S01",
+          "name": "Protection des appareils",
+          "blurb": "Une protection des postes de travail gérée, pas seulement installée.",
+          "price": "$12",
+          "unit": "/utilisateur/mois",
+          "problem": "Vos portables et postes de travail sont la porte d'entrée la plus facile : appareils non gérés, mises à jour manquées et logiciels malveillants qui passent inaperçus.",
+          "what_we_do": "Nous déployons et gérons la protection des postes sur chaque appareil, surveillons les menaces en continu et intervenons dès qu'un problème est détecté.",
+          "deliverables": [
+            "Référence de sécurité des postes",
+            "Rapport de couverture mensuel",
+            "Constats et plan de remédiation",
+            "Résumés des incidents et des menaces"
+          ],
+          "benefits": [
+            "Moins d'appareils non gérés et non protégés",
+            "Une détection plus rapide en cas de problème",
+            "Des rapports clairs sur l'état de sécurité de vos postes"
+          ],
+          "process": "Déployer la protection → Surveiller en continu → Détecter et intervenir → Rapporter chaque mois",
+          "outcome": "Chaque appareil géré est protégé, surveillé et comptabilisé."
+        },
+        {
+          "code": "C04-S02",
+          "name": "Bouclier courriel",
+          "blurb": "Une sécurité courriel qui arrête ce que les filtres laissent passer.",
+          "price": "$6",
+          "unit": "/utilisateur/mois",
+          "problem": "Le courriel demeure la voie d'entrée numéro un des attaquants : hameçonnage, pièces jointes malveillantes et compromission de messagerie d'affaires.",
+          "what_we_do": "Nous surveillons et filtrons votre trafic courriel, bloquons le contenu malveillant avant qu'il n'atteigne votre équipe et gérons les politiques qui tiennent l'hameçonnage à distance.",
+          "deliverables": [
+            "Configuration de la sécurité courriel",
+            "Blocage de l'hameçonnage et des logiciels malveillants",
+            "Rapport de sécurité mensuel"
+          ],
+          "benefits": [
+            "Moins de courriels d'hameçonnage atteignant votre équipe",
+            "Blocage des pièces jointes et liens malveillants",
+            "Un ajustement continu à mesure que les menaces évoluent"
+          ],
+          "process": "Configurer la protection → Filtrer en continu → Bloquer les menaces → Rapporter chaque mois",
+          "outcome": "Les courriels malveillants sont arrêtés avant même que votre équipe ne les voie."
+        },
+        {
+          "code": "C04-S03",
+          "name": "Sécurité du personnel",
+          "blurb": "Une formation qui fait de votre équipe une ligne de défense.",
+          "price": "$40",
+          "unit": "/utilisateur/an",
+          "problem": "Votre équipe est souvent le maillon le plus faible, non pas par négligence, mais parce que personne ne l'a formée à repérer ce qui s'en vient.",
+          "what_we_do": "Nous offrons une formation continue en sensibilisation à la sécurité et des simulations d'hameçonnage, pour que votre équipe apprenne à reconnaître les vraies menaces.",
+          "deliverables": [
+            "Évaluation initiale des risques",
+            "Programme de formation continue",
+            "Simulations d'hameçonnage",
+            "Résumé annuel des risques"
+          ],
+          "benefits": [
+            "Une équipe qui repère l'hameçonnage au lieu d'en être victime",
+            "Une amélioration mesurable du risque humain dans le temps",
+            "Un dossier de formation solide pour les audits et les assurances"
+          ],
+          "process": "Évaluer la base → Former → Simuler l'hameçonnage → Mesurer → Recommencer",
+          "outcome": "Votre équipe devient une ligne de défense, et non plus votre plus grand risque."
+        }
+      ]
+    },
+    {
+      "code": "C05",
+      "name": "Contrôlez qui a accès",
+      "tagline": "Les bonnes personnes, les bons accès.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C05-S01",
+          "name": "Gestion des accès",
+          "blurb": "Les bonnes personnes, les bons accès, rien de plus.",
+          "price": "$8",
+          "unit": "/utilisateur/mois",
+          "problem": "**Gestion des accès met en place la couche fondamentale d'identité et d'accès qui établit les identités numériques, gère le cycle de vie des comptes, attribue les accès appropriés et applique le principe du moindre privilège dans l'ensemble des systèmes du client.**\n\nEn pratique, cela signifie que nous maintenons des identités et des comptes exacts; contrôlons l'accès aux systèmes et aux applications; appliquons le principe du moindre privilège.",
+          "what_we_do": "Nous mettons en place la couche fondamentale d'identité et d'accès qui établit les identités numériques, gère le cycle de vie des comptes, attribue les accès appropriés et applique le principe du moindre privilège dans l'ensemble des systèmes du client.",
+          "deliverables": [
+            "Évaluation et référence de sécurité",
+            "Recommandations de configuration et de politiques",
+            "Mise en œuvre ou gestion des contrôles",
+            "Rapports sur la posture de sécurité",
+            "Gestion des exceptions",
+            "Recommandations de remédiation",
+            "Révision périodique",
+            "Intégration avec les services ORAGROL connexes"
+          ],
+          "benefits": [
+            "Réduction du risque lié à l'identité et à l'accès",
+            "Des contrôles de sécurité renforcés",
+            "Une meilleure visibilité",
+            "Réduction des accès excessifs ou inappropriés",
+            "Une application des politiques améliorée",
+            "Une meilleure traçabilité",
+            "Des opérations de sécurité plus cohérentes"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une réduction du risque lié à l'identité et à l'accès."
+        },
+        {
+          "code": "C05-S02",
+          "name": "Bouclier d'authentification",
+          "blurb": "L'authentification multifacteur, déployée et gérée.",
+          "price": "$4",
+          "unit": "/utilisateur/mois",
+          "problem": "**Bouclier d'authentification protège l'authentification en exigeant une vérification supplémentaire appropriée et en réduisant le risque qu'un mot de passe volé se transforme en accès non autorisé.**\n\nEn pratique, cela signifie que nous augmentons la couverture MFA; protégeons l'authentification à haut risque; soutenons l'authentification résistante à l'hameçonnage.",
+          "what_we_do": "Nous protégeons l'authentification en exigeant une vérification supplémentaire appropriée et en réduisant le risque qu'un mot de passe volé se transforme en accès non autorisé.",
+          "deliverables": [
+            "Évaluation et référence de sécurité",
+            "Recommandations de configuration et de politiques",
+            "Mise en œuvre ou gestion des contrôles",
+            "Rapports sur la posture de sécurité",
+            "Gestion des exceptions",
+            "Recommandations de remédiation",
+            "Révision périodique",
+            "Intégration avec les services ORAGROL connexes"
+          ],
+          "benefits": [
+            "Réduction du risque lié à l'identité et à l'accès",
+            "Des contrôles de sécurité renforcés",
+            "Une meilleure visibilité",
+            "Réduction des accès excessifs ou inappropriés",
+            "Une application des politiques améliorée",
+            "Une meilleure traçabilité",
+            "Des opérations de sécurité plus cohérentes"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une réduction du risque lié à l'identité et à l'accès."
+        },
+        {
+          "code": "C05-S03",
+          "name": "Bouclier des comptes privilégiés",
+          "blurb": "Les comptes privilégiés, sous surveillance étroite.",
+          "price": "$30",
+          "unit": "/utilisateur privilégié/mois",
+          "problem": "**Bouclier des comptes privilégiés protège les comptes d'administrateur et les autres comptes à fort impact en contrôlant les accès privilégiés, en réduisant les privilèges permanents, en sécurisant les identifiants et en améliorant la responsabilisation liée aux activités administratives.**\n\nEn pratique, cela signifie que nous réduisons les privilèges permanents; protégeons les identifiants privilégiés; contrôlons les sessions administratives.",
+          "what_we_do": "Nous protégeons les comptes d'administrateur et les autres comptes à fort impact en contrôlant les accès privilégiés, en réduisant les privilèges permanents, en sécurisant les identifiants et en améliorant la responsabilisation liée aux activités administratives.",
+          "deliverables": [
+            "Évaluation et référence de sécurité",
+            "Recommandations de configuration et de politiques",
+            "Mise en œuvre ou gestion des contrôles",
+            "Rapports sur la posture de sécurité",
+            "Gestion des exceptions",
+            "Recommandations de remédiation",
+            "Révision périodique",
+            "Intégration avec les services ORAGROL connexes"
+          ],
+          "benefits": [
+            "Réduction du risque lié à l'identité et à l'accès",
+            "Des contrôles de sécurité renforcés",
+            "Une meilleure visibilité",
+            "Réduction des accès excessifs ou inappropriés",
+            "Une application des politiques améliorée",
+            "Une meilleure traçabilité",
+            "Des opérations de sécurité plus cohérentes"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une réduction du risque lié à l'identité et à l'accès."
+        },
+        {
+          "code": "C05-S04",
+          "name": "Gouvernance des accès",
+          "blurb": "Des révisions régulières pour que les accès ne dérivent jamais en silence.",
+          "price": "$6",
+          "unit": "/utilisateur/mois",
+          "problem": "**Gouvernance des accès détermine qui devrait avoir accès, pourquoi, qui l'a approuvé, combien de temps il devrait durer, et si l'accès demeure approprié à mesure que les personnes et les rôles d'affaires évoluent.**\n\nEn pratique, cela signifie que nous établissons la gouvernance des accès; automatisons les contrôles du cycle de vie des identités; soutenons les demandes et les approbations d'accès.",
+          "what_we_do": "Nous déterminons qui devrait avoir accès, pourquoi, qui l'a approuvé, combien de temps il devrait durer, et si l'accès demeure approprié à mesure que les personnes et les rôles d'affaires évoluent.",
+          "deliverables": [
+            "Évaluation et référence de sécurité",
+            "Recommandations de configuration et de politiques",
+            "Mise en œuvre ou gestion des contrôles",
+            "Rapports sur la posture de sécurité",
+            "Gestion des exceptions",
+            "Recommandations de remédiation",
+            "Révision périodique",
+            "Intégration avec les services ORAGROL connexes"
+          ],
+          "benefits": [
+            "Réduction du risque lié à l'identité et à l'accès",
+            "Des contrôles de sécurité renforcés",
+            "Une meilleure visibilité",
+            "Réduction des accès excessifs ou inappropriés",
+            "Une application des politiques améliorée",
+            "Une meilleure traçabilité",
+            "Des opérations de sécurité plus cohérentes"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une réduction du risque lié à l'identité et à l'accès."
+        },
+        {
+          "code": "C05-S05",
+          "name": "Protection Zero Trust",
+          "blurb": "Ne jamais faire confiance, toujours vérifier.",
+          "price": "$10",
+          "unit": "/utilisateur/mois",
+          "problem": "**Protection Zero Trust applique les décisions d'accès en fonction de l'identité, de l'appareil, de l'application, de l'emplacement, du contexte de session et du risque, plutôt que de présumer qu'un utilisateur ou un réseau est intrinsèquement digne de confiance.**\n\nEn pratique, cela signifie que nous appliquons le principe de vérification avant confiance; appliquons l'accès selon le moindre privilège; utilisons des décisions d'accès contextuelles.",
+          "what_we_do": "Nous appliquons les décisions d'accès en fonction de l'identité, de l'appareil, de l'application, de l'emplacement, du contexte de session et du risque, plutôt que de présumer qu'un utilisateur ou un réseau est intrinsèquement digne de confiance.",
+          "deliverables": [
+            "Évaluation et référence de sécurité",
+            "Recommandations de configuration et de politiques",
+            "Mise en œuvre ou gestion des contrôles",
+            "Rapports sur la posture de sécurité",
+            "Gestion des exceptions",
+            "Recommandations de remédiation",
+            "Révision périodique",
+            "Intégration avec les services ORAGROL connexes"
+          ],
+          "benefits": [
+            "Réduction du risque lié à l'identité et à l'accès",
+            "Des contrôles de sécurité renforcés",
+            "Une meilleure visibilité",
+            "Réduction des accès excessifs ou inappropriés",
+            "Une application des politiques améliorée",
+            "Une meilleure traçabilité",
+            "Des opérations de sécurité plus cohérentes"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une réduction du risque lié à l'identité et à l'accès."
+        }
+      ]
+    },
+    {
+      "code": "C06",
+      "name": "Sécurisez votre infonuagique et vos systèmes",
+      "tagline": "Mauvaises configurations, charges de travail et infrastructure, tout est couvert.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C06-S01",
+          "name": "Protection infonuagique",
+          "blurb": "Les mauvaises configurations infonuagiques repérées avant d'être exploitées.",
+          "price": "$400",
+          "unit": "/mois",
+          "problem": "**Protection infonuagique évalue en continu les environnements infonuagiques selon les meilleures pratiques de sécurité, repère les mauvaises configurations, priorise les risques liés à la posture et pilote la remédiation dans l'ensemble des comptes et ressources infonuagiques approuvés.**\n\nEn pratique, cela signifie que nous découvrons les comptes, abonnements, projets et ressources infonuagiques; évaluons la posture de sécurité infonuagique; détectons les mauvaises configurations et les violations de politiques.",
+          "what_we_do": "Nous évaluons en continu les environnements infonuagiques selon les meilleures pratiques de sécurité, repérons les mauvaises configurations, priorisons les risques liés à la posture et pilotons la remédiation dans l'ensemble des comptes et ressources infonuagiques approuvés.",
+          "deliverables": [
+            "Référence de sécurité",
+            "Évaluation de l'environnement",
+            "Constats de sécurité",
+            "Priorisation des risques",
+            "Recommandations de remédiation",
+            "Recommandations de configuration et de politiques",
+            "Registres d'exceptions",
+            "Rapports sur la posture de sécurité",
+            "Suivi de la remédiation",
+            "Rapports de gestion périodiques"
+          ],
+          "benefits": [
+            "Une meilleure visibilité de l'infonuagique et de l'infrastructure",
+            "Réduction du risque de mauvaise configuration",
+            "Des références de sécurité renforcées",
+            "Une remédiation améliorée",
+            "Réduction de l'infrastructure exposée",
+            "Une meilleure posture de conformité",
+            "Une meilleure coordination avec les services d'identité et de gestion des menaces"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité de l'infonuagique et de l'infrastructure."
+        },
+        {
+          "code": "C06-S02",
+          "name": "Bouclier des charges de travail",
+          "blurb": "Une protection pour ce qui tourne réellement dans votre infonuagique.",
+          "price": "$500",
+          "unit": "/mois",
+          "problem": "**Bouclier des charges de travail protège les charges de travail hébergées dans l'infonuagique, comme les machines virtuelles, les conteneurs et les charges de travail applicatives, grâce à des contrôles de sécurité, une visibilité des charges de travail et une protection fondée sur le risque.**\n\nEn pratique, cela signifie que nous protégeons les machines virtuelles; protégeons les conteneurs et leurs hôtes; évaluons la posture de sécurité des charges de travail.",
+          "what_we_do": "Nous protégeons les charges de travail hébergées dans l'infonuagique, comme les machines virtuelles, les conteneurs et les charges de travail applicatives, grâce à des contrôles de sécurité, une visibilité des charges de travail et une protection fondée sur le risque.",
+          "deliverables": [
+            "Référence de sécurité",
+            "Évaluation de l'environnement",
+            "Constats de sécurité",
+            "Priorisation des risques",
+            "Recommandations de remédiation",
+            "Recommandations de configuration et de politiques",
+            "Registres d'exceptions",
+            "Rapports sur la posture de sécurité",
+            "Suivi de la remédiation",
+            "Rapports de gestion périodiques"
+          ],
+          "benefits": [
+            "Une meilleure visibilité de l'infonuagique et de l'infrastructure",
+            "Réduction du risque de mauvaise configuration",
+            "Des références de sécurité renforcées",
+            "Une remédiation améliorée",
+            "Réduction de l'infrastructure exposée",
+            "Une meilleure posture de conformité",
+            "Une meilleure coordination avec les services d'identité et de gestion des menaces"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité de l'infonuagique et de l'infrastructure."
+        },
+        {
+          "code": "C06-S03",
+          "name": "Protection de l'infrastructure",
+          "blurb": "Serveurs et infrastructure, renforcés et surveillés.",
+          "price": "$450",
+          "unit": "/mois",
+          "problem": "**Protection de l'infrastructure protège les serveurs, les composants d'infrastructure et les environnements technologiques fondamentaux grâce à une configuration sécurisée, un renforcement, une évaluation des contrôles et une gestion de la remédiation.**\n\nEn pratique, cela signifie que nous réalisons l'inventaire de l'infrastructure; effectuons le renforcement de la sécurité; établissons des références de sécurité des serveurs.",
+          "what_we_do": "Nous protégeons les serveurs, les composants d'infrastructure et les environnements technologiques fondamentaux grâce à une configuration sécurisée, un renforcement, une évaluation des contrôles et une gestion de la remédiation.",
+          "deliverables": [
+            "Référence de sécurité",
+            "Évaluation de l'environnement",
+            "Constats de sécurité",
+            "Priorisation des risques",
+            "Recommandations de remédiation",
+            "Recommandations de configuration et de politiques",
+            "Registres d'exceptions",
+            "Rapports sur la posture de sécurité",
+            "Suivi de la remédiation",
+            "Rapports de gestion périodiques"
+          ],
+          "benefits": [
+            "Une meilleure visibilité de l'infonuagique et de l'infrastructure",
+            "Réduction du risque de mauvaise configuration",
+            "Des références de sécurité renforcées",
+            "Une remédiation améliorée",
+            "Réduction de l'infrastructure exposée",
+            "Une meilleure posture de conformité",
+            "Une meilleure coordination avec les services d'identité et de gestion des menaces"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité de l'infonuagique et de l'infrastructure."
+        },
+        {
+          "code": "C06-S04",
+          "name": "Bouclier réseau",
+          "blurb": "Une segmentation réseau qui contient réellement une brèche.",
+          "price": "$350",
+          "unit": "/mois",
+          "problem": "**Bouclier réseau sécurise l'architecture réseau infonuagique grâce à la segmentation, aux contrôles du trafic, à la réduction de l'exposition, à une connectivité sécurisée et à l'application des politiques réseau.**\n\nEn pratique, cela signifie que nous effectuons la révision de l'architecture réseau infonuagique; la segmentation réseau; la révision des politiques de groupes de sécurité et de pare-feu.",
+          "what_we_do": "Nous sécurisons l'architecture réseau infonuagique grâce à la segmentation, aux contrôles du trafic, à la réduction de l'exposition, à une connectivité sécurisée et à l'application des politiques réseau.",
+          "deliverables": [
+            "Référence de sécurité",
+            "Évaluation de l'environnement",
+            "Constats de sécurité",
+            "Priorisation des risques",
+            "Recommandations de remédiation",
+            "Recommandations de configuration et de politiques",
+            "Registres d'exceptions",
+            "Rapports sur la posture de sécurité",
+            "Suivi de la remédiation",
+            "Rapports de gestion périodiques"
+          ],
+          "benefits": [
+            "Une meilleure visibilité de l'infonuagique et de l'infrastructure",
+            "Réduction du risque de mauvaise configuration",
+            "Des références de sécurité renforcées",
+            "Une remédiation améliorée",
+            "Réduction de l'infrastructure exposée",
+            "Une meilleure posture de conformité",
+            "Une meilleure coordination avec les services d'identité et de gestion des menaces"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité de l'infonuagique et de l'infrastructure."
+        },
+        {
+          "code": "C06-S05",
+          "name": "Conformité infonuagique",
+          "blurb": "Votre environnement infonuagique, conforme et démontrable.",
+          "price": "$300",
+          "unit": "/mois",
+          "problem": "**Conformité infonuagique établit et évalue en continu la configuration infonuagique par rapport aux normes de sécurité approuvées, aux référentiels, aux exigences contractuelles et aux cadres de conformité applicables.**\n\nEn pratique, cela signifie que nous définissons des normes de configuration; appliquons des référentiels de sécurité infonuagique; réalisons la cartographie de la conformité.",
+          "what_we_do": "Nous établissons et évaluons en continu la configuration infonuagique par rapport aux normes de sécurité approuvées, aux référentiels, aux exigences contractuelles et aux cadres de conformité applicables.",
+          "deliverables": [
+            "Référence de sécurité",
+            "Évaluation de l'environnement",
+            "Constats de sécurité",
+            "Priorisation des risques",
+            "Recommandations de remédiation",
+            "Recommandations de configuration et de politiques",
+            "Registres d'exceptions",
+            "Rapports sur la posture de sécurité",
+            "Suivi de la remédiation",
+            "Rapports de gestion périodiques"
+          ],
+          "benefits": [
+            "Une meilleure visibilité de l'infonuagique et de l'infrastructure",
+            "Réduction du risque de mauvaise configuration",
+            "Des références de sécurité renforcées",
+            "Une remédiation améliorée",
+            "Réduction de l'infrastructure exposée",
+            "Une meilleure posture de conformité",
+            "Une meilleure coordination avec les services d'identité et de gestion des menaces"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité de l'infonuagique et de l'infrastructure."
+        }
+      ]
+    },
+    {
+      "code": "C07",
+      "name": "Sécurisez vos applications et sites Web",
+      "tagline": "De la conception jusqu'au contact avec vos clients.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C07-S01",
+          "name": "Bouclier applicatif",
+          "blurb": "La sécurité applicative intégrée à votre façon de développer.",
+          "price": "$300",
+          "unit": "/app/mois",
+          "problem": "**Bouclier applicatif met en place une couche de sécurité applicative intégrée qui repère et réduit les faiblesses de sécurité dans l'architecture des applications, le code, les dépendances, les flux d'authentification, la gestion des données et les contrôles liés à l'exécution.**\n\nConcrètement, cela signifie que nous établissons des bases de référence en sécurité applicative; nous évaluons l'architecture applicative et les contrôles de sécurité; nous repérons les faiblesses de sécurité applicative.",
+          "what_we_do": "Mettre en place une couche de sécurité applicative intégrée qui repère et réduit les faiblesses de sécurité dans l'architecture des applications, le code, les dépendances, les flux d'authentification, la gestion des données et les contrôles liés à l'exécution.",
+          "deliverables": [
+            "Inventaire des applications, sites Web et API, le cas échéant",
+            "Base de référence en matière de sécurité",
+            "Évaluation de la sécurité",
+            "Résultats des tests, le cas échéant",
+            "Constats priorisés selon le risque",
+            "Recommandations de correction",
+            "Recommandations sur les contrôles de sécurité",
+            "Preuves et rapports",
+            "Suivi des correctifs",
+            "Rapports périodiques sur la posture de sécurité"
+          ],
+          "benefits": [
+            "Surface d'attaque applicative réduite",
+            "Meilleure posture de sécurité applicative",
+            "Exposition Web et API réduite",
+            "Détection plus rapide des faiblesses logicielles",
+            "Pratiques de développement sécurisé renforcées",
+            "Meilleure visibilité sur les correctifs",
+            "Sécurité améliorée avant le déploiement"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une surface d'attaque applicative réduite."
+        },
+        {
+          "code": "C07-S02",
+          "name": "Bouclier Web",
+          "blurb": "Vos applications Web publiques, surveillées et protégées.",
+          "price": "$250",
+          "unit": "/app/mois",
+          "problem": "**Bouclier Web protège les applications Web exposées sur Internet et les applications internes contre les menaces courantes visant les applications Web, grâce à une configuration sécurisée, des contrôles défensifs, des intégrations de surveillance et une correction fondée sur le risque.**\n\nConcrètement, cela signifie que nous évaluons la posture de sécurité des applications Web; nous protégeons les points d'entrée des applications exposées sur le Web; nous révisons les contrôles de sécurité Web.",
+          "what_we_do": "Protéger les applications Web exposées sur Internet et les applications internes contre les menaces courantes visant les applications Web, grâce à une configuration sécurisée, des contrôles défensifs, des intégrations de surveillance et une correction fondée sur le risque.",
+          "deliverables": [
+            "Inventaire des applications, sites Web et API, le cas échéant",
+            "Base de référence en matière de sécurité",
+            "Évaluation de la sécurité",
+            "Résultats des tests, le cas échéant",
+            "Constats priorisés selon le risque",
+            "Recommandations de correction",
+            "Recommandations sur les contrôles de sécurité",
+            "Preuves et rapports",
+            "Suivi des correctifs",
+            "Rapports périodiques sur la posture de sécurité"
+          ],
+          "benefits": [
+            "Surface d'attaque applicative réduite",
+            "Meilleure posture de sécurité applicative",
+            "Exposition Web et API réduite",
+            "Détection plus rapide des faiblesses logicielles",
+            "Pratiques de développement sécurisé renforcées",
+            "Meilleure visibilité sur les correctifs",
+            "Sécurité améliorée avant le déploiement"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une surface d'attaque applicative réduite."
+        },
+        {
+          "code": "C07-S03",
+          "name": "Protection API",
+          "blurb": "Les API sont la nouvelle porte d'entrée.",
+          "price": "$300",
+          "unit": "/API/mois",
+          "problem": "**Protection API protège les API en découvrant leur exposition, en évaluant les contrôles d'authentification et d'autorisation, en repérant les points de terminaison à risque et en réduisant les risques d'abus et d'exposition des données.**\n\nConcrètement, cela signifie que nous découvrons les API et leurs points de terminaison; nous évaluons l'authentification des API; nous évaluons l'autorisation des API.",
+          "what_we_do": "Protéger les API en découvrant leur exposition, en évaluant les contrôles d'authentification et d'autorisation, en repérant les points de terminaison à risque et en réduisant les risques d'abus et d'exposition des données.",
+          "deliverables": [
+            "Inventaire des applications, sites Web et API, le cas échéant",
+            "Base de référence en matière de sécurité",
+            "Évaluation de la sécurité",
+            "Résultats des tests, le cas échéant",
+            "Constats priorisés selon le risque",
+            "Recommandations de correction",
+            "Recommandations sur les contrôles de sécurité",
+            "Preuves et rapports",
+            "Suivi des correctifs",
+            "Rapports périodiques sur la posture de sécurité"
+          ],
+          "benefits": [
+            "Surface d'attaque applicative réduite",
+            "Meilleure posture de sécurité applicative",
+            "Exposition Web et API réduite",
+            "Détection plus rapide des faiblesses logicielles",
+            "Pratiques de développement sécurisé renforcées",
+            "Meilleure visibilité sur les correctifs",
+            "Sécurité améliorée avant le déploiement"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une surface d'attaque applicative réduite."
+        },
+        {
+          "code": "C07-S04",
+          "name": "Bouclier du code",
+          "blurb": "Des pratiques de développement sécurisé que votre équipe peut suivre.",
+          "price": "$600",
+          "unit": "/mois",
+          "problem": "**Bouclier du code intègre la sécurité au cycle de vie du développement logiciel afin que les exigences de sécurité, les pratiques de codage sécurisé, les contrôles des dépendances et la correction fassent partie du processus de développement normal.**\n\nConcrètement, cela signifie que nous définissons les exigences de développement sécurisé; nous soutenons les pratiques de codage sécurisé; nous intégrons la sécurité au CI/CD.",
+          "what_we_do": "Intégrer la sécurité au cycle de vie du développement logiciel afin que les exigences de sécurité, les pratiques de codage sécurisé, les contrôles des dépendances et la correction fassent partie du processus de développement normal.",
+          "deliverables": [
+            "Inventaire des applications, sites Web et API, le cas échéant",
+            "Base de référence en matière de sécurité",
+            "Évaluation de la sécurité",
+            "Résultats des tests, le cas échéant",
+            "Constats priorisés selon le risque",
+            "Recommandations de correction",
+            "Recommandations sur les contrôles de sécurité",
+            "Preuves et rapports",
+            "Suivi des correctifs",
+            "Rapports périodiques sur la posture de sécurité"
+          ],
+          "benefits": [
+            "Surface d'attaque applicative réduite",
+            "Meilleure posture de sécurité applicative",
+            "Exposition Web et API réduite",
+            "Détection plus rapide des faiblesses logicielles",
+            "Pratiques de développement sécurisé renforcées",
+            "Meilleure visibilité sur les correctifs",
+            "Sécurité améliorée avant le déploiement"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une surface d'attaque applicative réduite."
+        },
+        {
+          "code": "C07-S05",
+          "name": "Test applicatif",
+          "blurb": "Des tests concrets qui prouvent qu'une application est sécuritaire.",
+          "price": "$3,500",
+          "unit": "/app",
+          "problem": "**Test applicatif teste les applications à la recherche de faiblesses de sécurité au moyen de méthodes de test automatisées et autorisées, valide les constats, priorise le risque et fournit des preuves pour la correction.**\n\nConcrètement, cela signifie que nous effectuons des tests de sécurité applicatifs autorisés; nous soutenons le SAST; nous soutenons le DAST.",
+          "what_we_do": "Tester les applications à la recherche de faiblesses de sécurité au moyen de méthodes de test automatisées et autorisées, valider les constats, prioriser le risque et fournir des preuves pour la correction.",
+          "deliverables": [
+            "Inventaire des applications, sites Web et API, le cas échéant",
+            "Base de référence en matière de sécurité",
+            "Évaluation de la sécurité",
+            "Résultats des tests, le cas échéant",
+            "Constats priorisés selon le risque",
+            "Recommandations de correction",
+            "Recommandations sur les contrôles de sécurité",
+            "Preuves et rapports",
+            "Suivi des correctifs",
+            "Rapports périodiques sur la posture de sécurité"
+          ],
+          "benefits": [
+            "Surface d'attaque applicative réduite",
+            "Meilleure posture de sécurité applicative",
+            "Exposition Web et API réduite",
+            "Détection plus rapide des faiblesses logicielles",
+            "Pratiques de développement sécurisé renforcées",
+            "Meilleure visibilité sur les correctifs",
+            "Sécurité améliorée avant le déploiement"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une surface d'attaque applicative réduite."
+        }
+      ]
+    },
+    {
+      "code": "C08",
+      "name": "Protégez vos données",
+      "tagline": "Sachez ce que vous avez. Empêchez-le de sortir.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C08-S01",
+          "name": "Bouclier des données",
+          "blurb": "Une protection des données conçue autour de ce que détient votre entreprise.",
+          "price": "$10",
+          "unit": "/utilisateur/mois",
+          "problem": "**Bouclier des données protège les données sensibles et essentielles à l'entreprise tout au long de leur cycle de vie, y compris le stockage, le traitement, la transmission, la sauvegarde et le partage contrôlé.**\n\nConcrètement, cela signifie que nous repérons les référentiels de données critiques; nous établissons des bases de référence en protection des données; nous protégeons les données au repos et en transit.",
+          "what_we_do": "Protéger les données sensibles et essentielles à l'entreprise tout au long de leur cycle de vie, y compris le stockage, le traitement, la transmission, la sauvegarde et le partage contrôlé.",
+          "deliverables": [
+            "Base de référence en sécurité des données",
+            "Inventaire des données et information de classification, le cas échéant",
+            "Constats en matière de sécurité et de confidentialité",
+            "Priorisation des risques",
+            "Recommandations de protection",
+            "Politiques ou recommandations DLP, le cas échéant",
+            "Processus et rapports liés à la vie privée",
+            "Rapports de surveillance",
+            "Registre des exceptions",
+            "Suivi des correctifs"
+          ],
+          "benefits": [
+            "Meilleure visibilité sur les données sensibles",
+            "Risque de perte de données réduit",
+            "Protection des données renforcée",
+            "Contrôles de confidentialité améliorés",
+            "Meilleure classification et gouvernance",
+            "Meilleure surveillance de l'activité liée aux données sensibles",
+            "Meilleure préparation à la conformité",
+            "Cycle de vie des données mieux maîtrisé"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité sur les données sensibles."
+        },
+        {
+          "code": "C08-S02",
+          "name": "Protection des données",
+          "blurb": "Empêchez les données sensibles de sortir quand elles ne le devraient pas.",
+          "price": "$8",
+          "unit": "/utilisateur/mois",
+          "problem": "**Protection des données prévient la divulgation, le transfert, la copie ou l'exfiltration non autorisés de renseignements sensibles à travers les points d'extrémité, le courriel, les applications infonuagiques et les autres canaux approuvés.**\n\nConcrètement, cela signifie que nous repérons les mouvements de données sensibles; nous appliquons des politiques DLP; nous protégeons les données dans les canaux approuvés.",
+          "what_we_do": "Prévenir la divulgation, le transfert, la copie ou l'exfiltration non autorisés de renseignements sensibles à travers les points d'extrémité, le courriel, les applications infonuagiques et les autres canaux approuvés.",
+          "deliverables": [
+            "Base de référence en sécurité des données",
+            "Inventaire des données et information de classification, le cas échéant",
+            "Constats en matière de sécurité et de confidentialité",
+            "Priorisation des risques",
+            "Recommandations de protection",
+            "Politiques ou recommandations DLP, le cas échéant",
+            "Processus et rapports liés à la vie privée",
+            "Rapports de surveillance",
+            "Registre des exceptions",
+            "Suivi des correctifs"
+          ],
+          "benefits": [
+            "Meilleure visibilité sur les données sensibles",
+            "Risque de perte de données réduit",
+            "Protection des données renforcée",
+            "Contrôles de confidentialité améliorés",
+            "Meilleure classification et gouvernance",
+            "Meilleure surveillance de l'activité liée aux données sensibles",
+            "Meilleure préparation à la conformité",
+            "Cycle de vie des données mieux maîtrisé"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité sur les données sensibles."
+        },
+        {
+          "code": "C08-S03",
+          "name": "Protection de la vie privée",
+          "blurb": "La conformité en matière de vie privée, sans incertitude.",
+          "price": "$700",
+          "unit": "/mois",
+          "problem": "**Protection de la vie privée aide les organisations à gérer les contrôles de sécurité et les processus liés à la protection de la vie privée pour les données personnelles et sensibles, y compris les exigences en matière de confidentialité, le traitement des données, les processus liés aux droits des personnes et la reddition de comptes.**\n\nConcrètement, cela signifie que nous repérons le traitement des données personnelles; nous cartographions les contrôles liés à la vie privée; nous soutenons l'évaluation des risques liés à la vie privée.",
+          "what_we_do": "Aider les organisations à gérer les contrôles de sécurité et les processus liés à la protection de la vie privée pour les données personnelles et sensibles, y compris les exigences en matière de confidentialité, le traitement des données, les processus liés aux droits des personnes et la reddition de comptes.",
+          "deliverables": [
+            "Base de référence en sécurité des données",
+            "Inventaire des données et information de classification, le cas échéant",
+            "Constats en matière de sécurité et de confidentialité",
+            "Priorisation des risques",
+            "Recommandations de protection",
+            "Politiques ou recommandations DLP, le cas échéant",
+            "Processus et rapports liés à la vie privée",
+            "Rapports de surveillance",
+            "Registre des exceptions",
+            "Suivi des correctifs"
+          ],
+          "benefits": [
+            "Meilleure visibilité sur les données sensibles",
+            "Risque de perte de données réduit",
+            "Protection des données renforcée",
+            "Contrôles de confidentialité améliorés",
+            "Meilleure classification et gouvernance",
+            "Meilleure surveillance de l'activité liée aux données sensibles",
+            "Meilleure préparation à la conformité",
+            "Cycle de vie des données mieux maîtrisé"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité sur les données sensibles."
+        },
+        {
+          "code": "C08-S04",
+          "name": "Classification des données",
+          "blurb": "Sachez quelles données vous détenez et à quel point elles sont sensibles.",
+          "price": "$400",
+          "unit": "/mois",
+          "problem": "**Classification des données découvre, classe, étiquette et gouverne les données selon leur sensibilité, leur valeur d'affaires, leur propriété, les exigences réglementaires et les règles de traitement approuvées.**\n\nConcrètement, cela signifie que nous découvrons les référentiels de données; nous classons les données sensibles; nous appliquons des étiquettes lorsque cela est possible.",
+          "what_we_do": "Découvrir, classer, étiqueter et gouverner les données selon leur sensibilité, leur valeur d'affaires, leur propriété, les exigences réglementaires et les règles de traitement approuvées.",
+          "deliverables": [
+            "Base de référence en sécurité des données",
+            "Inventaire des données et information de classification, le cas échéant",
+            "Constats en matière de sécurité et de confidentialité",
+            "Priorisation des risques",
+            "Recommandations de protection",
+            "Politiques ou recommandations DLP, le cas échéant",
+            "Processus et rapports liés à la vie privée",
+            "Rapports de surveillance",
+            "Registre des exceptions",
+            "Suivi des correctifs"
+          ],
+          "benefits": [
+            "Meilleure visibilité sur les données sensibles",
+            "Risque de perte de données réduit",
+            "Protection des données renforcée",
+            "Contrôles de confidentialité améliorés",
+            "Meilleure classification et gouvernance",
+            "Meilleure surveillance de l'activité liée aux données sensibles",
+            "Meilleure préparation à la conformité",
+            "Cycle de vie des données mieux maîtrisé"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité sur les données sensibles."
+        },
+        {
+          "code": "C08-S05",
+          "name": "Surveillance des données",
+          "blurb": "Une surveillance continue des déplacements de vos données.",
+          "price": "$6",
+          "unit": "/utilisateur/mois",
+          "problem": "**Surveillance des données surveille l'accès, les déplacements et les tendances d'utilisation des données pertinentes à la sécurité afin de repérer les activités suspectes, les violations de politiques et les compromissions potentielles de données.**\n\nConcrètement, cela signifie que nous surveillons l'accès aux données sensibles; nous détectons les activités inhabituelles liées aux données; nous repérons les déplacements suspects de données.",
+          "what_we_do": "Surveiller l'accès, les déplacements et les tendances d'utilisation des données pertinentes à la sécurité afin de repérer les activités suspectes, les violations de politiques et les compromissions potentielles de données.",
+          "deliverables": [
+            "Base de référence en sécurité des données",
+            "Inventaire des données et information de classification, le cas échéant",
+            "Constats en matière de sécurité et de confidentialité",
+            "Priorisation des risques",
+            "Recommandations de protection",
+            "Politiques ou recommandations DLP, le cas échéant",
+            "Processus et rapports liés à la vie privée",
+            "Rapports de surveillance",
+            "Registre des exceptions",
+            "Suivi des correctifs"
+          ],
+          "benefits": [
+            "Meilleure visibilité sur les données sensibles",
+            "Risque de perte de données réduit",
+            "Protection des données renforcée",
+            "Contrôles de confidentialité améliorés",
+            "Meilleure classification et gouvernance",
+            "Meilleure surveillance de l'activité liée aux données sensibles",
+            "Meilleure préparation à la conformité",
+            "Cycle de vie des données mieux maîtrisé"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité sur les données sensibles."
+        }
+      ]
+    },
+    {
+      "code": "C09",
+      "name": "Sécurisez vos systèmes d'IA",
+      "tagline": "La même rigueur, désormais appliquée à votre IA.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C09-S01",
+          "name": "Vérification IA",
+          "blurb": "Découvrez si vos systèmes d'IA sont réellement sécuritaires.",
+          "price": "$4,500",
+          "unit": "ponctuel",
+          "problem": "**Vérification IA évalue les systèmes d'IA, les cas d'usage, l'architecture, les contrôles et l'exposition d'une organisation afin de repérer les risques de sécurité propres à l'IA et d'établir un plan d'amélioration priorisé.**\n\nConcrètement, cela signifie que nous découvrons les systèmes d'IA et leurs cas d'usage; nous évaluons l'architecture de sécurité de l'IA; nous repérons les surfaces d'attaque propres à l'IA.",
+          "what_we_do": "Évaluer les systèmes d'IA, les cas d'usage, l'architecture, les contrôles et l'exposition d'une organisation afin de repérer les risques de sécurité propres à l'IA et d'établir un plan d'amélioration priorisé.",
+          "deliverables": [
+            "Inventaire des systèmes d'IA et des cas d'usage, le cas échéant",
+            "Évaluation de la sécurité de l'IA",
+            "Registre des risques liés à l'IA",
+            "Politiques et contrôles de gouvernance",
+            "Constats sur la sécurité des modèles, le cas échéant",
+            "Constats sur la sécurité des données liées à l'IA, le cas échéant",
+            "Rapports sur les menaces liées à l'IA, le cas échéant",
+            "Recommandations de correction",
+            "Preuves de gouvernance",
+            "Rapports à la direction",
+            "Suivi des correctifs"
+          ],
+          "benefits": [
+            "Meilleure visibilité sur l'utilisation de l'IA",
+            "Risque de sécurité propre à l'IA réduit",
+            "Gouvernance de l'IA renforcée",
+            "Adoption de l'IA plus sécuritaire",
+            "Meilleure protection des modèles et des données d'IA",
+            "Exposition aux abus et aux attaques liées à l'IA réduite",
+            "Reddition de comptes et vérifiabilité améliorées"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité sur l'utilisation de l'IA."
+        },
+        {
+          "code": "C09-S02",
+          "name": "Gouvernance de l'IA",
+          "blurb": "Des politiques et une supervision pour l'utilisation de l'IA par votre entreprise.",
+          "price": "$900",
+          "unit": "/mois",
+          "problem": "**Gouvernance de l'IA établit et gère les contrôles de gouvernance nécessaires à une utilisation responsable et sécuritaire de l'IA, y compris la responsabilité des risques liés à l'IA, les politiques, les processus d'approbation, la reddition de comptes et la supervision du cycle de vie.**\n\nConcrètement, cela signifie que nous établissons un cadre de gouvernance de l'IA; nous tenons à jour l'inventaire des systèmes d'IA et de leur propriété; nous évaluons le risque lié à l'IA.",
+          "what_we_do": "Établir et gérer les contrôles de gouvernance nécessaires à une utilisation responsable et sécuritaire de l'IA, y compris la responsabilité des risques liés à l'IA, les politiques, les processus d'approbation, la reddition de comptes et la supervision du cycle de vie.",
+          "deliverables": [
+            "Inventaire des systèmes d'IA et des cas d'usage, le cas échéant",
+            "Évaluation de la sécurité de l'IA",
+            "Registre des risques liés à l'IA",
+            "Politiques et contrôles de gouvernance",
+            "Constats sur la sécurité des modèles, le cas échéant",
+            "Constats sur la sécurité des données liées à l'IA, le cas échéant",
+            "Rapports sur les menaces liées à l'IA, le cas échéant",
+            "Recommandations de correction",
+            "Preuves de gouvernance",
+            "Rapports à la direction",
+            "Suivi des correctifs"
+          ],
+          "benefits": [
+            "Meilleure visibilité sur l'utilisation de l'IA",
+            "Risque de sécurité propre à l'IA réduit",
+            "Gouvernance de l'IA renforcée",
+            "Adoption de l'IA plus sécuritaire",
+            "Meilleure protection des modèles et des données d'IA",
+            "Exposition aux abus et aux attaques liées à l'IA réduite",
+            "Reddition de comptes et vérifiabilité améliorées"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité sur l'utilisation de l'IA."
+        },
+        {
+          "code": "C09-S03",
+          "name": "Bouclier des modèles",
+          "blurb": "Une protection pour les modèles d'IA en production.",
+          "price": "$350",
+          "unit": "/modèle/mois",
+          "problem": "**Bouclier des modèles protège les modèles d'IA et les systèmes de mise en service de modèles contre les menaces de sécurité propres aux modèles, comme la manipulation, l'extraction, l'empoisonnement, l'abus et les modifications non autorisées.**\n\nConcrètement, cela signifie que nous évaluons la sécurité des modèles; nous protégeons l'accès aux modèles; nous évaluons les contrôles de mise en service des modèles.",
+          "what_we_do": "Protéger les modèles d'IA et les systèmes de mise en service de modèles contre les menaces de sécurité propres aux modèles, comme la manipulation, l'extraction, l'empoisonnement, l'abus et les modifications non autorisées.",
+          "deliverables": [
+            "Inventaire des systèmes d'IA et des cas d'usage, le cas échéant",
+            "Évaluation de la sécurité de l'IA",
+            "Registre des risques liés à l'IA",
+            "Politiques et contrôles de gouvernance",
+            "Constats sur la sécurité des modèles, le cas échéant",
+            "Constats sur la sécurité des données liées à l'IA, le cas échéant",
+            "Rapports sur les menaces liées à l'IA, le cas échéant",
+            "Recommandations de correction",
+            "Preuves de gouvernance",
+            "Rapports à la direction",
+            "Suivi des correctifs"
+          ],
+          "benefits": [
+            "Meilleure visibilité sur l'utilisation de l'IA",
+            "Risque de sécurité propre à l'IA réduit",
+            "Gouvernance de l'IA renforcée",
+            "Adoption de l'IA plus sécuritaire",
+            "Meilleure protection des modèles et des données d'IA",
+            "Exposition aux abus et aux attaques liées à l'IA réduite",
+            "Reddition de comptes et vérifiabilité améliorées"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité sur l'utilisation de l'IA."
+        },
+        {
+          "code": "C09-S04",
+          "name": "Protection des données IA",
+          "blurb": "Protégez les données qui alimentent vos systèmes d'IA.",
+          "price": "$8",
+          "unit": "/utilisateur/mois",
+          "problem": "**Protection des données IA protège les données utilisées, traitées, transmises ou générées par les systèmes d'IA, avec une attention particulière portée aux renseignements sensibles, aux invites, aux résultats, aux données d'entraînement, à la vie privée et aux fuites de données.**\n\nConcrètement, cela signifie que nous repérons les flux de données liés à l'IA; nous protégeons les données sensibles utilisées par l'IA; nous évaluons le traitement des invites et des résultats.",
+          "what_we_do": "Protéger les données utilisées, traitées, transmises ou générées par les systèmes d'IA, avec une attention particulière portée aux renseignements sensibles, aux invites, aux résultats, aux données d'entraînement, à la vie privée et aux fuites de données.",
+          "deliverables": [
+            "Inventaire des systèmes d'IA et des cas d'usage, le cas échéant",
+            "Évaluation de la sécurité de l'IA",
+            "Registre des risques liés à l'IA",
+            "Politiques et contrôles de gouvernance",
+            "Constats sur la sécurité des modèles, le cas échéant",
+            "Constats sur la sécurité des données liées à l'IA, le cas échéant",
+            "Rapports sur les menaces liées à l'IA, le cas échéant",
+            "Recommandations de correction",
+            "Preuves de gouvernance",
+            "Rapports à la direction",
+            "Suivi des correctifs"
+          ],
+          "benefits": [
+            "Meilleure visibilité sur l'utilisation de l'IA",
+            "Risque de sécurité propre à l'IA réduit",
+            "Gouvernance de l'IA renforcée",
+            "Adoption de l'IA plus sécuritaire",
+            "Meilleure protection des modèles et des données d'IA",
+            "Exposition aux abus et aux attaques liées à l'IA réduite",
+            "Reddition de comptes et vérifiabilité améliorées"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité sur l'utilisation de l'IA."
+        },
+        {
+          "code": "C09-S05",
+          "name": "Protection contre les menaces IA",
+          "blurb": "Des menaces conçues spécifiquement pour l'IA, détectées et arrêtées.",
+          "price": "$400",
+          "unit": "/mois",
+          "problem": "**Protection contre les menaces IA détecte et réduit les menaces propres à l'IA et les activités malveillantes touchant les systèmes d'IA, les utilisateurs, les modèles, les agents et les flux de travail activés par l'IA.**\n\nConcrètement, cela signifie que nous surveillons les événements de sécurité liés à l'IA; nous détectons les schémas d'attaque propres à l'IA; nous repérons les indicateurs d'injection d'invites et d'abus.",
+          "what_we_do": "Détecter et réduire les menaces propres à l'IA et les activités malveillantes touchant les systèmes d'IA, les utilisateurs, les modèles, les agents et les flux de travail activés par l'IA.",
+          "deliverables": [
+            "Inventaire des systèmes d'IA et des cas d'usage, le cas échéant",
+            "Évaluation de la sécurité de l'IA",
+            "Registre des risques liés à l'IA",
+            "Politiques et contrôles de gouvernance",
+            "Constats sur la sécurité des modèles, le cas échéant",
+            "Constats sur la sécurité des données liées à l'IA, le cas échéant",
+            "Rapports sur les menaces liées à l'IA, le cas échéant",
+            "Recommandations de correction",
+            "Preuves de gouvernance",
+            "Rapports à la direction",
+            "Suivi des correctifs"
+          ],
+          "benefits": [
+            "Meilleure visibilité sur l'utilisation de l'IA",
+            "Risque de sécurité propre à l'IA réduit",
+            "Gouvernance de l'IA renforcée",
+            "Adoption de l'IA plus sécuritaire",
+            "Meilleure protection des modèles et des données d'IA",
+            "Exposition aux abus et aux attaques liées à l'IA réduite",
+            "Reddition de comptes et vérifiabilité améliorées"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité sur l'utilisation de l'IA."
+        }
+      ]
+    },
+    {
+      "code": "C10",
+      "name": "Services de spécialistes certifiés",
+      "tagline": "Des travaux menés par des spécialistes qualifiés pour les tests, les attestations, les évaluations et la réponse aux incidents.",
+      "tier": "Tier 1 - Cybersecurity",
+      "services": [
+        {
+          "code": "C10-S01",
+          "name": "Test en conditions réelles",
+          "blurb": "Des spécialistes certifiés tentent de s'introduire dans vos systèmes, en toute sécurité.",
+          "price": "From $7,500",
+          "unit": "par mandat",
+          "problem": "Vous avez besoin de la preuve que vos défenses fonctionnent réellement, pas seulement d'une évaluation qui indique qu'elles pourraient comporter des failles.",
+          "what_we_do": "Un testeur certifié tente une exploitation autorisée dans le cadre d'une portée convenue, documente précisément ce qu'il a pu accomplir et vous remet un plan priorisé pour corriger les failles.",
+          "deliverables": [
+            "Une entente de test signée",
+            "Un rapport complet des constats, appuyé par des preuves",
+            "Un résumé exécutif",
+            "Une feuille de route de remédiation priorisée"
+          ],
+          "benefits": [
+            "Une preuve indéniable du risque réel, plutôt qu'une note théorique",
+            "Des preuves qui satisfont les assureurs, les clients d'entreprise et les auditeurs",
+            "Une liste de correctifs claire et priorisée, fondée sur ce qui était réellement exploitable"
+          ],
+          "process": "Définir la portée et autoriser → Tester → Documenter → Rapporter → Corriger → Retester.",
+          "outcome": "Vous savez exactement ce qu'un attaquant aurait pu faire — et vous avez corrigé la faille."
+        },
+        {
+          "code": "C10-S02",
+          "name": "Prêt pour l'audit",
+          "blurb": "Préparez vos contrôles et vos preuves en vue d'un examen SOC 2 de type II mené par un auditeur indépendant.",
+          "price": "$8,000 setup + $12,000 annual",
+          "unit": "frais de départ",
+          "problem": "Vous avez besoin d'une assurance indépendante sur les contrôles visés, mais vos preuves et le fonctionnement de vos contrôles ne sont pas encore organisés pour la période d'examen.",
+          "what_we_do": "ORAGROL coordonne la préparation, l'examen des écarts de contrôle et la préparation des preuves avec un partenaire d'audit CPA qualifié. L'auditeur indépendant réalise l'examen et détermine le rapport et l'opinion.",
+          "deliverables": [
+            "Un examen de préparation par rapport à la portée d'examen convenue",
+            "Un registre des écarts relatifs aux contrôles et aux preuves",
+            "Des preuves organisées pour le processus d'observation et d'examen",
+            "Une coordination avec le partenaire d'audit CPA indépendant"
+          ],
+          "benefits": [
+            "Une préparation claire pour la portée SOC 2 convenue",
+            "Des preuves de contrôle mieux organisées",
+            "Des responsabilités clairement définies entre votre organisation, ORAGROL et l'auditeur indépendant"
+          ],
+          "process": "Définir la portée → Évaluer la préparation → Combler les écarts → Organiser les preuves → Soutenir l'examen.",
+          "outcome": "Votre organisation et ses preuves sont prêtes pour l'examen SOC 2 de type II déterminé de façon indépendante."
+        },
+        {
+          "code": "C10-S03",
+          "name": "Prêt pour les paiements",
+          "blurb": "Faites évaluer votre environnement de paiement par carte par un QSA PCI qualifié.",
+          "price": "From $10,000",
+          "unit": "par mandat annuel",
+          "problem": "Vous avez besoin d'une évaluation qualifiée de votre environnement de paiement par carte et d'un registre clair des écarts et des suivis requis.",
+          "what_we_do": "ORAGROL vous aide à confirmer la portée, à cartographier les contrôles et à organiser les preuves en vue d'une évaluation par un QSA qualifié, par rapport aux exigences PCI DSS applicables.",
+          "deliverables": [
+            "Une portée d'évaluation confirmée et les exigences de validation",
+            "Un examen des contrôles et des preuves",
+            "Des preuves organisées et les écarts relevés",
+            "Une évaluation réalisée par le QSA qualifié",
+            "La documentation d'évaluation et les constats convenus"
+          ],
+          "benefits": [
+            "Une vue claire des exigences liées à l'environnement de paiement",
+            "Des preuves prêtes pour l'évaluation qualifiée",
+            "Un suivi priorisé pour les écarts relevés"
+          ],
+          "process": "Confirmer la portée → Cartographier les contrôles → Organiser les preuves → Évaluation par le QSA → Traiter les constats.",
+          "outcome": "Vous recevez la documentation d'évaluation qualifiée convenue, ainsi qu'un compte rendu clair des suivis requis."
+        },
+        {
+          "code": "C10-S04",
+          "name": "Preuves après une brèche",
+          "blurb": "Enquêtez sur un incident de sécurité et préservez les preuves qui s'y rattachent.",
+          "price": "From $12,000",
+          "unit": "par incident; forfait mensuel optionnel à partir de 500 $/mois",
+          "problem": "Après un incident de sécurité, vous avez besoin d'une enquête qualifiée, de preuves préservées et d'un compte rendu défendable de ce qui peut être établi.",
+          "what_we_do": "Des spécialistes qualifiés préservent et analysent les éléments pertinents dans le cadre de la portée convenue, établissent une chronologie de l'incident et documentent les constats, les limites et les recommandations d'intervention.",
+          "deliverables": [
+            "Une portée initiale de l'incident et un plan de préservation des preuves",
+            "Des registres de traitement des preuves et une chronologie de l'incident",
+            "Des constats et des limites documentés",
+            "Des recommandations d'intervention pertinentes",
+            "Un rapport final révisé par un spécialiste"
+          ],
+          "benefits": [
+            "Des preuves préservées grâce à un processus défini",
+            "Une chronologie claire de l'incident et des constats documentés",
+            "De l'information révisée pour appuyer le rétablissement et les discussions avec vos conseillers ou votre assureur"
+          ],
+          "process": "Autoriser → Préserver → Recueillir → Analyser → Rapporter → Soutenir le rétablissement.",
+          "outcome": "Vous recevez un compte rendu révisé par un spécialiste, couvrant les preuves, les constats, les limites et les prochaines étapes de l'incident."
+        }
+      ]
+    }
+  ],
+  "business_automation_tier2": [
+    {
+      "code": "C11",
+      "name": "Trouvez vos occasions liées à l'IA",
+      "tagline": "Là où l'IA rapporte réellement dans votre entreprise.",
+      "tier": "Tier 2 - Business Automation",
+      "services": [
+        {
+          "code": "C11-S01",
+          "name": "Prêt pour l'IA",
+          "blurb": "Découvrez si votre entreprise est vraiment prête pour l'IA.",
+          "price": "$2,500",
+          "unit": "ponctuel",
+          "problem": "**Prêt pour l'IA évalue les personnes, les processus, la technologie, les données, la gouvernance et le modèle d'exploitation d'une organisation afin de déterminer son degré de préparation pour une adoption pratique de l'IA.**\n\nEn pratique, cela signifie que nous évaluons la préparation organisationnelle à l'IA; nous évaluons la préparation technologique; nous évaluons la préparation des données.",
+          "what_we_do": "Évaluer les personnes, les processus, la technologie, les données, la gouvernance et le modèle d'exploitation d'une organisation afin de déterminer son degré de préparation pour une adoption pratique de l'IA.",
+          "deliverables": [
+            "Évaluation de la préparation à l'IA",
+            "Résultats de la découverte des processus",
+            "Portefeuille d'occasions liées à l'IA",
+            "Cas d'usage priorisés",
+            "Analyse de la valeur d'affaires",
+            "Feuille de route de transformation",
+            "Analyse des écarts de capacités",
+            "Rapports d'adoption et d'optimisation",
+            "Suivi des bénéfices",
+            "Recommandations à la direction"
+          ],
+          "benefits": [
+            "Une stratégie d'IA plus claire",
+            "Une meilleure compréhension de la préparation à l'IA",
+            "Le repérage d'occasions à forte valeur",
+            "Moins d'investissements en IA gaspillés",
+            "Une feuille de route de transformation concrète",
+            "Une meilleure adoption",
+            "Des résultats d'affaires mesurables",
+            "Une amélioration continue"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client obtient une stratégie d'IA plus claire."
+        },
+        {
+          "code": "C11-S02",
+          "name": "Détecteur de processus",
+          "blurb": "Cartographiez les processus que l'IA pourrait prendre en charge à votre place.",
+          "price": "$3,500",
+          "unit": "projet",
+          "problem": "**Détecteur de processus repère les processus d'affaires et les workflows où l'IA, l'automatisation ou l'aide à la décision intelligente peuvent créer une valeur opérationnelle mesurable.**\n\nEn pratique, cela signifie que nous cartographions les processus d'affaires; nous repérons le travail répétitif et manuel; nous repérons les goulots d'étranglement.",
+          "what_we_do": "Repérer les processus d'affaires et les workflows où l'IA, l'automatisation ou l'aide à la décision intelligente peuvent créer une valeur opérationnelle mesurable.",
+          "deliverables": [
+            "Évaluation de la préparation à l'IA",
+            "Résultats de la découverte des processus",
+            "Portefeuille d'occasions liées à l'IA",
+            "Cas d'usage priorisés",
+            "Analyse de la valeur d'affaires",
+            "Feuille de route de transformation",
+            "Analyse des écarts de capacités",
+            "Rapports d'adoption et d'optimisation",
+            "Suivi des bénéfices",
+            "Recommandations à la direction"
+          ],
+          "benefits": [
+            "Une stratégie d'IA plus claire",
+            "Une meilleure compréhension de la préparation à l'IA",
+            "Le repérage d'occasions à forte valeur",
+            "Moins d'investissements en IA gaspillés",
+            "Une feuille de route de transformation concrète",
+            "Une meilleure adoption",
+            "Des résultats d'affaires mesurables",
+            "Une amélioration continue"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client obtient une stratégie d'IA plus claire."
+        },
+        {
+          "code": "C11-S03",
+          "name": "Occasions liées à l'IA",
+          "blurb": "Transformez le potentiel de l'IA en une liste priorisée d'occasions concrètes.",
+          "price": "$4,000",
+          "unit": "projet",
+          "problem": "**Occasions liées à l'IA relève, évalue et priorise les cas d'usage de l'IA en fonction de la valeur d'affaires, de la faisabilité, du risque, des exigences en matière de données, du coût et du rendement attendu.**\n\nEn pratique, cela signifie que nous générons des cas d'usage potentiels pour l'IA; nous évaluons la valeur d'affaires; nous évaluons la faisabilité technique.",
+          "what_we_do": "Relever, évaluer et prioriser les cas d'usage de l'IA en fonction de la valeur d'affaires, de la faisabilité, du risque, des exigences en matière de données, du coût et du rendement attendu.",
+          "deliverables": [
+            "Évaluation de la préparation à l'IA",
+            "Résultats de la découverte des processus",
+            "Portefeuille d'occasions liées à l'IA",
+            "Cas d'usage priorisés",
+            "Analyse de la valeur d'affaires",
+            "Feuille de route de transformation",
+            "Analyse des écarts de capacités",
+            "Rapports d'adoption et d'optimisation",
+            "Suivi des bénéfices",
+            "Recommandations à la direction"
+          ],
+          "benefits": [
+            "Une stratégie d'IA plus claire",
+            "Une meilleure compréhension de la préparation à l'IA",
+            "Le repérage d'occasions à forte valeur",
+            "Moins d'investissements en IA gaspillés",
+            "Une feuille de route de transformation concrète",
+            "Une meilleure adoption",
+            "Des résultats d'affaires mesurables",
+            "Une amélioration continue"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client obtient une stratégie d'IA plus claire."
+        },
+        {
+          "code": "C11-S04",
+          "name": "Feuille de route IA",
+          "blurb": "Un plan clair et séquencé pour adopter l'IA.",
+          "price": "$5,000",
+          "unit": "projet",
+          "problem": "**Feuille de route IA traduit les occasions d'IA priorisées en une feuille de route de transformation concrète, couvrant les initiatives, les dépendances, les capacités, les ressources, les jalons et les priorités de mise en œuvre.**\n\nEn pratique, cela signifie que nous séquençons les initiatives d'IA; nous définissons les phases de transformation; nous repérons les dépendances.",
+          "what_we_do": "Traduire les occasions d'IA priorisées en une feuille de route de transformation concrète, couvrant les initiatives, les dépendances, les capacités, les ressources, les jalons et les priorités de mise en œuvre.",
+          "deliverables": [
+            "Évaluation de la préparation à l'IA",
+            "Résultats de la découverte des processus",
+            "Portefeuille d'occasions liées à l'IA",
+            "Cas d'usage priorisés",
+            "Analyse de la valeur d'affaires",
+            "Feuille de route de transformation",
+            "Analyse des écarts de capacités",
+            "Rapports d'adoption et d'optimisation",
+            "Suivi des bénéfices",
+            "Recommandations à la direction"
+          ],
+          "benefits": [
+            "Une stratégie d'IA plus claire",
+            "Une meilleure compréhension de la préparation à l'IA",
+            "Le repérage d'occasions à forte valeur",
+            "Moins d'investissements en IA gaspillés",
+            "Une feuille de route de transformation concrète",
+            "Une meilleure adoption",
+            "Des résultats d'affaires mesurables",
+            "Une amélioration continue"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client obtient une stratégie d'IA plus claire."
+        },
+        {
+          "code": "C11-S05",
+          "name": "Optimiseur IA",
+          "blurb": "Continuez d'améliorer ce qui est déjà automatisé.",
+          "price": "$1,500",
+          "unit": "/mois",
+          "problem": "**Optimiseur IA aide les organisations à adopter l'IA dans leurs opérations quotidiennes, à mesurer les résultats, à améliorer les workflows, à gérer les obstacles à l'adoption et à optimiser continuellement les processus habilités par l'IA.**\n\nEn pratique, cela signifie que nous soutenons l'adoption de l'IA; nous suivons l'utilisation et l'adoption; nous repérons les obstacles à l'adoption.",
+          "what_we_do": "Aider les organisations à adopter l'IA dans leurs opérations quotidiennes, à mesurer les résultats, à améliorer les workflows, à gérer les obstacles à l'adoption et à optimiser continuellement les processus habilités par l'IA.",
+          "deliverables": [
+            "Évaluation de la préparation à l'IA",
+            "Résultats de la découverte des processus",
+            "Portefeuille d'occasions liées à l'IA",
+            "Cas d'usage priorisés",
+            "Analyse de la valeur d'affaires",
+            "Feuille de route de transformation",
+            "Analyse des écarts de capacités",
+            "Rapports d'adoption et d'optimisation",
+            "Suivi des bénéfices",
+            "Recommandations à la direction"
+          ],
+          "benefits": [
+            "Une stratégie d'IA plus claire",
+            "Une meilleure compréhension de la préparation à l'IA",
+            "Le repérage d'occasions à forte valeur",
+            "Moins d'investissements en IA gaspillés",
+            "Une feuille de route de transformation concrète",
+            "Une meilleure adoption",
+            "Des résultats d'affaires mesurables",
+            "Une amélioration continue"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client obtient une stratégie d'IA plus claire."
+        }
+      ]
+    },
+    {
+      "code": "C12",
+      "name": "Automatisez vos workflows",
+      "tagline": "Le travail répétitif que votre équipe ne devrait pas faire à la main.",
+      "tier": "Tier 2 - Business Automation",
+      "services": [
+        {
+          "code": "C12-S01",
+          "name": "Automatiseur de workflows",
+          "blurb": "Des workflows répétitifs, conçus une fois, exécutés automatiquement.",
+          "price": "$6,000",
+          "unit": "/workflow",
+          "problem": "**Automatiseur de workflows conçoit, met en œuvre et gère des workflows habilités par l'IA qui automatisent les activités d'affaires répétitives, les décisions, l'acheminement et les actions approuvées.**\n\nEn pratique, cela signifie que nous repérons les candidats à l'automatisation; nous concevons des workflows habilités par l'IA; nous automatisons les activités répétitives.",
+          "what_we_do": "Concevoir, mettre en œuvre et gérer des workflows habilités par l'IA qui automatisent les activités d'affaires répétitives, les décisions, l'acheminement et les actions approuvées.",
+          "deliverables": [
+            "Évaluation de l'automatisation",
+            "Conception des workflows",
+            "Architecture d'intégration",
+            "Conception de l'intégration des agents",
+            "Automatisations de workflows",
+            "Intégrations de systèmes",
+            "Workflows d'orchestration",
+            "Rapports de surveillance et d'exécution",
+            "Gestion des exceptions",
+            "Recommandations d'optimisation"
+          ],
+          "benefits": [
+            "Moins de travail manuel",
+            "Des processus d'affaires plus rapides",
+            "Moins de tâches répétitives",
+            "Une meilleure connectivité entre les systèmes",
+            "Une exécution plus constante",
+            "Une meilleure visibilité sur les workflows",
+            "Une meilleure utilisation de l'IA",
+            "Moins de friction opérationnelle",
+            "Des résultats d'automatisation mesurables"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une réduction du travail manuel."
+        },
+        {
+          "code": "C12-S02",
+          "name": "Connexion d'agents",
+          "blurb": "Des agents IA qui se branchent aux outils que vous utilisez déjà.",
+          "price": "$8,000",
+          "unit": "projet",
+          "problem": "**Connexion d'agents relie les agents IA aux outils approuvés, aux sources de données, aux systèmes et à d'autres agents, afin qu'ils puissent échanger de l'information et effectuer un travail coordonné.**\n\nEn pratique, cela signifie que nous connectons les agents IA; nous définissons les interfaces des agents; nous connectons les outils approuvés.",
+          "what_we_do": "Connecter les agents IA aux outils approuvés, aux sources de données, aux systèmes et à d'autres agents, afin qu'ils puissent échanger de l'information et effectuer un travail coordonné.",
+          "deliverables": [
+            "Évaluation de l'automatisation",
+            "Conception des workflows",
+            "Architecture d'intégration",
+            "Conception de l'intégration des agents",
+            "Automatisations de workflows",
+            "Intégrations de systèmes",
+            "Workflows d'orchestration",
+            "Rapports de surveillance et d'exécution",
+            "Gestion des exceptions",
+            "Recommandations d'optimisation"
+          ],
+          "benefits": [
+            "Moins de travail manuel",
+            "Des processus d'affaires plus rapides",
+            "Moins de tâches répétitives",
+            "Une meilleure connectivité entre les systèmes",
+            "Une exécution plus constante",
+            "Une meilleure visibilité sur les workflows",
+            "Une meilleure utilisation de l'IA",
+            "Moins de friction opérationnelle",
+            "Des résultats d'automatisation mesurables"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une réduction du travail manuel."
+        },
+        {
+          "code": "C12-S03",
+          "name": "Passerelle de systèmes",
+          "blurb": "Vos systèmes d'affaires, enfin connectés entre eux.",
+          "price": "$7,000",
+          "unit": "projet",
+          "problem": "**Passerelle de systèmes intègre les capacités de l'IA aux systèmes d'affaires tels que les plateformes CRM, ERP, ITSM, de communication, de gestion documentaire, infonuagiques et opérationnelles.**\n\nEn pratique, cela signifie que nous relevons les exigences d'intégration; nous connectons les systèmes d'affaires; nous synchronisons les données approuvées.",
+          "what_we_do": "Intégrer les capacités de l'IA aux systèmes d'affaires tels que les plateformes CRM, ERP, ITSM, de communication, de gestion documentaire, infonuagiques et opérationnelles.",
+          "deliverables": [
+            "Évaluation de l'automatisation",
+            "Conception des workflows",
+            "Architecture d'intégration",
+            "Conception de l'intégration des agents",
+            "Automatisations de workflows",
+            "Intégrations de systèmes",
+            "Workflows d'orchestration",
+            "Rapports de surveillance et d'exécution",
+            "Gestion des exceptions",
+            "Recommandations d'optimisation"
+          ],
+          "benefits": [
+            "Moins de travail manuel",
+            "Des processus d'affaires plus rapides",
+            "Moins de tâches répétitives",
+            "Une meilleure connectivité entre les systèmes",
+            "Une exécution plus constante",
+            "Une meilleure visibilité sur les workflows",
+            "Une meilleure utilisation de l'IA",
+            "Moins de friction opérationnelle",
+            "Des résultats d'automatisation mesurables"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une réduction du travail manuel."
+        },
+        {
+          "code": "C12-S04",
+          "name": "Orchestrateur IA",
+          "blurb": "Des processus complexes en plusieurs étapes, coordonnés automatiquement.",
+          "price": "$2,500",
+          "unit": "/mois",
+          "problem": "**Orchestrateur IA coordonne les processus en plusieurs étapes, faisant appel à plusieurs agents et systèmes, afin que le travail habilité par l'IA puisse passer du déclenchement à la décision, à l'action, à l'approbation et à l'achèvement.**\n\nEn pratique, cela signifie que nous concevons l'orchestration de bout en bout; nous coordonnons les agents et les systèmes; nous gérons l'état des workflows.",
+          "what_we_do": "Coordonner les processus en plusieurs étapes, faisant appel à plusieurs agents et systèmes, afin que le travail habilité par l'IA puisse passer du déclenchement à la décision, à l'action, à l'approbation et à l'achèvement.",
+          "deliverables": [
+            "Évaluation de l'automatisation",
+            "Conception des workflows",
+            "Architecture d'intégration",
+            "Conception de l'intégration des agents",
+            "Automatisations de workflows",
+            "Intégrations de systèmes",
+            "Workflows d'orchestration",
+            "Rapports de surveillance et d'exécution",
+            "Gestion des exceptions",
+            "Recommandations d'optimisation"
+          ],
+          "benefits": [
+            "Moins de travail manuel",
+            "Des processus d'affaires plus rapides",
+            "Moins de tâches répétitives",
+            "Une meilleure connectivité entre les systèmes",
+            "Une exécution plus constante",
+            "Une meilleure visibilité sur les workflows",
+            "Une meilleure utilisation de l'IA",
+            "Moins de friction opérationnelle",
+            "Des résultats d'automatisation mesurables"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une réduction du travail manuel."
+        },
+        {
+          "code": "C12-S05",
+          "name": "Optimiseur d'automatisation",
+          "blurb": "Tirez davantage parti des automatisations que vous avez déjà.",
+          "price": "$1,200",
+          "unit": "/mois",
+          "problem": "**Optimiseur d'automatisation mesure la performance de l'automatisation par IA et améliore continuellement les workflows, les intégrations, la fiabilité, l'efficacité et les résultats d'affaires.**\n\nEn pratique, cela signifie que nous mesurons la performance de l'automatisation; nous repérons les goulots d'étranglement; nous analysons les défaillances.",
+          "what_we_do": "Mesurer la performance de l'automatisation par IA et améliorer continuellement les workflows, les intégrations, la fiabilité, l'efficacité et les résultats d'affaires.",
+          "deliverables": [
+            "Évaluation de l'automatisation",
+            "Conception des workflows",
+            "Architecture d'intégration",
+            "Conception de l'intégration des agents",
+            "Automatisations de workflows",
+            "Intégrations de systèmes",
+            "Workflows d'orchestration",
+            "Rapports de surveillance et d'exécution",
+            "Gestion des exceptions",
+            "Recommandations d'optimisation"
+          ],
+          "benefits": [
+            "Moins de travail manuel",
+            "Des processus d'affaires plus rapides",
+            "Moins de tâches répétitives",
+            "Une meilleure connectivité entre les systèmes",
+            "Une exécution plus constante",
+            "Une meilleure visibilité sur les workflows",
+            "Une meilleure utilisation de l'IA",
+            "Moins de friction opérationnelle",
+            "Des résultats d'automatisation mesurables"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une réduction du travail manuel."
+        }
+      ]
+    },
+    {
+      "code": "C13",
+      "name": "Transformez vos données en décisions",
+      "tagline": "Les réponses sont déjà dans votre entreprise.",
+      "tier": "Tier 2 - Business Automation",
+      "services": [
+        {
+          "code": "C13-S01",
+          "name": "Centre de connaissances",
+          "blurb": "Vos connaissances d'entreprise, organisées et consultables.",
+          "price": "$1,500",
+          "unit": "/mois",
+          "problem": "**Knowledge Hub construit, organise, maintient et rend les connaissances organisationnelles accessibles aux systèmes d'IA et aux utilisateurs autorisés grâce à des bases de connaissances structurées.**\n\nEn pratique, cela signifie que nous repérons les sources de connaissances, organisons les connaissances de l'entreprise et bâtissons des structures de connaissances.",
+          "what_we_do": "Construire, organiser, maintenir et rendre les connaissances organisationnelles accessibles aux systèmes d'IA et aux utilisateurs autorisés grâce à des bases de connaissances structurées.",
+          "deliverables": [
+            "Inventaire des connaissances",
+            "Structures de connaissances",
+            "Base de connaissances prête pour l'IA",
+            "Extrants d'intelligence des données",
+            "Résultats de découverte des connaissances",
+            "Analyses et renseignements",
+            "Extrants d'aide à la décision",
+            "Analyse des lacunes de connaissances",
+            "Rapports de gestion",
+            "Recommandations d'amélioration de l'intelligence"
+          ],
+          "benefits": [
+            "Meilleur accès aux connaissances organisationnelles",
+            "Réduction des silos de connaissances",
+            "Meilleure utilisation des données d'affaires existantes",
+            "Découverte de l'information plus rapide",
+            "Renseignements d'affaires plus utiles",
+            "Meilleure aide à la décision",
+            "Intelligence organisationnelle améliorée",
+            "Réduction du temps consacré à la recherche d'information"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'un meilleur accès aux connaissances organisationnelles."
+        },
+        {
+          "code": "C13-S02",
+          "name": "Perspective des données",
+          "blurb": "Comprenez ce que vos données vous disent vraiment.",
+          "price": "$2,000",
+          "unit": "/mois",
+          "problem": "**Data Insight transforme les données d'affaires approuvées en intelligence structurée qui aide les organisations à comprendre leur performance, leurs relations, leurs tendances et leurs conditions opérationnelles.**\n\nEn pratique, cela signifie que nous connectons les sources de données approuvées, structurons les données d'affaires et repérons les relations pertinentes.",
+          "what_we_do": "Transformer les données d'affaires approuvées en intelligence structurée qui aide les organisations à comprendre leur performance, leurs relations, leurs tendances et leurs conditions opérationnelles.",
+          "deliverables": [
+            "Inventaire des connaissances",
+            "Structures de connaissances",
+            "Base de connaissances prête pour l'IA",
+            "Extrants d'intelligence des données",
+            "Résultats de découverte des connaissances",
+            "Analyses et renseignements",
+            "Extrants d'aide à la décision",
+            "Analyse des lacunes de connaissances",
+            "Rapports de gestion",
+            "Recommandations d'amélioration de l'intelligence"
+          ],
+          "benefits": [
+            "Meilleur accès aux connaissances organisationnelles",
+            "Réduction des silos de connaissances",
+            "Meilleure utilisation des données d'affaires existantes",
+            "Découverte de l'information plus rapide",
+            "Renseignements d'affaires plus utiles",
+            "Meilleure aide à la décision",
+            "Intelligence organisationnelle améliorée",
+            "Réduction du temps consacré à la recherche d'information"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'un meilleur accès aux connaissances organisationnelles."
+        },
+        {
+          "code": "C13-S03",
+          "name": "Explorateur de connaissances",
+          "blurb": "Trouvez la réponse enfouie dans vos propres documents.",
+          "price": "$1,200",
+          "unit": "/mois",
+          "problem": "**Knowledge Finder découvre l'information pertinente, les relations, les tendances et les connaissances jusque-là cachées dans les sources d'information organisationnelles approuvées.**\n\nEn pratique, cela signifie que nous parcourons les connaissances organisationnelles, découvrons des relations et repérons l'information pertinente.",
+          "what_we_do": "Découvrir l'information pertinente, les relations, les tendances et les connaissances jusque-là cachées dans les sources d'information organisationnelles approuvées.",
+          "deliverables": [
+            "Inventaire des connaissances",
+            "Structures de connaissances",
+            "Base de connaissances prête pour l'IA",
+            "Extrants d'intelligence des données",
+            "Résultats de découverte des connaissances",
+            "Analyses et renseignements",
+            "Extrants d'aide à la décision",
+            "Analyse des lacunes de connaissances",
+            "Rapports de gestion",
+            "Recommandations d'amélioration de l'intelligence"
+          ],
+          "benefits": [
+            "Meilleur accès aux connaissances organisationnelles",
+            "Réduction des silos de connaissances",
+            "Meilleure utilisation des données d'affaires existantes",
+            "Découverte de l'information plus rapide",
+            "Renseignements d'affaires plus utiles",
+            "Meilleure aide à la décision",
+            "Intelligence organisationnelle améliorée",
+            "Réduction du temps consacré à la recherche d'information"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'un meilleur accès aux connaissances organisationnelles."
+        },
+        {
+          "code": "C13-S04",
+          "name": "Moteur d'analyse",
+          "blurb": "Des analyses qui font ressortir l'essentiel, automatiquement.",
+          "price": "$2,200",
+          "unit": "/mois",
+          "problem": "**Insight Engine analyse l'information d'affaires afin de générer des renseignements exploitables, des tendances, des schémas, des prévisions et de l'intelligence de performance à des fins opérationnelles et de gestion.**\n\nEn pratique, cela signifie que nous analysons la performance de l'entreprise, repérons les tendances et détectons les schémas.",
+          "what_we_do": "Analyser l'information d'affaires afin de générer des renseignements exploitables, des tendances, des schémas, des prévisions et de l'intelligence de performance à des fins opérationnelles et de gestion.",
+          "deliverables": [
+            "Inventaire des connaissances",
+            "Structures de connaissances",
+            "Base de connaissances prête pour l'IA",
+            "Extrants d'intelligence des données",
+            "Résultats de découverte des connaissances",
+            "Analyses et renseignements",
+            "Extrants d'aide à la décision",
+            "Analyse des lacunes de connaissances",
+            "Rapports de gestion",
+            "Recommandations d'amélioration de l'intelligence"
+          ],
+          "benefits": [
+            "Meilleur accès aux connaissances organisationnelles",
+            "Réduction des silos de connaissances",
+            "Meilleure utilisation des données d'affaires existantes",
+            "Découverte de l'information plus rapide",
+            "Renseignements d'affaires plus utiles",
+            "Meilleure aide à la décision",
+            "Intelligence organisationnelle améliorée",
+            "Réduction du temps consacré à la recherche d'information"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'un meilleur accès aux connaissances organisationnelles."
+        },
+        {
+          "code": "C13-S05",
+          "name": "Moteur de décision",
+          "blurb": "Une aide à la décision fondée sur vos données d'affaires réelles.",
+          "price": "$2,500",
+          "unit": "/mois",
+          "problem": "**Decision Engine fournit une intelligence décisionnelle assistée par l'IA en combinant les connaissances, les données, le contexte, les scénarios et les règles d'affaires approuvés pour appuyer de meilleures décisions.**\n\nEn pratique, cela signifie que nous combinons les connaissances et les données, analysons le contexte décisionnel et évaluons les scénarios.",
+          "what_we_do": "Fournir une intelligence décisionnelle assistée par l'IA en combinant les connaissances, les données, le contexte, les scénarios et les règles d'affaires approuvés pour appuyer de meilleures décisions.",
+          "deliverables": [
+            "Inventaire des connaissances",
+            "Structures de connaissances",
+            "Base de connaissances prête pour l'IA",
+            "Extrants d'intelligence des données",
+            "Résultats de découverte des connaissances",
+            "Analyses et renseignements",
+            "Extrants d'aide à la décision",
+            "Analyse des lacunes de connaissances",
+            "Rapports de gestion",
+            "Recommandations d'amélioration de l'intelligence"
+          ],
+          "benefits": [
+            "Meilleur accès aux connaissances organisationnelles",
+            "Réduction des silos de connaissances",
+            "Meilleure utilisation des données d'affaires existantes",
+            "Découverte de l'information plus rapide",
+            "Renseignements d'affaires plus utiles",
+            "Meilleure aide à la décision",
+            "Intelligence organisationnelle améliorée",
+            "Réduction du temps consacré à la recherche d'information"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'un meilleur accès aux connaissances organisationnelles."
+        }
+      ]
+    },
+    {
+      "code": "C14",
+      "name": "Simplifiez vos opérations TI",
+      "tagline": "Votre technologie, gérée sans la lourdeur administrative.",
+      "tier": "Tier 2 - Business Automation",
+      "services": [
+        {
+          "code": "C14-S01",
+          "name": "Gestionnaire TI",
+          "blurb": "Une gestion des services TI qui fonctionne vraiment d'elle-même.",
+          "price": "$35",
+          "unit": "/utilisateur/mois",
+          "problem": "**IT Manager gère les services TI au moyen de processus structurés couvrant les demandes de service, les incidents, les changements, les problèmes, les niveaux de service et l'amélioration continue.**\n\nEn pratique, cela signifie que nous gérons le catalogue de services TI, gérons les incidents et les demandes, et coordonnons les changements.",
+          "what_we_do": "Gérer les services TI au moyen de processus structurés couvrant les demandes de service, les incidents, les changements, les problèmes, les niveaux de service et l'amélioration continue.",
+          "deliverables": [
+            "Information sur les services TI",
+            "Registres des incidents et des demandes",
+            "Suivi des changements et des problèmes",
+            "Rapports opérationnels sur l'infrastructure",
+            "Inventaire des actifs",
+            "Information de configuration",
+            "Rapports du centre de services",
+            "Surveillance opérationnelle",
+            "Recommandations d'optimisation"
+          ],
+          "benefits": [
+            "Meilleure visibilité TI",
+            "Résolution plus rapide des problèmes",
+            "Processus TI plus cohérents",
+            "Meilleur contrôle des actifs",
+            "Fiabilité accrue de l'infrastructure",
+            "Réduction des interruptions opérationnelles",
+            "Meilleure performance des services",
+            "Opérations TI plus efficaces"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité TI."
+        },
+        {
+          "code": "C14-S02",
+          "name": "Exploitation de l'infrastructure",
+          "blurb": "Votre infrastructure, exploitée et optimisée.",
+          "price": "$500",
+          "unit": "/mois",
+          "problem": "**Infrastructure Ops exploite et maintient l'infrastructure TI approuvée de l'organisation, y compris les serveurs, les réseaux, les ressources cloud, les plateformes essentielles et les environnements technologiques de soutien.**\n\nEn pratique, cela signifie que nous tenons à jour l'inventaire de l'infrastructure, coordonnons l'exploitation de l'infrastructure et gérons l'entretien courant.",
+          "what_we_do": "Exploiter et maintenir l'infrastructure TI approuvée de l'organisation, y compris les serveurs, les réseaux, les ressources cloud, les plateformes essentielles et les environnements technologiques de soutien.",
+          "deliverables": [
+            "Information sur les services TI",
+            "Registres des incidents et des demandes",
+            "Suivi des changements et des problèmes",
+            "Rapports opérationnels sur l'infrastructure",
+            "Inventaire des actifs",
+            "Information de configuration",
+            "Rapports du centre de services",
+            "Surveillance opérationnelle",
+            "Recommandations d'optimisation"
+          ],
+          "benefits": [
+            "Meilleure visibilité TI",
+            "Résolution plus rapide des problèmes",
+            "Processus TI plus cohérents",
+            "Meilleur contrôle des actifs",
+            "Fiabilité accrue de l'infrastructure",
+            "Réduction des interruptions opérationnelles",
+            "Meilleure performance des services",
+            "Opérations TI plus efficaces"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité TI."
+        },
+        {
+          "code": "C14-S03",
+          "name": "Contrôle des actifs",
+          "blurb": "Sachez exactement quelle technologie vous possédez, et où.",
+          "price": "$10",
+          "unit": "/utilisateur/mois",
+          "problem": "**Asset Control maintient la visibilité et le contrôle sur les actifs TI, les configurations, la propriété, le statut du cycle de vie et les relations entre les composants technologiques.**\n\nEn pratique, cela signifie que nous tenons à jour l'inventaire des actifs, suivons la propriété des actifs et suivons leur cycle de vie.",
+          "what_we_do": "Maintenir la visibilité et le contrôle sur les actifs TI, les configurations, la propriété, le statut du cycle de vie et les relations entre les composants technologiques.",
+          "deliverables": [
+            "Information sur les services TI",
+            "Registres des incidents et des demandes",
+            "Suivi des changements et des problèmes",
+            "Rapports opérationnels sur l'infrastructure",
+            "Inventaire des actifs",
+            "Information de configuration",
+            "Rapports du centre de services",
+            "Surveillance opérationnelle",
+            "Recommandations d'optimisation"
+          ],
+          "benefits": [
+            "Meilleure visibilité TI",
+            "Résolution plus rapide des problèmes",
+            "Processus TI plus cohérents",
+            "Meilleur contrôle des actifs",
+            "Fiabilité accrue de l'infrastructure",
+            "Réduction des interruptions opérationnelles",
+            "Meilleure performance des services",
+            "Opérations TI plus efficaces"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité TI."
+        },
+        {
+          "code": "C14-S04",
+          "name": "Service d'assistance TI",
+          "blurb": "Un soutien sur lequel votre équipe peut vraiment compter.",
+          "price": "$40",
+          "unit": "/utilisateur/mois",
+          "problem": "**IT Helpdesk offre un soutien TI structuré aux utilisateurs en recevant, classifiant, résolvant, escaladant et suivant les problèmes technologiques et les demandes de service.**\n\nEn pratique, cela signifie que nous recevons les demandes de soutien, classifions les problèmes et dépannons les problèmes courants.",
+          "what_we_do": "Offrir un soutien TI structuré aux utilisateurs en recevant, classifiant, résolvant, escaladant et suivant les problèmes technologiques et les demandes de service.",
+          "deliverables": [
+            "Information sur les services TI",
+            "Registres des incidents et des demandes",
+            "Suivi des changements et des problèmes",
+            "Rapports opérationnels sur l'infrastructure",
+            "Inventaire des actifs",
+            "Information de configuration",
+            "Rapports du centre de services",
+            "Surveillance opérationnelle",
+            "Recommandations d'optimisation"
+          ],
+          "benefits": [
+            "Meilleure visibilité TI",
+            "Résolution plus rapide des problèmes",
+            "Processus TI plus cohérents",
+            "Meilleur contrôle des actifs",
+            "Fiabilité accrue de l'infrastructure",
+            "Réduction des interruptions opérationnelles",
+            "Meilleure performance des services",
+            "Opérations TI plus efficaces"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité TI."
+        },
+        {
+          "code": "C14-S05",
+          "name": "Surveillance TI",
+          "blurb": "Une surveillance continue qui détecte les problèmes avant qu'ils ne deviennent des pannes.",
+          "price": "$400",
+          "unit": "/mois",
+          "problem": "**IT Watch surveille la performance opérationnelle TI et cerne les possibilités d'amélioration en matière de fiabilité, de capacité, d'efficacité et de qualité de service dans l'ensemble de l'environnement technologique.**\n\nEn pratique, cela signifie que nous surveillons les opérations TI, repérons les anomalies opérationnelles et suivons la performance des services.",
+          "what_we_do": "Surveiller la performance opérationnelle TI et cerner les possibilités d'amélioration en matière de fiabilité, de capacité, d'efficacité et de qualité de service dans l'ensemble de l'environnement technologique.",
+          "deliverables": [
+            "Information sur les services TI",
+            "Registres des incidents et des demandes",
+            "Suivi des changements et des problèmes",
+            "Rapports opérationnels sur l'infrastructure",
+            "Inventaire des actifs",
+            "Information de configuration",
+            "Rapports du centre de services",
+            "Surveillance opérationnelle",
+            "Recommandations d'optimisation"
+          ],
+          "benefits": [
+            "Meilleure visibilité TI",
+            "Résolution plus rapide des problèmes",
+            "Processus TI plus cohérents",
+            "Meilleur contrôle des actifs",
+            "Fiabilité accrue de l'infrastructure",
+            "Réduction des interruptions opérationnelles",
+            "Meilleure performance des services",
+            "Opérations TI plus efficaces"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une meilleure visibilité TI."
+        }
+      ]
+    },
+    {
+      "code": "C15",
+      "name": "Faites croître vos revenus automatiquement",
+      "tagline": "Du premier contact au renouvellement.",
+      "tier": "Tier 2 - Business Automation",
+      "services": [
+        {
+          "code": "C15-S01",
+          "name": "Service à la clientèle",
+          "blurb": "Les interactions clients, gérées rapidement et de façon cohérente.",
+          "price": "$1,800",
+          "unit": "/mois",
+          "problem": "**Customer Care automatise les interactions avec la clientèle, les demandes de service, les communications et les activités du parcours client, tout en maintenant une escalade humaine appropriée.**\n\nEn pratique, cela signifie que nous automatisons les communications avec les clients, gérons les demandes des clients et acheminons les interactions clients.",
+          "what_we_do": "Automatiser les interactions avec la clientèle, les demandes de service, les communications et les activités du parcours client, tout en maintenant une escalade humaine appropriée.",
+          "deliverables": [
+            "Workflows d'automatisation client",
+            "Automatisation des prospects",
+            "Acheminement et suivi des ventes",
+            "Workflows d'intégration",
+            "Renseignements sur la santé client",
+            "Workflows de rétention",
+            "Intelligence des revenus",
+            "Rapports de performance",
+            "Recommandations d'optimisation"
+          ],
+          "benefits": [
+            "Réponse plus rapide aux clients",
+            "Meilleure gestion des prospects",
+            "Efficacité commerciale améliorée",
+            "Intégration client plus rapide",
+            "Meilleur engagement client",
+            "Signaux de rétention plus précoces",
+            "Meilleure visibilité sur les revenus",
+            "Réduction du travail manuel",
+            "Meilleure gestion du cycle de vie client"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une réponse plus rapide à ses clients."
+        },
+        {
+          "code": "C15-S02",
+          "name": "Flux des ventes",
+          "blurb": "Un suivi automatique des prospects, rien ne passe entre les mailles du filet.",
+          "price": "$2,200",
+          "unit": "/mois",
+          "problem": "**Sales Flow automatise la capture, la qualification, l'acheminement, le suivi, le soutien à la prospection et les activités du processus de vente afin d'améliorer l'efficacité commerciale et le taux de conversion.**\n\nEn pratique, cela signifie que nous captons les prospects, les qualifions, puis les notons et les priorisons.",
+          "what_we_do": "Automatiser la capture, la qualification, l'acheminement, le suivi, le soutien à la prospection et les activités du processus de vente afin d'améliorer l'efficacité commerciale et le taux de conversion.",
+          "deliverables": [
+            "Workflows d'automatisation client",
+            "Automatisation des prospects",
+            "Acheminement et suivi des ventes",
+            "Workflows d'intégration",
+            "Renseignements sur la santé client",
+            "Workflows de rétention",
+            "Intelligence des revenus",
+            "Rapports de performance",
+            "Recommandations d'optimisation"
+          ],
+          "benefits": [
+            "Réponse plus rapide aux clients",
+            "Meilleure gestion des prospects",
+            "Efficacité commerciale améliorée",
+            "Intégration client plus rapide",
+            "Meilleur engagement client",
+            "Signaux de rétention plus précoces",
+            "Meilleure visibilité sur les revenus",
+            "Réduction du travail manuel",
+            "Meilleure gestion du cycle de vie client"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une réponse plus rapide à ses clients."
+        },
+        {
+          "code": "C15-S03",
+          "name": "Intégration",
+          "blurb": "De nouveaux clients intégrés en douceur, à chaque fois.",
+          "price": "$1,500",
+          "unit": "/mois",
+          "problem": "**Onboard automatise et coordonne le parcours client, de la signature de l'entente jusqu'à l'intégration, la configuration, la collecte d'information, l'activation et le transfert au service continu.**\n\nEn pratique, cela signifie que nous amorçons l'intégration, recueillons l'information requise et coordonnons les tâches d'intégration.",
+          "what_we_do": "Automatiser et coordonner le parcours client, de la signature de l'entente jusqu'à l'intégration, la configuration, la collecte d'information, l'activation et le transfert au service continu.",
+          "deliverables": [
+            "Workflows d'automatisation client",
+            "Automatisation des prospects",
+            "Acheminement et suivi des ventes",
+            "Workflows d'intégration",
+            "Renseignements sur la santé client",
+            "Workflows de rétention",
+            "Intelligence des revenus",
+            "Rapports de performance",
+            "Recommandations d'optimisation"
+          ],
+          "benefits": [
+            "Réponse plus rapide aux clients",
+            "Meilleure gestion des prospects",
+            "Efficacité commerciale améliorée",
+            "Intégration client plus rapide",
+            "Meilleur engagement client",
+            "Signaux de rétention plus précoces",
+            "Meilleure visibilité sur les revenus",
+            "Réduction du travail manuel",
+            "Meilleure gestion du cycle de vie client"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une réponse plus rapide à ses clients."
+        },
+        {
+          "code": "C15-S04",
+          "name": "Pouls client",
+          "blurb": "Sachez quels clients sont à risque avant qu'ils ne partent.",
+          "price": "$1,800",
+          "unit": "/mois",
+          "problem": "**Customer Pulse surveille l'engagement client et les signaux du cycle de vie afin de cerner les occasions de rétention, les préoccupations liées au service, les occasions de croissance et les risques potentiels d'attrition.**\n\nEn pratique, cela signifie que nous surveillons l'engagement, repérons les signaux de risque client et suivons la santé client.",
+          "what_we_do": "Surveiller l'engagement client et les signaux du cycle de vie afin de cerner les occasions de rétention, les préoccupations liées au service, les occasions de croissance et les risques potentiels d'attrition.",
+          "deliverables": [
+            "Workflows d'automatisation client",
+            "Automatisation des prospects",
+            "Acheminement et suivi des ventes",
+            "Workflows d'intégration",
+            "Renseignements sur la santé client",
+            "Workflows de rétention",
+            "Intelligence des revenus",
+            "Rapports de performance",
+            "Recommandations d'optimisation"
+          ],
+          "benefits": [
+            "Réponse plus rapide aux clients",
+            "Meilleure gestion des prospects",
+            "Efficacité commerciale améliorée",
+            "Intégration client plus rapide",
+            "Meilleur engagement client",
+            "Signaux de rétention plus précoces",
+            "Meilleure visibilité sur les revenus",
+            "Réduction du travail manuel",
+            "Meilleure gestion du cycle de vie client"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une réponse plus rapide à ses clients."
+        },
+        {
+          "code": "C15-S05",
+          "name": "Aperçu des revenus",
+          "blurb": "Découvrez où se cachent les occasions de revenus dans vos données.",
+          "price": "$2,500",
+          "unit": "/mois",
+          "problem": "**Revenue Insight analyse l'information sur les clients, les ventes, le service et les revenus afin de cerner les occasions de conversion, de croissance, de rétention, de tarification et d'amélioration de la performance des revenus.**\n\nEn pratique, cela signifie que nous analysons la performance des revenus, repérons les occasions de conversion et repérons les occasions de croissance.",
+          "what_we_do": "Analyser l'information sur les clients, les ventes, le service et les revenus afin de cerner les occasions de conversion, de croissance, de rétention, de tarification et d'amélioration de la performance des revenus.",
+          "deliverables": [
+            "Workflows d'automatisation client",
+            "Automatisation des prospects",
+            "Acheminement et suivi des ventes",
+            "Workflows d'intégration",
+            "Renseignements sur la santé client",
+            "Workflows de rétention",
+            "Intelligence des revenus",
+            "Rapports de performance",
+            "Recommandations d'optimisation"
+          ],
+          "benefits": [
+            "Réponse plus rapide aux clients",
+            "Meilleure gestion des prospects",
+            "Efficacité commerciale améliorée",
+            "Intégration client plus rapide",
+            "Meilleur engagement client",
+            "Signaux de rétention plus précoces",
+            "Meilleure visibilité sur les revenus",
+            "Réduction du travail manuel",
+            "Meilleure gestion du cycle de vie client"
+          ],
+          "process": "Connecter → Recueillir → Analyser → Prioriser → Rapporter → Réviser ensemble.",
+          "outcome": "Le client bénéficie d'une réponse plus rapide à ses clients."
+        }
+      ]
+    }
+  ]
+}

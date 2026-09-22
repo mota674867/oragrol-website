@@ -16,7 +16,8 @@ import {
   UserRound,
   Workflow,
 } from "lucide-react";
-import rawData from "../../../data/oragrol-services-data.json";
+import rawDataEn from "../../../data/oragrol-services-data.json";
+import rawDataFr from "../../../data/oragrol-services-data.fr.json";
 
 /**
  * Services data layer — 2026-08-20 restructure.
@@ -34,6 +35,27 @@ import rawData from "../../../data/oragrol-services-data.json";
  * Mohammad's explicit choice — `oragrol-pricing-reference.csv`'s richer
  * breakdown (setup fee, annual, month-to-month, bundle role, confidence)
  * stays a reference file, not wired into the page.
+ *
+ * Bilingual (Phase 2m, 2026-09-22): this file — and by extension every
+ * `getServices*`/`getAllCategories`/`getServiceBySlug` accessor below — was
+ * the one remaining piece of the full-site bilingual review with no
+ * existing French-translation doc to work from (unlike every other phase).
+ * `oragrol-services-data.fr.json` is a full French counterpart of the same
+ * 15-category/67-service structure. `code`, `price`, and `tier` are
+ * byte-identical to the English file — the dollar figure itself must never
+ * diverge between locales, that's a real pricing-integrity risk, not just
+ * a translation nicety. `unit` is the one exception: its actual currency
+ * suffix is untouched (`/mo`, `/user`, ...) but the handful of full-English
+ * billing-type words (`one-time`, `project`, `per engagement`, ...) are
+ * translated — those aren't numbers, so translating them carries no
+ * pricing-divergence risk, and leaving "$4,500 — one-time" showing on a
+ * French page would read as an unfinished translation. Every accessor below
+ * now takes a `locale` param (defaulting to `"en"` so the many existing
+ * call sites — the already-bilingual `/services` and `/business-automation`
+ * hub pages, which source their own display copy from next-intl's
+ * `Services`/`BusinessAutomation` message namespaces, not from this JSON —
+ * don't need to change). Only the two `[code]/page.tsx` detail routes and
+ * `ServiceDetail` actually pass `"fr"` through.
  */
 
 export interface RawService {
@@ -63,7 +85,14 @@ interface RawData {
   business_automation_tier2: RawCategory[];
 }
 
-const data = rawData as RawData;
+export type ServiceLocale = "en" | "fr";
+
+const dataEn = rawDataEn as RawData;
+const dataFr = rawDataFr as RawData;
+
+function dataFor(locale: ServiceLocale): RawData {
+  return locale === "fr" ? dataFr : dataEn;
+}
 
 export type LucideIconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -107,16 +136,17 @@ export function serviceSlug(serviceCode: string): string {
   return serviceCode.toLowerCase();
 }
 
-export function getServicesTier1(): RawCategory[] {
-  return data.services_tier1;
+export function getServicesTier1(locale: ServiceLocale = "en"): RawCategory[] {
+  return dataFor(locale).services_tier1;
 }
 
-export function getBusinessAutomationTier2(): RawCategory[] {
-  return data.business_automation_tier2;
+export function getBusinessAutomationTier2(locale: ServiceLocale = "en"): RawCategory[] {
+  return dataFor(locale).business_automation_tier2;
 }
 
-export function getAllCategories(): RawCategory[] {
-  return [...data.services_tier1, ...data.business_automation_tier2];
+export function getAllCategories(locale: ServiceLocale = "en"): RawCategory[] {
+  const d = dataFor(locale);
+  return [...d.services_tier1, ...d.business_automation_tier2];
 }
 
 export function getAllServiceSlugs(): string[] {
@@ -138,8 +168,16 @@ export interface ServiceWithCategory {
   category: RawCategory;
 }
 
-export function getServiceBySlug(slug: string): ServiceWithCategory | undefined {
-  for (const category of getAllCategories()) {
+/**
+ * Bilingual: `locale` picks which language's JSON (`dataEn`/`dataFr`) the
+ * returned `service`/`category` objects come from. Both files share
+ * identical `code`/`price`/`unit`/`tier` values and array shapes (verified
+ * structurally when `oragrol-services-data.fr.json` was built), so a given
+ * `slug` always resolves to the same service regardless of locale — only
+ * the display text differs.
+ */
+export function getServiceBySlug(slug: string, locale: ServiceLocale = "en"): ServiceWithCategory | undefined {
+  for (const category of getAllCategories(locale)) {
     const service = category.services.find((s) => serviceSlug(s.code) === slug);
     if (service) return { service, category };
   }

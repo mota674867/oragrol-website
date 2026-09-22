@@ -6,20 +6,27 @@ import {
   getServiceSlugsTier2,
   isBusinessAutomationCategory,
 } from "@/app/components/sections/services/services-data";
+import { languageAlternates } from "@/app/lib/seo";
 
 export function generateStaticParams() {
   return getServiceSlugsTier2().map((code) => ({ code }));
 }
 
-type Params = { code: string };
+type Params = { code: string; locale: string };
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
-  const { code } = await params;
-  const result = getServiceBySlug(code);
+  const { code, locale } = await params;
+  const isFr = locale === "fr";
+  const result = getServiceBySlug(code, isFr ? "fr" : "en");
   if (!result || !isBusinessAutomationCategory(result.category.code)) return {};
+  const canonicalPath = isFr ? `/fr/business-automation/${code}` : `/business-automation/${code}`;
   return {
-    title: `${result.service.name} | Oragrol Global`,
+    title: `${result.service.name} | ORAGROL Global`,
     description: result.service.blurb,
+    alternates: {
+      canonical: canonicalPath,
+      languages: languageAlternates(`/business-automation/${code}`),
+    },
   };
 }
 
@@ -31,11 +38,15 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
  * `/services/[code]` in the same pass that split Business Automation out
  * to its own top-level nav item/page — real `code`s (C11-C15, service
  * slugs like `c11-s01`) unchanged, only the route prefix moved.
+ *
+ * Bilingual (Phase 2m, 2026-09-22): same `locale` wiring as
+ * `/services/[code]/page.tsx` — see that file's own comment.
  */
 export default async function BusinessAutomationServiceDetailPage({ params }: { params: Promise<Params> }) {
-  const { code } = await params;
-  const result = getServiceBySlug(code);
+  const { code, locale } = await params;
+  const isFr = locale === "fr";
+  const result = getServiceBySlug(code, isFr ? "fr" : "en");
   if (!result || !isBusinessAutomationCategory(result.category.code)) notFound();
 
-  return <ServiceDetail service={result.service} category={result.category} />;
+  return <ServiceDetail service={result.service} category={result.category} isFr={isFr} />;
 }
