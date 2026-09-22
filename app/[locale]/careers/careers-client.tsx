@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import OragrolOpportunityPage from "@/app/components/site/oragrol-opportunity-page";
 import { submitOpportunity } from "@/app/lib/submit-opportunity";
 

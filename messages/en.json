@@ -2603,5 +2603,158 @@
         }
       ]
     }
+  },
+  "Opportunity": {
+    "srChooseOpportunity": "Choose your opportunity",
+    "allFieldsRequired": "All fields are required unless marked optional.",
+    "optionalSuffix": "optional",
+    "formTitle": {
+      "career": "Introduce yourself",
+      "idea": "Share your idea",
+      "talent": "Introduce your expertise",
+      "other": "Start a conversation"
+    },
+    "fields": {
+      "organizationName": "Organization name",
+      "role": "Role",
+      "selectRole": "Select a role",
+      "specialty": "Specialty",
+      "selectSpecialty": "Select your specialty",
+      "otherSpecialty": "Other relevant specialty",
+      "applyingAs": "Applying as",
+      "individual": "Individual",
+      "organization": "Organization",
+      "individualSpecialist": "Individual specialist",
+      "firmTeam": "Firm / Team",
+      "fullName": "Full name",
+      "email": "Email",
+      "country": "Country",
+      "city": "City",
+      "phoneCountryCode": "Phone country code",
+      "phoneNumber": "Phone number",
+      "certifications": "Certifications or accreditation",
+      "areaOfExpertise": "Area of expertise",
+      "ideaTitle": "Idea title",
+      "categoryDiscipline": "Category / discipline (any area welcome)",
+      "proposedRegion": "Proposed country / region",
+      "marketExperience": "Local market experience",
+      "technology": "Technology or opportunity of interest",
+      "involvement": "Preferred involvement"
+    },
+    "descriptionLabel": {
+      "experience": "Relevant experience",
+      "idea": "Describe your idea and the value it could create",
+      "expertise": "Your expertise and how you would like to contribute",
+      "opportunity": "Opportunity summary and what you would bring"
+    },
+    "wordsMax": "maximum",
+    "wordsShorten": "— shorten your response to continue",
+    "ideaConfidentialNote": "Please share a non-confidential overview at this stage.",
+    "cvLabel": "CV / professional profile and supporting document",
+    "supportingDocsLabel": "Supporting documents (optional)",
+    "fileNoteBase": "Maximum 2 PDFs · 8 MB combined",
+    "fileNoteCareerSuffix": " · At least one CV or professional profile is required.",
+    "privacyNoteApplication": "We use your information to review and respond to your application.",
+    "privacyNoteSubmission": "We use your information to review and respond to your submission.",
+    "privacyPolicyLink": "Privacy Policy",
+    "termsLink": "Terms & Conditions",
+    "consentCareer": "Keep my application for future opportunities, as described in the Privacy Policy.",
+    "consentOther": "Contact me about future relevant collaboration opportunities, as described in the Privacy Policy.",
+    "partnershipsDisclaimer": "Submitting an enquiry does not establish a partnership, branch appointment or investment agreement.",
+    "submissionsNotOpen": "Online submissions are not open yet.",
+    "submitting": "Submitting…",
+    "submitApplication": "Submit Application",
+    "sendIntroduction": "Send Introduction",
+    "submitEnquiry": "Submit Enquiry",
+    "errorCheckDescription": "Check the description and required PDF attachment before submitting.",
+    "successMessage": "Your submission has been received. Thank you for your interest.",
+    "errorGeneric": "We couldn’t complete your submission. Your details remain here so you can try again.",
+    "fileErrors": {
+      "tooMany": "Choose no more than 2 PDFs.",
+      "onlyPdf": "Only PDF files are accepted.",
+      "tooLarge": "The combined file size must not exceed 8 MB.",
+      "empty": "Empty files are not accepted."
+    },
+    "specialties": [
+      {
+        "title": "Certified Penetration Tester",
+        "credential": "OSCP / GPEN"
+      },
+      {
+        "title": "SOC 2 Audit Partner",
+        "credential": "CPA firm · AICPA SOC practice"
+      },
+      {
+        "title": "PCI-DSS QSA",
+        "credential": "PCI SSC accredited"
+      },
+      {
+        "title": "Certified Forensic Examiner",
+        "credential": "GCFA / GCFE"
+      }
+    ],
+    "pages": {
+      "careers": {
+        "eyebrow": "CAREERS",
+        "title": "Build what comes next.",
+        "intro": "Join ORAGROL through employment or paid project-based work. Bring your expertise, initiative and commitment to meaningful outcomes.",
+        "categories": [
+          "Sales & Growth",
+          "Certified Specialists",
+          "Current Vacancies"
+        ],
+        "salesGrowth": {
+          "body": "Applications are always open for people who can build relationships, develop opportunities and help businesses grow."
+        },
+        "certifiedSpecialists": {
+          "title": "Certified Specialists & Audit Partners",
+          "body": "Project-based opportunities for independent specialists and qualified firms.",
+          "otherNote": "Other relevant expertise is welcome."
+        },
+        "currentVacancies": {
+          "applyBelow": "Apply for a confirmed role below.",
+          "noneListed": "There are no other vacancies listed at present. Sales and specialist project applications remain open."
+        }
+      },
+      "talent": {
+        "eyebrow": "TALENT",
+        "title": "Bring your expertise. Share what comes next.",
+        "intro": "Introduce your expertise or an idea worth exploring. This is a place for exploratory collaboration without a defined job or project role.",
+        "categories": [
+          "Share Your Expertise",
+          "Propose an Idea"
+        ],
+        "shareExpertise": {
+          "body": "Tell us what you do, where you could contribute and how you would like to collaborate."
+        },
+        "proposeIdea": {
+          "body": "Introduce a problem, possibility or new approach and the value you believe it could create."
+        },
+        "sharedNote": "AI, intelligent agents, automation, sales and marketing are areas of interest—not limits. All relevant disciplines and ideas are welcome."
+      },
+      "partnerships": {
+        "eyebrow": "PARTNERSHIPS",
+        "title": "Stronger outcomes, built together.",
+        "intro": "Explore collaboration, regional growth or investment in new technology. Individuals and organizations in Canada and internationally are welcome.",
+        "categories": [
+          "Business Collaboration",
+          "Regional or Branch",
+          "Technology Investment",
+          "Other Opportunity"
+        ],
+        "businessCollaboration": {
+          "body": "Explore technology, delivery, referral, channel or strategic collaboration—or another way of working together."
+        },
+        "regionalOrBranch": {
+          "body": "Express interest in developing an ORAGROL presence in a Canadian region or another country."
+        },
+        "technologyInvestment": {
+          "body": "Tell us about your interest in investing in new technology or supporting its development and growth."
+        },
+        "otherOpportunity": {
+          "body": "Have a different opportunity in mind? Tell us what you would like to build together."
+        }
+      }
+    }
   }
 }

@@ -2603,5 +2603,158 @@
         }
       ]
     }
+  },
+  "Opportunity": {
+    "srChooseOpportunity": "Choisissez votre occasion",
+    "allFieldsRequired": "Tous les champs sont obligatoires, sauf indication contraire.",
+    "optionalSuffix": "facultatif",
+    "formTitle": {
+      "career": "Présentez-vous",
+      "idea": "Partagez votre idée",
+      "talent": "Présentez votre expertise",
+      "other": "Amorcez une conversation"
+    },
+    "fields": {
+      "organizationName": "Nom de l'organisation",
+      "role": "Poste",
+      "selectRole": "Sélectionnez un poste",
+      "specialty": "Spécialité",
+      "selectSpecialty": "Sélectionnez votre spécialité",
+      "otherSpecialty": "Autre spécialité pertinente",
+      "applyingAs": "Vous postulez en tant que",
+      "individual": "Particulier",
+      "organization": "Organisation",
+      "individualSpecialist": "Spécialiste individuel",
+      "firmTeam": "Cabinet / Équipe",
+      "fullName": "Nom complet",
+      "email": "Courriel",
+      "country": "Pays",
+      "city": "Ville",
+      "phoneCountryCode": "Indicatif de pays du téléphone",
+      "phoneNumber": "Numéro de téléphone",
+      "certifications": "Certifications ou accréditation",
+      "areaOfExpertise": "Domaine d'expertise",
+      "ideaTitle": "Titre de l'idée",
+      "categoryDiscipline": "Catégorie / discipline (tout domaine est bienvenu)",
+      "proposedRegion": "Pays / région proposé",
+      "marketExperience": "Expérience du marché local",
+      "technology": "Technologie ou occasion d'intérêt",
+      "involvement": "Type de participation souhaité"
+    },
+    "descriptionLabel": {
+      "experience": "Expérience pertinente",
+      "idea": "Décrivez votre idée et la valeur qu'elle pourrait créer",
+      "expertise": "Votre expertise et comment vous aimeriez contribuer",
+      "opportunity": "Résumé de l'occasion et ce que vous apporteriez"
+    },
+    "wordsMax": "maximum",
+    "wordsShorten": "— raccourcissez votre réponse pour continuer",
+    "ideaConfidentialNote": "Veuillez fournir un aperçu non confidentiel à cette étape.",
+    "cvLabel": "CV / profil professionnel et document à l'appui",
+    "supportingDocsLabel": "Documents à l'appui (facultatif)",
+    "fileNoteBase": "Maximum de 2 fichiers PDF · 8 Mo au total",
+    "fileNoteCareerSuffix": " · Au moins un CV ou profil professionnel est requis.",
+    "privacyNoteApplication": "Nous utilisons vos renseignements pour examiner votre candidature et y répondre.",
+    "privacyNoteSubmission": "Nous utilisons vos renseignements pour examiner votre soumission et y répondre.",
+    "privacyPolicyLink": "Politique de confidentialité",
+    "termsLink": "Conditions générales",
+    "consentCareer": "Conserver ma candidature pour de futures occasions, comme décrit dans la politique de confidentialité.",
+    "consentOther": "Me contacter au sujet de futures occasions de collaboration pertinentes, comme décrit dans la politique de confidentialité.",
+    "partnershipsDisclaimer": "Soumettre une demande de renseignements n'établit ni partenariat, ni nomination de succursale, ni entente d'investissement.",
+    "submissionsNotOpen": "Les soumissions en ligne ne sont pas encore ouvertes.",
+    "submitting": "Envoi en cours…",
+    "submitApplication": "Soumettre la candidature",
+    "sendIntroduction": "Envoyer la présentation",
+    "submitEnquiry": "Soumettre la demande",
+    "errorCheckDescription": "Vérifiez la description et la pièce jointe PDF requise avant de soumettre.",
+    "successMessage": "Votre soumission a été reçue. Merci de votre intérêt.",
+    "errorGeneric": "Nous n'avons pas pu compléter votre soumission. Vos renseignements demeurent ici pour que vous puissiez réessayer.",
+    "fileErrors": {
+      "tooMany": "Choisissez au maximum 2 fichiers PDF.",
+      "onlyPdf": "Seuls les fichiers PDF sont acceptés.",
+      "tooLarge": "La taille combinée des fichiers ne doit pas dépasser 8 Mo.",
+      "empty": "Les fichiers vides ne sont pas acceptés."
+    },
+    "specialties": [
+      {
+        "title": "Testeur d'intrusion certifié",
+        "credential": "OSCP / GPEN"
+      },
+      {
+        "title": "Partenaire d'audit SOC 2",
+        "credential": "Cabinet CPA · Pratique SOC de l'AICPA"
+      },
+      {
+        "title": "Évaluateur de sécurité qualifié (QSA) PCI-DSS",
+        "credential": "Accrédité par le PCI SSC"
+      },
+      {
+        "title": "Examinateur judiciaire certifié",
+        "credential": "GCFA / GCFE"
+      }
+    ],
+    "pages": {
+      "careers": {
+        "eyebrow": "CARRIÈRES",
+        "title": "Bâtissez ce qui vient ensuite.",
+        "intro": "Joignez-vous à ORAGROL par un emploi ou un travail rémunéré à la pièce. Apportez votre expertise, votre initiative et votre engagement envers des résultats significatifs.",
+        "categories": [
+          "Ventes et croissance",
+          "Spécialistes certifiés",
+          "Postes actuellement vacants"
+        ],
+        "salesGrowth": {
+          "body": "Les candidatures sont toujours ouvertes pour les personnes capables de bâtir des relations, de développer des occasions d'affaires et d'aider les entreprises à croître."
+        },
+        "certifiedSpecialists": {
+          "title": "Spécialistes certifiés et partenaires d'audit",
+          "body": "Des occasions à la pièce pour les spécialistes indépendants et les cabinets qualifiés.",
+          "otherNote": "Toute autre expertise pertinente est la bienvenue."
+        },
+        "currentVacancies": {
+          "applyBelow": "Postulez pour un poste confirmé ci-dessous.",
+          "noneListed": "Aucun autre poste n'est actuellement affiché. Les candidatures pour les ventes et les mandats de spécialistes demeurent ouvertes."
+        }
+      },
+      "talent": {
+        "eyebrow": "TALENT",
+        "title": "Apportez votre expertise. Partagez ce qui vient ensuite.",
+        "intro": "Présentez votre expertise ou une idée qui mérite d'être explorée. C'est un espace pour une collaboration exploratoire, sans poste ou rôle de projet défini.",
+        "categories": [
+          "Partagez votre expertise",
+          "Proposez une idée"
+        ],
+        "shareExpertise": {
+          "body": "Dites-nous ce que vous faites, où vous pourriez contribuer et comment vous aimeriez collaborer."
+        },
+        "proposeIdea": {
+          "body": "Présentez un problème, une possibilité ou une nouvelle approche, ainsi que la valeur que vous croyez qu'elle pourrait créer."
+        },
+        "sharedNote": "L'IA, les agents intelligents, l'automatisation, les ventes et le marketing sont des domaines d'intérêt — pas des limites. Toutes les disciplines et idées pertinentes sont les bienvenues."
+      },
+      "partnerships": {
+        "eyebrow": "PARTENARIATS",
+        "title": "Des résultats plus solides, bâtis ensemble.",
+        "intro": "Explorez la collaboration, la croissance régionale ou l'investissement dans de nouvelles technologies. Les particuliers et organisations du Canada et de l'étranger sont les bienvenus.",
+        "categories": [
+          "Collaboration d'affaires",
+          "Régional ou succursale",
+          "Investissement technologique",
+          "Autre occasion"
+        ],
+        "businessCollaboration": {
+          "body": "Explorez une collaboration technologique, de prestation, de référencement, de distribution ou stratégique — ou une autre façon de travailler ensemble."
+        },
+        "regionalOrBranch": {
+          "body": "Manifestez votre intérêt à développer une présence d'ORAGROL dans une région canadienne ou un autre pays."
+        },
+        "technologyInvestment": {
+          "body": "Parlez-nous de votre intérêt à investir dans une nouvelle technologie ou à soutenir son développement et sa croissance."
+        },
+        "otherOpportunity": {
+          "body": "Vous avez une autre occasion en tête ? Dites-nous ce que vous aimeriez bâtir ensemble."
+        }
+      }
+    }
   }
 }
