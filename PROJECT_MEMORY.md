@@ -4,6 +4,22 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 
 ---
 
+## Session — Full-site bilingual review, Task #27: final consolidated cross-site verification pass — 2026-09-22
+
+**Context:** Phases 2a-2m had each been individually verified as they shipped, but no single pass had checked the entire site — every route, both locales — in one sweep, and the two interactive flows (Contact form, Cyber Health quiz) had only ever been checked for page-load correctness, not click-through/submit behavior. This closes that gap.
+
+**Full-site route sweep:** built a script (`full_site_sweep.js`) that reads the real route data at runtime rather than a hand-maintained list — the 67 service codes from `oragrol-services-data.json`, the 16 article slugs from `ORAGROL_ResourceArticles.ts`, plus the 20 static top-level routes (including the 3 confirmed-out-of-scope pages from Task #26: `/canada-coverage-study`, `/solutions`, `/style-guide`, checked in English only, per that task's own scope decision). 103 unique routes × 2 locales, minus the 3 EN-only out-of-scope pages' FR variant = 203 checks total. Each check: HTTP status, `body.innerText()` scanned for `MISSING_MESSAGE`/`IntlError`, console errors, page errors. **Result: 0 real failures.** Two apparent failures were investigated and confirmed to be non-issues, not translation bugs: the French homepage (`/fr`) showed a transient 308 in the script's response listener but `curl` confirms a clean 200 (a Playwright response-timing artifact, not a real redirect); `/solutions` (English) legitimately 308-redirects to `/services` — that's the pre-existing intentional alias behavior Task #26 already documented, not a new regression.
+
+**Contact form end-to-end (both locales):** filled and submitted the real `/contact` enquiry form (`#enquiry`) in both English and French — confirmed French field labels render (no hardcoded English leaking through), submit triggers the real `/api/contact` route, which returns a graceful 500 (this sandbox has no `RESEND_API_KEY`/`CONTACT_TO_EMAIL` set — confirmed via `.env.local` absent before testing, so **no real email was sent or attempted to send** in this verification), and the client handles that failure without a JS crash in either locale.
+
+**Cyber Health quiz end-to-end (both locales):** clicked through intro → profile → into the qualify/assessment steps in both English and French, checking `body.innerText()` at each step for `MISSING_MESSAGE`/`IntlError` and watching for console/page errors. 0 failures. This wasn't a full 20-question run-through to the final report (that's Phase 2h's own already-verified territory) — the goal here was confirming the multi-step wizard's state transitions still work correctly end-to-end in French after every later phase's changes, not re-deriving the scoring logic.
+
+**Result: 0 failures across the full-site sweep and both interactive-flow tests.** This closes Task #27. Combined with Phase 2l (legal pages + footer) and Phase 2m (67 services), the entire bilingual build is now verified as a whole, not just phase-by-phase.
+
+**Still open:** confirming with Mohammad that patches 13 through 16 have actually been applied and pushed — origin (`9ce0b7d`) had not moved past Phase 2i at any point across this entire autonomous review, so nothing from Phase 2j onward is live yet.
+
+---
+
 ## Session — Full-site bilingual review, Phase 2m: all 67 service detail pages fully bilingual (services/[code] + business-automation/[code]) — 2026-09-22
 
 **Completed:** Translated the full 15-category/67-service catalog's detail-page body content (`problem`/`what_we_do`/`deliverables[]`/`benefits[]`/`process`/`outcome`, plus category `name`/`tagline` and service `name`/`blurb`) — this was the single largest remaining gap flagged at the end of Phase 2k (Task #29), the one phase with **no existing translation doc** to work from (~69,000 characters of source English across 67 services).
