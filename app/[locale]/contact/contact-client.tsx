@@ -1,6 +1,6 @@
 "use client";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { Link, usePathname } from "@/i18n/navigation";
 
 import { FormEvent, useEffect, useState } from "react";
 import PreFooterCta from "@/app/components/site/pre-footer-cta";
@@ -16,6 +16,14 @@ type Conversation =
   | "Partnership or General Enquiry";
 type ScopeItem = { id: string; area: string; code: string; title: string };
 
+// Bilingual (D-086, Task #21): `options` below is left untouched -- its
+// `name` values are submitted to /api/contact as free text (see
+// app/lib/contact-schema.ts's `conversation: z.string()`) and land in
+// Mohammad's internal notification email subject/body, so they stay the
+// stable English identifiers on /fr too rather than becoming French text
+// he'd have to context-switch to read. The *displayed* label/summary come
+// from Contact.conversations.options instead, index-paired against this
+// array (same pattern as OR ONE's builder categories).
 const options: { name: Conversation; index: string; summary: string }[] = [
   {
     name: "Cybersecurity Services",
@@ -43,6 +51,9 @@ const options: { name: Conversation; index: string; summary: string }[] = [
 ];
 
 function ContactPageClient() {
+  const t = useTranslations("Contact");
+  const locale = useLocale();
+  const otherLocale = locale === "fr" ? "en" : "fr";
   const pathname = usePathname();
   const [conversation, setConversation] = useState<Conversation>(
     "Cybersecurity Services",
@@ -90,12 +101,12 @@ function ContactPageClient() {
       });
       const data: { ok: boolean; error?: string } = await res.json();
       if (!res.ok || !data.ok) {
-        setSubmitError(data.error || "Could not send your message. Please try again.");
+        setSubmitError(data.error || t("form.genericSubmitError"));
         return;
       }
       setSubmitted(true);
     } catch {
-      setSubmitError("Could not send your message. Check your connection and try again.");
+      setSubmitError(t("form.networkError"));
     } finally {
       setSubmitting(false);
     }
@@ -110,12 +121,14 @@ function ContactPageClient() {
         <OragrolMegaNav items={NAV_ITEMS} activePath={pathname} />
         <div>
           <a className="active" href="#enquiry">
-            Start enquiry
+            {t("nav.startEnquiry")}
           </a>
-          <button className="search" aria-label="Search">
+          <button className="search" aria-label={t("nav.search")}>
             <span />
           </button>
-          <button className="language">EN / FR</button>
+          <Link href={pathname} locale={otherLocale} className="language" aria-label={t("nav.changeLanguage")}>
+            {locale.toUpperCase()} / {otherLocale.toUpperCase()}
+          </Link>
         </div>
       </header>
 
@@ -124,37 +137,31 @@ function ContactPageClient() {
           OR
         </div>
         <div>
-          <p>Contact / ORAGROL Global</p>
+          <p>{t("hero.eyebrow")}</p>
           <h1>
-            Start with a<br />
-            <span>clear conversation.</span>
+            {t("hero.title1")}
+            <br />
+            <span>{t("hero.titleEmphasis")}</span>
           </h1>
-          <p>
-            Whether you are exploring ORAGROL Global for a specific priority or
-            a more coordinated transformation, begin with a conversation shaped
-            around how your business operates.
-          </p>
+          <p>{t("hero.body")}</p>
           <a href="#conversations">
-            Choose your conversation <b>↓</b>
+            {t("hero.chooseConversation")} <b>↓</b>
           </a>
         </div>
       </section>
 
       <section className="contact-conversations" id="conversations">
         <header>
-          <span>01 / Begin here</span>
+          <span>{t("conversations.eyebrow")}</span>
           <h2>
-            Choose your
+            {t("conversations.title1")}
             <br />
-            conversation.
+            {t("conversations.titleEmphasis")}
           </h2>
-          <p>
-            Select the direction closest to your current priority. You can add
-            context before submitting.
-          </p>
+          <p>{t("conversations.sub")}</p>
         </header>
         <div className="conversation-grid">
-          {options.map((o) => (
+          {options.map((o, i) => (
             <button
               className={conversation === o.name ? "selected" : ""}
               onClick={() => setConversation(o.name)}
@@ -162,9 +169,9 @@ function ContactPageClient() {
               key={o.name}
             >
               <span>{o.index}</span>
-              <i>{conversation === o.name ? "Selected" : "Select"}</i>
-              <h3>{o.name}</h3>
-              <p>{o.summary}</p>
+              <i>{conversation === o.name ? t("conversations.selectedLabel") : t("conversations.selectLabel")}</i>
+              <h3>{t(`conversations.options.${i}.label`)}</h3>
+              <p>{t(`conversations.options.${i}.summary`)}</p>
               <b>↗</b>
             </button>
           ))}
@@ -173,17 +180,14 @@ function ContactPageClient() {
 
       <section className="contact-enquiry" id="enquiry">
         <div className="enquiry-intro">
-          <span>02 / Your enquiry</span>
-          <h2>Tell us what you are working on.</h2>
-          <p>
-            Share the outcome you need. We will review the context before
-            recommending a next step.
-          </p>
+          <span>{t("enquiry.eyebrow")}</span>
+          <h2>{t("enquiry.title")}</h2>
+          <p>{t("enquiry.sub")}</p>
           {scope.length > 0 && (
             <aside>
-              <small>MY SCOPE ATTACHED</small>
+              <small>{t("enquiry.scopeAttachedLabel")}</small>
               <strong>
-                {String(scope.length).padStart(2, "0")} selection
+                {String(scope.length).padStart(2, "0")} {t("enquiry.selectionWord")}
                 {scope.length === 1 ? "" : "s"}
               </strong>
               <p>
@@ -191,101 +195,104 @@ function ContactPageClient() {
                   .slice(0, 3)
                   .map((x) => x.title)
                   .join(" · ")}
-                {scope.length > 3 ? ` · +${scope.length - 3} more` : ""}
+                {scope.length > 3 ? t("enquiry.moreSuffix", { count: scope.length - 3 }) : ""}
               </p>
             </aside>
           )}
         </div>
         <form onSubmit={submit}>
           <div className="selected-conversation">
-            <span>Conversation</span>
-            <strong>{conversation}</strong>
+            <span>{t("form.conversationLabel")}</span>
+            <strong>{t(`conversations.options.${options.findIndex((o) => o.name === conversation)}.label`)}</strong>
             <button
               type="button"
               onClick={() =>
                 document.getElementById("conversations")?.scrollIntoView()
               }
             >
-              Change
+              {t("form.changeButton")}
             </button>
           </div>
           <div className="field-pair">
             <label>
-              First name
+              {t("form.firstName")}
               <input required name="firstName" />
             </label>
             <label>
-              Last name
+              {t("form.lastName")}
               <input required name="lastName" />
             </label>
           </div>
           <div className="field-pair">
             <label>
-              Business email
+              {t("form.businessEmail")}
               <input
                 required
                 type="email"
                 name="email"
-                placeholder="name@company.ca"
+                placeholder={t("form.emailPlaceholder")}
               />
             </label>
             <label>
-              Company
+              {t("form.company")}
               <input required name="company" />
             </label>
           </div>
           <div className="field-pair">
             <label>
-              Job title
+              {t("form.jobTitle")}
               <input name="jobTitle" />
             </label>
             <label>
-              Company size
+              {t("form.companySize")}
               <select name="companySize" defaultValue="">
                 <option value="" disabled>
-                  Select
+                  {t("form.selectPlaceholder")}
                 </option>
-                <option>1–10 employees</option>
-                <option>11–50 employees</option>
-                <option>51–200 employees</option>
-                <option>201+ employees</option>
+                <option>{t("form.size1to10")}</option>
+                <option>{t("form.size11to50")}</option>
+                <option>{t("form.size51to200")}</option>
+                <option>{t("form.size201plus")}</option>
               </select>
             </label>
           </div>
           <label>
-            What would you like to achieve?
+            {t("form.achieveLabel")}
             <textarea
               required
               name="context"
-              placeholder="Describe the priority, outcome or challenge in your own words."
+              placeholder={t("form.achievePlaceholder")}
             />
           </label>
           <div className="field-pair">
             <label>
-              Preferred contact method
+              {t("form.contactMethodLabel")}
+              {/* Bilingual (D-086, Task #21): explicit `value` attrs keep
+                  the submitted field and defaultValue matching stable
+                  English identifiers regardless of locale -- only the
+                  visible option text is translated. */}
               <select name="contactMethod" defaultValue="Email">
-                <option>Email</option>
-                <option>Video call</option>
+                <option value="Email">{t("form.methodEmail")}</option>
+                <option value="Video call">{t("form.methodVideo")}</option>
               </select>
             </label>
             <label>
-              Preferred time to connect
+              {t("form.preferredTimeLabel")}
               <input
                 name="preferredTime"
-                placeholder="Morning, afternoon or a specific date"
+                placeholder={t("form.preferredTimePlaceholder")}
               />
             </label>
           </div>
           <label className="contact-consent">
-            <input required type="checkbox" /> I agree that ORAGROL Global may
-            contact me about this enquiry.
+            <input required type="checkbox" /> {t("form.consentLabel")}
           </label>
           <button className="contact-submit" type="submit" disabled={submitting}>
-            {submitting ? "Sending…" : "Submit Enquiry"} <span>↗</span>
+            {submitting ? t("form.sendingLabel") : t("form.submitButton")} <span>↗</span>
           </button>
           {submitError && (
             <div className="contact-confirmation" role="alert">
-              <strong>Something went wrong.</strong>
+              <strong>{t("form.errorHeading")}</strong>
               <span>{submitError}</span>
             </div>
           )}
@@ -293,106 +300,72 @@ function ContactPageClient() {
             <button
               className="contact-pdf"
               type="button"
-              onClick={() =>
-                alert(
-                  "Open My Scope on Services, Business Automation or OR ONE to download the current branded PDF.",
-                )
-              }
+              onClick={() => alert(t("form.downloadScopeAlert"))}
             >
-              Download My Scope as PDF
+              {t("form.downloadScopePdf")}
             </button>
           )}
           {submitted && (
             <div className="contact-confirmation" role="status">
-              <strong>Thank you.</strong>
-              <span>
-                Your enquiry has been sent to the ORAGROL Global team for
-                review. We aim to respond within two business days.
-              </span>
+              <strong>{t("form.successHeading")}</strong>
+              <span>{t("form.successBody")}</span>
             </div>
           )}
           <small className="contact-privacy">
-            Your information will be used only to review and respond to your
-            request.
+            {t("form.privacyNote")}
           </small>
         </form>
       </section>
 
       <section className="contact-next">
         <header>
-          <span>03 / What happens next</span>
+          <span>{t("next.eyebrow")}</span>
           <h2>
-            A considered response.
+            {t("next.title1")}
             <br />
-            <i>Not an automated sales pitch.</i>
+            <i>{t("next.titleEmphasis")}</i>
           </h2>
         </header>
         <div>
-          {[
-            [
-              "01",
-              "Review",
-              "We review your enquiry, selected scope and stated priorities.",
-            ],
-            [
-              "02",
-              "Confirm",
-              "You receive confirmation that your request has been received.",
-            ],
-            [
-              "03",
-              "Connect",
-              "We arrange the right conversation for your requirements.",
-            ],
-            [
-              "04",
-              "Scope",
-              "We define the recommended path before any commitment.",
-            ],
-          ].map((s) => (
-            <article key={s[0]}>
-              <span>{s[0]}</span>
-              <h3>{s[1]}</h3>
-              <p>{s[2]}</p>
+          {(t.raw("next.steps") as { number: string; title: string; copy: string }[]).map((s) => (
+            <article key={s.number}>
+              <span>{s.number}</span>
+              <h3>{s.title}</h3>
+              <p>{s.copy}</p>
             </article>
           ))}
         </div>
-        <p>
-          We aim to acknowledge qualified enquiries within two business days.
-        </p>
+        <p>{t("next.footer")}</p>
       </section>
 
       <section className="contact-locations">
         <div>
-          <span>04 / ORAGROL Global</span>
+          <span>{t("locations.eyebrow")}</span>
           <h2>
-            Canadian foundation.
+            {t("locations.title1")}
             <br />
-            Clear points of contact.
+            {t("locations.title2")}
           </h2>
         </div>
         <div className="location-cards">
           <article>
-            <span>Registered Headquarters</span>
-            <h3>Thunder Bay</h3>
-            <p>Ontario · Canada</p>
+            <span>{t("locations.hq.label")}</span>
+            <h3>{t("locations.hq.city")}</h3>
+            <p>{t("locations.hq.region")}</p>
           </article>
           <article>
-            <span>Toronto Presence</span>
-            <h3>Toronto</h3>
+            <span>{t("locations.toronto.label")}</span>
+            <h3>{t("locations.toronto.city")}</h3>
             <p>
-              Client relationships and business development
+              {t("locations.toronto.body")}
               <br />
-              Ontario · Canada
+              {t("locations.toronto.region")}
             </p>
           </article>
           <article>
-            <span>Digital enquiries</span>
-            <h3>orgro.ca</h3>
-            <p>
-              Our approved @orgro.ca contact email will be published when
-              activated.
-            </p>
+            <span>{t("locations.digital.label")}</span>
+            <h3>{t("locations.digital.domain")}</h3>
+            <p>{t("locations.digital.body")}</p>
           </article>
         </div>
       </section>

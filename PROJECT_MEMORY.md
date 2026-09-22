@@ -4,6 +4,45 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 
 ---
 
+### 2026-09-22 (later same day) — Bilingual EN/FR build, Phase 2f: Contact + FAQ pages fully wired (36 Q&As custom-translated against live code, not the richer draft doc)
+
+**Completed:**
+- Confirmed the OR ONE patch applied and pushed by Mohammad (`569e0e2` on `origin/feat/fr-locale`, "done, move") — `git fetch` + `git reset --hard` to resync before starting, same discipline as every prior phase.
+- Built out Task #21's next two pages: `/contact` + `/fr/contact` and `/faq` + `/fr/faq`, sourced from `ORAGROL_Contact_FAQ_FR_Translation.md` (page 5 of the 5-page translation series). New `Contact` and `Faq` messages namespaces.
+- **Contact**: hero, the 4-option conversation selector, the full enquiry form (name/email/company/job title/company size/goal textarea/contact method/preferred time/consent/submit/error/success states), the "what happens next" 4-step section, and the 3 location cards (HQ/Toronto/Digital) all translated.
+- **Index-pairing safety constraint, same pattern as OR ONE's `groups` array:** Contact's `options` array (the 4 conversation `name` values — "Cybersecurity Services" / "Business Automation" / "OR ONE" / "Partnership or General Enquiry") was left completely untouched. Those values are submitted verbatim to `/api/contact` (`conversation: z.string()`) and land in Mohammad's internal English notification email, so they stay stable English identifiers on `/fr` too. Displayed label/summary come from `Contact.conversations.options[i]` instead, resolved by array index (`t(\`conversations.options.${i}.label\`)`), including in the "selected conversation" recap inside the form (`options.findIndex((o) => o.name === conversation)`).
+- Caught and fixed a self-introduced bug before it shipped: the `contactMethod` `<select>` had `defaultValue="Email"` but no explicit `value` attrs on its `<option>`s, so once the option text became French ("Courriel"/"Appel vidéo") the browser's implicit value-from-text-content would silently stop matching `"Email"` on `/fr`. Fixed by adding explicit `value="Email"`/`value="Video call"` to the options (translated text stays as children only) — submitted field and default selection now stay stable across locales.
+- Added a working language-switcher `Link` to Contact's header, replacing a dead `<button className="language">EN / FR</button>` that had no href and did nothing — same fix Phase 2e made on OR ONE.
+- **FAQ**: all 36 Q&A pairs across the 7 topic groups (Getting started, Purchasing, Payment & contracts, How the service works, What you receive, Technical support, Company & trust) translated, plus hero/search UI/no-results state.
+- **Found and fixed a real functional bug, not just a display gap:** the `groups` array (all 36 Q&As) used to be a hardcoded English module-level constant, and the search box filters over `(q + " " + a).toLowerCase().includes(query)` — so on `/fr/faq`, a French visitor typing a French search term was filtering against English source text and getting zero matches. Fixed architecturally by sourcing `groups` from `t.raw("groups")` inside the component instead (re-fetched per locale), which fixes the search-locale bug as a side effect of doing the translation correctly rather than as a separate patch.
+- **Deliberately did NOT use the FR translation doc's answer text verbatim.** `ORAGROL_Contact_FAQ_FR_Translation.md` states its own answers were sourced from `ORAGROL_Website_FAQ_Draft.md` — a draft with materially different, more detailed wording than what's actually live in `faq-client.tsx`'s `groups` array (e.g. the cancellation-fee and GST/HST answers are more detailed in the draft than the live English text). Per CLAUDE.md's Honesty Rule (client-facing copy carries real liability/accuracy risk for an MSSP, and the two language versions of the same answer must say the same thing), all 36 answers were custom-translated against the exact live EN text pulled from the component, using the doc's FR only as a terminology/style reference — not pasted in. Flagging this explicitly so a future session doesn't "helpfully" swap in the doc's richer wording thinking something was missed.
+- Added a working language-switcher `Link` to FAQ's header — this page previously had none at all (unlike every other converted page), so this is a new capability, not a fix to a broken one.
+- `SharedCta.contact` and `SharedCta.faq` placeholder English keys got real French translations. `SharedCta` placeholders remaining after this: resources, company (2, down from the original 6).
+- Verified, not assumed: `npx tsc --noEmit` clean, `npm run lint` 0 errors (same 7 pre-existing warnings). Live dev-server check of all 4 routes (200s). Grep-verified translated vs. untranslated content split correctly by locale on both pages. No `MISSING_MESSAGE`/`IntlError` markers in any rendered output. Playwright screenshots confirmed clean visual rendering on both locales for both pages, including the two new working language switchers not breaking existing header layout (`.faq-nav`'s `justify-content: space-between` with a new 4th child; `.language` class reuse on Contact).
+
+**Files changed:**
+- Content: `messages/en.json`, `messages/fr.json` (new `Contact` and `Faq` namespaces; `SharedCta.contact`/`SharedCta.faq` real translations)
+- `app/[locale]/contact/page.tsx` (static → `generateMetadata`), `contact-client.tsx`
+- `app/[locale]/faq/page.tsx` (static → `generateMetadata`), `faq-client.tsx`
+- `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- FAQ's client-side search was locale-blind (see above) — a real bug, not cosmetic, fixed as part of this phase's normal architecture rather than as a separate patch.
+- Translation-doc/live-code divergence on FAQ answer wording (see above) — handled per the Honesty Rule by translating the live text, not by silently "upgrading" the English side to match the doc.
+
+**Problems solved:**
+- Contact and FAQ are now fully bilingual — Contact's backend-facing `conversation` field kept safely English while its display translates; FAQ's search now actually works in French.
+
+**Still open / needs verification:**
+- Not yet delivered to Mohammad as a patch — immediate next step.
+- Task #21 remaining: Company (translation doc `ORAGROL_Company_FR_Translation.md` exists in project docs, not yet opened/verified), Cyber Health quiz, Resources (flagged in its own doc as likely needing its own multi-file delivery, largest remaining item), Careers/Talent/Partnerships, How We Work, chat widget.
+- Services' own Details-accordion content (`app/lib/services-details-content.tsx`, ~370 lines) still untranslated — unblocked via the `labels` prop already added to `DetailsDialog.tsx` in an earlier phase, but not yet done.
+- `SharedCta` placeholders remaining: resources, company.
+- Legal pages (Privacy/Terms/Accessibility) stay English-only per Mohammad's earlier explicit decision.
+- PR #13 should stay unmerged into `main` until the whole site is bilingual (Mohammad agreed to this earlier).
+
+---
+
 ### 2026-09-22 (later same day) — Bilingual EN/FR build, Phase 2e: OR ONE page fully wired, incl. the 77-item builder and all 4 tier Details dialogs; `ScopeTray` (shared, site-wide) translated too — retroactively fixes Services/Business Automation/Contact
 
 **Completed:**

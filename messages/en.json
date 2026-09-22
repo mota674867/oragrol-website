@@ -1727,5 +1727,331 @@
       "downloadCopy": "Download a copy of your scope PDF"
     },
     "continueBrowsing": "Continue browsing"
+  },
+  "Contact": {
+    "nav": {
+      "startEnquiry": "Start enquiry",
+      "search": "Search",
+      "changeLanguage": "Change language"
+    },
+    "hero": {
+      "eyebrow": "Contact / ORAGROL Global",
+      "title1": "Start with a",
+      "titleEmphasis": "clear conversation.",
+      "body": "Whether you are exploring ORAGROL Global for a specific priority or a more coordinated transformation, begin with a conversation shaped around how your business operates.",
+      "chooseConversation": "Choose your conversation"
+    },
+    "conversations": {
+      "eyebrow": "01 / Begin here",
+      "title1": "Choose your",
+      "titleEmphasis": "conversation.",
+      "sub": "Select the direction closest to your current priority. You can add context before submitting.",
+      "selectedLabel": "Selected",
+      "selectLabel": "Select",
+      "options": [
+        {
+          "label": "Cybersecurity Services",
+          "summary": "Assess risk, strengthen protection or address a specific security priority."
+        },
+        {
+          "label": "Business Automation",
+          "summary": "Improve a defined business process through secure, practical automation."
+        },
+        {
+          "label": "OR ONE",
+          "summary": "Coordinate cybersecurity, automation and operational intelligence within one secure system."
+        },
+        {
+          "label": "Partnership or General Enquiry",
+          "summary": "Discuss partnerships, company information or another request."
+        }
+      ]
+    },
+    "enquiry": {
+      "eyebrow": "02 / Your enquiry",
+      "title": "Tell us what you are working on.",
+      "sub": "Share the outcome you need. We will review the context before recommending a next step.",
+      "scopeAttachedLabel": "MY SCOPE ATTACHED",
+      "selectionWord": "selection",
+      "moreSuffix": " · +{count} more"
+    },
+    "form": {
+      "conversationLabel": "Conversation",
+      "changeButton": "Change",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "businessEmail": "Business email",
+      "emailPlaceholder": "name@company.ca",
+      "company": "Company",
+      "jobTitle": "Job title",
+      "companySize": "Company size",
+      "selectPlaceholder": "Select",
+      "size1to10": "1–10 employees",
+      "size11to50": "11–50 employees",
+      "size51to200": "51–200 employees",
+      "size201plus": "201+ employees",
+      "achieveLabel": "What would you like to achieve?",
+      "achievePlaceholder": "Describe the priority, outcome or challenge in your own words.",
+      "contactMethodLabel": "Preferred contact method",
+      "methodEmail": "Email",
+      "methodVideo": "Video call",
+      "preferredTimeLabel": "Preferred time to connect",
+      "preferredTimePlaceholder": "Morning, afternoon or a specific date",
+      "consentLabel": "I agree that ORAGROL Global may contact me about this enquiry.",
+      "submitButton": "Submit Enquiry",
+      "sendingLabel": "Sending…",
+      "errorHeading": "Something went wrong.",
+      "genericSubmitError": "Could not send your message. Please try again.",
+      "networkError": "Could not send your message. Check your connection and try again.",
+      "downloadScopePdf": "Download My Scope as PDF",
+      "downloadScopeAlert": "Open My Scope on Services, Business Automation or OR ONE to download the current branded PDF.",
+      "successHeading": "Thank you.",
+      "successBody": "Your enquiry has been sent to the ORAGROL Global team for review. We aim to respond within two business days.",
+      "privacyNote": "Your information will be used only to review and respond to your request."
+    },
+    "next": {
+      "eyebrow": "03 / What happens next",
+      "title1": "A considered response.",
+      "titleEmphasis": "Not an automated sales pitch.",
+      "steps": [
+        {
+          "number": "01",
+          "title": "Review",
+          "copy": "We review your enquiry, selected scope and stated priorities."
+        },
+        {
+          "number": "02",
+          "title": "Confirm",
+          "copy": "You receive confirmation that your request has been received."
+        },
+        {
+          "number": "03",
+          "title": "Connect",
+          "copy": "We arrange the right conversation for your requirements."
+        },
+        {
+          "number": "04",
+          "title": "Scope",
+          "copy": "We define the recommended path before any commitment."
+        }
+      ],
+      "footer": "We aim to acknowledge qualified enquiries within two business days."
+    },
+    "locations": {
+      "eyebrow": "04 / ORAGROL Global",
+      "title1": "Canadian foundation.",
+      "title2": "Clear points of contact.",
+      "hq": {
+        "label": "Registered Headquarters",
+        "city": "Thunder Bay",
+        "region": "Ontario · Canada"
+      },
+      "toronto": {
+        "label": "Toronto Presence",
+        "city": "Toronto",
+        "body": "Client relationships and business development",
+        "region": "Ontario · Canada"
+      },
+      "digital": {
+        "label": "Digital enquiries",
+        "domain": "orgro.ca",
+        "body": "Our approved @orgro.ca contact email will be published when activated."
+      }
+    }
+  },
+  "Faq": {
+    "nav": {
+      "contactLink": "Contact"
+    },
+    "hero": {
+      "eyebrow": "ORAGROL / QUESTIONS",
+      "title1": "Clear answers.",
+      "titleEmphasis": "Before you begin.",
+      "sub": "Services, purchasing, support and how we work—explained without unnecessary technical language.",
+      "searchPlaceholder": "Search questions",
+      "searchAriaLabel": "Search frequently asked questions"
+    },
+    "noResults": "No matching questions. Try a shorter search.",
+    "groups": [
+      {
+        "title": "Getting started",
+        "items": [
+          {
+            "q": "How do I choose which services I need?",
+            "a": "Pick what you already know you need, or use Not sure — help me choose. Our team will help you find the right starting point without guessing."
+          },
+          {
+            "q": "Do I need to talk to someone before I sign up?",
+            "a": "No. You can use email, ORAGROL chat, the website form or meet in person. A conversation is only needed when you want one or the service requires custom scoping."
+          },
+          {
+            "q": "What if I want to talk to someone before deciding?",
+            "a": "ORAGROL chat is available 24/7. A real person is available Monday to Friday, 9am to 6pm ET, subject to availability."
+          }
+        ]
+      },
+      {
+        "title": "How you purchase",
+        "items": [
+          {
+            "q": "What happens after I reach out?",
+            "a": "We confirm what you need and prepare a proposal covering the appropriate scope."
+          },
+          {
+            "q": "How do you prepare a proposal?",
+            "a": "We use the products or services you selected to define scope, pricing and terms for your review."
+          },
+          {
+            "q": "What is in the contract?",
+            "a": "The exact products or services ordered, conditions, amount, payment method and both sides’ responsibilities."
+          },
+          {
+            "q": "How do I sign and confirm?",
+            "a": "You review, sign and return the contract. We finalize it before the order is confirmed."
+          },
+          {
+            "q": "When and how do I pay?",
+            "a": "Payment follows the signed contract, never before. It is due according to the terms stated there."
+          },
+          {
+            "q": "Do I get an invoice?",
+            "a": "Yes. Once the signed contract and payment are received, we issue a complete invoice for the order."
+          }
+        ]
+      },
+      {
+        "title": "Payment, contracts and cancellation",
+        "items": [
+          {
+            "q": "What payment methods do you accept?",
+            "a": "Card or bank transfer, as stated in your contract."
+          },
+          {
+            "q": "Is GST or HST shown separately?",
+            "a": "Yes. Applicable tax is shown as a separate line on your invoice."
+          },
+          {
+            "q": "What happens if a payment is late?",
+            "a": "Invoices are due within 30 days. Unpaid balances accrue interest at 1.5% per month, and service may be paused when payment is more than 15 days overdue."
+          },
+          {
+            "q": "Can I cancel or change services later?",
+            "a": "Yes. With 60 days’ written notice and no outstanding balance, there is no cancellation fee. Other cancellation costs and OR ONE term conditions are defined in the contract."
+          },
+          {
+            "q": "What happens to my data if I cancel?",
+            "a": "Under our standard agreement, data is returned or securely destroyed within 30 days, with written certification available on request."
+          },
+          {
+            "q": "What guarantees do you offer?",
+            "a": "Action-taking services state target response times. They remain targets, not guarantees, until proven in live operation."
+          },
+          {
+            "q": "What are my responsibilities and yours?",
+            "a": "Both sides’ responsibilities are written explicitly into the contract before signing."
+          }
+        ]
+      },
+      {
+        "title": "How the service works",
+        "items": [
+          {
+            "q": "Is this just a security report?",
+            "a": "No. Most services are designed to take action, while selected services provide ongoing expert oversight and advice."
+          },
+          {
+            "q": "Who does the work?",
+            "a": "Detection and analysis can run automatically around the clock. Nothing reaches you and no action is taken without human review."
+          },
+          {
+            "q": "How fast do you respond to a real problem?",
+            "a": "Each action-taking service has a stated target response time. The applicable target appears with the service."
+          },
+          {
+            "q": "What access do you need?",
+            "a": "Primarily read access and, for action-taking services, limited write access to approved business systems. Access can start narrow and expand when appropriate."
+          },
+          {
+            "q": "Is this one-time or ongoing?",
+            "a": "Most services provide ongoing protection rather than a one-time checkup."
+          }
+        ]
+      },
+      {
+        "title": "What you receive",
+        "items": [
+          {
+            "q": "What do I receive?",
+            "a": "Clear visibility into findings, fixes and open items, plus urgent alerts. Delivery begins through written summaries and email, with a fuller online dashboard planned."
+          },
+          {
+            "q": "Do I need a technical background?",
+            "a": "No. Information is written for business owners and decision-makers."
+          },
+          {
+            "q": "Will dangerous findings be flagged immediately?",
+            "a": "Yes. Urgent findings are not held for a scheduled update."
+          }
+        ]
+      },
+      {
+        "title": "Technical support",
+        "items": [
+          {
+            "q": "What if something is not working?",
+            "a": "Reach us through ORAGROL chat or email and our team will review it."
+          },
+          {
+            "q": "How fast do you respond to support?",
+            "a": "Urgent issues for active clients follow the target stated in their service. General questions are handled the same or next business day."
+          },
+          {
+            "q": "Do you offer support outside business hours?",
+            "a": "ORAGROL chat is available 24/7. Human support is Monday to Friday, 9am to 6pm ET, subject to availability."
+          },
+          {
+            "q": "Can chat help with an active incident if I am not a client?",
+            "a": "Chat can route your message, but it is not emergency incident response and does not create a service relationship. It does not provide remediation instructions."
+          }
+        ]
+      },
+      {
+        "title": "Company and trust",
+        "items": [
+          {
+            "q": "How do I reach ORAGROL?",
+            "a": "Use ORAGROL chat or the contact form. Department mailboxes will be published once the permanent domain is active."
+          },
+          {
+            "q": "Where are you located?",
+            "a": "Headquarters and Registered Office: Thunder Bay, Ontario. Toronto Presence: Toronto, Ontario."
+          },
+          {
+            "q": "Can I talk to a real person?",
+            "a": "Yes, Monday to Friday, 9am to 6pm ET, subject to availability."
+          },
+          {
+            "q": "Is my data safe?",
+            "a": "We handle data in line with Canadian privacy law and require appropriate insurance before taking on client-system access."
+          },
+          {
+            "q": "How much does it cost?",
+            "a": "Starting prices appear on each service page. Your exact cost depends on the selected Cybersecurity, Business Automation or OR ONE scope."
+          },
+          {
+            "q": "What if we outgrow our plan?",
+            "a": "Cybersecurity tiers and Business Automation packages can be upgraded, while OR ONE scales into custom requirements."
+          },
+          {
+            "q": "Do you replace our IT provider?",
+            "a": "Usually no. We work alongside existing IT providers or internal teams, focusing on the security and automation layer."
+          },
+          {
+            "q": "Which industries do you serve?",
+            "a": "We support Canadian small and medium-sized businesses across the industry profiles shown on our Industries page."
+          }
+        ]
+      }
+    ]
   }
 }

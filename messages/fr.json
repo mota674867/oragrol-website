@@ -392,14 +392,14 @@
       "secondaryLabel": "Start a Conversation"
     },
     "contact": {
-      "eyebrow": "One clear starting point",
-      "headline": "Start with clarity. We will help you identify the most valuable next step.",
-      "secondaryLabel": "Submit an Enquiry"
+      "eyebrow": "Un point de départ clair",
+      "headline": "Commencez avec clarté. Nous vous aiderons à cerner la prochaine étape la plus utile.",
+      "secondaryLabel": "Soumettre une demande"
     },
     "faq": {
-      "eyebrow": "Still have a question?",
-      "headline": "Still looking for clarity? Let us help you find the right answer.",
-      "secondaryLabel": "Contact ORAGROL"
+      "eyebrow": "Vous avez encore une question?",
+      "headline": "Vous cherchez encore des réponses claires? Laissez-nous vous aider à trouver la bonne réponse.",
+      "secondaryLabel": "Contacter ORAGROL"
     },
     "getCyberHealthScore": "Obtenez votre Cyber Health Score"
   },
@@ -1727,5 +1727,331 @@
       "downloadCopy": "Télécharger une copie du PDF de votre portée"
     },
     "continueBrowsing": "Continuer la navigation"
+  },
+  "Contact": {
+    "nav": {
+      "startEnquiry": "Commencer une demande",
+      "search": "Recherche",
+      "changeLanguage": "Changer de langue"
+    },
+    "hero": {
+      "eyebrow": "Contact / ORAGROL Global",
+      "title1": "Commencez par une",
+      "titleEmphasis": "conversation claire.",
+      "body": "Que vous exploriez ORAGROL Global pour une priorité précise ou pour une transformation plus coordonnée, commencez par une conversation adaptée au fonctionnement de votre entreprise.",
+      "chooseConversation": "Choisissez votre conversation"
+    },
+    "conversations": {
+      "eyebrow": "01 / Commencez ici",
+      "title1": "Choisissez votre",
+      "titleEmphasis": "conversation.",
+      "sub": "Sélectionnez l'orientation la plus proche de votre priorité actuelle. Vous pouvez ajouter du contexte avant de soumettre votre demande.",
+      "selectedLabel": "Sélectionné",
+      "selectLabel": "Sélectionner",
+      "options": [
+        {
+          "label": "Services de cybersécurité",
+          "summary": "Évaluez les risques, renforcez la protection ou répondez à une priorité de sécurité précise."
+        },
+        {
+          "label": "Business Automation",
+          "summary": "Améliorez un processus d'affaires défini grâce à une automatisation sécurisée et pratique."
+        },
+        {
+          "label": "OR ONE",
+          "summary": "Coordonnez la cybersécurité, l'automatisation et l'intelligence opérationnelle au sein d'un seul système sécurisé."
+        },
+        {
+          "label": "Partenariat ou demande générale",
+          "summary": "Discutez de partenariats, d'information sur l'entreprise ou d'une autre demande."
+        }
+      ]
+    },
+    "enquiry": {
+      "eyebrow": "02 / Votre demande",
+      "title": "Dites-nous sur quoi vous travaillez.",
+      "sub": "Partagez le résultat que vous recherchez. Nous examinerons le contexte avant de recommander une prochaine étape.",
+      "scopeAttachedLabel": "MA PORTÉE JOINTE",
+      "selectionWord": "sélection",
+      "moreSuffix": " · +{count} de plus"
+    },
+    "form": {
+      "conversationLabel": "Conversation",
+      "changeButton": "Modifier",
+      "firstName": "Prénom",
+      "lastName": "Nom de famille",
+      "businessEmail": "Courriel professionnel",
+      "emailPlaceholder": "nom@entreprise.ca",
+      "company": "Entreprise",
+      "jobTitle": "Titre du poste",
+      "companySize": "Taille de l'entreprise",
+      "selectPlaceholder": "Sélectionner",
+      "size1to10": "1 à 10 employés",
+      "size11to50": "11 à 50 employés",
+      "size51to200": "51 à 200 employés",
+      "size201plus": "201 employés et plus",
+      "achieveLabel": "Que souhaitez-vous accomplir?",
+      "achievePlaceholder": "Décrivez la priorité, le résultat ou le défi dans vos propres mots.",
+      "contactMethodLabel": "Méthode de contact préférée",
+      "methodEmail": "Courriel",
+      "methodVideo": "Appel vidéo",
+      "preferredTimeLabel": "Moment préféré pour vous joindre",
+      "preferredTimePlaceholder": "Matin, après-midi ou une date précise",
+      "consentLabel": "J'accepte qu'ORAGROL Global communique avec moi au sujet de cette demande.",
+      "submitButton": "Soumettre la demande",
+      "sendingLabel": "Envoi en cours…",
+      "errorHeading": "Un problème est survenu.",
+      "genericSubmitError": "Impossible d'envoyer votre message. Veuillez réessayer.",
+      "networkError": "Impossible d'envoyer votre message. Vérifiez votre connexion et réessayez.",
+      "downloadScopePdf": "Télécharger ma portée en PDF",
+      "downloadScopeAlert": "Ouvrez Ma portée sur Services, Business Automation ou OR ONE pour télécharger le PDF de marque actuel.",
+      "successHeading": "Merci.",
+      "successBody": "Votre demande a été envoyée à l'équipe d'ORAGROL Global pour examen. Nous visons à répondre dans un délai de deux jours ouvrables.",
+      "privacyNote": "Vos renseignements ne seront utilisés que pour examiner et répondre à votre demande."
+    },
+    "next": {
+      "eyebrow": "03 / Les prochaines étapes",
+      "title1": "Une réponse réfléchie.",
+      "titleEmphasis": "Pas un argumentaire de vente automatisé.",
+      "steps": [
+        {
+          "number": "01",
+          "title": "Examen",
+          "copy": "Nous examinons votre demande, la portée sélectionnée et les priorités énoncées."
+        },
+        {
+          "number": "02",
+          "title": "Confirmation",
+          "copy": "Vous recevez une confirmation que votre demande a été reçue."
+        },
+        {
+          "number": "03",
+          "title": "Mise en contact",
+          "copy": "Nous organisons la bonne conversation en fonction de vos besoins."
+        },
+        {
+          "number": "04",
+          "title": "Portée",
+          "copy": "Nous définissons la voie recommandée avant tout engagement."
+        }
+      ],
+      "footer": "Nous visons à accuser réception des demandes admissibles dans un délai de deux jours ouvrables."
+    },
+    "locations": {
+      "eyebrow": "04 / ORAGROL Global",
+      "title1": "Une fondation canadienne.",
+      "title2": "Des points de contact clairs.",
+      "hq": {
+        "label": "Siège social enregistré",
+        "city": "Thunder Bay",
+        "region": "Ontario · Canada"
+      },
+      "toronto": {
+        "label": "Présence à Toronto",
+        "city": "Toronto",
+        "body": "Relations avec la clientèle et développement des affaires",
+        "region": "Ontario · Canada"
+      },
+      "digital": {
+        "label": "Demandes numériques",
+        "domain": "orgro.ca",
+        "body": "Notre adresse courriel de contact approuvée @orgro.ca sera publiée dès son activation."
+      }
+    }
+  },
+  "Faq": {
+    "nav": {
+      "contactLink": "Contact"
+    },
+    "hero": {
+      "eyebrow": "ORAGROL / QUESTIONS",
+      "title1": "Des réponses claires.",
+      "titleEmphasis": "Avant de commencer.",
+      "sub": "Services, achat, soutien et notre façon de travailler — expliqués sans jargon technique inutile.",
+      "searchPlaceholder": "Rechercher des questions",
+      "searchAriaLabel": "Rechercher dans les questions fréquentes"
+    },
+    "noResults": "Aucune question correspondante. Essayez une recherche plus courte.",
+    "groups": [
+      {
+        "title": "Pour commencer",
+        "items": [
+          {
+            "q": "Comment choisir les services dont j'ai besoin?",
+            "a": "Choisissez ce que vous savez déjà nécessaire, ou utilisez l'option « Pas certain — aidez-moi à choisir ». Notre équipe vous aidera à trouver le bon point de départ sans avoir à deviner."
+          },
+          {
+            "q": "Dois-je parler à quelqu'un avant de m'inscrire?",
+            "a": "Non. Vous pouvez utiliser le courriel, le clavardage ORAGROL, le formulaire du site Web ou une rencontre en personne. Une conversation n'est nécessaire que si vous le souhaitez ou si le service exige une définition de portée personnalisée."
+          },
+          {
+            "q": "Et si je veux parler à quelqu'un avant de décider?",
+            "a": "Le clavardage ORAGROL est disponible 24 heures sur 24, 7 jours sur 7. Une personne réelle est disponible du lundi au vendredi, de 9 h à 18 h HE, selon la disponibilité."
+          }
+        ]
+      },
+      {
+        "title": "Comment vous achetez",
+        "items": [
+          {
+            "q": "Que se passe-t-il après que je vous contacte?",
+            "a": "Nous confirmons ce dont vous avez besoin et préparons une proposition couvrant la portée appropriée."
+          },
+          {
+            "q": "Comment préparez-vous une proposition?",
+            "a": "Nous utilisons les produits ou services que vous avez sélectionnés pour définir la portée, les prix et les modalités, aux fins de votre examen."
+          },
+          {
+            "q": "Que contient le contrat?",
+            "a": "Les produits ou services exacts commandés, les conditions, le montant, le mode de paiement et les responsabilités des deux parties."
+          },
+          {
+            "q": "Comment signer et confirmer?",
+            "a": "Vous examinez, signez et retournez le contrat. Nous le finalisons avant que la commande soit confirmée."
+          },
+          {
+            "q": "Quand et comment dois-je payer?",
+            "a": "Le paiement suit la signature du contrat, jamais avant. Il est dû selon les modalités qui y sont énoncées."
+          },
+          {
+            "q": "Vais-je recevoir une facture?",
+            "a": "Oui. Une fois le contrat signé et le paiement reçus, nous émettons une facture complète pour la commande."
+          }
+        ]
+      },
+      {
+        "title": "Paiement, contrats et annulation",
+        "items": [
+          {
+            "q": "Quels modes de paiement acceptez-vous?",
+            "a": "Carte ou virement bancaire, tel qu'indiqué dans votre contrat."
+          },
+          {
+            "q": "La TPS ou la TVH est-elle indiquée séparément?",
+            "a": "Oui. La taxe applicable apparaît comme une ligne distincte sur votre facture."
+          },
+          {
+            "q": "Que se passe-t-il si un paiement est en retard?",
+            "a": "Les factures sont dues dans les 30 jours. Les soldes impayés portent intérêt à 1,5 % par mois, et le service peut être suspendu lorsque le paiement accuse plus de 15 jours de retard."
+          },
+          {
+            "q": "Puis-je annuler ou modifier mes services plus tard?",
+            "a": "Oui. Avec un préavis écrit de 60 jours et aucun solde impayé, aucuns frais d'annulation ne s'appliquent. Les autres coûts d'annulation et les conditions de durée d'OR ONE sont définis dans le contrat."
+          },
+          {
+            "q": "Qu'advient-il de mes données si j'annule?",
+            "a": "Conformément à notre entente standard, les données sont retournées ou détruites de façon sécurisée dans les 30 jours, avec une attestation écrite disponible sur demande."
+          },
+          {
+            "q": "Quelles garanties offrez-vous?",
+            "a": "Les services qui prennent des mesures indiquent des délais de réponse cibles. Ils demeurent des cibles, et non des garanties, jusqu'à ce qu'ils soient éprouvés en exploitation réelle."
+          },
+          {
+            "q": "Quelles sont mes responsabilités et les vôtres?",
+            "a": "Les responsabilités des deux parties sont énoncées explicitement dans le contrat avant la signature."
+          }
+        ]
+      },
+      {
+        "title": "Comment fonctionne le service",
+        "items": [
+          {
+            "q": "S'agit-il simplement d'un rapport de sécurité?",
+            "a": "Non. La plupart des services sont conçus pour passer à l'action, tandis que certains services offrent une supervision et des conseils d'experts en continu."
+          },
+          {
+            "q": "Qui effectue le travail?",
+            "a": "La détection et l'analyse peuvent fonctionner automatiquement en tout temps. Rien ne vous parvient et aucune mesure n'est prise sans révision humaine."
+          },
+          {
+            "q": "À quelle vitesse répondez-vous à un problème réel?",
+            "a": "Chaque service qui prend des mesures a un délai de réponse cible indiqué. La cible applicable est précisée avec le service."
+          },
+          {
+            "q": "De quel accès avez-vous besoin?",
+            "a": "Principalement un accès en lecture et, pour les services qui prennent des mesures, un accès en écriture limité aux systèmes d'affaires approuvés. L'accès peut commencer de façon restreinte et s'élargir lorsque c'est approprié."
+          },
+          {
+            "q": "S'agit-il d'un service ponctuel ou continu?",
+            "a": "La plupart des services offrent une protection continue plutôt qu'une vérification ponctuelle."
+          }
+        ]
+      },
+      {
+        "title": "Ce que vous recevez",
+        "items": [
+          {
+            "q": "Que vais-je recevoir?",
+            "a": "Une visibilité claire sur les constats, les correctifs et les éléments en suspens, ainsi que des alertes urgentes. La livraison commence par des résumés écrits et des courriels, avec un tableau de bord en ligne plus complet à venir."
+          },
+          {
+            "q": "Ai-je besoin de connaissances techniques?",
+            "a": "Non. L'information est rédigée pour les propriétaires d'entreprise et les décideurs."
+          },
+          {
+            "q": "Les constats dangereux seront-ils signalés immédiatement?",
+            "a": "Oui. Les constats urgents ne sont pas retenus pour une mise à jour planifiée."
+          }
+        ]
+      },
+      {
+        "title": "Soutien technique",
+        "items": [
+          {
+            "q": "Que faire si quelque chose ne fonctionne pas?",
+            "a": "Contactez-nous par le clavardage ORAGROL ou par courriel, et notre équipe l'examinera."
+          },
+          {
+            "q": "À quelle vitesse répondez-vous aux demandes de soutien?",
+            "a": "Les problèmes urgents pour les clients actifs suivent la cible indiquée dans leur service. Les questions générales sont traitées le jour même ou le jour ouvrable suivant."
+          },
+          {
+            "q": "Offrez-vous du soutien en dehors des heures d'ouverture?",
+            "a": "Le clavardage ORAGROL est disponible 24 heures sur 24, 7 jours sur 7. Le soutien humain est offert du lundi au vendredi, de 9 h à 18 h HE, selon la disponibilité."
+          },
+          {
+            "q": "Le clavardage peut-il m'aider en cas d'incident actif si je ne suis pas client?",
+            "a": "Le clavardage peut acheminer votre message, mais il ne s'agit pas d'une intervention d'urgence en cas d'incident et cela ne crée pas de relation de service. Il ne fournit pas d'instructions de remédiation."
+          }
+        ]
+      },
+      {
+        "title": "Entreprise et confiance",
+        "items": [
+          {
+            "q": "Comment puis-je joindre ORAGROL?",
+            "a": "Utilisez le clavardage ORAGROL ou le formulaire de contact. Les boîtes de courriel des services seront publiées une fois le domaine permanent activé."
+          },
+          {
+            "q": "Où êtes-vous situés?",
+            "a": "Siège social et bureau enregistré : Thunder Bay, Ontario. Présence à Toronto : Toronto, Ontario."
+          },
+          {
+            "q": "Puis-je parler à une personne réelle?",
+            "a": "Oui, du lundi au vendredi, de 9 h à 18 h HE, selon la disponibilité."
+          },
+          {
+            "q": "Mes données sont-elles en sécurité?",
+            "a": "Nous traitons les données conformément à la loi canadienne sur la protection de la vie privée et exigeons une assurance appropriée avant d'obtenir un accès aux systèmes des clients."
+          },
+          {
+            "q": "Combien cela coûte-t-il?",
+            "a": "Les prix de départ apparaissent sur chaque page de service. Votre coût exact dépend de la portée sélectionnée en cybersécurité, en Business Automation ou en OR ONE."
+          },
+          {
+            "q": "Que se passe-t-il si nous dépassons notre forfait?",
+            "a": "Les paliers de cybersécurité et les forfaits Business Automation peuvent être mis à niveau, tandis qu'OR ONE évolue selon des besoins personnalisés."
+          },
+          {
+            "q": "Remplacez-vous notre fournisseur de services TI?",
+            "a": "Habituellement non. Nous travaillons aux côtés des fournisseurs de services TI existants ou des équipes internes, en nous concentrant sur la couche de sécurité et d'automatisation."
+          },
+          {
+            "q": "Quels secteurs desservez-vous?",
+            "a": "Nous accompagnons les petites et moyennes entreprises canadiennes dans les profils sectoriels présentés sur notre page Secteurs d'activité."
+          }
+        ]
+      }
+    ]
   }
 }
