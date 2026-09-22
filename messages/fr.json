@@ -2145,5 +2145,300 @@
       "torontoCity": "Toronto, Ontario",
       "body": "Le Canada est la fondation. L'Amérique du Nord est la direction. La norme demeure une réflexion pratique, une technologie responsable et des systèmes conçus autour des entreprises qu'ils servent."
     }
+  },
+  "CyberHealth": {
+    "header": {
+      "wordmark": "ORAGROL",
+      "wordmarkSmall": "GLOBAL",
+      "introLabel": "CYBER HEALTH / ÉVALUATION CONFIDENTIELLE",
+      "profileLabel": "01 / PROFIL DE L'ENTREPRISE",
+      "qualifyLabel": "02 / CONTEXTE DE L'ENTREPRISE",
+      "resultLabel": "VOTRE RÉSULTAT"
+    },
+    "intro": {
+      "meta": "5 À 7 MINUTES · 42 QUESTIONS DE SÉCURITÉ",
+      "title1": "Sachez où vous en êtes.",
+      "titleEmphasis": "Sachez quoi faire ensuite.",
+      "body": "Établissez une base concrète couvrant l'identité, le courriel, les appareils, l'infonuagique, le personnel, les données et la gouvernance.",
+      "cta": "Commencer l'évaluation ↗"
+    },
+    "profile": {
+      "eyebrow": "ÉVALUATION CONFIDENTIELLE",
+      "title": "Parlez-nous de votre entreprise.",
+      "sub": "Ces renseignements personnalisent votre rapport. Ils n'ont aucune incidence sur votre Cyber Health Score.",
+      "fields": {
+        "company": "Nom de l'entreprise",
+        "industry": "Secteur d'activité",
+        "province": "Province",
+        "employees": "Nombre d'employés",
+        "platform": "Plateforme infonuagique",
+        "name": "Nom du contact",
+        "email": "Courriel professionnel",
+        "phone": "Téléphone"
+      },
+      "selectPlaceholder": "Sélectionner",
+      "industries": [
+        "Commerce de détail",
+        "Services professionnels",
+        "Santé",
+        "Construction",
+        "Fabrication",
+        "Hôtellerie et restauration",
+        "Organisme à but non lucratif",
+        "Autre"
+      ],
+      "provinces": [
+        "Alberta",
+        "Colombie-Britannique",
+        "Manitoba",
+        "Nouveau-Brunswick",
+        "Terre-Neuve-et-Labrador",
+        "Territoires du Nord-Ouest",
+        "Nouvelle-Écosse",
+        "Nunavut",
+        "Ontario",
+        "Île-du-Prince-Édouard",
+        "Québec",
+        "Saskatchewan",
+        "Yukon",
+        "Autre"
+      ],
+      "employeeRanges": [
+        "1 à 10",
+        "11 à 25",
+        "26 à 50",
+        "51 à 100",
+        "101 à 200"
+      ],
+      "platformOptions": [
+        "Microsoft 365",
+        "Google Workspace",
+        "Aucune des deux",
+        "Incertain"
+      ],
+      "back": "← Retour",
+      "continue": "Continuer →",
+      "disclaimer": "Vos réponses servent à créer votre rapport et à assurer le suivi. Nous ne vendons pas vos données."
+    },
+    "qualify": {
+      "eyebrow": "QUESTIONS RAPIDES",
+      "title": "Un peu de contexte.",
+      "sub": "Vos réponses nous aident à rendre la prochaine conversation pertinente. Elles n'ont aucune incidence sur votre pointage.",
+      "questions": [
+        {
+          "label": "Représentez-vous une entreprise?",
+          "choices": [
+            "Oui",
+            "Non",
+            "Incertain"
+          ]
+        },
+        {
+          "label": "Êtes-vous responsable des décisions en TI ou en cybersécurité au sein de votre entreprise?",
+          "choices": [
+            "Oui",
+            "Non",
+            "Incertain"
+          ]
+        },
+        {
+          "label": "Quel est votre budget approximatif pour améliorer la cybersécurité au cours des 12 prochains mois?",
+          "choices": [
+            "Moins de 2 000 $",
+            "2 000 $ à 10 000 $",
+            "10 000 $ et plus",
+            "Pas encore certain"
+          ]
+        },
+        {
+          "label": "Quand comptez-vous apporter des améliorations en matière de sécurité?",
+          "choices": [
+            "Immédiatement",
+            "Dans les 3 mois",
+            "Dans les 6 mois",
+            "Simple recherche pour l'instant"
+          ]
+        }
+      ],
+      "back": "← Retour",
+      "startQuestions": "Commencer les questions →"
+    },
+    "assessment": {
+      "sectionIntro": "Sélectionnez ce qui reflète le mieux la situation actuelle de l'entreprise.",
+      "sections": [
+        "Identité et accès",
+        "Courriel et appareils",
+        "Réseau et infonuagique",
+        "Personnel et accès",
+        "Gouvernance et conclusion"
+      ],
+      "answerOptions": [
+        "Oui",
+        "Non",
+        "Incertain"
+      ],
+      "questions": [
+        {
+          "text": "Chaque personne dans l'entreprise utilise-t-elle un mot de passe différent pour chaque compte professionnel, plutôt que de réutiliser le même partout?"
+        },
+        {
+          "text": "Les mots de passe par défaut sont-ils changés immédiatement lors de la configuration de nouveaux appareils ou logiciels?"
+        },
+        {
+          "text": "Les employés se connectent-ils avec un mot de passe en plus d'un code provenant de leur téléphone ou d'une application d'authentification pour le courriel et les autres comptes importants?"
+        },
+        {
+          "text": "L'authentification multifacteur (MFA) est-elle exigée pour quiconque peut accéder aux systèmes ou aux données de l'entreprise depuis l'extérieur du bureau?"
+        },
+        {
+          "text": "Votre système de courriel filtre-t-il les pourriels et les messages suspects avant qu'ils n'atteignent les boîtes de réception des employés?"
+        },
+        {
+          "text": "Les employés ont-ils reçu une formation sur la détection des courriels d'hameçonnage au cours des 12 derniers mois?"
+        },
+        {
+          "text": "Existe-t-il un moyen simple pour les employés de signaler un courriel suspect afin qu'il soit vérifié?"
+        },
+        {
+          "text": "Tous les ordinateurs de l'entreprise sont-ils munis d'un logiciel antivirus ou antimaliciel installé et actif?"
+        },
+        {
+          "text": "Les ordinateurs portables et de bureau de l'entreprise sont-ils configurés pour se verrouiller automatiquement après une courte période d'inactivité?"
+        },
+        {
+          "text": "Les mises à jour des logiciels et du système d'exploitation sont-elles installées automatiquement, ou dans les quelques jours suivant leur publication?"
+        },
+        {
+          "text": "Votre entreprise a-t-elle confirmé que tous les logiciels et le matériel actuellement utilisés reçoivent encore des mises à jour de sécurité?"
+        },
+        {
+          "text": "Les données de votre entreprise sont-elles sauvegardées automatiquement selon un calendrier régulier (quotidiennement ou plus souvent)?"
+        },
+        {
+          "text": "Une restauration de sauvegarde a-t-elle réellement été testée au cours des 12 derniers mois, et pas seulement la sauvegarde elle-même?"
+        },
+        {
+          "text": "Si un rançongiciel verrouillait tous vos fichiers demain, êtes-vous confiant que l'entreprise pourrait s'en remettre sans payer?"
+        },
+        {
+          "text": "Le réseau Wi-Fi de votre bureau est-il protégé par mot de passe et séparé de tout réseau invité?"
+        },
+        {
+          "text": "Votre entreprise utilise-t-elle un pare-feu pour aider à protéger son réseau contre les menaces externes?"
+        },
+        {
+          "text": "Les fonctions de sécurité comme la validation en deux étapes et les alertes de connexion suspecte sont-elles activées dans les paramètres d'administration de votre Google Workspace?"
+        },
+        {
+          "text": "Quelqu'un vérifie-t-il périodiquement les personnes ayant accès aux fichiers et dossiers partagés sur Google Drive?"
+        },
+        {
+          "text": "Les fonctions de sécurité comme la connexion multifacteur et les alertes de connexion suspecte sont-elles activées dans le système de courriel ou de fichiers infonuagique que vous utilisez?"
+        },
+        {
+          "text": "Quelqu'un vérifie-t-il périodiquement qui a accès aux fichiers et dossiers partagés dans votre système infonuagique?"
+        },
+        {
+          "text": "Les employés ont-ils reçu une forme quelconque de formation de sensibilisation à la cybersécurité?"
+        },
+        {
+          "text": "Existe-t-il une politique écrite simple que les employés peuvent consulter pour utiliser la technologie de l'entreprise de façon sécuritaire?"
+        },
+        {
+          "text": "Les employés n'ont-ils généralement accès qu'aux fichiers et systèmes dont ils ont réellement besoin pour leur travail?"
+        },
+        {
+          "text": "L'accès aux systèmes d'un employé est-il révoqué rapidement lorsqu'il quitte l'entreprise?"
+        },
+        {
+          "text": "Les téléphones et tablettes appartenant à l'entreprise sont-ils protégés par un code d'accès ou un verrouillage par empreinte digitale ou reconnaissance faciale?"
+        },
+        {
+          "text": "Si un appareil mobile de l'entreprise était perdu ou volé, pourrait-il être verrouillé ou effacé à distance?"
+        },
+        {
+          "text": "Les employés qui travaillent à distance se connectent-ils aux systèmes de l'entreprise par une connexion sécurisée ou VPN?"
+        },
+        {
+          "text": "Les appareils personnels utilisés pour accéder aux données de l'entreprise doivent-ils respecter des normes de sécurité de base, comme un code d'accès et des logiciels à jour?"
+        },
+        {
+          "text": "Les données sensibles de l'entreprise ou des clients sont-elles stockées uniquement dans des systèmes approuvés, plutôt que dans un courriel personnel ou un espace infonuagique personnel?"
+        },
+        {
+          "text": "Les données sensibles sont-elles chiffrées lorsqu'elles sont stockées ou envoyées à d'autres personnes?"
+        },
+        {
+          "text": "Savez-vous quels fournisseurs ou entrepreneurs externes ont actuellement accès à vos systèmes ou à vos données?"
+        },
+        {
+          "text": "Connaissez-vous les pratiques de sécurité que suivent vos fournisseurs clés pour protéger les données partagées?"
+        },
+        {
+          "text": "Votre site Web utilise-t-il le protocole HTTPS (l'icône de cadenas affichée dans la barre d'adresse du navigateur)?"
+        },
+        {
+          "text": "Votre site Web, ainsi que toute zone de connexion client, est-il maintenu à jour et surveillé?"
+        },
+        {
+          "text": "Si vous acceptez les paiements par carte, utilisez-vous un processeur de paiement conforme à la norme PCI-DSS plutôt que de conserver vous-même les données de carte?"
+        },
+        {
+          "text": "L'accès aux services bancaires en ligne et aux systèmes financiers est-il limité à un petit nombre de personnes de confiance?"
+        },
+        {
+          "text": "Votre entreprise a-t-elle un plan sur la marche à suivre en cas de soupçon de cyberattaque ou d'atteinte à la protection des données?"
+        },
+        {
+          "text": "Les employés sauraient-ils exactement qui contacter immédiatement si quelque chose semblait suspect?"
+        },
+        {
+          "text": "L'accès aux serveurs, à l'équipement réseau ou aux documents sensibles est-il restreint au personnel autorisé seulement?"
+        },
+        {
+          "text": "Les écrans d'ordinateur sont-ils verrouillés ou fermés lorsque les employés s'éloignent de leur poste de travail?"
+        },
+        {
+          "text": "Une personne ou un rôle précis a-t-il été désigné responsable des décisions en cybersécurité dans l'entreprise?"
+        },
+        {
+          "text": "Les dépenses ou les investissements en cybersécurité sont-ils révisés au moins une fois par année?"
+        },
+        {
+          "text": "Votre entreprise détient-elle actuellement une police d'assurance responsabilité cybernétique?"
+        },
+        {
+          "text": "Connaissez-vous des exigences réglementaires ou sectorielles précises qui s'appliquent à votre entreprise (par exemple, la LPRPDE ou la norme PCI-DSS)?"
+        }
+      ],
+      "back": "← Retour",
+      "nextSection": "Section suivante →",
+      "calculateScore": "Calculer le pointage →"
+    },
+    "result": {
+      "scoreLabel": "Cyber Health Score",
+      "riskTierLabel": "Niveau de risque",
+      "tierNames": {
+        "Low": "Faible",
+        "Medium": "Moyen",
+        "High": "Élevé",
+        "Critical": "Critique"
+      },
+      "nextStepLabel": "Prochaine étape recommandée",
+      "nextStepValue": "Examen confidentiel de la portée",
+      "businessFallback": "VOTRE ENTREPRISE",
+      "tierHeadlines": {
+        "Low": "Une base solide.",
+        "Medium": "Une base fonctionnelle avec des lacunes claires.",
+        "High": "Des améliorations importantes sont nécessaires.",
+        "Critical": "Commencez par l'essentiel."
+      },
+      "disclaimer": "Une base directionnelle, non une certification ni une garantie. Passez en revue les contrôles incertains ou manquants avant de décider par où commencer.",
+      "reviewAnswers": "Revoir les réponses",
+      "reportSending": "Préparation de votre rapport complet pour {email}…",
+      "reportSent": "Votre rapport complet a été envoyé à {email}.",
+      "reportErrorGeneric": "Impossible d'envoyer votre rapport. Veuillez réessayer.",
+      "reportErrorNetwork": "Impossible d'envoyer votre rapport. Vérifiez votre connexion et réessayez."
+    }
   }
 }

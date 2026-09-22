@@ -2145,5 +2145,300 @@
       "torontoCity": "Toronto, Ontario",
       "body": "Canada is the foundation. North America is the direction. The standard remains practical thinking, responsible technology and systems built around the businesses they serve."
     }
+  },
+  "CyberHealth": {
+    "header": {
+      "wordmark": "ORAGROL",
+      "wordmarkSmall": "GLOBAL",
+      "introLabel": "CYBER HEALTH / PRIVATE ASSESSMENT",
+      "profileLabel": "01 / COMPANY PROFILE",
+      "qualifyLabel": "02 / BUSINESS CONTEXT",
+      "resultLabel": "YOUR RESULT"
+    },
+    "intro": {
+      "meta": "5–7 MINUTES · 42 SECURITY QUESTIONS",
+      "title1": "Know where you stand.",
+      "titleEmphasis": "Know what to do next.",
+      "body": "Build a practical baseline across identity, email, devices, cloud, people, data and governance.",
+      "cta": "Begin assessment ↗"
+    },
+    "profile": {
+      "eyebrow": "PRIVATE ASSESSMENT",
+      "title": "Tell us about your business.",
+      "sub": "These details personalize your report. They do not affect your Cyber Health Score.",
+      "fields": {
+        "company": "Company Name",
+        "industry": "Industry",
+        "province": "Province",
+        "employees": "Number of Employees",
+        "platform": "Cloud Platform",
+        "name": "Contact Name",
+        "email": "Business Email",
+        "phone": "Phone"
+      },
+      "selectPlaceholder": "Select",
+      "industries": [
+        "Retail",
+        "Professional Services",
+        "Healthcare",
+        "Construction",
+        "Manufacturing",
+        "Hospitality",
+        "Non-Profit",
+        "Other"
+      ],
+      "provinces": [
+        "Alberta",
+        "British Columbia",
+        "Manitoba",
+        "New Brunswick",
+        "Newfoundland and Labrador",
+        "Northwest Territories",
+        "Nova Scotia",
+        "Nunavut",
+        "Ontario",
+        "Prince Edward Island",
+        "Quebec",
+        "Saskatchewan",
+        "Yukon",
+        "Other"
+      ],
+      "employeeRanges": [
+        "1-10",
+        "11-25",
+        "26-50",
+        "51-100",
+        "101-200"
+      ],
+      "platformOptions": [
+        "Microsoft 365",
+        "Google Workspace",
+        "Neither",
+        "Not Sure"
+      ],
+      "back": "← Back",
+      "continue": "Continue →",
+      "disclaimer": "Your responses are used to create your report and follow up about it. We do not sell your data."
+    },
+    "qualify": {
+      "eyebrow": "QUICK QUESTIONS",
+      "title": "A little context.",
+      "sub": "Your answers help us make the next conversation relevant. They do not affect your score.",
+      "questions": [
+        {
+          "label": "Do you represent a business?",
+          "choices": [
+            "Yes",
+            "No",
+            "Not sure"
+          ]
+        },
+        {
+          "label": "Are you responsible for IT or cybersecurity decisions at your business?",
+          "choices": [
+            "Yes",
+            "No",
+            "Not sure"
+          ]
+        },
+        {
+          "label": "What's your rough budget range for improving cybersecurity in the next 12 months?",
+          "choices": [
+            "Under $2,000",
+            "$2,000–$10,000",
+            "$10,000+",
+            "Not sure yet"
+          ]
+        },
+        {
+          "label": "When are you looking to make security improvements?",
+          "choices": [
+            "Immediately",
+            "Within 3 months",
+            "Within 6 months",
+            "Just researching"
+          ]
+        }
+      ],
+      "back": "← Back",
+      "startQuestions": "Start questions →"
+    },
+    "assessment": {
+      "sectionIntro": "Select what best reflects the business today.",
+      "sections": [
+        "Identity & Access",
+        "Email & Devices",
+        "Network & Cloud",
+        "People & Access",
+        "Governance & Wrap-up"
+      ],
+      "answerOptions": [
+        "Yes",
+        "No",
+        "Not Sure"
+      ],
+      "questions": [
+        {
+          "text": "Does everyone in the business use a different password for each work account, instead of reusing the same one everywhere?"
+        },
+        {
+          "text": "Are default passwords changed immediately when new devices or software are set up?"
+        },
+        {
+          "text": "Do employees sign in using a password plus a code from their phone or an authenticator app for email and other important accounts?"
+        },
+        {
+          "text": "Is MFA required for anyone who can access company systems or data from outside the office?"
+        },
+        {
+          "text": "Does your email system filter out spam and suspicious messages before they reach employee inboxes?"
+        },
+        {
+          "text": "Have employees received any training on spotting phishing emails in the past 12 months?"
+        },
+        {
+          "text": "Is there a simple way for employees to report a suspicious email so it can be checked?"
+        },
+        {
+          "text": "Do all company computers have antivirus or anti-malware software installed and actively running?"
+        },
+        {
+          "text": "Are company laptops and desktops set to automatically lock after a short period of inactivity?"
+        },
+        {
+          "text": "Are software and operating system updates installed automatically, or within a few days of release?"
+        },
+        {
+          "text": "Has your business confirmed that all software and hardware currently in use is still supported with security updates?"
+        },
+        {
+          "text": "Is your business data backed up automatically on a regular schedule (daily or more frequently)?"
+        },
+        {
+          "text": "Has a backup restore actually been tested in the past 12 months, not just the backup itself?"
+        },
+        {
+          "text": "If ransomware locked every file tomorrow, are you confident the business could recover without paying?"
+        },
+        {
+          "text": "Is your office Wi-Fi password-protected and kept separate from any guest network?"
+        },
+        {
+          "text": "Does your business use a firewall to help protect its network from outside threats?"
+        },
+        {
+          "text": "Are security features like 2-Step Verification and suspicious sign-in alerts turned on in your Google Workspace admin settings?"
+        },
+        {
+          "text": "Does someone check periodically who has access to shared Google Drive files and folders?"
+        },
+        {
+          "text": "Are security features like multi-factor sign-in and suspicious login alerts turned on in whatever cloud email/file system you use?"
+        },
+        {
+          "text": "Does someone check periodically who has access to shared files and folders in your cloud system?"
+        },
+        {
+          "text": "Have employees received any form of cybersecurity awareness training?"
+        },
+        {
+          "text": "Is there a simple written policy employees can refer to for using company technology safely?"
+        },
+        {
+          "text": "Do employees generally only have access to the files and systems they actually need for their job?"
+        },
+        {
+          "text": "Is an employee's system access removed promptly when they leave the company?"
+        },
+        {
+          "text": "Are company-owned phones and tablets protected with a passcode or fingerprint/face lock?"
+        },
+        {
+          "text": "If a company mobile device were lost or stolen, could it be remotely locked or wiped?"
+        },
+        {
+          "text": "Do employees working remotely connect to company systems through a secure or VPN connection?"
+        },
+        {
+          "text": "Are personal devices used to access company data required to meet basic security standards, like a passcode and updated software?"
+        },
+        {
+          "text": "Is sensitive business or customer data stored only in approved systems, rather than personal email or personal cloud drives?"
+        },
+        {
+          "text": "Is sensitive data encrypted when it's stored or sent to others?"
+        },
+        {
+          "text": "Do you know which outside vendors or contractors currently have access to your systems or data?"
+        },
+        {
+          "text": "Are you aware of any security practices your key vendors follow to protect shared data?"
+        },
+        {
+          "text": "Does your website use HTTPS (the padlock icon shown in the browser address bar)?"
+        },
+        {
+          "text": "Is your website, and any customer login area, kept updated and monitored?"
+        },
+        {
+          "text": "If you accept card payments, do you use a PCI-compliant payment processor rather than storing card details yourself?"
+        },
+        {
+          "text": "Is access to online banking and financial systems limited to a small number of trusted people?"
+        },
+        {
+          "text": "Does your business have any plan for what to do if you suspect a cyberattack or data breach?"
+        },
+        {
+          "text": "Would employees know exactly who to contact immediately if something looked suspicious?"
+        },
+        {
+          "text": "Is access to servers, network equipment, or sensitive paperwork restricted to authorized staff only?"
+        },
+        {
+          "text": "Are computer screens locked or logged off when employees step away from their desks?"
+        },
+        {
+          "text": "Has a specific person or role been assigned responsibility for cybersecurity decisions in the business?"
+        },
+        {
+          "text": "Is cybersecurity spending or investment reviewed at least once a year?"
+        },
+        {
+          "text": "Does your business currently carry a cyber liability insurance policy?"
+        },
+        {
+          "text": "Are you aware of any specific regulatory or industry requirements that apply to your business (for example, PIPEDA or PCI-DSS)?"
+        }
+      ],
+      "back": "← Back",
+      "nextSection": "Next section →",
+      "calculateScore": "Calculate score →"
+    },
+    "result": {
+      "scoreLabel": "CYBER HEALTH SCORE",
+      "riskTierLabel": "Risk tier",
+      "tierNames": {
+        "Low": "Low",
+        "Medium": "Medium",
+        "High": "High",
+        "Critical": "Critical"
+      },
+      "nextStepLabel": "Recommended next step",
+      "nextStepValue": "Private Scope Review",
+      "businessFallback": "YOUR BUSINESS",
+      "tierHeadlines": {
+        "Low": "Strong foundation.",
+        "Medium": "A workable base with clear gaps.",
+        "High": "Material improvement is needed.",
+        "Critical": "Start with the essentials."
+      },
+      "disclaimer": "A directional baseline, not a certification or guarantee. Review uncertain and missing controls before deciding what to improve first.",
+      "reviewAnswers": "Review answers",
+      "reportSending": "Preparing your full report for {email}…",
+      "reportSent": "Your full report has been sent to {email}.",
+      "reportErrorGeneric": "Could not send your report. Please try again.",
+      "reportErrorNetwork": "Could not send your report. Check your connection and try again."
+    }
   }
 }
