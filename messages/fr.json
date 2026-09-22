@@ -382,9 +382,9 @@
       "secondaryLabel": "Trouvez votre secteur"
     },
     "resources": {
-      "eyebrow": "One useful starting point",
-      "headline": "Turn credible insight into clearer decisions and practical action.",
-      "secondaryLabel": "Explore Our Resources"
+      "eyebrow": "Un point de départ utile",
+      "headline": "Transformez une analyse crédible en décisions plus claires et en actions concrètes.",
+      "secondaryLabel": "Explorez nos ressources"
     },
     "company": {
       "eyebrow": "Un point de départ clair",
@@ -2440,5 +2440,116 @@
       "reportErrorGeneric": "Impossible d'envoyer votre rapport. Veuillez réessayer.",
       "reportErrorNetwork": "Impossible d'envoyer votre rapport. Vérifiez votre connexion et réessayez."
     }
+  },
+  "Resources": {
+    "header": {
+      "getCyberHealthScore": "Obtenez votre Cyber Health Score",
+      "search": "Rechercher",
+      "changeLanguage": "Changer de langue"
+    },
+    "hero": {
+      "eyebrow": "Ressources / Intelligence ORAGROL",
+      "titleLine1": "De la clarté pour les décisions",
+      "titleLine2": "qui ne peuvent pas attendre.",
+      "body": "Une intelligence pratique en cybersécurité pour les dirigeants d'entreprises canadiennes — claire, crédible et conçue pour passer à l'action.",
+      "pathInsights": "01 / Analyses",
+      "pathGuides": "02 / Guides",
+      "pathBriefs": "03 / Notes de synthèse",
+      "cta": "Explorez les dernières analyses"
+    },
+    "essential": {
+      "label": "01 / Lectures essentielles",
+      "title": "Commencez par la clarté.",
+      "body": "Six bases concrètes pour comprendre et réduire le cyberrisque de votre entreprise."
+    },
+    "newGuides": {
+      "label": "02 / Nouveaux guides et analyses",
+      "title": "Allez plus loin.",
+      "body": "Des conseils ciblés pour la protection, l'automatisation et les opérations coordonnées."
+    },
+    "readAction": "Lire",
+    "readSuffix": "de lecture",
+    "items": [
+      {
+        "title": "Qu'est-ce que le Cyber Health Score?",
+        "type": "Article",
+        "summary": "Une explication en langage clair de ce que mesure le pointage, de son mode de calcul et de la raison pour laquelle une base de référence utile compte plus qu'une note de réussite ou d'échec."
+      },
+      {
+        "title": "MFA : le seul contrôle qui arrête la plupart des cyberattaques",
+        "type": "Article",
+        "summary": "Comment les PME canadiennes devraient prioriser l'authentification multifacteur, choisir une authentification plus robuste et éviter les erreurs de mise en œuvre courantes."
+      },
+      {
+        "title": "Récupération après un rançongiciel : ce que les PME canadiennes font mal",
+        "type": "Article",
+        "summary": "Pourquoi une sauvegarde jamais testée n'est pas un plan de récupération — et quelles lacunes corriger avant qu'une interruption ne devienne une crise."
+      },
+      {
+        "title": "Les bases de la sécurité du courriel pour les petites entreprises",
+        "type": "Article",
+        "summary": "Un programme pratique de sécurité du courriel protège la boîte de réception, le domaine de l'entreprise et les personnes qui prennent les décisions financières."
+      },
+      {
+        "title": "La cybersécurité pour les cabinets de services professionnels : un guide pratique",
+        "type": "Guide",
+        "summary": "La cybersécurité comme composante de la confiance des clients, de la continuité des activités et de la discipline opérationnelle pour les cabinets professionnels."
+      },
+      {
+        "title": "Comprendre la LPRPDE (PIPEDA) : ce qu'elle signifie pour votre entreprise",
+        "type": "Article",
+        "summary": "Là où les obligations canadiennes en matière de protection de la vie privée et les mesures pratiques de cybersécurité se rejoignent — et là où elles demeurent distinctes."
+      },
+      {
+        "title": "Liste de vérification de préparation à l'assurance cyberrisque pour les PME canadiennes",
+        "type": "Liste de vérification",
+        "summary": "Organisez les contrôles, les preuves et les renseignements opérationnels nécessaires à une demande d'assurance ou à une conversation de renouvellement plus solide."
+      },
+      {
+        "title": "Application du DMARC : de la surveillance au p=reject",
+        "type": "Guide",
+        "summary": "Passez de la simple visibilité à l'application sans bloquer par erreur des courriels professionnels légitimes."
+      },
+      {
+        "title": "Les premières 24 heures d'un cyberincident",
+        "type": "Guide d'intervention",
+        "summary": "Une structure concrète pour la première journée : commandement, confinement, preuves, communication et récupération sécuritaire."
+      },
+      {
+        "title": "Le risque fournisseur avant d'accorder l'accès",
+        "type": "Liste de vérification",
+        "summary": "Posez les bonnes questions et appliquez les bons contrôles avant qu'un fournisseur ne devienne partie intégrante de votre environnement de sécurité."
+      },
+      {
+        "title": "Une politique pratique d'utilisation de l'IA pour les entreprises canadiennes",
+        "type": "Guide de politique",
+        "summary": "Définissez les outils approuvés, les renseignements protégés, l'imputabilité humaine et les limites opérationnelles sans freiner l'expérimentation responsable."
+      },
+      {
+        "title": "Base de référence de sécurité Microsoft 365 pour une PME",
+        "type": "Liste de vérification technique",
+        "summary": "Une base de référence ciblée pour l'identité, le courriel, les appareils, la collaboration, la journalisation et la récupération dans Microsoft 365."
+      },
+      {
+        "title": "La cybersécurité pour les cabinets de comptabilité et de tenue de livres",
+        "type": "Note sectorielle",
+        "summary": "Des priorités de sécurité bâties autour du courriel de confiance, des renseignements financiers, de la comptabilité infonuagique et de l'autorité de paiement."
+      },
+      {
+        "title": "Note de synthèse sur le cyberrisque des PME canadiennes 2026",
+        "type": "Note de synthèse",
+        "summary": "Ce que les données canadiennes actuelles signifient pour les priorités de la direction, la résilience opérationnelle et l'investissement en sécurité."
+      },
+      {
+        "title": "Évaluation de préparation à l'automatisation d'entreprise",
+        "type": "Évaluation",
+        "summary": "Cinq tests pour choisir un résultat précis et à forte valeur avant d'investir dans des outils ou des intégrations."
+      },
+      {
+        "title": "Quand des automatisations séparées devraient devenir OR ONE",
+        "type": "Guide pour dirigeants",
+        "summary": "Reconnaissez le moment où plusieurs flux de travail, départements et contrôles ont besoin d'un seul système d'exploitation sécurisé et coordonné."
+      }
+    ]
   }
 }

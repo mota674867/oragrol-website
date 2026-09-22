@@ -2440,5 +2440,116 @@
       "reportErrorGeneric": "Could not send your report. Please try again.",
       "reportErrorNetwork": "Could not send your report. Check your connection and try again."
     }
+  },
+  "Resources": {
+    "header": {
+      "getCyberHealthScore": "Get Cyber Health Score",
+      "search": "Search",
+      "changeLanguage": "Change language"
+    },
+    "hero": {
+      "eyebrow": "Resources / ORAGROL Intelligence",
+      "titleLine1": "Clarity for decisions",
+      "titleLine2": "that cannot wait.",
+      "body": "Practical cybersecurity intelligence for Canadian business leaders—clear, credible and built for action.",
+      "pathInsights": "01 / Insights",
+      "pathGuides": "02 / Guides",
+      "pathBriefs": "03 / Executive Briefs",
+      "cta": "Explore the latest intelligence"
+    },
+    "essential": {
+      "label": "01 / Essential reading",
+      "title": "Start with clarity.",
+      "body": "Six practical foundations for understanding and reducing business cyber risk."
+    },
+    "newGuides": {
+      "label": "02 / New guides & intelligence",
+      "title": "Go deeper.",
+      "body": "Focused guidance for protection, automation and coordinated operations."
+    },
+    "readAction": "Read",
+    "readSuffix": "read",
+    "items": [
+      {
+        "title": "What Is a Cyber Health Score?",
+        "type": "Article",
+        "summary": "A plain-language breakdown of what the score measures, how it is calculated and why a useful baseline matters more than a pass-or-fail grade."
+      },
+      {
+        "title": "MFA: The One Control That Stops Most Breaches",
+        "type": "Article",
+        "summary": "How Canadian SMBs should prioritize MFA, choose stronger authentication and avoid common implementation mistakes."
+      },
+      {
+        "title": "Ransomware Recovery: What Canadian SMBs Get Wrong",
+        "type": "Article",
+        "summary": "Why an untested backup is not a recovery plan—and which gaps should be resolved before disruption becomes a crisis."
+      },
+      {
+        "title": "Email Security Basics for Small Business",
+        "type": "Article",
+        "summary": "A practical email-security program protects the mailbox, the business domain and the people making financial decisions."
+      },
+      {
+        "title": "Cybersecurity for Professional Services Firms: A Practical Guide",
+        "type": "Guide",
+        "summary": "Cybersecurity as part of client trust, business continuity and operational discipline for professional firms."
+      },
+      {
+        "title": "Understanding PIPEDA: What It Means for Your Business",
+        "type": "Article",
+        "summary": "Where Canadian privacy obligations and practical cybersecurity safeguards meet—and where they remain different."
+      },
+      {
+        "title": "Cyber Insurance Readiness Checklist for Canadian SMBs",
+        "type": "Checklist",
+        "summary": "Organize the controls, evidence and operating information required for a stronger insurance application or renewal conversation."
+      },
+      {
+        "title": "DMARC Enforcement: From Monitoring to p=reject",
+        "type": "Guide",
+        "summary": "Move from visibility to enforcement without accidentally blocking legitimate business email."
+      },
+      {
+        "title": "The First 24 Hours of a Cyber Incident",
+        "type": "Playbook",
+        "summary": "A practical first-day structure for command, containment, evidence, communication and safe recovery."
+      },
+      {
+        "title": "Vendor Risk Before You Grant Access",
+        "type": "Checklist",
+        "summary": "Apply the right questions and controls before a supplier becomes part of your security environment."
+      },
+      {
+        "title": "A Practical AI Use Policy for Canadian Businesses",
+        "type": "Policy Guide",
+        "summary": "Define approved tools, protected information, human accountability and operating limits without stopping responsible experimentation."
+      },
+      {
+        "title": "Microsoft 365 Security Baseline for an SMB",
+        "type": "Technical Checklist",
+        "summary": "A focused baseline for identity, email, devices, collaboration, logging and recovery in Microsoft 365."
+      },
+      {
+        "title": "Cybersecurity for Accounting and Bookkeeping Firms",
+        "type": "Industry Brief",
+        "summary": "Security priorities built around trusted email, financial information, cloud accounting and payment authority."
+      },
+      {
+        "title": "Canadian SMB Cyber-Risk Brief 2026",
+        "type": "Executive Brief",
+        "summary": "What current Canadian evidence means for leadership priorities, operational resilience and security investment."
+      },
+      {
+        "title": "Business Automation Readiness Assessment",
+        "type": "Assessment",
+        "summary": "Five tests for choosing one valuable, bounded outcome before investing in tools or integrations."
+      },
+      {
+        "title": "When Separate Automations Should Become OR ONE",
+        "type": "Executive Guide",
+        "summary": "Recognize when several workflows, departments and controls need one coordinated secure operating system."
+      }
+    ]
   }
 }

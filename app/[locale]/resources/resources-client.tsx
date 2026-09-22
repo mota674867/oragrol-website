@@ -1,11 +1,23 @@
 "use client";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { Link, usePathname } from "@/i18n/navigation";
 import PreFooterCta from "@/app/components/site/pre-footer-cta";
 import SiteFooter from "@/app/components/site/footer";
 import OragrolMegaNav from "@/app/components/site/oragrol-mega-nav";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
 import "@/app/gpt-pages.css";
+
+/**
+ * Bilingual (D-086, Task #21, Phase 2i): rewired to consume the
+ * `Resources` namespace in messages/{en,fr}.json, sourced from
+ * `ORAGROL_Resources_FR_Translation.md`. The canonical `resources`
+ * array below stays untouched (hrefs, order, slice indices the two
+ * card grids depend on) -- display text (title/type/summary) is
+ * pulled from `t.raw("items")`, index-paired 1:1 against `resources`
+ * in the same order, same pattern used throughout this project. Also
+ * fixed the dead `<button>EN / FR</button>` into a working locale
+ * switch, and switched `Link`/`usePathname` to `@/i18n/navigation`.
+ */
 
 type Resource = {
   title: string;
@@ -200,9 +212,19 @@ const resources: Resource[] = [
 ];
 
 function ResourcesPageClient() {
+  const t = useTranslations("Resources");
+  const locale = useLocale();
+  const otherLocale = locale === "fr" ? "en" : "fr";
   const pathname = usePathname();
-  const essential = resources.slice(0, 6),
-    newResources = resources.slice(6);
+
+  const items = t.raw("items") as { title: string; type: string; summary: string }[];
+  // Index-paired against the canonical `resources` array above -- same
+  // order, same length (16), translated display text only. `href` stays
+  // canonical/English-only since it's a real route.
+  const localized = resources.map((r, i) => ({ ...r, ...items[i] }));
+  const essential = localized.slice(0, 6),
+    newResources = localized.slice(6);
+
   return (
     <main className="res-page">
       <header className="industry-header res-header">
@@ -212,11 +234,18 @@ function ResourcesPageClient() {
         </Link>
         <OragrolMegaNav items={NAV_ITEMS} activePath={pathname} />
         <div>
-          <Link href="/cyber-health">Get Cyber Health Score</Link>
-          <button className="search" aria-label="Search">
+          <Link href="/cyber-health">{t("header.getCyberHealthScore")}</Link>
+          <button className="search" aria-label={t("header.search")}>
             <span />
           </button>
-          <button className="language">EN / FR</button>
+          <Link
+            className="language"
+            href={pathname}
+            locale={otherLocale}
+            aria-label={t("header.changeLanguage")}
+          >
+            {locale.toUpperCase()} / {otherLocale.toUpperCase()}
+          </Link>
         </div>
       </header>
 
@@ -230,23 +259,20 @@ function ResourcesPageClient() {
           <span>OR</span>
         </div>
         <div className="res-hero-copy">
-          <p>Resources / ORAGROL Intelligence</p>
+          <p>{t("hero.eyebrow")}</p>
           <h1>
-            Clarity for decisions
+            {t("hero.titleLine1")}
             <br />
-            <span>that cannot wait.</span>
+            <span>{t("hero.titleLine2")}</span>
           </h1>
-          <p>
-            Practical cybersecurity intelligence for Canadian business
-            leaders—clear, credible and built for action.
-          </p>
+          <p>{t("hero.body")}</p>
           <div className="res-paths">
-            <span>01 / Insights</span>
-            <span>02 / Guides</span>
-            <span>03 / Executive Briefs</span>
+            <span>{t("hero.pathInsights")}</span>
+            <span>{t("hero.pathGuides")}</span>
+            <span>{t("hero.pathBriefs")}</span>
           </div>
           <a href="#resource-library">
-            Explore the latest intelligence <b>↓</b>
+            {t("hero.cta")} <b>↓</b>
           </a>
         </div>
       </section>
@@ -254,13 +280,10 @@ function ResourcesPageClient() {
       <section className="res-simple-library" id="resource-library">
         <header>
           <div>
-            <span>01 / Essential reading</span>
-            <h2>Start with clarity.</h2>
+            <span>{t("essential.label")}</span>
+            <h2>{t("essential.title")}</h2>
           </div>
-          <p>
-            Six practical foundations for understanding and reducing business
-            cyber risk.
-          </p>
+          <p>{t("essential.body")}</p>
         </header>
         <div className="res-simple-grid">
           {essential.map((r, i) => (
@@ -269,12 +292,14 @@ function ResourcesPageClient() {
                 <span>
                   {String(i + 1).padStart(2, "0")} / {r.type}
                 </span>
-                <span>{r.read} read</span>
+                <span>
+                  {r.read} {t("readSuffix")}
+                </span>
               </div>
               <h3>{r.title}</h3>
               <p>{r.summary}</p>
               <div className="res-card-action">
-                <span>Read</span>
+                <span>{t("readAction")}</span>
                 <b>↗</b>
               </div>
             </Link>
@@ -285,13 +310,10 @@ function ResourcesPageClient() {
       <section className="res-simple-library res-new-library">
         <header>
           <div>
-            <span>02 / New guides & intelligence</span>
-            <h2>Go deeper.</h2>
+            <span>{t("newGuides.label")}</span>
+            <h2>{t("newGuides.title")}</h2>
           </div>
-          <p>
-            Focused guidance for protection, automation and coordinated
-            operations.
-          </p>
+          <p>{t("newGuides.body")}</p>
         </header>
         <div className="res-simple-grid">
           {newResources.map((r, i) => (
@@ -300,12 +322,14 @@ function ResourcesPageClient() {
                 <span>
                   {String(i + 7).padStart(2, "0")} / {r.type}
                 </span>
-                <span>{r.read} read</span>
+                <span>
+                  {r.read} {t("readSuffix")}
+                </span>
               </div>
               <h3>{r.title}</h3>
               <p>{r.summary}</p>
               <div className="res-card-action">
-                <span>Read</span>
+                <span>{t("readAction")}</span>
                 <b>↗</b>
               </div>
             </Link>

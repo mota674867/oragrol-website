@@ -11,9 +11,10 @@
 // approved content and layout for all 16.
 
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Fragment, type ReactNode } from "react";
+import { Link } from "@/i18n/navigation";
+import { languageAlternates } from "@/app/lib/seo";
 import PreFooterCta from "@/app/components/site/pre-footer-cta";
 import SiteFooter from "@/app/components/site/footer";
 import "@/app/gpt-pages.css";
@@ -23,7 +24,25 @@ import {
   type ResourceArticle,
 } from "./ORAGROL_ResourceArticles";
 
-type PageProps = { params: Promise<{ slug: string }> };
+/**
+ * Bilingual (D-086, Task #21, Phase 2i): `RESOURCE_ARTICLES_BY_SLUG`
+ * carries both EN and FR fields per article (see the type-level comment
+ * in ORAGROL_ResourceArticles.ts). This page stays a plain async Server
+ * Component -- given how much of it is one-off article chrome text, it
+ * uses simple `isFr` ternaries (matching the pattern `generateMetadata`
+ * below already used before this pass) rather than pulling in a
+ * messages.json namespace for text that isn't reused anywhere else.
+ * `Link` now comes from `@/i18n/navigation` (was `next/link`) so every
+ * internal link -- including ones that previously used a plain `<a>`
+ * (primary CTA, related-article cards) -- correctly keeps the `/fr`
+ * prefix when browsing the French site; this also fixes a latent bug
+ * where those `<a>` tags would have dropped a French visitor back into
+ * English. Nav labels stay in English on both locales, matching the
+ * site-wide NAV_ITEMS convention already established on every other
+ * page (`app/components/site/nav-items.ts`).
+ */
+
+type PageProps = { params: Promise<{ locale: string; slug: string }> };
 
 type BodyBlock =
   | { type: "heading"; text: string; id: string }
@@ -209,30 +228,54 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const article = RESOURCE_ARTICLES_BY_SLUG[slug];
   if (!article) return {};
 
+  const isFr = locale === "fr";
+  const canonicalPath = isFr ? `/fr/resources/${slug}` : `/resources/${slug}`;
+  const title = isFr ? article.seoTitleFr : article.seoTitle;
+  const description = isFr ? article.seoDescriptionFr : article.seoDescription;
+
   return {
-    title: article.seoTitle,
-    description: article.seoDescription,
-    alternates: { canonical: `/resources/${article.slug}` },
+    title,
+    description,
+    alternates: {
+      canonical: canonicalPath,
+      languages: languageAlternates(`/resources/${slug}`),
+    },
     openGraph: {
       type: "article",
-      title: article.seoTitle,
-      description: article.seoDescription,
-      url: `/resources/${article.slug}`,
+      title,
+      description,
+      url: canonicalPath,
       siteName: "ORAGROL Global",
+      locale: isFr ? "fr_CA" : "en_CA",
+      alternateLocale: isFr ? "en_CA" : "fr_CA",
     },
   };
 }
 
 export default async function ResourceDetailPage({ params }: PageProps) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const article = RESOURCE_ARTICLES_BY_SLUG[slug];
   if (!article) notFound();
 
-  const blocks = parseBody(article.body);
+  const isFr = locale === "fr";
+  const otherLocale = isFr ? "en" : "fr";
+  const T = {
+    title: isFr ? article.titleFr : article.title,
+    type: isFr ? article.typeFr : article.type,
+    topic: isFr ? article.topicFr : article.topic,
+    industry: isFr ? article.industryFr : article.industry,
+    summary: isFr ? article.summaryFr : article.summary,
+    body: isFr ? article.bodyFr : article.body,
+    nextAction: isFr ? article.nextActionFr : article.nextAction,
+    primaryCta: isFr ? article.primaryCtaFr : article.primaryCta,
+    sources: isFr ? article.sourcesFr : article.sources,
+  };
+
+  const blocks = parseBody(T.body);
   const headings = blocks.filter(
     (block): block is Extract<BodyBlock, { type: "heading" }> => block.type === "heading",
   );
@@ -270,22 +313,31 @@ export default async function ResourceDetailPage({ params }: PageProps) {
             ))}
           </nav>
           <div>
-            <Link href="/resources#resource-library">Back to Resources</Link>
-            <button className="search" aria-label="Search">
+            <Link href="/resources#resource-library">
+              {isFr ? "Retour aux ressources" : "Back to Resources"}
+            </Link>
+            <button className="search" aria-label={isFr ? "Rechercher" : "Search"}>
               <span />
             </button>
-            <button className="language">EN / FR</button>
+            <Link
+              className="language"
+              href={`/resources/${slug}`}
+              locale={otherLocale}
+              aria-label={isFr ? "Changer de langue" : "Change language"}
+            >
+              {locale.toUpperCase()} / {otherLocale.toUpperCase()}
+            </Link>
           </div>
         </header>
 
         <header className="resource-hero">
           <div className="resource-shell">
             <nav className="resource-breadcrumb" aria-label="Breadcrumb">
-              <Link href="/resources">Resources</Link>
+              <Link href="/resources">{isFr ? "Ressources" : "Resources"}</Link>
               <span>/</span>
-              <span>{article.topic.split("/")[0].trim()}</span>
+              <span>{T.topic.split("/")[0].trim()}</span>
               <span>/</span>
-              <span aria-current="page">{article.title}</span>
+              <span aria-current="page">{T.title}</span>
             </nav>
 
             <div className="resource-hero__layout">
@@ -294,14 +346,14 @@ export default async function ResourceDetailPage({ params }: PageProps) {
               </span>
               <div className="resource-hero__content">
                 <p className="resource-eyebrow">
-                  {article.type.toUpperCase()} · {article.topic.toUpperCase()}
+                  {T.type.toUpperCase()} · {T.topic.toUpperCase()}
                 </p>
-                <h1>{article.title}</h1>
-                <p className="resource-summary">{article.summary}</p>
+                <h1>{T.title}</h1>
+                <p className="resource-summary">{T.summary}</p>
                 <div className="resource-meta-line">
                   <span>◷ {article.estimatedRead.toUpperCase()}</span>
                   <span aria-hidden="true">·</span>
-                  <span>{article.industry.toUpperCase()}</span>
+                  <span>{T.industry.toUpperCase()}</span>
                 </div>
               </div>
             </div>
@@ -315,7 +367,7 @@ export default async function ResourceDetailPage({ params }: PageProps) {
         <div className="resource-shell resource-article-grid">
           <aside className="resource-toc">
             <details open>
-              <summary>IN THIS ARTICLE</summary>
+              <summary>{isFr ? "DANS CET ARTICLE" : "IN THIS ARTICLE"}</summary>
               <nav aria-label="Article contents">
                 {headings.map((heading) => (
                   <a href={`#${heading.id}`} key={heading.id}>{heading.text}</a>
@@ -329,22 +381,22 @@ export default async function ResourceDetailPage({ params }: PageProps) {
 
             <section className="next-action" aria-labelledby="next-action-title">
               <div>
-                <p id="next-action-title">ONE NEXT ACTION</p>
-                <h2>{article.nextAction}</h2>
+                <p id="next-action-title">{isFr ? "UNE PROCHAINE ACTION" : "ONE NEXT ACTION"}</p>
+                <h2>{T.nextAction}</h2>
               </div>
-              <a href={article.primaryCta.href}>
-                <span>{article.primaryCta.label}</span><span aria-hidden="true">↗</span>
-              </a>
+              <Link href={T.primaryCta.href}>
+                <span>{T.primaryCta.label}</span><span aria-hidden="true">↗</span>
+              </Link>
             </section>
           </article>
 
           <aside className="resource-facts" aria-label="Article details">
-            <h2>ARTICLE DETAILS</h2>
+            <h2>{isFr ? "DÉTAILS DE L'ARTICLE" : "ARTICLE DETAILS"}</h2>
             <dl>
-              <div><dt>Type</dt><dd>{article.type}</dd></div>
-              <div><dt>Industry</dt><dd>{article.industry}</dd></div>
-              <div><dt>Updated</dt><dd>2026</dd></div>
-              <div><dt>Reading time</dt><dd>{article.estimatedRead}</dd></div>
+              <div><dt>Type</dt><dd>{T.type}</dd></div>
+              <div><dt>{isFr ? "Secteur" : "Industry"}</dt><dd>{T.industry}</dd></div>
+              <div><dt>{isFr ? "Mise à jour" : "Updated"}</dt><dd>2026</dd></div>
+              <div><dt>{isFr ? "Temps de lecture" : "Reading time"}</dt><dd>{article.estimatedRead}</dd></div>
             </dl>
           </aside>
         </div>
@@ -353,7 +405,7 @@ export default async function ResourceDetailPage({ params }: PageProps) {
           <details className="resource-sources">
             <summary>SOURCES <span aria-hidden="true">+</span></summary>
             <ul>
-              {article.sources.map((source) => (
+              {T.sources.map((source) => (
                 <li key={source.label}>
                   {source.href ? (
                     <a href={source.href} target="_blank" rel="noreferrer">
@@ -366,14 +418,14 @@ export default async function ResourceDetailPage({ params }: PageProps) {
           </details>
 
           <section className="related-resources" aria-labelledby="related-heading">
-            <h2 id="related-heading">RELATED RESOURCES</h2>
+            <h2 id="related-heading">{isFr ? "RESSOURCES CONNEXES" : "RELATED RESOURCES"}</h2>
             <div className="related-grid">
               {related.map((item) => (
-                <a className="related-card" href={`/resources/${item.slug}`} key={item.slug}>
-                  <span className="related-card__type">{item.type.toUpperCase()}</span>
-                  <h3>{item.title}</h3>
+                <Link className="related-card" href={`/resources/${item.slug}`} key={item.slug}>
+                  <span className="related-card__type">{(isFr ? item.typeFr : item.type).toUpperCase()}</span>
+                  <h3>{isFr ? item.titleFr : item.title}</h3>
                   <div><span>◷ {item.estimatedRead.toUpperCase()}</span><span aria-hidden="true">→</span></div>
-                </a>
+                </Link>
               ))}
             </div>
           </section>
