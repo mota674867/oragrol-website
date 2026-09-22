@@ -1,7 +1,7 @@
 "use client";
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { Link, usePathname } from "@/i18n/navigation";
 import { ScopeTray, useScope } from "@/app/components/ScopeTray";
 import PreFooterCta from "@/app/components/site/pre-footer-cta";
 import SiteFooter from "@/app/components/site/footer";
@@ -214,9 +214,14 @@ const groups: Group[] = [
 // table). `tierFor` below is unrelated and still used live by the builder
 // (the "preliminary system" tier name shown as items are selected), so it
 // stays.
+// Bilingual (D-086, Task #21): returns "" for points===0 rather than a
+// hardcoded English "Not estimated" -- callers render OrOne.scopeItem
+// .notEstimatedTier (translated) for that case instead. The four tier
+// names themselves (OR/ONE STARTER, 100, 200, 400) are brand identifiers
+// per the approved translation doc and stay in English on /fr too.
 const tierFor = (points: number, categoryCount: number) =>
   points === 0
-    ? "Not estimated"
+    ? ""
     : points <= 30 && categoryCount === 1
       ? "OR/ONE STARTER"
       : points <= 100
@@ -226,11 +231,37 @@ const tierFor = (points: number, categoryCount: number) =>
           : "OR/ONE 400";
 
 function OrOneClient() {
+  const t = useTranslations("OrOne");
+  const locale = useLocale();
+  const otherLocale = locale === "fr" ? "en" : "fr";
   const pathname = usePathname();
   const [active, setActive] = useState(0);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [trayOpen, setTrayOpen] = useState(false);
   const scope = useScope();
+  // Bilingual (D-086, Task #21): translated display data for the builder,
+  // index-paired with `groups` above -- `groups` itself (item.name,
+  // group.name) is NEVER touched, since it's the exact key the capability
+  // registry (`OR_ONE_CAPABILITY_BY_NAME`), the `selected` Set and the
+  // localStorage-persisted scope state all match against. Only the
+  // *rendered* labels come from this translated array, resolved by index.
+  const categoryIds = [
+    "sales",
+    "marketingBranding",
+    "financeAccounting",
+    "hrPeople",
+    "customerService",
+    "operationsAdmin",
+    "itTechnology",
+    "procurementVendor",
+    "legalCompliance",
+    "leadershipStrategy",
+  ] as const;
+  const riskLabel: Record<Risk, string> = {
+    Standard: t("builder.tierStandard"),
+    Controlled: t("builder.tierControlled"),
+    Critical: t("builder.tierCritical"),
+  };
   const points = useMemo(
     () =>
       groups
@@ -273,9 +304,14 @@ function OrOneClient() {
           id: "orone:builder",
           area: "OR ONE",
           code: "OR/ONE",
-          title: `${tierFor(points, selectedCategoryCount)} preliminary system`,
-          detail: `${selected.size} capabilities selected across ${selectedCategoryCount} categories.`,
-          commercial: `${points} / 400 points · ${risks.Standard} standard · ${risks.Controlled} controlled · ${risks.Critical} critical`,
+          title: `${points === 0 ? t("scopeItem.notEstimatedTier") : tierFor(points, selectedCategoryCount)} ${t("scopeItem.preliminarySystemSuffix")}`,
+          detail: t("scopeItem.capabilitiesSelected", { count: selected.size, categories: selectedCategoryCount }),
+          commercial: t("scopeItem.commercialSummary", {
+            points,
+            standard: risks.Standard,
+            controlled: risks.Controlled,
+            critical: risks.Critical,
+          }),
           // Server-side resolution (app/lib/scope-resolve.ts) reads
           // this, not `detail`'s count or `title`'s tier name, to
           // recover the actual selected capabilities — see
@@ -306,6 +342,7 @@ function OrOneClient() {
     risks.Standard,
     risks.Controlled,
     risks.Critical,
+    t,
   ]);
   return (
     <main className="orone-full">
@@ -320,13 +357,15 @@ function OrOneClient() {
             className="scope-nav-button"
             onClick={() => setTrayOpen(true)}
           >
-            My Scope <b>{scope.items.length}</b>
+            {t("nav.myScope")} <b>{scope.items.length}</b>
           </button>
-          <Link href="/cyber-health">Get Cyber Health Score</Link>
-          <button className="one-search" aria-label="Search">
+          <Link href="/cyber-health">{t("nav.getCyberHealthScore")}</Link>
+          <button className="one-search" aria-label={t("nav.search")}>
             <span />
           </button>
-          <button>EN / FR</button>
+          <Link href={pathname} locale={otherLocale} aria-label={t("nav.changeLanguage")}>
+            {locale.toUpperCase()} / {otherLocale.toUpperCase()}
+          </Link>
         </div>
       </header>
       <section className="one-hero" aria-labelledby="one-title">
@@ -337,17 +376,17 @@ function OrOneClient() {
           <i />
         </div>
         <div className="one-meta">
-          <span>OR ONE / Coordinated business system</span>
-          <span>Security · Automation · Intelligence</span>
+          <span>{t("hero.meta1")}</span>
+          <span>{t("hero.meta2")}</span>
         </div>
         <div className="one-headline">
-          <p>One connected operating model</p>
+          <p>{t("hero.model")}</p>
           <h1 id="one-title">
-            One secure system
+            {t("hero.title1")}
             <br />
-            for how your business
+            {t("hero.title2")}
             <br />
-            <span>operates.</span>
+            <span>{t("hero.titleEmphasis")}</span>
           </h1>
         </div>
         <div className="one-monument" aria-hidden="true">
@@ -355,61 +394,44 @@ function OrOneClient() {
           <strong>ONE</strong>
         </div>
         <div className="one-support">
-          <p>
-            OR ONE connects your business systems and coordinates AI workers
-            across your organization through one secure operating layer. It
-            centralizes approvals, oversight and performance while keeping
-            every important decision under human authority.
-          </p>
+          <p>{t("hero.support")}</p>
           <a href="#one-intro">
-            Discover OR ONE <span>↘</span>
+            {t("hero.discover")} <span>↘</span>
           </a>
         </div>
         <div className="one-bottom">
-          <span>Protect what matters</span>
-          <span>Automate what slows you down</span>
-          <span>Understand what drives the business</span>
-          <span>Operate as one system</span>
+          <span>{t("hero.pillar1")}</span>
+          <span>{t("hero.pillar2")}</span>
+          <span>{t("hero.pillar3")}</span>
+          <span>{t("hero.pillar4")}</span>
         </div>
       </section>
       <section className="orone-intro" id="one-intro">
         <div>
-          <p>A separate product line</p>
+          <p>{t("intro.eyebrow")}</p>
           <h2>
-            Your business,
+            {t("intro.title1")}
             <br />
-            <span>intelligently operated.</span>
+            <span>{t("intro.titleEmphasis")}</span>
           </h2>
         </div>
         <div>
-          <p>
-            OR ONE is a dedicated AI workforce engineered for one organization.
-            It connects to the tools your business already uses and operates
-            through clearly authorized access.
-          </p>
-          <p>
-            It is completely separate from ORAGROL&apos;s 67 standard
-            services—with its own engineering model, responsibility structure
-            and commercial terms.
-          </p>
-          <blockquote>Engineered by ORAGROL Global.</blockquote>
+          <p>{t("intro.body1")}</p>
+          <p>{t("intro.body2")}</p>
+          <blockquote>{t("intro.quote")}</blockquote>
         </div>
       </section>
       <RevisedSignature />
       <RevisedProcess />
       <section className="team-builder" id="team-builder">
         <div className="builder-heading">
-          <p>Interactive builder / 77 items</p>
+          <p>{t("builder.eyebrow")}</p>
           <h2>
-            Build your team.
+            {t("builder.title1")}
             <br />
-            <span>See the shape of the system.</span>
+            <span>{t("builder.titleEmphasis")}</span>
           </h2>
-          <p>
-            Select capabilities to create a preliminary scope. The estimate
-            shows Points and a likely tier—not a final price or proposal.
-            Selections stop at 400 points.
-          </p>
+          <p>{t("builder.sub")}</p>
         </div>
         <div className="builder-shell">
           <aside>
@@ -420,7 +442,7 @@ function OrOneClient() {
                 key={g.name}
               >
                 <span>{String(i + 1).padStart(2, "0")}</span>
-                <b>{g.name}</b>
+                <b>{t(`builder.categories.${categoryIds[i]}.name`)}</b>
                 <small>
                   {g.items.filter((x) => selected.has(x.name)).length}/
                   {g.items.length}
@@ -430,11 +452,13 @@ function OrOneClient() {
           </aside>
           <div className="builder-items">
             <div className="builder-group">
-              <span>Category {String(active + 1).padStart(2, "0")}</span>
-              <h3>{group.name}</h3>
-              <p>{group.benefit}</p>
+              <span>
+                {t("builder.categoryLabel")} {String(active + 1).padStart(2, "0")}
+              </span>
+              <h3>{t(`builder.categories.${categoryIds[active]}.name`)}</h3>
+              <p>{t(`builder.categories.${categoryIds[active]}.benefit`)}</p>
             </div>
-            {group.items.map((item) => {
+            {group.items.map((item, itemIndex) => {
               const blocked =
                 !selected.has(item.name) && points + item.points > 400;
               return (
@@ -446,49 +470,51 @@ function OrOneClient() {
                 >
                   <i>{selected.has(item.name) ? "✓" : blocked ? "×" : "+"}</i>
                   <div>
-                    <b>{item.name}</b>
+                    <b>{t(`builder.categories.${categoryIds[active]}.items.${itemIndex}.name`)}</b>
                     <small>
-                      {blocked ? "400-point limit reached" : item.risk}
+                      {blocked ? t("builder.limitReached") : riskLabel[item.risk]}
                     </small>
                   </div>
-                  <strong>{item.points} pts</strong>
+                  <strong>
+                    {item.points} {t("builder.ptsSuffix")}
+                  </strong>
                 </button>
               );
             })}
           </div>
           <div className="builder-total">
-            <span>Preliminary scope</span>
+            <span>{t("builder.preliminaryScope")}</span>
             <strong>
               {points}
               <i>/400</i>
             </strong>
-            <small>Points selected</small>
+            <small>{t("builder.pointsSelected")}</small>
             <div>
               <p>
                 {selected.size}
-                <span> items</span>
+                <span> {t("builder.itemsLabel")}</span>
               </p>
               <p>
-                {tierFor(points, selectedCategoryCount)}
-                <span> estimated tier</span>
+                {points === 0 ? t("builder.notEstimated") : tierFor(points, selectedCategoryCount)}
+                <span> {t("builder.estimatedTierLabel")}</span>
               </p>
             </div>
             <ul>
               <li>
-                Standard <b>{risks.Standard}</b>
+                {t("builder.tierStandard")} <b>{risks.Standard}</b>
               </li>
               <li>
-                Controlled <b>{risks.Controlled}</b>
+                {t("builder.tierControlled")} <b>{risks.Controlled}</b>
               </li>
               <li>
-                Critical <b>{risks.Critical}</b>
+                {t("builder.tierCritical")} <b>{risks.Critical}</b>
               </li>
             </ul>
             <button onClick={() => setTrayOpen(true)}>
-              Review in My Scope ↗
+              {t("builder.reviewInMyScope")}
             </button>
             <button onClick={() => setSelected(new Set())}>
-              Clear selection
+              {t("builder.clearSelection")}
             </button>
           </div>
         </div>

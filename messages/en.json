@@ -1142,5 +1142,590 @@
         }
       }
     }
+  },
+  "OrOne": {
+    "nav": {
+      "getCyberHealthScore": "Get Cyber Health Score",
+      "search": "Search",
+      "changeLanguage": "Change language",
+      "myScope": "My Scope"
+    },
+    "hero": {
+      "meta1": "OR ONE / Coordinated business system",
+      "meta2": "Security · Automation · Intelligence",
+      "model": "One connected operating model",
+      "title1": "One secure system",
+      "title2": "for how your business",
+      "titleEmphasis": "operates.",
+      "support": "OR ONE connects your business systems and coordinates AI workers across your organization through one secure operating layer. It centralizes approvals, oversight and performance while keeping every important decision under human authority.",
+      "discover": "Discover OR ONE",
+      "pillar1": "Protect what matters",
+      "pillar2": "Automate what slows you down",
+      "pillar3": "Understand what drives the business",
+      "pillar4": "Operate as one system"
+    },
+    "intro": {
+      "eyebrow": "A separate product line",
+      "title1": "Your business,",
+      "titleEmphasis": "intelligently operated.",
+      "body1": "OR ONE is a dedicated AI workforce engineered for one organization. It connects to the tools your business already uses and operates through clearly authorized access.",
+      "body2": "It is completely separate from ORAGROL's 67 standard services—with its own engineering model, responsibility structure and commercial terms.",
+      "quote": "Engineered by ORAGROL Global."
+    },
+    "signature": {
+      "label": "OR / ONE SIGNATURE",
+      "heading": "Your vision, precisely engineered.",
+      "body1": "Tell us what your operation needs to achieve. We will design and create a bespoke system around your ambitions—from intelligent workflows and automation to integrations, controls, reporting, and specialised capabilities.",
+      "body2": "Each Signature engagement is privately reviewed and shaped into a custom architecture, defined scope, implementation plan, and ongoing service structure.",
+      "cta": "BEGIN YOUR SIGNATURE PROJECT"
+    },
+    "process": {
+      "eyebrow": "FROM SCOPE TO OPERATION",
+      "title1": "A clear path.",
+      "titleEmphasis": "A working system.",
+      "sub": "Define the work, connect the right tools and agree the controls before launch.",
+      "steps": [
+        {
+          "number": "01",
+          "title": "Define scope",
+          "copy": "Agree the workflows, tools, access and outcomes your system needs to support.",
+          "result": "A defined scope"
+        },
+        {
+          "number": "02",
+          "title": "Build & connect",
+          "copy": "Engineer the agreed workflows and connect them to your approved business systems.",
+          "result": "Connected workflows"
+        },
+        {
+          "number": "03",
+          "title": "Test & approve",
+          "copy": "Review real scenarios with your team, including exceptions and approval points.",
+          "result": "Readiness for launch"
+        },
+        {
+          "number": "04",
+          "title": "Launch & maintain",
+          "copy": "Put approved workflows into operation with the agreed monitoring and support.",
+          "result": "An operating system"
+        }
+      ]
+    },
+    "builder": {
+      "eyebrow": "Interactive builder / 77 items",
+      "title1": "Build your team.",
+      "titleEmphasis": "See the shape of the system.",
+      "sub": "Select capabilities to create a preliminary scope. The estimate shows Points and a likely tier—not a final price or proposal. Selections stop at 400 points.",
+      "categoryLabel": "Category",
+      "ptsSuffix": "pts",
+      "limitReached": "400-point limit reached",
+      "tierStandard": "Standard",
+      "tierControlled": "Controlled",
+      "tierCritical": "Critical",
+      "preliminaryScope": "Preliminary scope",
+      "pointsSelected": "Points selected",
+      "itemsLabel": "items",
+      "estimatedTierLabel": "estimated tier",
+      "notEstimated": "Not estimated",
+      "reviewInMyScope": "Review in My Scope ↗",
+      "clearSelection": "Clear selection",
+      "categories": {
+        "sales": {
+          "name": "Sales",
+          "benefit": "Build a sales operation that finds, qualifies and follows opportunity consistently.",
+          "items": [
+            {
+              "name": "Lead generation/prospecting"
+            },
+            {
+              "name": "Cold email outreach"
+            },
+            {
+              "name": "Lead qualification"
+            },
+            {
+              "name": "Quote/proposal drafting"
+            },
+            {
+              "name": "CRM data entry & pipeline tracking"
+            },
+            {
+              "name": "Follow-up with existing clients"
+            },
+            {
+              "name": "Upsell/cross-sell offer generation"
+            },
+            {
+              "name": "Sales forecasting & reporting"
+            },
+            {
+              "name": "Referral management"
+            }
+          ]
+        },
+        "marketingBranding": {
+          "name": "Marketing & Branding",
+          "benefit": "Create, distribute and measure brand activity without losing consistency.",
+          "items": [
+            {
+              "name": "Website management"
+            },
+            {
+              "name": "SEO"
+            },
+            {
+              "name": "Content writing"
+            },
+            {
+              "name": "Social media posting"
+            },
+            {
+              "name": "Email marketing"
+            },
+            {
+              "name": "Paid ad campaign management"
+            },
+            {
+              "name": "Graphic design (routine)"
+            },
+            {
+              "name": "Market & competitor research"
+            },
+            {
+              "name": "Marketing analytics/reporting"
+            },
+            {
+              "name": "Lead-gen campaigns"
+            }
+          ]
+        },
+        "financeAccounting": {
+          "name": "Finance & Accounting",
+          "benefit": "Turn routine financial administration into a controlled, auditable operating system.",
+          "items": [
+            {
+              "name": "Bookkeeping"
+            },
+            {
+              "name": "Accounts payable"
+            },
+            {
+              "name": "Accounts receivable/invoicing"
+            },
+            {
+              "name": "Payroll processing"
+            },
+            {
+              "name": "Bank reconciliation"
+            },
+            {
+              "name": "Financial statements"
+            },
+            {
+              "name": "Budgeting & forecasting"
+            },
+            {
+              "name": "Expense tracking/reimbursement"
+            },
+            {
+              "name": "Cash flow management"
+            },
+            {
+              "name": "Financial reporting to ownership"
+            },
+            {
+              "name": "Tax preparation (client-validated filing)"
+            }
+          ]
+        },
+        "hrPeople": {
+          "name": "HR & People",
+          "benefit": "Support the employee lifecycle with structured, responsible automation.",
+          "items": [
+            {
+              "name": "Recruiting/job posting"
+            },
+            {
+              "name": "Resume screening"
+            },
+            {
+              "name": "Onboarding"
+            },
+            {
+              "name": "Employee records"
+            },
+            {
+              "name": "Benefits administration"
+            },
+            {
+              "name": "Training & development"
+            },
+            {
+              "name": "PTO/time-off tracking"
+            },
+            {
+              "name": "Workplace policy management"
+            },
+            {
+              "name": "Offboarding"
+            },
+            {
+              "name": "Employment-law compliance tracking"
+            }
+          ]
+        },
+        "customerService": {
+          "name": "Customer Service",
+          "benefit": "Respond faster and maintain a consistent experience from inquiry through follow-up.",
+          "items": [
+            {
+              "name": "Answering inquiries"
+            },
+            {
+              "name": "Complaint triage/handling"
+            },
+            {
+              "name": "Order/service issue resolution"
+            },
+            {
+              "name": "Returns/refunds"
+            },
+            {
+              "name": "FAQ/knowledge base upkeep"
+            },
+            {
+              "name": "Satisfaction surveys"
+            },
+            {
+              "name": "Support ticket tracking"
+            },
+            {
+              "name": "After-sales follow-up"
+            }
+          ]
+        },
+        "operationsAdmin": {
+          "name": "Operations & Admin",
+          "benefit": "Connect the everyday work that keeps the business moving.",
+          "items": [
+            {
+              "name": "Scheduling/calendar management"
+            },
+            {
+              "name": "Document filing"
+            },
+            {
+              "name": "Data entry across systems"
+            },
+            {
+              "name": "Internal communications"
+            },
+            {
+              "name": "Meeting coordination & notetaking"
+            },
+            {
+              "name": "SOP documentation"
+            },
+            {
+              "name": "Project/task tracking"
+            },
+            {
+              "name": "Inventory tracking/reorder alerts"
+            },
+            {
+              "name": "Shipping coordination"
+            }
+          ]
+        },
+        "itTechnology": {
+          "name": "IT & Technology",
+          "benefit": "Keep technology connected, maintained and operational without unnecessary overhead.",
+          "items": [
+            {
+              "name": "Software maintenance/patching"
+            },
+            {
+              "name": "Software license management"
+            },
+            {
+              "name": "IT helpdesk"
+            },
+            {
+              "name": "Data backup"
+            },
+            {
+              "name": "Basic cyber hygiene monitoring"
+            },
+            {
+              "name": "Website/hosting upkeep"
+            },
+            {
+              "name": "Connecting software tools together"
+            }
+          ]
+        },
+        "procurementVendor": {
+          "name": "Procurement & Vendor",
+          "benefit": "Bring structure and visibility to purchasing and supplier performance.",
+          "items": [
+            {
+              "name": "Supplier sourcing/shortlisting"
+            },
+            {
+              "name": "Purchase orders"
+            },
+            {
+              "name": "Reorder/inventory management"
+            },
+            {
+              "name": "Vendor performance tracking"
+            }
+          ]
+        },
+        "legalCompliance": {
+          "name": "Legal & Compliance",
+          "benefit": "Track recurring obligations and keep evidence organized for responsible review.",
+          "items": [
+            {
+              "name": "License/permit renewal tracking & filing"
+            },
+            {
+              "name": "Regulatory compliance tracking"
+            },
+            {
+              "name": "Insurance management"
+            },
+            {
+              "name": "Corporate record-keeping"
+            },
+            {
+              "name": "Privacy/data compliance tracking"
+            }
+          ]
+        },
+        "leadershipStrategy": {
+          "name": "Leadership & Strategy",
+          "benefit": "Give leadership a connected view of performance, opportunity and risk.",
+          "items": [
+            {
+              "name": "KPI/performance dashboards"
+            },
+            {
+              "name": "Investor/board reporting"
+            },
+            {
+              "name": "Company-wide analytics"
+            },
+            {
+              "name": "Risk monitoring/flagging"
+            }
+          ]
+        }
+      }
+    },
+    "pricing": {
+      "eyebrow": "OR ONE / SYSTEM FEES",
+      "title1": "Know the investment.",
+      "titleEmphasis": "Define the scope.",
+      "sub": "One build fee for your system. A base monthly fee for ongoing operation.",
+      "buildFeeLabel": "BUILD FEE",
+      "monthlyFeeLabel": "BASE MONTHLY OR SERVICE FEE",
+      "perMonthSuffix": "/mo",
+      "note1": "All fees in CAD. Points measure the complexity of your selected capabilities and help determine your system tier. Final scope and monthly fee are confirmed through private review.",
+      "note2": "The builder provides a preliminary tier, not a binding quote."
+    },
+    "control": {
+      "eyebrow": "RESPONSIBILITY / AUTHORIZED ACTION",
+      "title1": "You stay",
+      "titleEmphasis": "in control.",
+      "sub": "Agree what the system may do, where your team reviews its work and which actions remain restricted.",
+      "rows": [
+        {
+          "number": "01",
+          "title": "Routine work",
+          "tag": "Within agreed boundaries",
+          "copy": "Research, reporting and reversible administration can be configured to run within approved access and rules."
+        },
+        {
+          "number": "02",
+          "title": "Review points",
+          "tag": "Your team decides where",
+          "copy": "Customer communications, draft invoices and operational updates need clearly defined review and approval rules."
+        },
+        {
+          "number": "03",
+          "title": "Sensitive actions",
+          "tag": "Explicit authority required",
+          "copy": "Payments, payroll, hiring decisions and security changes require specific controls and authorization. Selecting a capability does not grant that authority."
+        }
+      ],
+      "footnote": "Approval rules, access limits and escalation responsibilities are agreed during scoping and validated before launch."
+    },
+    "management": {
+      "eyebrow": "MONTHLY MANAGEMENT / OR SERVICE FEE",
+      "title1": "Built once.",
+      "titleEmphasis": "Looked after continuously.",
+      "sub": "The build fee covers engineering. The monthly OR Service Fee supports the live system within your agreed scope.",
+      "items": [
+        {
+          "title": "Monitor",
+          "copy": "Review workflow health and surface exceptions that need attention."
+        },
+        {
+          "title": "Maintain",
+          "copy": "Maintain approved integrations and configurations as connected systems change."
+        },
+        {
+          "title": "Test",
+          "copy": "Check agreed workflows and controls when changes are introduced."
+        },
+        {
+          "title": "Support",
+          "copy": "Help your team resolve operating issues through the agreed support process."
+        }
+      ],
+      "footnote": "Coverage, review frequency, support arrangements and the final monthly fee are confirmed in your proposal."
+    },
+    "detailsLabels": {
+      "detailsButton": "Details",
+      "viewWhatsIncluded": "View what's included",
+      "viewDetailsFor": "View details for",
+      "close": "Close",
+      "whatsIncluded": "What's included",
+      "whoItSuitsHeading": "Who it suits",
+      "illustrativeExample": "Illustrative example",
+      "youStayInControl": "You stay in control"
+    },
+    "details": {
+      "STARTER": {
+        "itemLabel": "STARTER",
+        "title": "OR ONE Starter",
+        "subtitle": "A focused first system.",
+        "intro": "Build a connected automation system for selected tasks within one business category, up to 30 points. We scope the capabilities, required connections and approval steps, then build and manage the agreed system. You receive a dashboard to review activity and decisions within that focused scope.",
+        "inclusions": [
+          "Up to 30 points of selected capabilities from one category only.",
+          "Build and configuration for the agreed workflow.",
+          "Required connections identified during scoping.",
+          "Dashboard visibility and defined approval steps.",
+          "Managed operation within the agreed service scope."
+        ],
+        "control": "Review proposed outcomes through the dashboard and approve sensitive actions. Changes to selected capabilities are assessed for scope, feasibility and any additional work; a points balance is not an unlimited change allowance.",
+        "whoItSuits": "Businesses beginning with a focused workflow in one function.",
+        "example": "Select lead qualification and related Sales tasks within the 30-point limit, with the exact combination checked in the builder.",
+        "scope": "One category only. The build fee and Base monthly OR Service Fee are displayed on the tier card; final scope is confirmed through review.",
+        "pointsLabel": "Up to 30 Points · one category"
+      },
+      "100": {
+        "itemLabel": "100",
+        "title": "OR ONE 100",
+        "subtitle": "A broader connected scope.",
+        "intro": "Build a coordinated system using up to 100 points of selected capabilities across the available business categories. We define how the selected workflows share information, handle exceptions and bring decisions to you. You receive a managed system and dashboard organized around that agreed combination.",
+        "inclusions": [
+          "Up to 100 points across selected categories.",
+          "Connected workflows and agreed data handovers.",
+          "Build and configuration for the confirmed scope.",
+          "Dashboard visibility and approval steps.",
+          "Managed operation within the agreed service scope."
+        ],
+        "control": "Approve proposed outcomes and sensitive actions through the agreed workflow. Changes are reviewed for feasibility and scope before implementation.",
+        "whoItSuits": "Businesses connecting a broader set of recurring tasks.",
+        "example": "Combine selected Sales and Customer Service capabilities within 100 points, so lead and customer records support a coordinated workflow.",
+        "scope": "Selected capabilities determine coverage; 100 points does not guarantee a whole department is automated. Refer to the tier card for the build fee and Base monthly OR Service Fee.",
+        "pointsLabel": "Up to 100 Points"
+      },
+      "200": {
+        "itemLabel": "200",
+        "title": "OR ONE 200",
+        "subtitle": "More workflows working together.",
+        "intro": "Build a coordinated system using up to 200 points across selected business categories. We design the connections, ownership and approval steps needed for the chosen workflows to work together. You receive consolidated activity visibility and managed operation across the confirmed scope.",
+        "inclusions": [
+          "Up to 200 points across selected categories.",
+          "Shared records and workflow handovers as scoped.",
+          "Build and configuration for the agreed combination.",
+          "Dashboard visibility and approval steps.",
+          "Managed operation within the agreed service scope."
+        ],
+        "control": "Proposed outcomes and sensitive decisions remain subject to approval. Changes to the system are reviewed before implementation.",
+        "whoItSuits": "Businesses coordinating recurring work across several functions.",
+        "example": "Connect selected Marketing, Sales and Customer Service tasks so campaign activity, leads and customer follow-up share an agreed process within 200 points.",
+        "scope": "Coverage depends on selected capabilities and connections. Refer to the tier card for the build fee and Base monthly OR Service Fee.",
+        "pointsLabel": "Up to 200 Points"
+      },
+      "400": {
+        "itemLabel": "400",
+        "title": "OR ONE 400",
+        "subtitle": "An extensive operating scope.",
+        "intro": "Build a wider coordinated system using up to 400 points across the available categories. We map the selected processes, shared information and approval responsibilities into the agreed operating design. You receive a managed system with a central view of activity, exceptions and decisions across those workflows.",
+        "inclusions": [
+          "Up to 400 points across selected categories.",
+          "Coordination of the agreed workflows and handovers.",
+          "Build and configuration for the confirmed operating scope.",
+          "Dashboard visibility and approval steps.",
+          "Managed operation within the agreed service scope."
+        ],
+        "control": "Final outcomes and sensitive actions follow agreed approval rules. Broader coverage does not remove human responsibility or permit unrestricted action.",
+        "whoItSuits": "Businesses needing extensive coordination across multiple functions.",
+        "example": "Connect selected Sales, Finance, Customer Service and Operations workflows within 400 points, with clear handovers and exception reporting.",
+        "scope": "This tier does not promise to run the entire business or every department. Refer to the tier card for the build fee and Base monthly OR Service Fee.",
+        "pointsLabel": "Up to 400 Points"
+      }
+    },
+    "scopeItem": {
+      "notEstimatedTier": "Not estimated",
+      "preliminarySystemSuffix": "preliminary system",
+      "capabilitiesSelected": "{count} capabilities selected across {categories} categories.",
+      "commercialSummary": "{points} / 400 points · {standard} standard · {controlled} controlled · {critical} critical"
+    }
+  },
+  "ScopeTray": {
+    "launcher": "MY SCOPE",
+    "closeAriaLabel": "Close scope tray",
+    "headerLabel": "ORAGROL / PRIVATE SCOPE",
+    "selectedSuffix": "SELECTED",
+    "areas": {
+      "Cybersecurity": "CYBERSECURITY",
+      "Automation": "AUTOMATION",
+      "OR ONE": "OR ONE"
+    },
+    "empty": {
+      "label": "Begin your scope",
+      "heading": "Choose what your business needs.",
+      "body": "Your selections stay together across Services, Business Automation and OR ONE."
+    },
+    "summary": {
+      "label": "PRELIMINARY SCOPE",
+      "heading": "A clearer first conversation.",
+      "body": "Review your selections, add context, then download a PDF or submit for private review."
+    },
+    "removeButton": "Remove",
+    "form": {
+      "priorityLabel": "Priority or context",
+      "priorityPlaceholder": "What should improve first?",
+      "nameLabel": "Name",
+      "emailLabel": "Business email",
+      "phoneLabel": "Phone",
+      "companyLabel": "Company",
+      "timeframeLabel": "Target timeframe",
+      "optionalSuffix": "(optional)",
+      "timeframeNotSpecified": "Not specified",
+      "timeframe30Days": "Within 30 days",
+      "timeframe1to3": "1-3 months",
+      "timeframe3to6": "3-6 months",
+      "timeframeExploring": "Exploring options",
+      "disclosure": "Your name, contact details and selected scope will be shared with ORAGROL to prepare your document and, if you request a review, to follow up with you. This is not a quotation, contract or confirmation of services.",
+      "consentLabel": "I have read the above and agree that ORAGROL may contact me about this scope.",
+      "downloadButton": "Download My Scope PDF",
+      "submittingLabel": "Submitting…",
+      "preparingPdfLabel": "Preparing your PDF…",
+      "submitButton": "Submit for Private Review",
+      "readyHint": "Enter your name, business email, phone and company above to continue.",
+      "pdfTimeout": "Your PDF is taking longer than expected to prepare. Please try again shortly."
+    },
+    "confirmation": {
+      "pdfDownloaded": "Your PDF has been downloaded. Reference: {reference}.",
+      "reviewReceived": "Your private review request has been received. Reference: {reference}.",
+      "downloadCopy": "Download a copy of your scope PDF"
+    },
+    "continueBrowsing": "Continue browsing"
   }
 }

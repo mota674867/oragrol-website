@@ -372,14 +372,14 @@
       "secondaryLabel": "Explorer les forfaits d'automatisation"
     },
     "or-one": {
-      "eyebrow": "Begin privately",
-      "headline": "Bring security, automation and operational intelligence into one coordinated system.",
-      "secondaryLabel": "Explore OR ONE"
+      "eyebrow": "Commencez en privé",
+      "headline": "Réunissez la sécurité, l'automatisation et l'intelligence opérationnelle dans un seul système coordonné.",
+      "secondaryLabel": "Explorer OR ONE"
     },
     "industries": {
-      "eyebrow": "Your clearest next step",
-      "headline": "Protection works better when it reflects how your industry actually operates.",
-      "secondaryLabel": "Find Your Industry"
+      "eyebrow": "Votre prochaine étape la plus claire",
+      "headline": "La protection fonctionne mieux lorsqu'elle reflète la façon dont votre secteur fonctionne réellement.",
+      "secondaryLabel": "Trouvez votre secteur"
     },
     "resources": {
       "eyebrow": "One useful starting point",
@@ -1142,5 +1142,590 @@
         }
       }
     }
+  },
+  "OrOne": {
+    "nav": {
+      "getCyberHealthScore": "Obtenez votre Cyber Health Score",
+      "search": "Recherche",
+      "changeLanguage": "Changer de langue",
+      "myScope": "Ma portée"
+    },
+    "hero": {
+      "meta1": "OR ONE / Système d'affaires coordonné",
+      "meta2": "Sécurité · Automatisation · Intelligence",
+      "model": "Un modèle d'exploitation connecté",
+      "title1": "Un système sécurisé",
+      "title2": "pour le fonctionnement de",
+      "titleEmphasis": "votre entreprise.",
+      "support": "OR ONE relie les systèmes de votre entreprise et coordonne des travailleurs IA dans toute votre organisation grâce à une seule couche opérationnelle sécurisée. Il centralise les approbations, la supervision et la performance, tout en gardant chaque décision importante sous autorité humaine.",
+      "discover": "Découvrir OR ONE",
+      "pillar1": "Protégez ce qui compte",
+      "pillar2": "Automatisez ce qui vous ralentit",
+      "pillar3": "Comprenez ce qui fait avancer l'entreprise",
+      "pillar4": "Fonctionnez comme un seul système"
+    },
+    "intro": {
+      "eyebrow": "Une gamme de produits distincte",
+      "title1": "Votre entreprise,",
+      "titleEmphasis": "exploitée intelligemment.",
+      "body1": "OR ONE est une main-d'œuvre IA dédiée, conçue pour une seule organisation. Elle se connecte aux outils que votre entreprise utilise déjà et fonctionne par un accès clairement autorisé.",
+      "body2": "Elle est entièrement distincte des 67 services standards d'ORAGROL — avec son propre modèle d'ingénierie, sa propre structure de responsabilité et ses propres conditions commerciales.",
+      "quote": "Conçu par ORAGROL Global."
+    },
+    "signature": {
+      "label": "OR / ONE SIGNATURE",
+      "heading": "Votre vision, conçue avec précision.",
+      "body1": "Dites-nous ce que votre entreprise doit accomplir. Nous concevrons et créerons un système sur mesure autour de vos ambitions — des flux de travail intelligents et de l'automatisation aux intégrations, aux contrôles, aux rapports et aux capacités spécialisées.",
+      "body2": "Chaque mandat Signature est examiné en privé et façonné en une architecture personnalisée, une portée définie, un plan de mise en œuvre et une structure de service continue.",
+      "cta": "DÉMARRER VOTRE PROJET SIGNATURE"
+    },
+    "process": {
+      "eyebrow": "DE LA PORTÉE À L'OPÉRATION",
+      "title1": "Une voie claire.",
+      "titleEmphasis": "Un système fonctionnel.",
+      "sub": "Définissez le travail, connectez les bons outils et convenez des contrôles avant le lancement.",
+      "steps": [
+        {
+          "number": "01",
+          "title": "Définir la portée",
+          "copy": "Convenez des flux de travail, des outils, des accès et des résultats que votre système doit soutenir.",
+          "result": "Une portée définie"
+        },
+        {
+          "number": "02",
+          "title": "Construire et connecter",
+          "copy": "Concevez les flux de travail convenus et connectez-les à vos systèmes d'affaires approuvés.",
+          "result": "Des flux de travail connectés"
+        },
+        {
+          "number": "03",
+          "title": "Tester et approuver",
+          "copy": "Passez en revue des scénarios réels avec votre équipe, y compris les exceptions et les points d'approbation.",
+          "result": "Prêt pour le lancement"
+        },
+        {
+          "number": "04",
+          "title": "Lancer et maintenir",
+          "copy": "Mettez en service les flux de travail approuvés avec le suivi et le soutien convenus.",
+          "result": "Un système opérationnel"
+        }
+      ]
+    },
+    "builder": {
+      "eyebrow": "Outil interactif / 77 éléments",
+      "title1": "Bâtissez votre équipe.",
+      "titleEmphasis": "Visualisez la forme du système.",
+      "sub": "Sélectionnez des capacités pour créer une portée préliminaire. L'estimation indique des points et un palier probable — pas un prix final ni une proposition. Les sélections s'arrêtent à 400 points.",
+      "categoryLabel": "Catégorie",
+      "ptsSuffix": "pts",
+      "limitReached": "Limite de 400 points atteinte",
+      "tierStandard": "Standard",
+      "tierControlled": "Contrôlé",
+      "tierCritical": "Critique",
+      "preliminaryScope": "Portée préliminaire",
+      "pointsSelected": "Points sélectionnés",
+      "itemsLabel": "éléments",
+      "estimatedTierLabel": "palier estimé",
+      "notEstimated": "Non estimé",
+      "reviewInMyScope": "Consulter dans Ma portée ↗",
+      "clearSelection": "Effacer la sélection",
+      "categories": {
+        "sales": {
+          "name": "Ventes",
+          "benefit": "Bâtissez une opération de vente qui trouve, qualifie et suit les occasions de façon constante.",
+          "items": [
+            {
+              "name": "Génération de prospects et prospection"
+            },
+            {
+              "name": "Sollicitation par courriel à froid"
+            },
+            {
+              "name": "Qualification des prospects"
+            },
+            {
+              "name": "Rédaction de devis et de propositions"
+            },
+            {
+              "name": "Saisie de données CRM et suivi du pipeline"
+            },
+            {
+              "name": "Suivi auprès des clients existants"
+            },
+            {
+              "name": "Génération d'offres de vente additionnelle et croisée"
+            },
+            {
+              "name": "Prévisions et rapports de vente"
+            },
+            {
+              "name": "Gestion des références"
+            }
+          ]
+        },
+        "marketingBranding": {
+          "name": "Marketing et image de marque",
+          "benefit": "Créez, diffusez et mesurez l'activité de marque sans perdre en cohérence.",
+          "items": [
+            {
+              "name": "Gestion du site Web"
+            },
+            {
+              "name": "Référencement (SEO)"
+            },
+            {
+              "name": "Rédaction de contenu"
+            },
+            {
+              "name": "Publication sur les réseaux sociaux"
+            },
+            {
+              "name": "Marketing par courriel"
+            },
+            {
+              "name": "Gestion de campagnes publicitaires payantes"
+            },
+            {
+              "name": "Conception graphique (routine)"
+            },
+            {
+              "name": "Recherche de marché et concurrentielle"
+            },
+            {
+              "name": "Analytique et rapports marketing"
+            },
+            {
+              "name": "Campagnes de génération de prospects"
+            }
+          ]
+        },
+        "financeAccounting": {
+          "name": "Finances et comptabilité",
+          "benefit": "Transformez l'administration financière courante en un système opérationnel contrôlé et vérifiable.",
+          "items": [
+            {
+              "name": "Tenue de livres"
+            },
+            {
+              "name": "Comptes fournisseurs"
+            },
+            {
+              "name": "Comptes clients et facturation"
+            },
+            {
+              "name": "Traitement de la paie"
+            },
+            {
+              "name": "Rapprochement bancaire"
+            },
+            {
+              "name": "États financiers"
+            },
+            {
+              "name": "Budgétisation et prévisions"
+            },
+            {
+              "name": "Suivi des dépenses et remboursements"
+            },
+            {
+              "name": "Gestion des flux de trésorerie"
+            },
+            {
+              "name": "Rapports financiers à la direction"
+            },
+            {
+              "name": "Préparation fiscale (production validée par le client)"
+            }
+          ]
+        },
+        "hrPeople": {
+          "name": "RH et personnel",
+          "benefit": "Soutenez le cycle de vie des employés grâce à une automatisation structurée et responsable.",
+          "items": [
+            {
+              "name": "Recrutement et affichage de postes"
+            },
+            {
+              "name": "Présélection des CV"
+            },
+            {
+              "name": "Intégration"
+            },
+            {
+              "name": "Dossiers des employés"
+            },
+            {
+              "name": "Administration des avantages sociaux"
+            },
+            {
+              "name": "Formation et perfectionnement"
+            },
+            {
+              "name": "Suivi des congés"
+            },
+            {
+              "name": "Gestion des politiques du milieu de travail"
+            },
+            {
+              "name": "Départ des employés"
+            },
+            {
+              "name": "Suivi de la conformité au droit du travail"
+            }
+          ]
+        },
+        "customerService": {
+          "name": "Service à la clientèle",
+          "benefit": "Répondez plus rapidement et maintenez une expérience cohérente, de la demande initiale jusqu'au suivi.",
+          "items": [
+            {
+              "name": "Réponse aux demandes"
+            },
+            {
+              "name": "Tri et traitement des plaintes"
+            },
+            {
+              "name": "Résolution des problèmes de commande et de service"
+            },
+            {
+              "name": "Retours et remboursements"
+            },
+            {
+              "name": "Mise à jour de la FAQ et de la base de connaissances"
+            },
+            {
+              "name": "Sondages de satisfaction"
+            },
+            {
+              "name": "Suivi des billets de soutien"
+            },
+            {
+              "name": "Suivi après-vente"
+            }
+          ]
+        },
+        "operationsAdmin": {
+          "name": "Opérations et administration",
+          "benefit": "Reliez le travail quotidien qui fait avancer l'entreprise.",
+          "items": [
+            {
+              "name": "Gestion des horaires et des calendriers"
+            },
+            {
+              "name": "Classement de documents"
+            },
+            {
+              "name": "Saisie de données entre systèmes"
+            },
+            {
+              "name": "Communications internes"
+            },
+            {
+              "name": "Coordination des réunions et prise de notes"
+            },
+            {
+              "name": "Documentation des procédures normalisées (PON)"
+            },
+            {
+              "name": "Suivi des projets et des tâches"
+            },
+            {
+              "name": "Suivi des stocks et alertes de réapprovisionnement"
+            },
+            {
+              "name": "Coordination des expéditions"
+            }
+          ]
+        },
+        "itTechnology": {
+          "name": "TI et technologie",
+          "benefit": "Gardez la technologie connectée, entretenue et opérationnelle sans surcharge inutile.",
+          "items": [
+            {
+              "name": "Entretien et correctifs logiciels"
+            },
+            {
+              "name": "Gestion des licences logicielles"
+            },
+            {
+              "name": "Assistance informatique"
+            },
+            {
+              "name": "Sauvegarde des données"
+            },
+            {
+              "name": "Surveillance de base de l'hygiène cybernétique"
+            },
+            {
+              "name": "Entretien du site Web et de l'hébergement"
+            },
+            {
+              "name": "Interconnexion des outils logiciels"
+            }
+          ]
+        },
+        "procurementVendor": {
+          "name": "Approvisionnement et fournisseurs",
+          "benefit": "Apportez de la structure et de la visibilité aux achats et à la performance des fournisseurs.",
+          "items": [
+            {
+              "name": "Recherche et présélection de fournisseurs"
+            },
+            {
+              "name": "Bons de commande"
+            },
+            {
+              "name": "Gestion du réapprovisionnement et des stocks"
+            },
+            {
+              "name": "Suivi de la performance des fournisseurs"
+            }
+          ]
+        },
+        "legalCompliance": {
+          "name": "Juridique et conformité",
+          "benefit": "Suivez les obligations récurrentes et gardez les preuves organisées pour un examen responsable.",
+          "items": [
+            {
+              "name": "Suivi et dépôt des renouvellements de permis et licences"
+            },
+            {
+              "name": "Suivi de la conformité réglementaire"
+            },
+            {
+              "name": "Gestion des assurances"
+            },
+            {
+              "name": "Tenue des registres corporatifs"
+            },
+            {
+              "name": "Suivi de la conformité en matière de confidentialité et de données"
+            }
+          ]
+        },
+        "leadershipStrategy": {
+          "name": "Direction et stratégie",
+          "benefit": "Donnez à la direction une vue connectée de la performance, des occasions et des risques.",
+          "items": [
+            {
+              "name": "Tableaux de bord des indicateurs de performance (KPI)"
+            },
+            {
+              "name": "Rapports aux investisseurs et au conseil d'administration"
+            },
+            {
+              "name": "Analytique à l'échelle de l'entreprise"
+            },
+            {
+              "name": "Surveillance et signalement des risques"
+            }
+          ]
+        }
+      }
+    },
+    "pricing": {
+      "eyebrow": "OR ONE / FRAIS DU SYSTÈME",
+      "title1": "Connaissez l'investissement.",
+      "titleEmphasis": "Définissez la portée.",
+      "sub": "Des frais de construction uniques pour votre système. Des frais mensuels de base pour l'exploitation continue.",
+      "buildFeeLabel": "FRAIS DE CONSTRUCTION",
+      "monthlyFeeLabel": "FRAIS MENSUELS DE BASE DU SERVICE OR",
+      "perMonthSuffix": "/mois",
+      "note1": "Tous les frais sont en CAD. Les points mesurent la complexité de vos capacités sélectionnées et aident à déterminer le palier de votre système. La portée finale et les frais mensuels sont confirmés lors d'un examen privé.",
+      "note2": "L'outil fournit un palier préliminaire, et non un devis contraignant."
+    },
+    "control": {
+      "eyebrow": "RESPONSABILITÉ / ACTION AUTORISÉE",
+      "title1": "Vous gardez",
+      "titleEmphasis": "le contrôle.",
+      "sub": "Convenez de ce que le système peut faire, où votre équipe examine son travail et quelles actions demeurent restreintes.",
+      "rows": [
+        {
+          "number": "01",
+          "title": "Travail courant",
+          "tag": "Dans les limites convenues",
+          "copy": "La recherche, les rapports et l'administration réversible peuvent être configurés pour fonctionner selon les accès et règles approuvés."
+        },
+        {
+          "number": "02",
+          "title": "Points de révision",
+          "tag": "Votre équipe décide où",
+          "copy": "Les communications avec les clients, les ébauches de factures et les mises à jour opérationnelles nécessitent des règles d'examen et d'approbation clairement définies."
+        },
+        {
+          "number": "03",
+          "title": "Actions sensibles",
+          "tag": "Autorité explicite requise",
+          "copy": "Les paiements, la paie, les décisions d'embauche et les changements de sécurité nécessitent des contrôles et une autorisation spécifiques. La sélection d'une capacité n'accorde pas cette autorité."
+        }
+      ],
+      "footnote": "Les règles d'approbation, les limites d'accès et les responsabilités d'escalade sont convenues lors de la définition de la portée et validées avant le lancement."
+    },
+    "management": {
+      "eyebrow": "GESTION MENSUELLE / FRAIS DU SERVICE OR",
+      "title1": "Construit une fois.",
+      "titleEmphasis": "Entretenu en continu.",
+      "sub": "Les frais de construction couvrent l'ingénierie. Les frais mensuels du service OR soutiennent le système en fonction dans le cadre de votre portée convenue.",
+      "items": [
+        {
+          "title": "Surveiller",
+          "copy": "Examinez l'état des flux de travail et faites ressortir les exceptions qui nécessitent une attention."
+        },
+        {
+          "title": "Maintenir",
+          "copy": "Maintenez les intégrations et configurations approuvées à mesure que les systèmes connectés évoluent."
+        },
+        {
+          "title": "Tester",
+          "copy": "Vérifiez les flux de travail et les contrôles convenus lorsque des changements sont apportés."
+        },
+        {
+          "title": "Soutien",
+          "copy": "Aidez votre équipe à résoudre les problèmes d'exploitation grâce au processus de soutien convenu."
+        }
+      ],
+      "footnote": "La couverture, la fréquence des examens, les modalités de soutien et les frais mensuels finaux sont confirmés dans votre proposition."
+    },
+    "detailsLabels": {
+      "detailsButton": "Détails",
+      "viewWhatsIncluded": "Voir ce qui est inclus",
+      "viewDetailsFor": "Voir les détails pour",
+      "close": "Fermer",
+      "whatsIncluded": "Ce qui est inclus",
+      "whoItSuitsHeading": "À qui cela convient",
+      "illustrativeExample": "Exemple illustratif",
+      "youStayInControl": "Vous gardez le contrôle"
+    },
+    "details": {
+      "STARTER": {
+        "itemLabel": "STARTER",
+        "title": "OR ONE Starter",
+        "subtitle": "Un premier système ciblé.",
+        "intro": "Construisez un système d'automatisation connecté pour des tâches sélectionnées au sein d'une seule catégorie d'affaires, jusqu'à 30 points. Nous définissons la portée des capacités, des connexions requises et des étapes d'approbation, puis nous construisons et gérons le système convenu. Vous recevez un tableau de bord pour examiner l'activité et les décisions au sein de cette portée ciblée.",
+        "inclusions": [
+          "Jusqu'à 30 points de capacités sélectionnées, dans une seule catégorie.",
+          "Construction et configuration du flux de travail convenu.",
+          "Connexions requises identifiées lors de la définition de la portée.",
+          "Visibilité par tableau de bord et étapes d'approbation définies.",
+          "Exploitation gérée dans le cadre de la portée de service convenue."
+        ],
+        "control": "Passez en revue les résultats proposés dans le tableau de bord et approuvez les actions sensibles. Les changements aux capacités sélectionnées sont évalués en fonction de la portée, de la faisabilité et de tout travail supplémentaire; un solde de points ne constitue pas une allocation de changement illimitée.",
+        "whoItSuits": "Les entreprises qui débutent avec un flux de travail ciblé dans une seule fonction.",
+        "example": "Sélectionnez la qualification des prospects et les tâches de vente connexes dans la limite de 30 points, la combinaison exacte étant vérifiée dans l'outil.",
+        "scope": "Une seule catégorie. Les frais de construction et les frais mensuels de base du service OR sont indiqués sur la fiche du palier; la portée finale est confirmée lors de l'examen.",
+        "pointsLabel": "Jusqu'à 30 points · une catégorie"
+      },
+      "100": {
+        "itemLabel": "100",
+        "title": "OR ONE 100",
+        "subtitle": "Une portée connectée plus large.",
+        "intro": "Construisez un système coordonné en utilisant jusqu'à 100 points de capacités sélectionnées parmi les catégories d'affaires disponibles. Nous définissons comment les flux de travail sélectionnés partagent l'information, gèrent les exceptions et vous soumettent les décisions. Vous recevez un système géré et un tableau de bord organisés autour de cette combinaison convenue.",
+        "inclusions": [
+          "Jusqu'à 100 points répartis dans les catégories sélectionnées.",
+          "Flux de travail connectés et transferts de données convenus.",
+          "Construction et configuration pour la portée confirmée.",
+          "Visibilité par tableau de bord et étapes d'approbation.",
+          "Exploitation gérée dans le cadre de la portée de service convenue."
+        ],
+        "control": "Approuvez les résultats proposés et les actions sensibles selon le flux de travail convenu. Les changements sont examinés pour leur faisabilité et leur portée avant leur mise en œuvre.",
+        "whoItSuits": "Les entreprises qui relient un ensemble plus large de tâches récurrentes.",
+        "example": "Combinez des capacités sélectionnées de Ventes et de Service à la clientèle dans une limite de 100 points, afin que les dossiers de prospects et de clients soutiennent un flux de travail coordonné.",
+        "scope": "Les capacités sélectionnées déterminent la couverture; 100 points ne garantit pas qu'un département entier soit automatisé. Consultez la fiche du palier pour les frais de construction et les frais mensuels de base du service OR.",
+        "pointsLabel": "Jusqu'à 100 points"
+      },
+      "200": {
+        "itemLabel": "200",
+        "title": "OR ONE 200",
+        "subtitle": "Plus de flux de travail fonctionnant ensemble.",
+        "intro": "Construisez un système coordonné en utilisant jusqu'à 200 points répartis dans les catégories d'affaires sélectionnées. Nous concevons les connexions, la responsabilité et les étapes d'approbation nécessaires pour que les flux de travail choisis fonctionnent ensemble. Vous obtenez une visibilité consolidée de l'activité et une exploitation gérée sur l'ensemble de la portée confirmée.",
+        "inclusions": [
+          "Jusqu'à 200 points répartis dans les catégories sélectionnées.",
+          "Dossiers partagés et transferts entre flux de travail, selon la portée définie.",
+          "Construction et configuration pour la combinaison convenue.",
+          "Visibilité par tableau de bord et étapes d'approbation.",
+          "Exploitation gérée dans le cadre de la portée de service convenue."
+        ],
+        "control": "Les résultats proposés et les décisions sensibles demeurent soumis à approbation. Les changements au système sont examinés avant leur mise en œuvre.",
+        "whoItSuits": "Les entreprises qui coordonnent du travail récurrent dans plusieurs fonctions.",
+        "example": "Reliez des tâches sélectionnées de Marketing, de Ventes et de Service à la clientèle afin que l'activité des campagnes, les prospects et le suivi des clients partagent un processus convenu, dans une limite de 200 points.",
+        "scope": "La couverture dépend des capacités et des connexions sélectionnées. Consultez la fiche du palier pour les frais de construction et les frais mensuels de base du service OR.",
+        "pointsLabel": "Jusqu'à 200 points"
+      },
+      "400": {
+        "itemLabel": "400",
+        "title": "OR ONE 400",
+        "subtitle": "Une portée opérationnelle étendue.",
+        "intro": "Construisez un système coordonné plus vaste en utilisant jusqu'à 400 points parmi les catégories disponibles. Nous cartographions les processus sélectionnés, l'information partagée et les responsabilités d'approbation dans la conception opérationnelle convenue. Vous obtenez un système géré offrant une vue centrale de l'activité, des exceptions et des décisions pour l'ensemble de ces flux de travail.",
+        "inclusions": [
+          "Jusqu'à 400 points répartis dans les catégories sélectionnées.",
+          "Coordination des flux de travail et des transferts convenus.",
+          "Construction et configuration pour la portée opérationnelle confirmée.",
+          "Visibilité par tableau de bord et étapes d'approbation.",
+          "Exploitation gérée dans le cadre de la portée de service convenue."
+        ],
+        "control": "Les résultats finaux et les actions sensibles suivent les règles d'approbation convenues. Une couverture plus large ne supprime pas la responsabilité humaine ni ne permet une action sans restriction.",
+        "whoItSuits": "Les entreprises qui ont besoin d'une coordination étendue entre plusieurs fonctions.",
+        "example": "Reliez des flux de travail sélectionnés de Ventes, Finances, Service à la clientèle et Opérations dans une limite de 400 points, avec des transferts clairs et des rapports d'exception.",
+        "scope": "Ce palier ne promet pas de gérer l'ensemble de l'entreprise ou chaque département. Consultez la fiche du palier pour les frais de construction et les frais mensuels de base du service OR.",
+        "pointsLabel": "Jusqu'à 400 points"
+      }
+    },
+    "scopeItem": {
+      "notEstimatedTier": "Non estimé",
+      "preliminarySystemSuffix": "système préliminaire",
+      "capabilitiesSelected": "{count} capacités sélectionnées dans {categories} catégories.",
+      "commercialSummary": "{points} / 400 points · {standard} standard · {controlled} contrôlé · {critical} critique"
+    }
+  },
+  "ScopeTray": {
+    "launcher": "MA PORTÉE",
+    "closeAriaLabel": "Fermer le panneau de portée",
+    "headerLabel": "ORAGROL / PORTÉE PRIVÉE",
+    "selectedSuffix": "SÉLECTIONNÉ(S)",
+    "areas": {
+      "Cybersecurity": "CYBERSÉCURITÉ",
+      "Automation": "AUTOMATISATION",
+      "OR ONE": "OR ONE"
+    },
+    "empty": {
+      "label": "Commencez votre portée",
+      "heading": "Choisissez ce dont votre entreprise a besoin.",
+      "body": "Vos sélections restent regroupées entre Services, Business Automation et OR ONE."
+    },
+    "summary": {
+      "label": "PORTÉE PRÉLIMINAIRE",
+      "heading": "Une première conversation plus claire.",
+      "body": "Passez en revue vos sélections, ajoutez du contexte, puis téléchargez un PDF ou soumettez une demande d'examen privé."
+    },
+    "removeButton": "Retirer",
+    "form": {
+      "priorityLabel": "Priorité ou contexte",
+      "priorityPlaceholder": "Qu'est-ce qui devrait s'améliorer en premier?",
+      "nameLabel": "Nom",
+      "emailLabel": "Courriel professionnel",
+      "phoneLabel": "Téléphone",
+      "companyLabel": "Entreprise",
+      "timeframeLabel": "Échéancier visé",
+      "optionalSuffix": "(optionnel)",
+      "timeframeNotSpecified": "Non précisé",
+      "timeframe30Days": "Dans les 30 jours",
+      "timeframe1to3": "1 à 3 mois",
+      "timeframe3to6": "3 à 6 mois",
+      "timeframeExploring": "En exploration",
+      "disclosure": "Votre nom, vos coordonnées et la portée sélectionnée seront partagés avec ORAGROL pour préparer votre document et, si vous demandez un examen, pour assurer un suivi auprès de vous. Ceci n'est ni une soumission, ni un contrat, ni une confirmation de services.",
+      "consentLabel": "J'ai lu ce qui précède et j'accepte qu'ORAGROL communique avec moi au sujet de cette portée.",
+      "downloadButton": "Télécharger le PDF de ma portée",
+      "submittingLabel": "Envoi en cours…",
+      "preparingPdfLabel": "Préparation de votre PDF…",
+      "submitButton": "Soumettre pour examen privé",
+      "readyHint": "Entrez votre nom, votre courriel professionnel, votre téléphone et votre entreprise ci-dessus pour continuer.",
+      "pdfTimeout": "La préparation de votre PDF prend plus de temps que prévu. Veuillez réessayer sous peu."
+    },
+    "confirmation": {
+      "pdfDownloaded": "Votre PDF a été téléchargé. Référence : {reference}.",
+      "reviewReceived": "Votre demande d'examen privé a été reçue. Référence : {reference}.",
+      "downloadCopy": "Télécharger une copie du PDF de votre portée"
+    },
+    "continueBrowsing": "Continuer la navigation"
   }
 }

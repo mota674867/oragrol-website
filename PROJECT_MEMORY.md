@@ -4,6 +4,39 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 
 ---
 
+### 2026-09-22 (later same day) — Bilingual EN/FR build, Phase 2e: OR ONE page fully wired, incl. the 77-item builder and all 4 tier Details dialogs; `ScopeTray` (shared, site-wide) translated too — retroactively fixes Services/Business Automation/Contact
+
+**Completed:**
+- Confirmed the Industries patch applied and pushed by Mohammad (`785354e` on `origin/feat/fr-locale`) — `git fetch` + `git reset --hard` to resync before starting, same discipline as every prior phase.
+- Built out Task #21's next page: `/or-one` and `/fr/or-one`, sourced from `ORAGROL_OR_ONE_FR_Translation.md` (page 4 of the project's 5-page translation series — fully complete, no truncation: hero, "separate product line" intro, OR/ONE Signature, "From scope to operation" 4-step process, all 10 builder categories × 77 items with tier labels, all 4 pricing tier cards (STARTER/100/200/400) including their full Details-dialog panels, Responsibility/Authorized-action, Monthly management, and the closing CTA). New `OrOne` messages namespace covers all of it.
+- **Critical safety constraint honored:** the `groups` array in `or-one-client.tsx` (77 item names, 10 category names) was NEVER edited — it's the exact key `OR_ONE_CAPABILITY_BY_NAME` (the permanent capability registry, `app/lib/or-one-capability-registry.ts`), the `selected` Set, and the localStorage-persisted scope state all match against by string identity. Translated display strings live in `OrOne.builder.categories` instead, index-paired against `groups`/`groups[i].items` (never re-keyed by name), resolved purely by array position at render time. A short comment block in both `or-one-client.tsx` and the messages-build script documents why, so a future edit doesn't "clean up" the apparent duplication and break capability-code resolution.
+- Same treatment for the dynamically-built "My Scope" tray entry the builder pushes via `useEffect` (`orone:builder` scope item) — its `title`/`detail`/`commercial` strings were English template literals; now built from new `OrOne.scopeItem.*` keys with interpolation (`{count}`, `{categories}`, `{points}`, `{standard}`, `{controlled}`, `{critical}`), matching the pattern Business Automation already established for its own scope-tray push.
+- **`ScopeTray.tsx` (`app/components/ScopeTray.tsx`) fully translated** — this is a genuinely shared, site-wide component (used by Services, Business Automation, OR ONE, and Contact), so this fix is retroactive: the "My Scope" side panel's full form (name/email/phone/company/timeframe/context, the 4 timeframe `<select>` options, the legal disclosure paragraph, the consent checkbox, both submit buttons and their in-flight labels, the PDF-ready/review-received confirmation screens, the empty state, and the "Continue browsing" footer) is now bilingual everywhere it appears, not just on OR ONE — same class of opportunistic site-wide fix as Phase 2c's `PreFooterCta` catch. New `ScopeTray` namespace. The one module-level (non-component) function, `pollForPdf`, can't call `useTranslations()` itself, so its one user-facing string (the "taking longer than expected" timeout message) is now passed in as a parameter from the component instead of hardcoded.
+- `SharedCta.or-one`'s placeholder English keys got their real French translation from the doc's "Closing" section. While auditing all `SharedCta` keys for this, found Phase 2d's Industries page had actually left `SharedCta.industries` as an English placeholder despite the page itself being fully translated (the closing CTA block just wasn't checked against `SharedCta` specifically) — fixed that too, pulling the real text from `ORAGROL_Industries_FR_Translation.md`'s shared-chrome table ("Votre prochaine étape la plus claire" / "Trouvez votre secteur"). `SharedCta` placeholders remaining: resources, company, contact, faq (4).
+- `review-sections.tsx` (Signature/Process/Pricing/Responsibility/Management — the 5 section components OR ONE renders from a sibling file) converted to `useTranslations`/`useLocale`; no `"use client"` pragma needed there since it's only ever imported from the already-client `or-one-client.tsx`. Pricing's build/monthly fee amounts stay as plain numbers formatted through the same locale-aware `money()` helper Business Automation already uses (`toLocaleString("en-CA"|"fr-CA")`), not literal currency strings in messages — these are pricing facts, not copy.
+- Fixed a real, if minor, pre-existing gap while here: the header's language switcher on this page was a dead `<button>EN / FR</button>` (no href, did nothing) — every other converted page already has a working `Link`/`locale` switcher. Replaced with the same working pattern (`Link href={pathname} locale={otherLocale}`) used on Industries/Business Automation. Not a content change to the English side; the page still renders identical English content at its English URL — this only makes the toggle functional, matching the site-wide pattern every other bilingual page already has.
+- Verified, not assumed: `npx tsc --noEmit` clean, `npm run lint` 0 errors (same 7 pre-existing warnings, one new harmless `react-hooks/exhaustive-deps` warning on a pre-existing `scope` dependency unrelated to this change). Live dev-server diff of `/or-one` vs `/fr/or-one`: hero/builder/pricing copy correctly French, all 77 item names and 10 category names translated, tier risk labels (Standard/Controlled/Critical → Standard/Contrôlé/Critique), all 4 Details dialogs' full content, and — separately — spot-checked `/fr/services`, `/fr/business-automation`, `/fr/contact` to confirm the `ScopeTray` fix actually landed retroactively on all three ("MA PORTÉE"/"Continuer la navigation" present on each). No `MISSING_MESSAGE`/`IntlError` markers in any rendered output (one `$undefined` match on `/or-one` is normal Next.js RSC flight-data serialization, not a translation error — checked the actual context before ruling it out).
+
+**Files changed:**
+- Content: `messages/en.json`, `messages/fr.json` (new `OrOne` and `ScopeTray` namespaces; `SharedCta.or-one` real translation)
+- `app/[locale]/or-one/page.tsx` (static → `generateMetadata`), `or-one-client.tsx`, `review-sections.tsx`
+- `app/components/ScopeTray.tsx` (shared component — affects Services/Business Automation/OR ONE/Contact)
+- `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- None new. The `groups`-array/capability-registry coupling was a known sharp edge going in (flagged in the file's own existing comments) rather than something discovered mid-task; handled by index-pairing rather than by touching the array.
+
+**Problems solved:**
+- OR ONE — the flagship product page, with by far the most content of any page converted so far (77 items) — is now fully bilingual, and the fix incidentally completed 3 other pages' "My Scope" side panel for free.
+
+**Still open / needs verification:**
+- Not yet delivered to Mohammad as a patch — immediate next step.
+- Task #21 remaining: Company, Contact+FAQ, Cyber Health quiz, Resources, Careers/Talent/Partnerships, How We Work, chat widget.
+- Services' own Details-accordion content (`services-details-content.tsx`) and `SharedCta`'s 4 remaining placeholder-English keys (resources/company/contact/faq) are still open, unchanged this phase.
+- Confirmed while browsing the claude.ai Project this phase: `ORAGROL_Contact_FAQ_FR_Translation.md` (page 5 of the 5-page series) is already complete and waiting — Contact+FAQ should be a fast next pickup, same as OR ONE was. `ORAGROL_Company_FR_Translation.md` also exists in the project docs list (not yet opened/verified this session) for whenever Company's turn comes up.
+
+---
+
 ### 2026-09-22 — Bilingual EN/FR build, Phase 2d: Industries page fully wired (incl. full detail-accordion translation)
 
 **Completed:**
