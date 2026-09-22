@@ -387,9 +387,9 @@
       "secondaryLabel": "Explore Our Resources"
     },
     "company": {
-      "eyebrow": "One clear starting point",
-      "headline": "Discover the thinking, experience and purpose behind ORAGROL Global.",
-      "secondaryLabel": "Start a Conversation"
+      "eyebrow": "Un point de départ clair",
+      "headline": "Découvrez la réflexion, l'expérience et la raison d'être derrière ORAGROL Global.",
+      "secondaryLabel": "Démarrer une conversation"
     },
     "contact": {
       "eyebrow": "Un point de départ clair",
@@ -2053,5 +2053,97 @@
         ]
       }
     ]
+  },
+  "Company": {
+    "nav": {
+      "getCyberHealthScore": "Obtenez votre Cyber Health Score",
+      "search": "Recherche",
+      "changeLanguage": "Changer de langue"
+    },
+    "hero": {
+      "eyebrow": "Entreprise / ORAGROL Global",
+      "title": "Conçu pour relier ce que les entreprises ne peuvent plus gérer séparément.",
+      "body": "ORAGROL Global relie la cybersécurité, l'automatisation intelligente et la réflexion opérationnelle à la façon dont une entreprise fonctionne réellement.",
+      "discoverStory": "Découvrez notre histoire",
+      "nameLine": "Orchestrated AI Governance, Risk, Operations and Learning."
+    },
+    "why": {
+      "eyebrow": "01 / Pourquoi ORAGROL existe",
+      "title": "La technologie devrait créer de la confiance, pas plus de complexité.",
+      "body1": "On attend des entreprises en croissance qu'elles protègent davantage de renseignements, fonctionnent avec plus de systèmes et prennent des décisions plus rapidement, souvent sans la structure de spécialistes internes dont disposent les grandes organisations.",
+      "body2": "ORAGROL part de la réalité de l'entreprise. Nous déterminons ce qui doit être protégé, quel travail peut être amélioré et où des systèmes distincts doivent fonctionner ensemble."
+    },
+    "meaning": {
+      "eyebrow": "02 / Le nom",
+      "title": "ORAGROL",
+      "tagline": "Orchestrated AI Governance, Risk, Operations and Learning.",
+      "body": "Un nom créé pour décrire une façon coordonnée de protéger, d'exploiter et d'améliorer continuellement une entreprise moderne.",
+      "terms": [
+        "Orchestrated",
+        "AI",
+        "Governance",
+        "Risk",
+        "Operations",
+        "Learning"
+      ]
+    },
+    "orange": {
+      "eyebrow": "03 / Pourquoi l'orange",
+      "title": "La couleur de la traduction, de la compréhension et de l'action.",
+      "body1": "Inspiré de l'équipe Orange en cybersécurité, l'orange représente le pont entre la perspicacité en matière de sécurité et le développement sécurisé. Il reflète la façon dont ORAGROL transforme les risques découverts en connaissances, en améliorations pratiques et en décisions plus solides.",
+      "body2": "Il est utilisé avec retenue comme signal qu'un élément important devient clair ou prêt à l'action."
+    },
+    "paths": [
+      {
+        "number": "01",
+        "title": "Protéger",
+        "body": "Comprenez votre exposition, renforcez les contrôles essentiels et intervenez avec confiance.",
+        "linkLabel": "Services de cybersécurité"
+      },
+      {
+        "number": "02",
+        "title": "Automatiser",
+        "body": "Améliorez des tâches définies où la coordination et l'exécution peuvent créer une valeur mesurable.",
+        "linkLabel": "Business Automation"
+      },
+      {
+        "number": "03",
+        "title": "Unifier",
+        "body": "Reliez les départements, les systèmes et les décisions au sein d'un seul environnement d'exploitation sécurisé.",
+        "linkLabel": "OR ONE"
+      }
+    ],
+    "founder": {
+      "portraitLabel": "Portrait du fondateur",
+      "portraitPending": "Image finale en attente",
+      "eyebrow": "04 / Fondateur",
+      "title": "Fondé sur l'expérience opérationnelle.",
+      "name": "Mohammad Chelouy Tabrizi",
+      "role": "Fondateur et chef de la direction",
+      "body1": "Mohammad a fondé sa première entreprise de cybersécurité en Iran en 2012. Diriger une véritable entreprise de sécurité et résoudre des problèmes concrets de clients ont façonné la philosophie « l'entreprise d'abord » derrière ORAGROL Global.",
+      "body2": "Sur plus de quinze ans, son travail s'est étendu à la cybersécurité, au développement de marchés régionaux, aux partenariats et aux opérations internationales. Sa formation académique comprend le génie logiciel, un MBA et un doctorat en gestion.",
+      "body3": "Il a fondé ORAGROL Global en Ontario en 2025 pour offrir aux entreprises canadiennes une cybersécurité pratique et une capacité d'exploitation intelligente, sans les obliger à assembler la solution à partir de fournisseurs déconnectés.",
+      "quote": "La technologie devrait rendre une entreprise plus claire, plus forte et plus capable. Si elle ne fait qu'ajouter de la complexité, elle n'a pas résolu le bon problème."
+    },
+    "operating": {
+      "eyebrow": "05 / Comment nous fonctionnons",
+      "title": "Dirigé par le fondateur. Soutenu par des spécialistes. Conçu pour croître de façon responsable.",
+      "body": "La stratégie, la compréhension des clients et les décisions de livraison importantes demeurent proches du fondateur. Les capacités spécialisées et les partenaires de livraison sont utilisés là où ils créent une valeur réelle, avec une autorité humaine définie pour les décisions importantes.",
+      "points": [
+        "Résultat clair",
+        "Responsabilité nommée",
+        "Approbation humaine",
+        "Preuves vérifiables"
+      ]
+    },
+    "canadian": {
+      "eyebrow": "06 / Fondation canadienne",
+      "title": "Ontario, Canada",
+      "hqLabel": "Siège social et bureau enregistré",
+      "hqCity": "Thunder Bay, Ontario",
+      "torontoLabel": "Bureau de Toronto",
+      "torontoCity": "Toronto, Ontario",
+      "body": "Le Canada est la fondation. L'Amérique du Nord est la direction. La norme demeure une réflexion pratique, une technologie responsable et des systèmes conçus autour des entreprises qu'ils servent."
+    }
   }
 }

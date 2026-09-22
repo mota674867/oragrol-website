@@ -4,6 +4,41 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 
 ---
 
+### 2026-09-22 (later same day) — Bilingual EN/FR build, Phase 2g: Company page fully wired; fixed the `SharedCta.company` English placeholder
+
+**Completed:**
+- Confirmed the Contact + FAQ patch applied and pushed by Mohammad (`00dacdd` on `origin/feat/fr-locale`, "ok done, next?") — `git fetch` + `git reset --hard` to resync before starting, same discipline as every prior phase.
+- Built out Task #21's next page: `/company` and `/fr/company`, sourced from `ORAGROL_Company_FR_Translation.md` (a short, single-pass page with no collapsed sections — the doc notes it was pulled directly from the live site, not a draft). New `Company` messages namespace covers the full page: hero, "Why ORAGROL exists," "The name," "Why orange," the 3 Protect/Automate/Unify path cards, Founder, "How we operate," and "Canadian foundation."
+- **Split the page into `page.tsx` + `company-client.tsx`**, same pattern as every other converted page — the pre-existing `page.tsx` was a static Server Component (no `"use client"`, static `metadata` export, dead `<button>EN / FR</button>`), unlike every other route which was already a client-component-plus-metadata-wrapper before this session touched it. Converted `metadata` to `generateMetadata({params})` and moved all JSX into the new client file wired to `useTranslations("Company")`.
+- **Two strings deliberately kept in English on both locales**, per the translation doc's own explicit call-out: "Orchestrated AI Governance, Risk, Operations and Learning" (the letter-by-letter expansion of the ORAGROL name — translating it would break the connection to the brand name's own letters, since a French version wouldn't spell "ORAGROL" anymore) and the 6 individual acronym words (Orchestrated/AI/Governance/Risk/Operations/Learning) in the "The name" section's term grid. Both stored as identical EN/FR values in messages rather than hardcoded outside the translation system, so they're still driven by the same `t()` calls as everything else on the page — just resolve to the same English text either way.
+- Path cards ("Protect"/"Automate"/"Unify") link to Services/Business Automation/OR ONE — translated per the doc: "Cybersecurity Services" → "Services de cybersécurité," but "Business Automation" and "OR ONE" stay as-is in French too (brand/product names, not translated in the source doc).
+- **Found and fixed a real gap while auditing `SharedCta` keys (same category of catch as Phase 2e's `SharedCta.industries` fix):** `SharedCta.company` in `fr.json` was still the English placeholder despite matching the doc's own "Closing" section content almost verbatim in English — fixed with the real French translation ("Un point de départ clair" / "Découvrez la réflexion, l'expérience et la raison d'être derrière ORAGROL Global." / "Démarrer une conversation"). `SharedCta` placeholders remaining after this: resources only (1, down from the original 6 — or-one, industries, contact, faq, company all fixed across this session).
+- Added a working language-switcher `Link` to Company's header, replacing the same dead `<button className="language">EN / FR</button>` pattern fixed on every other page this session.
+- Verified, not assumed: `npx tsc --noEmit` clean, `npm run lint` 0 errors (same 7 pre-existing warnings). Live dev-server check of both routes (200s). Grep-verified translated content on `/fr/company` including confirmation that the two deliberately-English strings (name-line, acronym terms) render correctly in English on the French page, and that the `SharedCta.company` fix actually landed (French closing-CTA text where English placeholder used to be). No `MISSING_MESSAGE`/`IntlError` markers. Playwright screenshots of hero/story/paths/founder/operating/closing-CTA sections on both locales confirmed clean rendering, correct layout, and the new working language switcher (href pattern `/en/company` from `/fr/company`, matching every other converted page's existing behavior — not a regression).
+
+**Files changed:**
+- Content: `messages/en.json`, `messages/fr.json` (new `Company` namespace; `SharedCta.company` real translation)
+- `app/[locale]/company/page.tsx` (static Server Component → `generateMetadata` wrapper), new `app/[locale]/company/company-client.tsx`
+- `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- `SharedCta.company` English placeholder in `fr.json` (see above) — same class of gap as Phase 2e's Industries catch, found the same way (auditing `SharedCta` keys against the page's own closing section while building it).
+- Company's `page.tsx` was the one remaining static Server Component among Task #21's pages (every other route had already been split into page+client before this session started touching it) — not a bug, just meant this page needed the file-split step the others didn't.
+
+**Problems solved:**
+- Company is now fully bilingual, including the deliberately-untranslated brand-acronym strings staying correct in both locales, and the closing CTA no longer silently shows English on `/fr/company`.
+
+**Still open / needs verification:**
+- Not yet delivered to Mohammad as a patch — immediate next step.
+- Task #21 remaining: Cyber Health quiz, Resources (flagged in its own doc as the largest remaining item, likely its own multi-file delivery), Careers/Talent/Partnerships, How We Work, chat widget.
+- Services' own Details-accordion content (`app/lib/services-details-content.tsx`, ~370 lines) still untranslated — unblocked via the `labels` prop already added to `DetailsDialog.tsx` in an earlier phase, but not yet done.
+- `SharedCta` placeholders remaining: resources only.
+- Legal pages (Privacy/Terms/Accessibility) stay English-only per Mohammad's earlier explicit decision.
+- PR #13 should stay unmerged into `main` until the whole site is bilingual (Mohammad agreed to this earlier).
+- The Company doc itself flags a live-site content gap, not a translation issue: the founder section still shows literal "Founder portrait / Final image pending" placeholder text (now translated into both locales, but the underlying image is still missing) — worth flagging to Mohammad separately from the bilingual work.
+
+---
+
 ### 2026-09-22 (later same day) — Bilingual EN/FR build, Phase 2f: Contact + FAQ pages fully wired (36 Q&As custom-translated against live code, not the richer draft doc)
 
 **Completed:**

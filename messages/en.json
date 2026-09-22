@@ -2053,5 +2053,97 @@
         ]
       }
     ]
+  },
+  "Company": {
+    "nav": {
+      "getCyberHealthScore": "Get Cyber Health Score",
+      "search": "Search",
+      "changeLanguage": "Change language"
+    },
+    "hero": {
+      "eyebrow": "Company / ORAGROL Global",
+      "title": "Built to connect what business can no longer manage separately.",
+      "body": "ORAGROL Global connects cybersecurity, intelligent automation and operational thinking around how a business actually works.",
+      "discoverStory": "Discover our story",
+      "nameLine": "Orchestrated AI Governance, Risk, Operations and Learning."
+    },
+    "why": {
+      "eyebrow": "01 / Why ORAGROL exists",
+      "title": "Technology should create confidence, not more complexity.",
+      "body1": "Growing businesses are expected to protect more information, operate across more systems and make faster decisions, often without the internal specialist structure available to larger organizations.",
+      "body2": "ORAGROL begins with the reality of the business. We identify what must be protected, what work can be improved and where separate systems need to operate together."
+    },
+    "meaning": {
+      "eyebrow": "02 / The name",
+      "title": "ORAGROL",
+      "tagline": "Orchestrated AI Governance, Risk, Operations and Learning.",
+      "body": "A name created to describe a coordinated way of protecting, operating and continuously improving a modern business.",
+      "terms": [
+        "Orchestrated",
+        "AI",
+        "Governance",
+        "Risk",
+        "Operations",
+        "Learning"
+      ]
+    },
+    "orange": {
+      "eyebrow": "03 / Why orange",
+      "title": "The colour of translation, understanding and action.",
+      "body1": "Inspired by the cybersecurity Orange Team, orange represents the bridge between security insight and secure development. It reflects how ORAGROL turns discovered risk into knowledge, practical improvement and stronger decisions.",
+      "body2": "It is used with control as a signal that something important is becoming clear or ready for action."
+    },
+    "paths": [
+      {
+        "number": "01",
+        "title": "Protect",
+        "body": "Understand exposure, strengthen essential controls and respond with confidence.",
+        "linkLabel": "Cybersecurity Services"
+      },
+      {
+        "number": "02",
+        "title": "Automate",
+        "body": "Improve defined jobs where coordination and execution can create measurable value.",
+        "linkLabel": "Business Automation"
+      },
+      {
+        "number": "03",
+        "title": "Unify",
+        "body": "Connect departments, systems and decisions within one secure operating environment.",
+        "linkLabel": "OR ONE"
+      }
+    ],
+    "founder": {
+      "portraitLabel": "Founder portrait",
+      "portraitPending": "Final image pending",
+      "eyebrow": "04 / Founder",
+      "title": "Built from operating experience.",
+      "name": "Mohammad Chelouy Tabrizi",
+      "role": "Founder and CEO",
+      "body1": "Mohammad built his first cybersecurity company in Iran in 2012. Running a real security business and solving practical client problems shaped the business first philosophy behind ORAGROL Global.",
+      "body2": "Across more than fifteen years, his work has extended through cybersecurity, regional market development, partnerships and international operations. His academic background includes software engineering, an MBA and a PhD in Management.",
+      "body3": "He founded ORAGROL Global in Ontario in 2025 to give Canadian businesses practical cybersecurity and intelligent operating capability without forcing them to assemble the solution from disconnected providers.",
+      "quote": "Technology should make a business clearer, stronger and more capable. If it only adds complexity, it has not solved the right problem."
+    },
+    "operating": {
+      "eyebrow": "05 / How we operate",
+      "title": "Founder led. Specialist supported. Built to scale responsibly.",
+      "body": "Strategy, client understanding and consequential delivery decisions remain close to the founder. Specialist capabilities and delivery partners are used where they create real value, with defined human authority for important decisions.",
+      "points": [
+        "Clear outcome",
+        "Named responsibility",
+        "Human approval",
+        "Reviewable evidence"
+      ]
+    },
+    "canadian": {
+      "eyebrow": "06 / Canadian foundation",
+      "title": "Ontario, Canada",
+      "hqLabel": "Headquarters and Registered Office",
+      "hqCity": "Thunder Bay, Ontario",
+      "torontoLabel": "Toronto Office",
+      "torontoCity": "Toronto, Ontario",
+      "body": "Canada is the foundation. North America is the direction. The standard remains practical thinking, responsible technology and systems built around the businesses they serve."
+    }
   }
 }
