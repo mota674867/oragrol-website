@@ -23,6 +23,18 @@ import { useEffect, useId, useRef } from "react";
  * spacing Tailwind classes are fine; only color/font properties are
  * inherited/cascading values at risk of that specific problem.
  *
+ * Bilingual (D-086, Task #21): the six chrome strings around the
+ * content ("Details" trigger, "View what's included", "View details
+ * for {title}", "Close", "What's included", "Who it suits",
+ * "Illustrative example") are optional props with their original
+ * English literals as defaults — so every existing call site (Services'
+ * still-English "Details" accordion content, and any future page that
+ * hasn't been converted yet) keeps rendering byte-identical English
+ * with zero changes required. Only a caller that explicitly passes
+ * translated `labels` (Business Automation, on /fr) sees French chrome
+ * around its French content. This is the same "optional prop, English
+ * default" pattern used for `controlHeading` already in this file.
+ *
  * Contrast, computed with the real WCAG relative-luminance formula,
  * not estimated:
  * - Charcoal (#141717) on Ivory (#f4f1e9): 15.97:1
@@ -49,6 +61,26 @@ export type DetailsAction = {
   disabled?: boolean;
 };
 
+export type DetailsDialogLabels = {
+  detailsButton: string;
+  viewWhatsIncluded: string;
+  viewDetailsFor: string;
+  close: string;
+  whatsIncluded: string;
+  whoItSuitsHeading: string;
+  illustrativeExample: string;
+};
+
+const ENGLISH_DEFAULT_LABELS: DetailsDialogLabels = {
+  detailsButton: "Details",
+  viewWhatsIncluded: "View what's included",
+  viewDetailsFor: "View details for",
+  close: "Close",
+  whatsIncluded: "What's included",
+  whoItSuitsHeading: "Who it suits",
+  illustrativeExample: "Illustrative example",
+};
+
 export function DetailsDialog({
   category,
   itemLabel,
@@ -62,6 +94,7 @@ export function DetailsDialog({
   example,
   scope,
   action,
+  labels = ENGLISH_DEFAULT_LABELS,
 }: {
   category: string;
   itemLabel: string;
@@ -75,6 +108,7 @@ export function DetailsDialog({
   example?: string;
   scope?: string;
   action?: DetailsAction;
+  labels?: DetailsDialogLabels;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -112,9 +146,9 @@ export function DetailsDialog({
           ref={triggerRef}
           type="button"
           onClick={open}
-          aria-label={`View details for ${title}`}
+          aria-label={`${labels.viewDetailsFor} ${title}`}
           aria-describedby={tooltipId}
-          title="View what's included"
+          title={labels.viewWhatsIncluded}
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -148,7 +182,7 @@ export function DetailsDialog({
           >
             i
           </span>
-          <span style={{ fontSize: "14px", fontWeight: 600 }}>Details</span>
+          <span style={{ fontSize: "14px", fontWeight: 600 }}>{labels.detailsButton}</span>
         </button>
         {/* Screen-reader-only: the visible hover tooltip is the native
             title attribute above (the browser positions it itself,
@@ -172,7 +206,7 @@ export function DetailsDialog({
             border: 0,
           }}
         >
-          View what&apos;s included
+          {labels.viewWhatsIncluded}
         </span>
       </span>
 
@@ -200,7 +234,7 @@ export function DetailsDialog({
           <button
             type="button"
             onClick={() => dialogRef.current?.close()}
-            aria-label="Close"
+            aria-label={labels.close}
             style={{
               position: "sticky",
               float: "right",
@@ -264,7 +298,7 @@ export function DetailsDialog({
             className="details-dialog-grid"
           >
             <div>
-              <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 800, color: CHARCOAL }}>What&apos;s included</h3>
+              <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 800, color: CHARCOAL }}>{labels.whatsIncluded}</h3>
               <ul style={{ margin: "14px 0 0", padding: 0, listStyle: "none" }}>
                 {inclusions.map((item, i) => (
                   <li
@@ -291,7 +325,7 @@ export function DetailsDialog({
               <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 800, color: CHARCOAL }}>{controlHeading}</h3>
               <p style={{ margin: "12px 0 0", fontSize: "16px", lineHeight: 1.6, color: CHARCOAL }}>{control}</p>
 
-              <h3 style={{ margin: "24px 0 0", fontSize: "20px", fontWeight: 800, color: CHARCOAL }}>Who it suits</h3>
+              <h3 style={{ margin: "24px 0 0", fontSize: "20px", fontWeight: 800, color: CHARCOAL }}>{labels.whoItSuitsHeading}</h3>
               <p style={{ margin: "12px 0 0", fontSize: "16px", lineHeight: 1.6, color: CHARCOAL }}>{whoItSuits}</p>
 
               {example && (
@@ -313,7 +347,7 @@ export function DetailsDialog({
                       color: ACCENT_ON_LIGHT,
                     }}
                   >
-                    Illustrative example
+                    {labels.illustrativeExample}
                   </p>
                   <p style={{ margin: "8px 0 0", fontSize: "16px", lineHeight: 1.55, color: CHARCOAL }}>{example}</p>
                 </div>

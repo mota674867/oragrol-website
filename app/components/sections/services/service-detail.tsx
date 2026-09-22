@@ -1,5 +1,5 @@
 import { ChevronRight } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Badge, ButtonLink, Caption, Container, DataText, H1, H2, Icon, Section, Text } from "../../ui";
 import { Reveal } from "../../motion/reveal";
 import { InlineMarkdown } from "../resources/inline-markdown";
@@ -56,6 +56,14 @@ function BulletList({ items }: { items: string[] }) {
  * (`getCategoryRootPath`), not passed in separately, so it can't drift
  * out of sync with which page a given service actually lives under.
  */
+/**
+ * Bilingual: `rootLabel` stays "Business Automation" / "Services" in both
+ * locales — these are the site's top-level nav item names, kept English
+ * everywhere else (site-header's `NAV_LINKS`, `OragrolMegaNav`'s
+ * `NAV_ITEMS`), same convention applied here. `aria-label="Breadcrumb"` and
+ * `serviceName`/`category.name` (already locale-selected by the caller via
+ * `getServiceBySlug(slug, locale)`) carry the translation.
+ */
 function ServiceBreadcrumb({ category, serviceName }: { category: RawCategory; serviceName: string }) {
   const rootPath = getCategoryRootPath(category.code);
   const rootLabel = isBusinessAutomationCategory(category.code) ? "Business Automation" : "Services";
@@ -95,7 +103,19 @@ function ServiceField({ label, children }: { label: string; children: React.Reac
   );
 }
 
-export function ServiceDetail({ service, category }: { service: RawService; category: RawCategory }) {
+export function ServiceDetail({
+  service,
+  category,
+  isFr = false,
+}: {
+  service: RawService;
+  category: RawCategory;
+  /** Bilingual (Phase 2m): `service`/`category` are already the correct
+   *  locale's content (the caller resolved that via `getServiceBySlug(code,
+   *  locale)`) — this only drives the handful of hardcoded UI strings on
+   *  this page (field labels, CTA copy). */
+  isFr?: boolean;
+}) {
   const icon = getCategoryIcon(category.code);
 
   return (
@@ -144,27 +164,27 @@ export function ServiceDetail({ service, category }: { service: RawService; cate
       <Section environment="dark" className="py-16 md:py-20">
         <Container size="md">
           <Reveal>
-            <ServiceField label="The Challenge">
+            <ServiceField label={isFr ? "Le défi" : "The Challenge"}>
               <Paragraphs text={service.problem} />
             </ServiceField>
           </Reveal>
           <Reveal delay={0.05}>
-            <ServiceField label="What Oragrol Does">
+            <ServiceField label={isFr ? "Ce qu'ORAGROL fait" : "What Oragrol Does"}>
               <Paragraphs text={service.what_we_do} />
             </ServiceField>
           </Reveal>
           <Reveal delay={0.1}>
-            <ServiceField label="What You Get">
+            <ServiceField label={isFr ? "Ce que vous obtenez" : "What You Get"}>
               <BulletList items={service.deliverables} />
             </ServiceField>
           </Reveal>
           <Reveal delay={0.15}>
-            <ServiceField label="Benefits">
+            <ServiceField label={isFr ? "Avantages" : "Benefits"}>
               <BulletList items={service.benefits} />
             </ServiceField>
           </Reveal>
           <Reveal delay={0.2}>
-            <ServiceField label="The Outcome">
+            <ServiceField label={isFr ? "Le résultat" : "The Outcome"}>
               <Paragraphs text={service.outcome} />
             </ServiceField>
           </Reveal>
@@ -173,10 +193,10 @@ export function ServiceDetail({ service, category }: { service: RawService; cate
             <div className="env-dark relative mt-14 overflow-hidden rounded-2xl border border-border bg-background p-8 md:p-10">
               <GlowEffect blur="strong" className="opacity-40" />
               <div className="relative">
-                <Caption tone="accent">Next step</Caption>
+                <Caption tone="accent">{isFr ? "Prochaine étape" : "Next step"}</Caption>
                 <H2 className="mt-3">{service.blurb}</H2>
                 <ButtonLink href="/contact" variant="primary" size="lg" className="mt-6">
-                  Talk to Oragrol
+                  {isFr ? "Parler à ORAGROL" : "Talk to Oragrol"}
                 </ButtonLink>
               </div>
             </div>

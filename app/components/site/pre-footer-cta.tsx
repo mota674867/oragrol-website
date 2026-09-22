@@ -1,4 +1,6 @@
-import Link from "next/link";
+"use client";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import "../../pre-footer-cta.css";
 
 /**
@@ -9,13 +11,38 @@ import "../../pre-footer-cta.css";
  * place instead of being re-typed as props at each call site.
  *
  * `page` is required deliberately (no pathname auto-detection) — every
- * call site passes it explicitly, which keeps this a plain server-
- * renderable component (no "use client"/usePathname needed) and never
- * depends on the URL matching what the caller intended.
+ * call site passes it explicitly, which keeps the copy decoupled from
+ * the URL matching what the caller intended.
  *
  * Styling lives in app/pre-footer-cta.css (see that file for why —
- * styled-jsx would force this into a Client Component, which broke the
- * Server Component pages that render it).
+ * styled-jsx would force this into a Client Component on its own,
+ * which broke the Server Component pages that used to render it).
+ *
+ * Bilingual (D-086, Task #21): found while building the Business
+ * Automation page — this component was never converted in Phase 2, so
+ * every "done" French page (Homepage, Services) was silently showing
+ * this exact English block right before the footer. Fixed here, which
+ * retroactively completes those two pages too, not just this one.
+ *
+ * Deliberately `"use client"` + `useTranslations` here, NOT
+ * `getTranslations` — almost every call site (home-client.tsx,
+ * services-client.tsx, ba-client.tsx, industries-client.tsx,
+ * or-one-client.tsx, contact-client.tsx, resources-client.tsx,
+ * faq-client.tsx) is itself a Client Component, and a Client Component
+ * cannot render an async Server Component via a direct JSX import (the
+ * exact bug this same build already hit once with HomeCybersecurity —
+ * see home-section-04.tsx). Making this a small Client Component is the
+ * one direction that's safe from every call site, server or client;
+ * the two Server Component callers (company/page.tsx,
+ * resources/[slug]/page.tsx) can render a Client Component with no
+ * issue, so nothing else needed to change there.
+ *
+ * `messages.SharedCta` carries all 9 CTAKeys so every current and
+ * future caller resolves cleanly under /fr; only the 3 pages actually
+ * translated so far (home, services, business-automation) have real
+ * French copy — the other 6 keys hold English placeholder text until
+ * their own page's turn in Task #21, flagged in PROJECT_MEMORY rather
+ * than left as a silent gap.
  */
 export type CTAKey =
   | "home"
@@ -28,102 +55,43 @@ export type CTAKey =
   | "contact"
   | "faq";
 
-type CTAContent = {
-  eyebrow: string;
-  headline: string;
-  secondaryLabel: string;
-  secondaryHref: string;
-};
-
-const CTA_CONTENT: Record<CTAKey, CTAContent> = {
-  home: {
-    eyebrow: "Clarity before complexity",
-    headline:
-      "Cybersecurity protection. Intelligent business automation. OR ONE coordinated system.",
-    secondaryLabel: "Explore What ORAGROL Does",
-    secondaryHref: "/services",
-  },
-  services: {
-    eyebrow: "Your clearest next step",
-    headline:
-      "The right protection begins with understanding what matters most.",
-    secondaryLabel: "Build Your Scope",
-    // Was #or10-index (the old radial category index) — that anchor no
-    // longer exists after the 2026-09-08 rebuild. Points at the new
-    // page's real first buyable section instead.
-    secondaryHref: "/services#service-packages",
-  },
-  "business-automation": {
-    eyebrow: "Your clearest next step",
-    headline:
-      "Find where time is being lost and where intelligent automation can create measurable value.",
-    secondaryLabel: "Explore Automation Packages",
-    secondaryHref: "/business-automation#packages",
-  },
-  "or-one": {
-    eyebrow: "Begin privately",
-    headline:
-      "Bring security, automation and operational intelligence into one coordinated system.",
-    secondaryLabel: "Explore OR ONE",
-    secondaryHref: "/or-one#one-intro",
-  },
-  industries: {
-    eyebrow: "Your clearest next step",
-    headline:
-      "Protection works better when it reflects how your industry actually operates.",
-    secondaryLabel: "Find Your Industry",
-    secondaryHref: "/industries#industry-index",
-  },
-  resources: {
-    eyebrow: "One useful starting point",
-    headline:
-      "Turn credible insight into clearer decisions and practical action.",
-    secondaryLabel: "Explore Our Resources",
-    secondaryHref: "/resources#resource-library",
-  },
-  company: {
-    eyebrow: "One clear starting point",
-    headline:
-      "Discover the thinking, experience and purpose behind ORAGROL Global.",
-    secondaryLabel: "Start a Conversation",
-    secondaryHref: "/contact",
-  },
-  contact: {
-    eyebrow: "One clear starting point",
-    headline:
-      "Start with clarity. We will help you identify the most valuable next step.",
-    secondaryLabel: "Submit an Enquiry",
-    secondaryHref: "/contact#enquiry",
-  },
-  faq: {
-    eyebrow: "Still have a question?",
-    headline:
-      "Still looking for clarity? Let us help you find the right answer.",
-    secondaryLabel: "Contact ORAGROL",
-    secondaryHref: "/contact",
-  },
+// Hrefs are internal paths, not translatable copy — next-intl's Link
+// prefixes them with /fr automatically, so these stay a plain lookup.
+const SECONDARY_HREF: Record<CTAKey, string> = {
+  home: "/services",
+  // Was #or10-index (the old radial category index) — that anchor no
+  // longer exists after the 2026-09-08 rebuild. Points at the new
+  // page's real first buyable section instead.
+  services: "/services#service-packages",
+  "business-automation": "/business-automation#packages",
+  "or-one": "/or-one#one-intro",
+  industries: "/industries#industry-index",
+  resources: "/resources#resource-library",
+  company: "/contact",
+  contact: "/contact#enquiry",
+  faq: "/contact",
 };
 
 export default function PreFooterCta({ page }: { page: CTAKey }) {
-  const content = CTA_CONTENT[page];
+  const t = useTranslations("SharedCta");
 
   return (
     <section className="oragrol-cta" aria-labelledby={`oragrol-cta-${page}`}>
       <div className="oragrol-cta__inner">
         <div className="oragrol-cta__copy">
-          <p className="oragrol-cta__eyebrow">{content.eyebrow}</p>
+          <p className="oragrol-cta__eyebrow">{t(`${page}.eyebrow`)}</p>
           <h2 id={`oragrol-cta-${page}`} className="oragrol-cta__headline">
-            {content.headline}
+            {t(`${page}.headline`)}
           </h2>
         </div>
 
         <div className="oragrol-cta__actions">
           <Link className="oragrol-cta__primary" href="/cyber-health">
-            <span>Get Your Cyber Health Score</span>
+            <span>{t("getCyberHealthScore")}</span>
             <span aria-hidden="true">↗</span>
           </Link>
-          <Link className="oragrol-cta__secondary" href={content.secondaryHref}>
-            <span>{content.secondaryLabel}</span>
+          <Link className="oragrol-cta__secondary" href={SECONDARY_HREF[page]}>
+            <span>{t(`${page}.secondaryLabel`)}</span>
             <span aria-hidden="true">↗</span>
           </Link>
         </div>

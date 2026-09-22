@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useId, useRef, useState } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 export type MenuLink = { label: string; href: string; description?: string };
 export type MenuGroup = { title?: string; links: MenuLink[] };
@@ -11,7 +11,9 @@ export type OragrolMegaNavProps = {
    *  source of truth this is built from. No invented routes. */
   items: NavItem[];
   label?: string;
-  /** Current page's pathname (from next/navigation's usePathname()) — used
+  /** Current page's pathname (from next-intl's locale-aware usePathname()
+   *  in @/i18n/navigation, NOT next/navigation — it must be the canonical,
+   *  locale-stripped path so this still matches on /fr/* pages) — used
    *  to mark the matching top-level item with the site's existing active
    *  underline. Adapted in from the standalone spec: every page already
    *  needed this (each page previously hardcoded its own `active` class by

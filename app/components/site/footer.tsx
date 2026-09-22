@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
+import { useLocale } from "next-intl";
 import { useId, useState } from "react";
 import type { CSSProperties, FormEvent, ReactNode } from "react";
 import styles from "./footer.module.css";
@@ -25,6 +26,20 @@ import { submitNewsletter } from "../../lib/submit-newsletter";
  * Careers / Talent / Partnerships shipped 2026-09-06 as their own
  * standalone logo-only pages (no shared nav/footer, per the handoff) and
  * are now real links here too.
+ *
+ * Bilingual (Phase 2l follow-up, discovered while translating the legal
+ * pages): this component, despite already importing the locale-aware
+ * `Link`, had ZERO actual text translation — every string was hardcoded
+ * English, on every single redesigned page's French version (confirmed via
+ * a live /fr/company screenshot showing an all-English footer). This was a
+ * site-wide gap, not specific to Legal Pages, so it's fixed here rather
+ * than flagged-and-deferred: added `useLocale` + `isFr` ternaries for the
+ * section headings, newsletter copy, form labels/placeholders/messages, and
+ * social aria-labels. Left in English, matching the established
+ * nav-link-label convention used everywhere else on the site (site-header,
+ * the old site-footer.tsx, OragrolMegaNav's NAV_ITEMS): the sitemap/
+ * company/legal link LABELS themselves (Home, Services, Company, Privacy
+ * Policy, ...) — these are page names, not sentence-level UI copy.
  */
 
 type NewsletterSubmission = { firstName: string; email: string; consent: true };
@@ -76,8 +91,8 @@ const SOCIAL_LINKS = {
   instagram: "https://www.instagram.com/oragrolglobal/",
 };
 
-function NavLink({ label, href }: { label: string; href: string | null }) {
-  return href ? <Link href={href}>{label}</Link> : <span className={styles.pending} title="Coming soon">{label}</span>;
+function NavLink({ label, href, isFr }: { label: string; href: string | null; isFr: boolean }) {
+  return href ? <Link href={href}>{label}</Link> : <span className={styles.pending} title={isFr ? "Bientôt disponible" : "Coming soon"}>{label}</span>;
 }
 
 export default function SiteFooter({
@@ -88,6 +103,8 @@ export default function SiteFooter({
   year = 2026,
 }: SiteFooterProps = {}) {
   const id = useId();
+  const locale = useLocale();
+  const isFr = locale === "fr";
   const [status, setStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
 
@@ -106,11 +123,11 @@ export default function SiteFooter({
         consent: true,
       });
       setStatus("success");
-      setMessage("Thank you. You’re subscribed to the monthly briefing.");
+      setMessage(isFr ? "Merci. Vous êtes maintenant abonné à l’infolettre mensuelle." : "Thank you. You’re subscribed to the monthly briefing.");
       form.reset();
     } catch {
       setStatus("error");
-      setMessage("We couldn’t complete your signup. Please try again.");
+      setMessage(isFr ? "Nous n’avons pas pu terminer votre inscription. Veuillez réessayer." : "We couldn’t complete your signup. Please try again.");
     }
   }
 
@@ -118,58 +135,58 @@ export default function SiteFooter({
     <footer className={styles.footer}>
       <div className={styles.grid}>
         <div>
-          <h2 className={styles.heading} id={`${id}-sitemap`}>SITEMAP</h2>
+          <h2 className={styles.heading} id={`${id}-sitemap`}>{isFr ? "PLAN DU SITE" : "SITEMAP"}</h2>
           <nav aria-labelledby={`${id}-sitemap`}>
             <ul className={styles.links}>
-              {sitemapLinks.map(([label, href]) => <li key={label}><NavLink label={label} href={href} /></li>)}
+              {sitemapLinks.map(([label, href]) => <li key={label}><NavLink label={label} href={href} isFr={isFr} /></li>)}
             </ul>
           </nav>
           <div className={styles.socials}>
-            <a href={SOCIAL_LINKS.linkedin} aria-label="ORAGROL Global on LinkedIn" target="_blank" rel="noreferrer"><LinkedInIcon /></a>
-            <a href={SOCIAL_LINKS.instagram} aria-label="ORAGROL Global on Instagram" target="_blank" rel="noreferrer"><InstagramIcon /></a>
+            <a href={SOCIAL_LINKS.linkedin} aria-label={isFr ? "ORAGROL Global sur LinkedIn" : "ORAGROL Global on LinkedIn"} target="_blank" rel="noreferrer"><LinkedInIcon /></a>
+            <a href={SOCIAL_LINKS.instagram} aria-label={isFr ? "ORAGROL Global sur Instagram" : "ORAGROL Global on Instagram"} target="_blank" rel="noreferrer"><InstagramIcon /></a>
           </div>
         </div>
 
         <div>
-          <h2 className={styles.heading} id={`${id}-company`}>COMPANY</h2>
+          <h2 className={styles.heading} id={`${id}-company`}>{isFr ? "ENTREPRISE" : "COMPANY"}</h2>
           <nav aria-labelledby={`${id}-company`}>
             <ul className={styles.links}>
-              {companyLinks.map(([label, href]) => <li key={label}><NavLink label={label} href={href} /></li>)}
+              {companyLinks.map(([label, href]) => <li key={label}><NavLink label={label} href={href} isFr={isFr} /></li>)}
             </ul>
           </nav>
         </div>
 
         <div>
-          <h2 className={styles.heading} id={`${id}-legal`}>LEGAL</h2>
+          <h2 className={styles.heading} id={`${id}-legal`}>{isFr ? "MENTIONS LÉGALES" : "LEGAL"}</h2>
           <nav aria-labelledby={`${id}-legal`}>
             <ul className={styles.links}>
-              {legalLinks.map(([label, href]) => <li key={label}><NavLink label={label} href={href} /></li>)}
+              {legalLinks.map(([label, href]) => <li key={label}><NavLink label={label} href={href} isFr={isFr} /></li>)}
             </ul>
           </nav>
         </div>
 
         <section aria-labelledby={`${id}-newsletter`} className={styles.newsletter}>
-          <h2 className={styles.heading} id={`${id}-newsletter`}>NEWSLETTER</h2>
-          <p className={styles.intro}>One monthly briefing for smarter operations, intelligent growth and stronger protection.</p>
+          <h2 className={styles.heading} id={`${id}-newsletter`}>{isFr ? "INFOLETTRE" : "NEWSLETTER"}</h2>
+          <p className={styles.intro}>{isFr ? "Un bulletin mensuel pour des opérations plus intelligentes, une croissance ciblée et une protection renforcée." : "One monthly briefing for smarter operations, intelligent growth and stronger protection."}</p>
           <form onSubmit={submit} className={styles.form} aria-busy={status === "pending"}>
             <div className={styles.fields}>
               <label>
-                <span className={styles.srOnly}>First name</span>
-                <input name="firstName" placeholder="First name" autoComplete="given-name" />
+                <span className={styles.srOnly}>{isFr ? "Prénom" : "First name"}</span>
+                <input name="firstName" placeholder={isFr ? "Prénom" : "First name"} autoComplete="given-name" />
               </label>
               <label>
-                <span className={styles.srOnly}>Work email</span>
-                <input name="email" placeholder="Work email" type="email" autoComplete="email" required />
+                <span className={styles.srOnly}>{isFr ? "Courriel professionnel" : "Work email"}</span>
+                <input name="email" placeholder={isFr ? "Courriel professionnel" : "Work email"} type="email" autoComplete="email" required />
               </label>
             </div>
             <button type="submit" disabled={status === "pending"}>
-              {status === "pending" ? "Joining…" : "Join the Briefing"}<span aria-hidden="true">→</span>
+              {status === "pending" ? (isFr ? "Inscription…" : "Joining…") : (isFr ? "S’abonner à l’infolettre" : "Join the Briefing")}<span aria-hidden="true">→</span>
             </button>
             <div className={styles.consent}>
               <input id={`${id}-consent`} name="consent" type="checkbox" required />
               <div>
-                <label htmlFor={`${id}-consent`}>I agree to receive the monthly briefing.</label>
-                <p>Unsubscribe anytime. <Link href="/privacy-policy">Privacy Policy</Link>.</p>
+                <label htmlFor={`${id}-consent`}>{isFr ? "J’accepte de recevoir l’infolettre mensuelle." : "I agree to receive the monthly briefing."}</label>
+                <p>{isFr ? "Désabonnement en tout temps. " : "Unsubscribe anytime. "}<Link href="/privacy-policy">{isFr ? "Politique de confidentialité" : "Privacy Policy"}</Link>.</p>
               </div>
             </div>
             <p className={styles.status} role="status" aria-live="polite">{message}</p>
@@ -187,7 +204,7 @@ export default function SiteFooter({
 
       <div className={styles.meta}>
         <div className={styles.copyright}>© {year} ORAGROL GLOBAL<span>Ontario · Canada</span></div>
-        <div className={styles.tagline}>PROTECT <i>/</i> AUTOMATE <i>/</i> UNIFY</div>
+        <div className={styles.tagline}>{isFr ? <>PROTÉGER <i>/</i> AUTOMATISER <i>/</i> UNIFIER</> : <>PROTECT <i>/</i> AUTOMATE <i>/</i> UNIFY</>}</div>
       </div>
     </footer>
   );

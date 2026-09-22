@@ -1,5 +1,8 @@
+"use client";
+
 import { PhoneCall } from "lucide-react";
-import Link from "next/link";
+import { useLocale } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { Icon } from "../ui";
 
 /**
@@ -18,6 +21,12 @@ import { Icon } from "../ui";
  * link here once a real Canadian emergency line is confirmed.
  */
 export function EmergencyCta() {
+  // Bilingual (Phase 2j): site-wide floating pill, rendered from
+  // SiteChrome alongside the old SiteHeader/SiteFooter -- same isFr
+  // ternary treatment, no shared messages namespace needed for one string.
+  const locale = useLocale();
+  const isFr = locale === "fr";
+
   return (
     <div className="env-dark fixed bottom-6 right-6 z-40">
       <Link
@@ -25,7 +34,7 @@ export function EmergencyCta() {
         className="flex items-center gap-2 rounded-full border border-accent/40 bg-background px-4 py-3 font-body text-sm font-medium text-text-primary shadow-lg shadow-accent/20 transition-colors duration-150 hover:border-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
         <Icon icon={PhoneCall} size="sm" className="text-accent" />
-        <span>Under attack? Contact us now</span>
+        <span>{isFr ? "Sous attaque ? Contactez-nous maintenant" : "Under attack? Contact us now"}</span>
       </Link>
     </div>
   );

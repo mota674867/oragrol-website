@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useLocale } from "next-intl";
+import { Link, usePathname } from "@/i18n/navigation";
 import { motion, useScroll, useTransform } from "motion/react";
 import { ButtonLink, MobileMenuTrigger, NavBar, NavLink } from "../ui";
 import { cn } from "../ui/cn";
@@ -103,6 +103,16 @@ const NAV_LINKS = [
 export function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  // Bilingual (Phase 2j): the old two-tier header predates next-intl and
+  // had a static, aria-hidden "EN | FR" label that did nothing (see the
+  // two-tier redesign note above -- "still the same static/decorative
+  // label since full locale routing isn't built yet"). Now a real,
+  // working locale switch, same pattern as every already-converted page's
+  // header. Nav-link labels stay English on both locales, matching the
+  // site-wide convention already established for NAV_ITEMS/OragrolMegaNav.
+  const locale = useLocale();
+  const isFr = locale === "fr";
+  const otherLocale = isFr ? "en" : "fr";
 
   // Window-scoped scroll (not tied to a specific section ref) drives a
   // smooth 0→1 fade for the stronger background layer over the first
@@ -185,9 +195,14 @@ export function SiteHeader() {
           <div className="flex h-9 items-center justify-between px-6 md:px-12">
             <div aria-hidden="true" />
             <div className="flex items-center gap-6">
-              <span className="font-body text-xs text-text-secondary" aria-hidden="true">
-                EN&nbsp;|&nbsp;FR
-              </span>
+              <Link
+                href={pathname}
+                locale={otherLocale}
+                className="font-body text-xs text-text-secondary transition-colors duration-150 hover:text-accent"
+                aria-label={isFr ? "Changer de langue" : "Change language"}
+              >
+                {locale.toUpperCase()}&nbsp;|&nbsp;{otherLocale.toUpperCase()}
+              </Link>
             </div>
           </div>
         </div>
@@ -205,7 +220,7 @@ export function SiteHeader() {
                 {navLinks}
               </nav>
               <ButtonLink variant="primary" size="sm" href="/cyber-health">
-                Get Cyber Score
+                {isFr ? "Obtenez votre Cyber Health Score" : "Get Cyber Score"}
               </ButtonLink>
             </>
           }
@@ -275,7 +290,7 @@ export function SiteHeader() {
             );
           })}
           <ButtonLink variant="primary" size="md" href="/cyber-health" className="mt-3 w-full">
-            Get Your Cyber Health Score
+            {isFr ? "Obtenez votre Cyber Health Score" : "Get Your Cyber Health Score"}
           </ButtonLink>
         </nav>
       </div>

@@ -1,0 +1,2760 @@
+{
+  "Home": {
+    "nav": {
+      "getCyberHealthScore": "Get Cyber Health Score",
+      "search": "Search",
+      "changeLanguage": "Change language",
+      "homeAriaLabel": "ORAGROL Global home"
+    },
+    "hero": {
+      "kicker": "Cybersecurity first. Intelligence led.",
+      "headline1": "Cybersecurity that acts.",
+      "headline2": "Automation that scales.",
+      "headline3": "One system that brings it together.",
+      "sub": "Built to do the work, not simply report on it.",
+      "ariaCapabilities": "ORAGROL capabilities"
+    },
+    "entryPoints": {
+      "protectName": "Services",
+      "protectSub": "Protect what matters.",
+      "automateName": "Business Automation",
+      "automateSub": "Remove what limits growth.",
+      "unifyName": "OR ONE",
+      "unifySub": "Intelligence built around your business."
+    },
+    "reality": {
+      "label": "The business reality",
+      "headline1": "Growth creates capability.",
+      "headline2": "It also creates exposure.",
+      "p1": "More systems, vendors, data and AI can move a business forward while making its operating environment harder to see and protect.",
+      "p2": "ORAGROL connects what is too often managed separately, giving leaders a clearer way to protect, improve and coordinate the business.",
+      "line": "Less noise. Fewer disconnected tools.",
+      "lineStrong": "More useful action."
+    },
+    "capabilities": {
+      "label": "Protect. Automate. Unify.",
+      "headline1": "Three capabilities.",
+      "headline2": "One business direction.",
+      "ariaSelect": "Select capability",
+      "protect": {
+        "name": "Protect",
+        "title": "Cybersecurity that acts.",
+        "text": "Understand risk, strengthen protection and respond with services selected around the way your business operates.",
+        "link": "Explore Services"
+      },
+      "automate": {
+        "name": "Automate",
+        "title": "Automation that scales.",
+        "text": "Remove repetitive work, connect important workflows and create more operating capacity without unnecessary complexity.",
+        "link": "Explore Business Automation"
+      },
+      "unify": {
+        "name": "Unify",
+        "title": "One system that brings it together.",
+        "text": "Coordinate security, automation and operational intelligence through OR ONE, built around your business.",
+        "link": "Explore OR ONE"
+      }
+    },
+    "method": {
+      "label": "How ORAGROL works",
+      "headline1": "Clarity first.",
+      "headline2": "Then coordinated action.",
+      "sub": "Move across the sequence to see how ORAGROL turns business context into practical progress.",
+      "ariaSelect": "ORAGROL working method",
+      "understand": {
+        "name": "Understand",
+        "line": "See the business clearly before prescribing technology."
+      },
+      "prioritize": {
+        "name": "Prioritize",
+        "line": "Focus attention and investment where they create the greatest value."
+      },
+      "protect": {
+        "name": "Protect",
+        "line": "Apply the right security controls, services and oversight."
+      },
+      "automate": {
+        "name": "Automate",
+        "line": "Improve defined work through practical, responsible automation."
+      },
+      "evolve": {
+        "name": "Evolve",
+        "line": "Strengthen the system as the business changes."
+      }
+    },
+    "cybersecurity": {
+      "eyebrow": "Cybersecurity",
+      "headline1": "Protection built",
+      "headline2": "around your business.",
+      "intro": "Choose a package, address a specific need or scope a specialist engagement.",
+      "packages": {
+        "count": "04",
+        "title": "Packages",
+        "description1": "Four levels of protection.",
+        "description2": "Foundation, Advanced,",
+        "description3": "Comprehensive and Elite.",
+        "link": "Explore Packages"
+      },
+      "alaCarte": {
+        "count": "12",
+        "title": "À La Carte",
+        "description": "Individual services for specific needs. Available standalone or alongside a package.",
+        "link": "Explore Individual Services"
+      },
+      "specialist": {
+        "count": "04",
+        "title1": "Specialist",
+        "title2": "Engagements",
+        "description": "Penetration testing, SOC 2 attestation, PCI-DSS assessment and forensic incident response.",
+        "link": "Discuss an Engagement"
+      }
+    },
+    "cyberHealthCta": {
+      "label": "Start with clarity",
+      "headline1": "Know where you stand.",
+      "headline2": "Know what to do next.",
+      "sub": "A guided assessment gives you a practical view of your cybersecurity position, priorities and next steps.",
+      "link": "Get Your Cyber Health Score",
+      "illustrativeLabel": "Cyber Health / Illustrative",
+      "currentPosition": "Current position",
+      "clearerPriorities": "Clearer next priorities"
+    },
+    "industries": {
+      "eyebrow": "INDUSTRIES + CANADA",
+      "returnHome": "Return to homepage",
+      "label": "BUILT AROUND YOUR REALITY",
+      "headline1": "Different businesses.",
+      "headline2": "Different risks.",
+      "selectLabel": "SELECT AN INDUSTRY",
+      "canadaWide": "CANADA-WIDE",
+      "canadaPerspective": "PERSPECTIVE",
+      "exploreIndustry": "Explore this industry",
+      "ariaLabel": "Industries",
+      "west": "WEST",
+      "central": "CENTRAL",
+      "east": "EAST",
+      "north": "NORTH",
+      "footerEyebrow": "CYBERSECURITY FIRST",
+      "footerLine1": "Business first.",
+      "footerLine2": "Practical, not complicated.",
+      "footerLine3": "Built for what's next.",
+      "footerStrong": "COAST TO COAST TO COAST",
+      "list": {
+        "professionalServices": {
+          "name": "Professional Services",
+          "risk": "Protect client data, communication and trust."
+        },
+        "healthcare": {
+          "name": "Healthcare",
+          "risk": "Strengthen privacy, access and operational resilience."
+        },
+        "financialServices": {
+          "name": "Financial Services",
+          "risk": "Reduce fraud, regulatory and transaction exposure."
+        },
+        "retail": {
+          "name": "Retail & E-commerce",
+          "risk": "Protect payments, customers and digital revenue."
+        },
+        "manufacturing": {
+          "name": "Manufacturing",
+          "risk": "Secure connected operations and production continuity."
+        },
+        "technology": {
+          "name": "Technology",
+          "risk": "Protect cloud environments, products and intellectual property."
+        },
+        "construction": {
+          "name": "Construction & Real Estate",
+          "risk": "Secure payments, mobile teams and partner access."
+        },
+        "education": {
+          "name": "Education",
+          "risk": "Prioritize protection across users, data and shared systems."
+        },
+        "otherSmbs": {
+          "name": "Other Canadian SMBs",
+          "risk": "Shape protection around the way your business operates."
+        }
+      }
+    }
+  },
+  "Services": {
+    "nav": {
+      "myScope": "My Scope",
+      "getCyberHealthScore": "Get Cyber Health Score",
+      "search": "Search",
+      "changeLanguage": "Change language"
+    },
+    "money": {
+      "moSuffix": "/mo",
+      "appSuffix": "/app"
+    },
+    "hero": {
+      "kicker1": "SERVICES / CYBERSECURITY",
+      "kicker2": "PROTECT / AUTOMATE / UNIFY",
+      "headline1": "CYBERSECURITY.",
+      "headline2a": "BUILT AROUND",
+      "headline2b": "YOUR BUSINESS.",
+      "sub1": "ORAGROL delivers cybersecurity as four fixed packages, twelve individual services or specialist engagements.",
+      "sub2": "Choose the scope that fits how your business actually operates.",
+      "packagesCount": "04",
+      "packagesLabel": "Packages",
+      "packagesDetail": "Foundation to Elite",
+      "alaCarteCount": "12",
+      "alaCarteLabel": "À La Carte",
+      "alaCarteDetail": "Available standalone",
+      "specialistCount": "04",
+      "specialistLabel": "Specialist Services",
+      "specialistDetail": "Available by engagement",
+      "footerKicker": "BUILT FOR CANADIAN BUSINESS",
+      "footerCta": "CLARITY BEFORE COMPLEXITY"
+    },
+    "clarity": {
+      "eyebrow": "NOT SURE WHERE TO START?",
+      "headline1": "Clarity before",
+      "headline2": "complexity.",
+      "body": "Start with your priorities. Your Cyber Health assessment can help identify areas to review before choosing a package, individual service or specialist engagement.",
+      "step1": "Understand your position",
+      "step2": "Prioritize what needs attention",
+      "step3": "Choose the scope that fits"
+    },
+    "packages": {
+      "eyebrow": "04 / CHOOSE YOUR PROTECTION",
+      "headline1": "Four packages.",
+      "headline2": "One clear starting point.",
+      "sub": "Select a package to explore its fit and included services. Add your preferred scope for review.",
+      "priceNote": "Prices in CAD. Package rates below are monthly rates for a 12-month contract.",
+      "servicesCount": "{n} SERVICES",
+      "includedServicesCount": "{n} INCLUDED SERVICES",
+      "idealFit": "IDEAL FIT",
+      "monthlyRateLabel": "MONTHLY RATE · 12-MONTH CONTRACT",
+      "whatsIncluded": "WHAT'S INCLUDED",
+      "initialOption": "Initial three-month option: {price}. Then moves into a 12-month standard contract.",
+      "addToScope": "Add to My Scope",
+      "addedToScope": "Added to My Scope",
+      "list": {
+        "foundation": {
+          "value": "Establish your core protection.",
+          "fit": "Businesses putting essential security controls around their people, devices and everyday work."
+        },
+        "advanced": {
+          "value": "Extend visibility and strengthen access.",
+          "fit": "Businesses that need broader monitoring, access governance and oversight of vendors and compliance needs."
+        },
+        "comprehensive": {
+          "value": "Connect protection across your environment.",
+          "fit": "Businesses with cloud workloads, applications and data that require a wider, coordinated scope of protection."
+        },
+        "elite": {
+          "value": "Bring protection and response together.",
+          "fit": "Businesses seeking the broadest package scope, including managed threat response, security response and data monitoring."
+        }
+      }
+    },
+    "serviceNames": {
+      "Security Rules Setup": "Security Rules Setup",
+      "Security Weakness Check": "Security Weakness Check",
+      "Device Guard": "Device Guard",
+      "Mail Shield": "Mail Shield",
+      "Staff Security": "Staff Security",
+      "Login Shield": "Login Shield",
+      "Compliance Check": "Compliance Check",
+      "Vendor Watch": "Vendor Watch",
+      "AI Security Monitoring": "AI Security Monitoring",
+      "Threat Watch": "Threat Watch",
+      "Access Manager": "Access Manager",
+      "Access Governance": "Access Governance",
+      "Cloud Guard": "Cloud Guard",
+      "Workload Shield": "Workload Shield",
+      "Infra Guard": "Infra Guard",
+      "Cloud Compliance": "Cloud Compliance",
+      "App Shield": "App Shield",
+      "Web Shield": "Web Shield",
+      "API Guard": "API Guard",
+      "Data Shield": "Data Shield",
+      "Data Guard": "Data Guard",
+      "Data Classifier": "Data Classifier",
+      "Managed Threat Response": "Managed Threat Response",
+      "Security Response": "Security Response",
+      "Data Watch": "Data Watch"
+    },
+    "individual": {
+      "eyebrow": "12 / À LA CARTE",
+      "headline1": "The capability",
+      "headline2": "you need.",
+      "sub": "Choose an individual service, available standalone or alongside a package.",
+      "priceNote": "MONTHLY RATE · 12-MONTH CONTRACT",
+      "monthlyService": "MONTHLY SERVICE",
+      "projectService": "PROJECT SERVICE",
+      "monthlyBilling": "Monthly rate · 12-month contract",
+      "oneTimeBilling": "One-time / project",
+      "perApplicationBilling": "One-time / project · per application",
+      "availableStandalone": "Available standalone.",
+      "addToScope": "Add to My Scope",
+      "addedToScope": "Added to My Scope",
+      "list": {
+        "C01-S04": {
+          "line": "Security leadership to guide priorities, decisions and oversight."
+        },
+        "C07-S04": {
+          "line": "Bring security practices into your software delivery process."
+        },
+        "C08-S03": {
+          "line": "Coordinate how personal information is handled and protected."
+        },
+        "C09-S01": {
+          "line": "Assess security risks in your AI use and identify practical next steps."
+        },
+        "C09-S02": {
+          "line": "Define responsibilities and manage risks around business use of AI."
+        },
+        "C05-S03": {
+          "line": "Strengthen oversight of accounts with elevated permissions."
+        },
+        "C05-S05": {
+          "line": "Apply identity and context checks to access decisions."
+        },
+        "C06-S04": {
+          "line": "Strengthen network controls across your cloud environment."
+        },
+        "C09-S03": {
+          "line": "Address security risks affecting AI models and their use."
+        },
+        "C09-S04": {
+          "line": "Protect sensitive information used by AI systems and workflows."
+        },
+        "C09-S05": {
+          "line": "Identify and address threats involving your AI environment."
+        },
+        "C07-S05": {
+          "line": "Test an application's security and prioritize the findings."
+        }
+      }
+    },
+    "specialists": {
+      "eyebrow": "04 / SPECIALIST ENGAGEMENTS",
+      "headline1": "Specialist expertise.",
+      "headline2": "Defined engagements.",
+      "sub": "Available by Engagement. Confirm requirements, boundaries and the appropriate specialist before work begins.",
+      "priceNote": "All fees in CAD. Starting fees apply to a defined scope. Final scope and fees are confirmed in your proposal.",
+      "discussEngagement": "Discuss Your Engagement",
+      "list": {
+        "C10-S01": {
+          "line": "A scoped engagement to test for exploitable weaknesses and prioritize remediation."
+        },
+        "C10-S02": {
+          "line": "An engagement with a qualified CPA audit partner, scoped to your organization and reporting needs."
+        },
+        "C10-S03": {
+          "line": "A scoped assessment with a qualified QSA for your payment environment."
+        },
+        "C10-S04": {
+          "line": "Specialist forensic investigation and incident response, with scope agreed for the incident."
+        }
+      }
+    }
+  },
+  "SharedCta": {
+    "home": {
+      "eyebrow": "Clarity before complexity",
+      "headline": "Cybersecurity protection. Intelligent business automation. OR ONE coordinated system.",
+      "secondaryLabel": "Explore What ORAGROL Does"
+    },
+    "services": {
+      "eyebrow": "Your clearest next step",
+      "headline": "The right protection begins with understanding what matters most.",
+      "secondaryLabel": "Build Your Scope"
+    },
+    "business-automation": {
+      "eyebrow": "Your clearest next step",
+      "headline": "Find where time is being lost and where intelligent automation can create measurable value.",
+      "secondaryLabel": "Explore Automation Packages"
+    },
+    "or-one": {
+      "eyebrow": "Begin privately",
+      "headline": "Bring security, automation and operational intelligence into one coordinated system.",
+      "secondaryLabel": "Explore OR ONE"
+    },
+    "industries": {
+      "eyebrow": "Your clearest next step",
+      "headline": "Protection works better when it reflects how your industry actually operates.",
+      "secondaryLabel": "Find Your Industry"
+    },
+    "resources": {
+      "eyebrow": "One useful starting point",
+      "headline": "Turn credible insight into clearer decisions and practical action.",
+      "secondaryLabel": "Explore Our Resources"
+    },
+    "company": {
+      "eyebrow": "One clear starting point",
+      "headline": "Discover the thinking, experience and purpose behind ORAGROL Global.",
+      "secondaryLabel": "Start a Conversation"
+    },
+    "contact": {
+      "eyebrow": "One clear starting point",
+      "headline": "Start with clarity. We will help you identify the most valuable next step.",
+      "secondaryLabel": "Submit an Enquiry"
+    },
+    "faq": {
+      "eyebrow": "Still have a question?",
+      "headline": "Still looking for clarity? Let us help you find the right answer.",
+      "secondaryLabel": "Contact ORAGROL"
+    },
+    "getCyberHealthScore": "Get Your Cyber Health Score"
+  },
+  "BusinessAutomation": {
+    "nav": {
+      "myScope": "My Scope",
+      "getCyberHealthScore": "Get Cyber Health Score",
+      "search": "Search",
+      "changeLanguage": "Change language"
+    },
+    "hero": {
+      "markLabel": "Five defined automation jobs",
+      "meta1": "Business Automation",
+      "meta2": "Built around measurable outcomes",
+      "title1": "Automate the work",
+      "title2": "that's capping your growth.",
+      "support": "BA transforms individual business functions through focused, tailored automation. It works with your existing software to improve sales, marketing, customer service, finance or IT—reducing manual work and delivering measurable results.",
+      "exploreLink": "Explore five systems + tailored",
+      "noPlatform": "No new platform required"
+    },
+    "jobSelector": {
+      "eyebrow": "OR5 / Choose the outcome",
+      "title1": "Five jobs.",
+      "title2": "One clear result each.",
+      "sub": "Select a job to understand the outcome, fit and commercial structure. Add any relevant job to My Scope.",
+      "commercialNote": "Prices are shown in Canadian dollars. API usage, software subscriptions and third-party infrastructure remain the client's responsibility and are not included."
+    },
+    "jobs": {
+      "sales-flow": {
+        "name": "Sales",
+        "short": "Sales",
+        "outcome": "Capture, qualify and follow every opportunity—from first enquiry to a clean handoff and close.",
+        "fit": "Teams losing leads between inboxes, spreadsheets and CRM follow-up.",
+        "tools": "Your CRM, email, calendar and proposal tools.",
+        "accent": "Revenue flow",
+        "kickerTag": "Defined automation job"
+      },
+      "customer-support": {
+        "name": "Customer Service",
+        "short": "Customer Service",
+        "outcome": "Respond faster, route requests correctly and keep every customer conversation moving.",
+        "fit": "Teams handling repeat questions, slow routing or inconsistent support across channels.",
+        "tools": "Your helpdesk, shared inbox, knowledge base and messaging tools.",
+        "accent": "Service continuity",
+        "kickerTag": "Defined automation job"
+      },
+      "operational-intelligence": {
+        "name": "Finance",
+        "short": "Finance",
+        "outcome": "Bring scattered business data into one dependable view for reporting, alerts and decisions.",
+        "fit": "Leaders waiting on manual reports or making decisions from disconnected systems.",
+        "tools": "Your accounting, CRM, operations and reporting tools.",
+        "accent": "Decision clarity",
+        "kickerTag": "Defined automation job"
+      },
+      "managed-it": {
+        "name": "IT",
+        "short": "IT",
+        "outcome": "Add an AI-driven IT operations and monitoring layer for routine device, account, ticket and infrastructure work.",
+        "fit": "Growing businesses that need operational coordination and monitoring, not a full break-fix helpdesk MSP.",
+        "tools": "Your Microsoft 365, ticketing, device and infrastructure tools.",
+        "accent": "AI-driven operations · not full managed IT",
+        "kickerTag": "Defined automation job"
+      },
+      "customer-growth": {
+        "name": "Marketing",
+        "short": "Marketing",
+        "outcome": "Strengthen onboarding, retention, reactivation and revenue opportunities across the customer lifecycle.",
+        "fit": "Businesses with valuable customers but inconsistent follow-up after the first sale.",
+        "tools": "Your CRM, billing, email and customer-success tools.",
+        "accent": "Customer value",
+        "kickerTag": "Defined automation job"
+      },
+      "tailored": {
+        "name": "Tailored Automation",
+        "short": "One bounded outcome",
+        "outcome": "Design one focused automation around an operational job that does not fit the five defined systems.",
+        "fit": "Businesses with a clear, measurable requirement that needs private scoping.",
+        "tools": "Designed around the approved tools your business already uses.",
+        "accent": "Purpose-built",
+        "kickerTag": "Privately scoped"
+      }
+    },
+    "jobFacts": {
+      "idealFit": "Ideal fit",
+      "worksThrough": "Works through",
+      "buildFee": "Build Fee",
+      "buildFeeNote": "One-time design, configuration and connection.",
+      "monthlyManagement": "Monthly Management",
+      "monthlyManagementNote": "Monitoring, maintenance and ongoing improvement."
+    },
+    "scopeAdd": {
+      "add": "Check My Fit · Add to Scope",
+      "added": "Added to My Scope ✓"
+    },
+    "existingTools": {
+      "eyebrow": "Built around your reality",
+      "title1": "Your tools stay.",
+      "title2": "The work moves.",
+      "body": "ORAGROL's automation engine works through the systems your business already uses. Your team continues working in its CRM, inbox, helpdesk, accounting and collaboration tools—without being forced onto a new platform.",
+      "tool1": "CRM",
+      "tool2": "Inbox",
+      "tool3": "Operations",
+      "tool4": "Reporting"
+    },
+    "journey": {
+      "eyebrow": "How it starts",
+      "steps": [
+        {
+          "title": "Assess",
+          "body": "Confirm the job, expected outcome and current tools."
+        },
+        {
+          "title": "Design",
+          "body": "Map the workflow, controls and measures of success."
+        },
+        {
+          "title": "Build",
+          "body": "Connect and configure the approved automation."
+        },
+        {
+          "title": "Operate",
+          "body": "Monitor, maintain and improve the live job."
+        }
+      ]
+    },
+    "feeExplainer": {
+      "eyebrow": "Two fees. Two responsibilities.",
+      "title1": "Built once.",
+      "title2": "Looked after continuously.",
+      "buildLabel": "01 / Build Fee",
+      "buildTitle": "Connect it to how you work.",
+      "buildBody": "The one-time fee covers design, configuration, integration, testing and launch within the agreed scope.",
+      "monthlyLabel": "02 / Monthly Management",
+      "monthlyTitle": "Keep it dependable.",
+      "monthlyBody": "The recurring fee covers monitoring, maintenance and responsible improvement as your operating environment changes."
+    },
+    "detailsLabels": {
+      "detailsButton": "Details",
+      "viewWhatsIncluded": "View what's included",
+      "viewDetailsFor": "View details for",
+      "close": "Close",
+      "whatsIncluded": "What's included",
+      "youStayInControl": "You stay in control",
+      "whoItSuitsHeading": "Who it suits",
+      "illustrativeExample": "Illustrative example"
+    },
+    "details": {
+      "sales-flow": {
+        "itemLabel": "SALES",
+        "title": "BA Sales",
+        "subtitle": "Keep your pipeline moving.",
+        "intro": "Connect your CRM and inbox to organize incoming leads, maintain sales records and coordinate follow-up. The service prepares quotes, proposals and suggested next steps using your agreed sales process. You receive a clearer pipeline, regular reporting and drafts ready for review, while routine activity follows the rules agreed at setup.",
+        "inclusions": [
+          "Lead qualification and scoring against agreed criteria.",
+          "CRM updates and activity records.",
+          "Quote and proposal drafts.",
+          "Scheduled follow-up with existing clients.",
+          "Upsell and cross-sell suggestions.",
+          "Sales forecasts and reports based on available pipeline data.",
+          "Referral reminders and request preparation."
+        ],
+        "control": "Quotes, proposals and new offers come to you for approval. Routine follow-ups run within agreed rules; requests outside those rules are escalated for your decision.",
+        "whoItSuits": "Businesses that want consistent follow-up and a clearer view of their sales pipeline.",
+        "example": "A lead arrives overnight. Its details are organized in your CRM, scored against your criteria and paired with a suggested next step for review.",
+        "scope": "Supported CRM and inbox connections, messaging rules and workflow coverage are confirmed before setup."
+      },
+      "customer-support": {
+        "itemLabel": "CUSTOMER SERVICE",
+        "title": "BA Customer Service",
+        "subtitle": "Give every enquiry a clear next step.",
+        "intro": "Connect supported helpdesk, inbox and agreed customer-service channels to organize enquiries and coordinate responses. The service uses your approved knowledge and policies to answer routine questions, track tickets and identify cases needing a person. You receive a more consistent support workflow, with exceptions and sensitive decisions brought to your attention.",
+        "inclusions": [
+          "Routine enquiry handling across agreed phone, email and chat connections.",
+          "Complaint triage and escalation.",
+          "Order and service issue handling within approved policies.",
+          "FAQ and knowledge-base update preparation.",
+          "Satisfaction surveys.",
+          "Support-ticket tracking.",
+          "After-sales follow-up.",
+          "Return and refund preparation for approval."
+        ],
+        "control": "Refunds, returns and exceptions outside approved policies are referred for your decision. Unverified answers are escalated rather than presented as facts.",
+        "whoItSuits": "Businesses that need consistent support as enquiry volumes grow.",
+        "example": "A customer asks about a delayed order. The service checks the connected order record and provides the available status, or routes the case for investigation when information is missing.",
+        "scope": "Channels, knowledge sources, coverage hours and escalation arrangements are agreed before launch."
+      },
+      "operational-intelligence": {
+        "itemLabel": "FINANCE",
+        "title": "BA Finance",
+        "subtitle": "Keep everyday finance organized.",
+        "intro": "Connect supported accounting software and financial data sources to coordinate invoicing, payment tracking and routine finance administration. The service prepares records, highlights exceptions and brings payroll, payables and reporting together for review. You receive a clearer financial picture while decisions involving payments or sensitive changes remain within your approval rules.",
+        "inclusions": [
+          "Invoice preparation and sending under agreed rules.",
+          "Payment collection workflows through approved payment tools.",
+          "Cash-flow monitoring and exception flags.",
+          "Expense tracking and recording.",
+          "Incoming and outgoing payment records and reconciliation support.",
+          "Subscription and recurring-charge tracking.",
+          "Loan-payment tracking.",
+          "Payroll preparation for approval.",
+          "Accounts-payable preparation for approval.",
+          "Tax-deadline reminders.",
+          "Invoice-tax application using your confirmed configuration.",
+          "Routine financial reports."
+        ],
+        "control": "Payroll, payables and sensitive financial actions require approval. Tax settings and accounting judgments require appropriate review; automation does not replace your accountant's professional judgment.",
+        "whoItSuits": "Owners who want coordinated invoicing, collections, expenses and reporting with less repetitive administration.",
+        "example": "Upcoming bills and recorded income indicate a possible cash shortfall. The service flags it so you can review timing and take action.",
+        "scope": "Available feeds, reconciliation frequency and payment permissions are confirmed during setup."
+      },
+      "managed-it": {
+        "itemLabel": "IT",
+        "title": "BA IT",
+        "subtitle": "Keep routine technology work under control.",
+        "intro": "Connect supported systems to coordinate maintenance, helpdesk work and everyday IT administration. The service tracks issues, prepares or performs permitted routine actions and flags changes that need review. You receive maintenance visibility and exception reporting, with critical-system changes handled through agreed controls.",
+        "inclusions": [
+          "Software maintenance and patch coordination.",
+          "Software-license management.",
+          "Helpdesk, password and access-request workflows.",
+          "Backup operation and verification within the agreed scope.",
+          "Basic cyber-hygiene monitoring.",
+          "Routine website and hosting maintenance.",
+          "Connections between supported software tools."
+        ],
+        "control": "Critical-system changes and sensitive access actions require approval. Routine changes follow agreed maintenance windows, verification and recovery procedures.",
+        "whoItSuits": "Businesses needing structured routine IT support and clearer ownership of recurring technical tasks.",
+        "example": "A relevant patch becomes available. The service identifies affected systems and prepares the update for the agreed testing and approval process.",
+        "scope": "Supported systems, backup verification depth and maintenance coverage are agreed before launch. This does not automatically include specialist cybersecurity or forensic response."
+      },
+      "customer-growth": {
+        "itemLabel": "MARKETING",
+        "title": "BA Marketing",
+        "subtitle": "Turn your marketing plan into consistent activity.",
+        "intro": "Coordinate content, email, social and advertising workflows through your supported accounts. The service prepares material in your brand voice, organizes your calendar and reports on campaign activity. You review publication and spending decisions, while approved work proceeds within the agreed plan.",
+        "inclusions": [
+          "Routine website-update preparation and coordination.",
+          "SEO maintenance and improvement recommendations.",
+          "Blog and article drafts.",
+          "Social scheduling and publication after approval.",
+          "Email campaigns and newsletters for eligible audiences.",
+          "Paid-campaign management within approved budgets.",
+          "Routine graphic-design preparation.",
+          "Market and competitor research.",
+          "Marketing performance reports.",
+          "Lead-generation campaign preparation and coordination."
+        ],
+        "control": "Public material requires approval before publication. Spending follows your approved budget; proposed increases require a new decision. Audience permissions and unsubscribe preferences must be respected.",
+        "whoItSuits": "Businesses seeking a consistent marketing cadence without managing every repetitive step themselves.",
+        "example": "Research identifies a relevant market change. The service drafts a campaign adjustment and supporting content for your review before anything is published.",
+        "scope": "Channels, content volumes, ad accounts and publishing permissions are agreed at setup. Search rankings and campaign results are not guaranteed."
+      },
+      "tailored": {
+        "itemLabel": "TAILORED AUTOMATION",
+        "title": "BA Tailored Automation",
+        "subtitle": "Automate a workflow unique to your business.",
+        "intro": "Describe a repetitive task that does not fit the standard BA services. We assess the workflow, confirm the inputs and decisions it needs, and scope an automation around that specific process. You receive a tested workflow with defined boundaries, exception handling and approval points.",
+        "inclusions": [
+          "Review of the task and its suitability for automation.",
+          "Identification of required data, software connections and owners.",
+          "A defined scope covering included actions and exclusions.",
+          "Build and testing against the agreed workflow.",
+          "Approval and exception-handling rules.",
+          "A quotation based on the confirmed scope."
+        ],
+        "control": "Sensitive actions and exceptions follow agreed approval rules. Changes beyond the agreed workflow are reviewed before implementation.",
+        "whoItSuits": "Businesses with a specific recurring task that does not fit a standard package.",
+        "example": "A property manager needs maintenance requests matched to suitable contractors. A tailored workflow prepares matches using job type and available information, with exceptions referred for review.",
+        "scope": "Custom quotation. A request spanning a broader connected operation may be better suited to OR ONE; this is assessed before committing to a build."
+      }
+    }
+  },
+  "Industries": {
+    "nav": {
+      "getCyberHealthScore": "Get Cyber Health Score",
+      "search": "Search",
+      "changeLanguage": "Change language"
+    },
+    "hero": {
+      "eyebrow": "Industries / Canada",
+      "title1": "Every industry operates differently.",
+      "title2": "Its protection should too.",
+      "sub": "Explore how ORAGROL aligns cybersecurity, intelligent automation and OR ONE with the risks, workflows and priorities of your industry.",
+      "pillarProtect": "Protect",
+      "pillarAutomate": "Automate",
+      "pillarUnify": "Unify",
+      "pillarsAriaLabel": "ORAGROL approach",
+      "chooseIndustry": "Choose your industry"
+    },
+    "navigator": {
+      "eyebrow": "01 / Select an industry",
+      "selectedLabel": "Selected industry",
+      "ringAriaLabel": "Industries"
+    },
+    "editorial": {
+      "heading": "The operating reality.",
+      "viewPath": "View the coordinated path"
+    },
+    "journey": {
+      "eyebrow": "02 / One coordinated path",
+      "protectLabel": "01 / Protect",
+      "protectHeading": "Protect what matters.",
+      "automateLabel": "02 / Automate",
+      "automateHeading": "Automate the right jobs.",
+      "unifyLabel": "03 / Unify",
+      "unifyHeading": "Know when it becomes OR ONE."
+    },
+    "evidence": {
+      "labelPrefix": "Flagship evidence / Accounting & bookkeeping",
+      "openDrawer": "Open evidence drawer",
+      "stat1": {
+        "value": "28.1%",
+        "prefix": "of sampled Canadian domains in a 2026 vendor study enforced DMARC at ",
+        "suffix": "."
+      },
+      "stat1Source": "PowerDMARC · 2026",
+      "stat2": {
+        "value": "$26B+",
+        "prefix": "stolen globally through business email compromise, including Canadian businesses.",
+        "suffix": ""
+      },
+      "stat2Source": "RCMP · Updated 2025",
+      "stat3": {
+        "value": "2 years",
+        "prefix": "minimum record-retention period for breaches under federal PIPEDA guidance.",
+        "suffix": ""
+      },
+      "stat3Source": "OPC guidance",
+      "disclaimer": "Controls support a stronger insurance-renewal conversation, but do not guarantee coverage, approval or lower premiums."
+    },
+    "fullProfile": {
+      "eyebrow": "03 / Industry detail",
+      "heading": "What leaders need to know.",
+      "sub": "Open only the detail relevant to your decision.",
+      "accordionRisk": "Risk and Canadian context",
+      "accordionProtect": "Protect",
+      "accordionAutomate": "Automate",
+      "accordionUnify": "Unify with OR ONE",
+      "detailsAriaSuffix": "details",
+      "scopeNote": "Applicable laws, standards and contractual duties vary by province, activity, regulator and data handled. ORAGROL confirms scope before recommending controls or automation."
+    },
+    "jobShortNames": {
+      "sales-flow": "Sales",
+      "customer-support": "Customer Service",
+      "operational-intelligence": "Finance",
+      "managed-it": "IT",
+      "customer-growth": "Marketing"
+    },
+    "list": {
+      "professionalServices": {
+        "name": "Professional Services",
+        "subBrand": "Accounting & bookkeeping firms",
+        "overview": "Accounting and bookkeeping firms sit at the centre of their clients’ financial lives—tax filings, payroll records, banking details and, often, authority to move client money. That concentration of sensitive data and payment authority makes firms a high-value target, independent of size.",
+        "risks": [
+          "Business email compromise and fraudulent banking-detail changes",
+          "Account takeover across email and cloud-accounting platforms",
+          "Unmanaged remote devices and unreviewed third-party access",
+          "Backup and recovery gaps affecting client financial records",
+          "Weak SPF, DKIM or DMARC enforcement"
+        ],
+        "priorities": [
+          "MFA on every email and cloud-accounting account",
+          "Independent verification for payment-detail changes",
+          "DMARC moved from monitoring to full enforcement",
+          "Regular staff and vendor access reviews",
+          "Tested backups and documented security awareness"
+        ],
+        "jobs": [
+          {
+            "jobKind": "sales-flow",
+            "why": "Keep every referral, enquiry, proposal and engagement-letter follow-up moving—even through busy season."
+          },
+          {
+            "jobKind": "operational-intelligence",
+            "why": "Turn scattered firm data into a current view of capacity, realization and client profitability."
+          }
+        ],
+        "unify": "When new-client intake, engagement and billing, staff capacity and client communication must move as one coordinated system—not as separate automations—that is OR ONE territory.",
+        "detail": {
+          "context": "PIPEDA may require safeguards appropriate to the sensitivity of personal information, breach reporting where there is a real risk of significant harm, notification, and breach records. Provincial privacy and professional rules may also apply. Accounting, legal and advisory firms should confirm their exact obligations during scoping.",
+          "protect": [
+            "Enforce MFA across email, cloud, accounting and privileged accounts.",
+            "Validate legitimate senders before moving SPF, DKIM and DMARC toward enforcement.",
+            "Independently verify payment instructions and banking-detail changes.",
+            "Review staff, contractor and vendor access at departures and on a defined schedule.",
+            "Protect client-document exchange, test backup restoration and document incident response."
+          ],
+          "automate": [
+            "Sales for referrals, proposals and engagement follow-up.",
+            "Secure client intake with document-status tracking and approved onboarding steps.",
+            "Finance for capacity, work in progress, billing and client-service visibility."
+          ],
+          "question": "What is the most common practical cyber risk for a professional-services firm?",
+          "answer": "Compromised email and identity are high-leverage risks because they can expose confidential information and enable convincing payment or account-change fraud."
+        }
+      },
+      "healthcare": {
+        "name": "Healthcare",
+        "subBrand": "Clinics & healthcare SMBs",
+        "overview": "Clinics work across scheduling, EMR, billing and communication systems maintained by several vendors, while staff turnover creates recurring access-control work around highly sensitive patient information.",
+        "risks": [
+          "Phishing aimed at front-desk and billing teams",
+          "Weak separation between clinical and administrative access",
+          "Unmanaged devices touching patient information"
+        ],
+        "priorities": [
+          "MFA across clinical and billing systems",
+          "Access reviews during every staff change",
+          "Managed protection for every connected endpoint"
+        ],
+        "jobs": [
+          {
+            "jobKind": "customer-support",
+            "why": "Improve high-volume scheduling, intake and follow-up communication."
+          },
+          {
+            "jobKind": "managed-it",
+            "why": "Keep scheduling and records systems dependable without building a full internal IT team."
+          }
+        ],
+        "unify": "When patient intake, billing, staff scheduling and communication must coordinate across providers or locations, the need has moved into OR ONE territory.",
+        "detail": {
+          "context": "In Ontario, PHIPA governs health information custodians and their agents. Custodians remain responsible when third-party providers are used, and breach notification and annual statistical reporting duties can apply. Other provinces have their own health-privacy regimes.",
+          "protect": [
+            "Enforce MFA for clinical, billing, remote and privileged accounts.",
+            "Use role-based access and review it after every staffing change.",
+            "Manage and patch every endpoint that touches patient information.",
+            "Test restoration of critical systems and maintain downtime procedures.",
+            "Review vendor safeguards, access, breach notice and data-disposition terms."
+          ],
+          "automate": [
+            "Approved reminders, intake status and non-clinical follow-up with staff escalation.",
+            "Administrative intake that checks completeness without automating clinical decisions.",
+            "IT for endpoint health, tickets, device lifecycle and recurring access work."
+          ],
+          "question": "Does a cloud healthcare vendor take privacy responsibility away from an Ontario clinic?",
+          "answer": "No. Ontario guidance makes clear that a custodian remains responsible for personal health information in its custody or control, including when providers are involved."
+        }
+      },
+      "financialServices": {
+        "name": "Financial Services",
+        "subBrand": "Advisors, brokers & lenders",
+        "overview": "Financial firms handle regulated data, high-value transactions and third-party platforms while maintaining evidence and audit trails as part of everyday operations.",
+        "risks": [
+          "Credential-based account takeover",
+          "Regulated financial-data exposure",
+          "Custodian, lender and CRM vendor risk"
+        ],
+        "priorities": [
+          "Strict identity and privileged-access controls",
+          "Continuous compliance evidence",
+          "Ongoing vendor-risk monitoring"
+        ],
+        "jobs": [
+          {
+            "jobKind": "operational-intelligence",
+            "why": "Create dependable visibility across reporting, portfolio and pipeline data."
+          },
+          {
+            "jobKind": "managed-it",
+            "why": "Maintain monitored, dependable infrastructure around critical workflows."
+          }
+        ],
+        "unify": "When compliance reporting, client communication and advisor operations need one coordinated, auditable system, that becomes OR ONE territory.",
+        "detail": {
+          "context": "The applicable framework depends on the activity. OSFI B-13 and B-10 apply to federally regulated financial institutions, not every financial SMB. FINTRAC applies to defined reporting entities and covered activities. Provincial, contractual and professional rules may also apply.",
+          "protect": [
+            "Use strong MFA for privileged, email, financial and remote accounts.",
+            "Separate and monitor administrative privilege.",
+            "Require independent verification for payment and account-detail changes.",
+            "Maintain vendor inventories, risk assessments, contract controls and exit plans.",
+            "Test incident response, continuity and recovery around critical workflows."
+          ],
+          "automate": [
+            "Compliance workflow support for evidence, review, exceptions and approvals.",
+            "Controlled client onboarding with required human review.",
+            "Finance for authorized pipeline, service, exception and risk views."
+          ],
+          "question": "Does OSFI Guideline B-13 apply to every Canadian financial business?",
+          "answer": "No. B-13 applies to federally regulated financial institutions. Other financial businesses may face different federal, provincial, contractual or professional obligations."
+        }
+      },
+      "retail": {
+        "name": "Retail & E-commerce",
+        "subBrand": "Commerce across channels",
+        "overview": "Retail and e-commerce operators manage payment data, seasonal demand and an always-on customer journey across marketing, checkout, fulfilment and support.",
+        "risks": [
+          "Payment and checkout compromise",
+          "Web and API exposure",
+          "Customer-data loss or misuse"
+        ],
+        "priorities": [
+          "Application and API security",
+          "PCI-relevant security hygiene",
+          "Continuous visibility into public systems"
+        ],
+        "jobs": [
+          {
+            "jobKind": "customer-growth",
+            "why": "Strengthen repeat purchases, retention and reactivation at scale."
+          },
+          {
+            "jobKind": "sales-flow",
+            "why": "Keep leads and abandonment follow-up moving without manual effort."
+          }
+        ],
+        "unify": "When marketing, sales, fulfilment and customer support must operate as one connected system across channels, that is OR ONE territory.",
+        "detail": {
+          "context": "Canadian privacy law may govern customer information. PCI DSS is a payment-card industry standard, not Canadian legislation. PCI DSS v4.0.1 includes e-commerce attention to payment-page scripts and change or tamper detection.",
+          "protect": [
+            "Enforce MFA for store administration, email, payments and remote access.",
+            "Minimize storage and exposure of payment and personal information.",
+            "Control plug-ins, scripts, integrations and updates.",
+            "Monitor payment-page changes, public applications, APIs and availability.",
+            "Review third-party access and test restoration before peak periods."
+          ],
+          "automate": [
+            "Customer Service for approved answers, routing and human escalation.",
+            "Marketing for consent-aware post-purchase, loyalty and reactivation journeys.",
+            "Finance for inventory, fulfilment, returns and campaign visibility."
+          ],
+          "question": "Is PCI DSS a Canadian privacy law?",
+          "answer": "No. PCI DSS is a payment-card industry security standard. Canadian privacy laws may separately govern the personal information a retailer handles."
+        }
+      },
+      "manufacturing": {
+        "name": "Manufacturing",
+        "subBrand": "Production & supply continuity",
+        "overview": "Manufacturers combine office IT, production-adjacent systems, legacy equipment and supplier access—where an ordinary technology incident can become measurable production downtime.",
+        "risks": [
+          "Supplier and vendor access exposure",
+          "Aging or unmanaged endpoints",
+          "Weak separation between office and production systems"
+        ],
+        "priorities": [
+          "Vendor access review",
+          "Complete endpoint coverage",
+          "Network segmentation around critical operations"
+        ],
+        "jobs": [
+          {
+            "jobKind": "managed-it",
+            "why": "Tie infrastructure reliability directly to production continuity."
+          },
+          {
+            "jobKind": "operational-intelligence",
+            "why": "Replace delayed inventory, supplier and production reporting with a current view."
+          }
+        ],
+        "unify": "When supply-chain, inventory and operating data need one coordinated planning-and-execution system, the requirement becomes OR ONE.",
+        "detail": {
+          "context": "Canadian cyber guidance highlights supply-chain threats, ransomware and risk-based security for smaller organizations. Exact duties depend on products, customers, safety, export controls, critical-infrastructure role and the information handled.",
+          "protect": [
+            "Inventory IT, OT, connected equipment, remote paths and critical dependencies.",
+            "Separate business and production environments where feasible.",
+            "Use approved, time-limited and monitored vendor access.",
+            "Prioritize vulnerabilities by exposure, exploitability, safety and production impact.",
+            "Test recovery for business systems and production-critical configurations."
+          ],
+          "automate": [
+            "IT for endpoints, access, service requests and recurring evidence.",
+            "Finance for authorized inventory, quality, downtime and supplier indicators.",
+            "Supplier workflows for approvals, evidence, expiry dates and exceptions."
+          ],
+          "question": "Why is vendor access a major manufacturing cyber risk?",
+          "answer": "Permanent, excessive or unmonitored supplier access can create a path into business or production environments when a vendor identity or system is compromised."
+        }
+      },
+      "technology": {
+        "name": "Technology",
+        "subBrand": "Growth-stage companies",
+        "overview": "Technology companies often scale revenue and headcount faster than internal process, accumulating SaaS tools, integrations and inconsistent access governance along the way.",
+        "risks": [
+          "SaaS sprawl and weak offboarding",
+          "API and integration exposure",
+          "Uncontrolled use of AI tools"
+        ],
+        "priorities": [
+          "Identity governance across the stack",
+          "Application and API security",
+          "Practical AI governance"
+        ],
+        "jobs": [
+          {
+            "jobKind": "sales-flow",
+            "why": "Scale pipeline execution without scaling administration at the same rate."
+          },
+          {
+            "jobKind": "operational-intelligence",
+            "why": "Connect product, customer and revenue information into current decisions."
+          }
+        ],
+        "unify": "When sales, product data and customer operations require one system rather than a growing collection of tools, that is OR ONE territory.",
+        "detail": {
+          "context": "Privacy, customer contracts, insurer conditions and supply-chain requirements all matter. Canada's proposed Artificial Intelligence and Data Act should not be described as enacted law; current advice should focus on privacy, security, approved use, human oversight and accountability.",
+          "protect": [
+            "Centralize identity, enforce MFA and control joiner, mover and leaver events.",
+            "Protect cloud administration, source code, CI/CD and secrets.",
+            "Establish secure development, dependency, vulnerability and release practices.",
+            "Inventory APIs, integrations, data flows and third-party components.",
+            "Define approved AI uses, prohibited data and human-review requirements."
+          ],
+          "automate": [
+            "Sales for demand, qualification, proposals and handoff.",
+            "Customer Service for approved knowledge, routing and escalation.",
+            "Finance for product, service, customer and revenue indicators."
+          ],
+          "question": "Is Canada's proposed Artificial Intelligence and Data Act currently law?",
+          "answer": "No. Technology companies should still establish practical AI governance around privacy, security, approved use, human oversight and accountability."
+        }
+      },
+      "construction": {
+        "name": "Construction & Real Estate",
+        "subBrand": "Distributed teams & projects",
+        "overview": "Construction and real-estate businesses coordinate office, field and site teams through email, mobile devices and a mix of project, transaction and client-management systems.",
+        "risks": [
+          "Field and mobile-device exposure",
+          "Invoice and payment-change fraud",
+          "Inconsistent access across sites and teams"
+        ],
+        "priorities": [
+          "Managed mobile devices",
+          "Independent payment verification",
+          "Enforced email authentication"
+        ],
+        "jobs": [
+          {
+            "jobKind": "managed-it",
+            "why": "Support a distributed workforce and its devices reliably."
+          },
+          {
+            "jobKind": "customer-growth",
+            "why": "Maintain disciplined follow-up across long buyer, tenant and client cycles."
+          }
+        ],
+        "unify": "When project management, client communication and back-office finance need to coordinate across multiple sites or listings, that is OR ONE territory.",
+        "detail": {
+          "context": "Real-estate brokers, representatives and developers can have FINTRAC duties when performing covered activities. Obligations differ by entity and activity. Privacy and contract requirements may also apply.",
+          "protect": [
+            "Enforce MFA across email, project, property, finance and remote systems.",
+            "Independently verify payment and banking-detail changes.",
+            "Manage mobile devices and protect business information.",
+            "Give contractors time-bound, least-privilege access.",
+            "Review access at project completion and retain required records."
+          ],
+          "automate": [
+            "Sales for enquiries, appointments, proposals and long-cycle follow-up.",
+            "Project intake for approved documents, missing items, routing and status.",
+            "IT for distributed devices, accounts and recurring service work."
+          ],
+          "question": "Do all Canadian construction and real-estate businesses have the same FINTRAC obligations?",
+          "answer": "No. Obligations depend on the entity and activities performed; covered businesses must assess the current guidance specific to them."
+        }
+      },
+      "education": {
+        "name": "Education",
+        "subBrand": "Schools & education providers",
+        "overview": "Education providers hold student and family data across administrative and learning systems while handling a constant volume of communication with parents, students and staff.",
+        "risks": [
+          "Phishing targeting administrative staff",
+          "Student-data exposure",
+          "Inconsistent access across learning and admin systems"
+        ],
+        "priorities": [
+          "Security awareness for staff",
+          "Governed access across platforms",
+          "Clear data-handling policy"
+        ],
+        "jobs": [
+          {
+            "jobKind": "customer-support",
+            "why": "Handle repeat parent and student enquiries more consistently."
+          },
+          {
+            "jobKind": "managed-it",
+            "why": "Support administrative and learning systems as one dependable environment."
+          }
+        ],
+        "unify": "When admissions, communication and administration must coordinate across programs or campuses, the operating need becomes OR ONE.",
+        "detail": {
+          "context": "Privacy duties depend on province and whether the institution is public or private. Ontario regulator findings on PowerSchool emphasize vendor oversight, contractual safeguards and continued responsibility for information in an institution's custody or control.",
+          "protect": [
+            "Enforce MFA for staff, administrators, remote and privileged accounts.",
+            "Review roles as students, staff and contractors enter or leave.",
+            "Protect endpoints, especially administrator and shared devices.",
+            "Assess education-technology vendors, contracts, access and data disposition.",
+            "Test restoration and maintain learning-continuity and incident plans."
+          ],
+          "automate": [
+            "Approved routine information and support with escalation to staff.",
+            "Admissions administration for document status, reminders and authorized handoffs.",
+            "IT for devices, accounts, tickets and access work."
+          ],
+          "question": "Does an education organization transfer privacy responsibility to its software provider?",
+          "answer": "Not automatically. Applicable law and organization type matter, but recent Ontario findings emphasize active vendor oversight and continued responsibility."
+        }
+      },
+      "otherSmbs": {
+        "name": "Other Canadian SMBs",
+        "subBrand": "A clear place to begin",
+        "overview": "Businesses that do not fit a named vertical still rely on the same essentials: email, cloud tools, a handful of vendors and operating work that is often more manual than it needs to be.",
+        "risks": [
+          "Phishing and account takeover",
+          "Incomplete MFA coverage",
+          "Unmanaged vendor access"
+        ],
+        "priorities": [
+          "MFA across every critical account",
+          "A documented risk baseline",
+          "Basic vendor and access review"
+        ],
+        "jobs": [
+          {
+            "jobKind": "sales-flow",
+            "why": "Create a dependable path from enquiry to close."
+          },
+          {
+            "jobKind": "customer-support",
+            "why": "Respond, route and follow up consistently as demand grows."
+          }
+        ],
+        "unify": "When sales, support and operations genuinely need to run as one coordinated system rather than separate functions, that is OR ONE territory.",
+        "detail": {
+          "context": "PIPEDA can apply to personal information handled in commercial activity. Alberta, British Columbia and Quebec have substantially similar private-sector laws, while sector and provincial duties may also apply. Canadian baseline controls offer a practical risk-based starting point.",
+          "protect": [
+            "Document critical assets, accounts, data and vendors.",
+            "Enforce MFA across email, cloud, finance and administration.",
+            "Manage endpoints, updates, backups and privileged access.",
+            "Protect email and train staff around phishing and payment fraud.",
+            "Test recovery and define incident decision ownership."
+          ],
+          "automate": [
+            "Sales workflows so enquiries and proposals do not go cold.",
+            "Customer Service for consistent routing, answers and escalation.",
+            "Finance for governed, current reporting.",
+            "IT for routine devices, accounts, tickets and access."
+          ],
+          "question": "Where should a Canadian SMB begin with cybersecurity?",
+          "answer": "Begin with a risk baseline covering critical accounts, devices, data, vendors, backups and business processes, then prioritize MFA, email protection, managed updates and tested recovery."
+        }
+      }
+    }
+  },
+  "OrOne": {
+    "nav": {
+      "getCyberHealthScore": "Get Cyber Health Score",
+      "search": "Search",
+      "changeLanguage": "Change language",
+      "myScope": "My Scope"
+    },
+    "hero": {
+      "meta1": "OR ONE / Coordinated business system",
+      "meta2": "Security · Automation · Intelligence",
+      "model": "One connected operating model",
+      "title1": "One secure system",
+      "title2": "for how your business",
+      "titleEmphasis": "operates.",
+      "support": "OR ONE connects your business systems and coordinates AI workers across your organization through one secure operating layer. It centralizes approvals, oversight and performance while keeping every important decision under human authority.",
+      "discover": "Discover OR ONE",
+      "pillar1": "Protect what matters",
+      "pillar2": "Automate what slows you down",
+      "pillar3": "Understand what drives the business",
+      "pillar4": "Operate as one system"
+    },
+    "intro": {
+      "eyebrow": "A separate product line",
+      "title1": "Your business,",
+      "titleEmphasis": "intelligently operated.",
+      "body1": "OR ONE is a dedicated AI workforce engineered for one organization. It connects to the tools your business already uses and operates through clearly authorized access.",
+      "body2": "It is completely separate from ORAGROL's 67 standard services—with its own engineering model, responsibility structure and commercial terms.",
+      "quote": "Engineered by ORAGROL Global."
+    },
+    "signature": {
+      "label": "OR / ONE SIGNATURE",
+      "heading": "Your vision, precisely engineered.",
+      "body1": "Tell us what your operation needs to achieve. We will design and create a bespoke system around your ambitions—from intelligent workflows and automation to integrations, controls, reporting, and specialised capabilities.",
+      "body2": "Each Signature engagement is privately reviewed and shaped into a custom architecture, defined scope, implementation plan, and ongoing service structure.",
+      "cta": "BEGIN YOUR SIGNATURE PROJECT"
+    },
+    "process": {
+      "eyebrow": "FROM SCOPE TO OPERATION",
+      "title1": "A clear path.",
+      "titleEmphasis": "A working system.",
+      "sub": "Define the work, connect the right tools and agree the controls before launch.",
+      "steps": [
+        {
+          "number": "01",
+          "title": "Define scope",
+          "copy": "Agree the workflows, tools, access and outcomes your system needs to support.",
+          "result": "A defined scope"
+        },
+        {
+          "number": "02",
+          "title": "Build & connect",
+          "copy": "Engineer the agreed workflows and connect them to your approved business systems.",
+          "result": "Connected workflows"
+        },
+        {
+          "number": "03",
+          "title": "Test & approve",
+          "copy": "Review real scenarios with your team, including exceptions and approval points.",
+          "result": "Readiness for launch"
+        },
+        {
+          "number": "04",
+          "title": "Launch & maintain",
+          "copy": "Put approved workflows into operation with the agreed monitoring and support.",
+          "result": "An operating system"
+        }
+      ]
+    },
+    "builder": {
+      "eyebrow": "Interactive builder / 77 items",
+      "title1": "Build your team.",
+      "titleEmphasis": "See the shape of the system.",
+      "sub": "Select capabilities to create a preliminary scope. The estimate shows Points and a likely tier—not a final price or proposal. Selections stop at 400 points.",
+      "categoryLabel": "Category",
+      "ptsSuffix": "pts",
+      "limitReached": "400-point limit reached",
+      "tierStandard": "Standard",
+      "tierControlled": "Controlled",
+      "tierCritical": "Critical",
+      "preliminaryScope": "Preliminary scope",
+      "pointsSelected": "Points selected",
+      "itemsLabel": "items",
+      "estimatedTierLabel": "estimated tier",
+      "notEstimated": "Not estimated",
+      "reviewInMyScope": "Review in My Scope ↗",
+      "clearSelection": "Clear selection",
+      "categories": {
+        "sales": {
+          "name": "Sales",
+          "benefit": "Build a sales operation that finds, qualifies and follows opportunity consistently.",
+          "items": [
+            {
+              "name": "Lead generation/prospecting"
+            },
+            {
+              "name": "Cold email outreach"
+            },
+            {
+              "name": "Lead qualification"
+            },
+            {
+              "name": "Quote/proposal drafting"
+            },
+            {
+              "name": "CRM data entry & pipeline tracking"
+            },
+            {
+              "name": "Follow-up with existing clients"
+            },
+            {
+              "name": "Upsell/cross-sell offer generation"
+            },
+            {
+              "name": "Sales forecasting & reporting"
+            },
+            {
+              "name": "Referral management"
+            }
+          ]
+        },
+        "marketingBranding": {
+          "name": "Marketing & Branding",
+          "benefit": "Create, distribute and measure brand activity without losing consistency.",
+          "items": [
+            {
+              "name": "Website management"
+            },
+            {
+              "name": "SEO"
+            },
+            {
+              "name": "Content writing"
+            },
+            {
+              "name": "Social media posting"
+            },
+            {
+              "name": "Email marketing"
+            },
+            {
+              "name": "Paid ad campaign management"
+            },
+            {
+              "name": "Graphic design (routine)"
+            },
+            {
+              "name": "Market & competitor research"
+            },
+            {
+              "name": "Marketing analytics/reporting"
+            },
+            {
+              "name": "Lead-gen campaigns"
+            }
+          ]
+        },
+        "financeAccounting": {
+          "name": "Finance & Accounting",
+          "benefit": "Turn routine financial administration into a controlled, auditable operating system.",
+          "items": [
+            {
+              "name": "Bookkeeping"
+            },
+            {
+              "name": "Accounts payable"
+            },
+            {
+              "name": "Accounts receivable/invoicing"
+            },
+            {
+              "name": "Payroll processing"
+            },
+            {
+              "name": "Bank reconciliation"
+            },
+            {
+              "name": "Financial statements"
+            },
+            {
+              "name": "Budgeting & forecasting"
+            },
+            {
+              "name": "Expense tracking/reimbursement"
+            },
+            {
+              "name": "Cash flow management"
+            },
+            {
+              "name": "Financial reporting to ownership"
+            },
+            {
+              "name": "Tax preparation (client-validated filing)"
+            }
+          ]
+        },
+        "hrPeople": {
+          "name": "HR & People",
+          "benefit": "Support the employee lifecycle with structured, responsible automation.",
+          "items": [
+            {
+              "name": "Recruiting/job posting"
+            },
+            {
+              "name": "Resume screening"
+            },
+            {
+              "name": "Onboarding"
+            },
+            {
+              "name": "Employee records"
+            },
+            {
+              "name": "Benefits administration"
+            },
+            {
+              "name": "Training & development"
+            },
+            {
+              "name": "PTO/time-off tracking"
+            },
+            {
+              "name": "Workplace policy management"
+            },
+            {
+              "name": "Offboarding"
+            },
+            {
+              "name": "Employment-law compliance tracking"
+            }
+          ]
+        },
+        "customerService": {
+          "name": "Customer Service",
+          "benefit": "Respond faster and maintain a consistent experience from inquiry through follow-up.",
+          "items": [
+            {
+              "name": "Answering inquiries"
+            },
+            {
+              "name": "Complaint triage/handling"
+            },
+            {
+              "name": "Order/service issue resolution"
+            },
+            {
+              "name": "Returns/refunds"
+            },
+            {
+              "name": "FAQ/knowledge base upkeep"
+            },
+            {
+              "name": "Satisfaction surveys"
+            },
+            {
+              "name": "Support ticket tracking"
+            },
+            {
+              "name": "After-sales follow-up"
+            }
+          ]
+        },
+        "operationsAdmin": {
+          "name": "Operations & Admin",
+          "benefit": "Connect the everyday work that keeps the business moving.",
+          "items": [
+            {
+              "name": "Scheduling/calendar management"
+            },
+            {
+              "name": "Document filing"
+            },
+            {
+              "name": "Data entry across systems"
+            },
+            {
+              "name": "Internal communications"
+            },
+            {
+              "name": "Meeting coordination & notetaking"
+            },
+            {
+              "name": "SOP documentation"
+            },
+            {
+              "name": "Project/task tracking"
+            },
+            {
+              "name": "Inventory tracking/reorder alerts"
+            },
+            {
+              "name": "Shipping coordination"
+            }
+          ]
+        },
+        "itTechnology": {
+          "name": "IT & Technology",
+          "benefit": "Keep technology connected, maintained and operational without unnecessary overhead.",
+          "items": [
+            {
+              "name": "Software maintenance/patching"
+            },
+            {
+              "name": "Software license management"
+            },
+            {
+              "name": "IT helpdesk"
+            },
+            {
+              "name": "Data backup"
+            },
+            {
+              "name": "Basic cyber hygiene monitoring"
+            },
+            {
+              "name": "Website/hosting upkeep"
+            },
+            {
+              "name": "Connecting software tools together"
+            }
+          ]
+        },
+        "procurementVendor": {
+          "name": "Procurement & Vendor",
+          "benefit": "Bring structure and visibility to purchasing and supplier performance.",
+          "items": [
+            {
+              "name": "Supplier sourcing/shortlisting"
+            },
+            {
+              "name": "Purchase orders"
+            },
+            {
+              "name": "Reorder/inventory management"
+            },
+            {
+              "name": "Vendor performance tracking"
+            }
+          ]
+        },
+        "legalCompliance": {
+          "name": "Legal & Compliance",
+          "benefit": "Track recurring obligations and keep evidence organized for responsible review.",
+          "items": [
+            {
+              "name": "License/permit renewal tracking & filing"
+            },
+            {
+              "name": "Regulatory compliance tracking"
+            },
+            {
+              "name": "Insurance management"
+            },
+            {
+              "name": "Corporate record-keeping"
+            },
+            {
+              "name": "Privacy/data compliance tracking"
+            }
+          ]
+        },
+        "leadershipStrategy": {
+          "name": "Leadership & Strategy",
+          "benefit": "Give leadership a connected view of performance, opportunity and risk.",
+          "items": [
+            {
+              "name": "KPI/performance dashboards"
+            },
+            {
+              "name": "Investor/board reporting"
+            },
+            {
+              "name": "Company-wide analytics"
+            },
+            {
+              "name": "Risk monitoring/flagging"
+            }
+          ]
+        }
+      }
+    },
+    "pricing": {
+      "eyebrow": "OR ONE / SYSTEM FEES",
+      "title1": "Know the investment.",
+      "titleEmphasis": "Define the scope.",
+      "sub": "One build fee for your system. A base monthly fee for ongoing operation.",
+      "buildFeeLabel": "BUILD FEE",
+      "monthlyFeeLabel": "BASE MONTHLY OR SERVICE FEE",
+      "perMonthSuffix": "/mo",
+      "note1": "All fees in CAD. Points measure the complexity of your selected capabilities and help determine your system tier. Final scope and monthly fee are confirmed through private review.",
+      "note2": "The builder provides a preliminary tier, not a binding quote."
+    },
+    "control": {
+      "eyebrow": "RESPONSIBILITY / AUTHORIZED ACTION",
+      "title1": "You stay",
+      "titleEmphasis": "in control.",
+      "sub": "Agree what the system may do, where your team reviews its work and which actions remain restricted.",
+      "rows": [
+        {
+          "number": "01",
+          "title": "Routine work",
+          "tag": "Within agreed boundaries",
+          "copy": "Research, reporting and reversible administration can be configured to run within approved access and rules."
+        },
+        {
+          "number": "02",
+          "title": "Review points",
+          "tag": "Your team decides where",
+          "copy": "Customer communications, draft invoices and operational updates need clearly defined review and approval rules."
+        },
+        {
+          "number": "03",
+          "title": "Sensitive actions",
+          "tag": "Explicit authority required",
+          "copy": "Payments, payroll, hiring decisions and security changes require specific controls and authorization. Selecting a capability does not grant that authority."
+        }
+      ],
+      "footnote": "Approval rules, access limits and escalation responsibilities are agreed during scoping and validated before launch."
+    },
+    "management": {
+      "eyebrow": "MONTHLY MANAGEMENT / OR SERVICE FEE",
+      "title1": "Built once.",
+      "titleEmphasis": "Looked after continuously.",
+      "sub": "The build fee covers engineering. The monthly OR Service Fee supports the live system within your agreed scope.",
+      "items": [
+        {
+          "title": "Monitor",
+          "copy": "Review workflow health and surface exceptions that need attention."
+        },
+        {
+          "title": "Maintain",
+          "copy": "Maintain approved integrations and configurations as connected systems change."
+        },
+        {
+          "title": "Test",
+          "copy": "Check agreed workflows and controls when changes are introduced."
+        },
+        {
+          "title": "Support",
+          "copy": "Help your team resolve operating issues through the agreed support process."
+        }
+      ],
+      "footnote": "Coverage, review frequency, support arrangements and the final monthly fee are confirmed in your proposal."
+    },
+    "detailsLabels": {
+      "detailsButton": "Details",
+      "viewWhatsIncluded": "View what's included",
+      "viewDetailsFor": "View details for",
+      "close": "Close",
+      "whatsIncluded": "What's included",
+      "whoItSuitsHeading": "Who it suits",
+      "illustrativeExample": "Illustrative example",
+      "youStayInControl": "You stay in control"
+    },
+    "details": {
+      "STARTER": {
+        "itemLabel": "STARTER",
+        "title": "OR ONE Starter",
+        "subtitle": "A focused first system.",
+        "intro": "Build a connected automation system for selected tasks within one business category, up to 30 points. We scope the capabilities, required connections and approval steps, then build and manage the agreed system. You receive a dashboard to review activity and decisions within that focused scope.",
+        "inclusions": [
+          "Up to 30 points of selected capabilities from one category only.",
+          "Build and configuration for the agreed workflow.",
+          "Required connections identified during scoping.",
+          "Dashboard visibility and defined approval steps.",
+          "Managed operation within the agreed service scope."
+        ],
+        "control": "Review proposed outcomes through the dashboard and approve sensitive actions. Changes to selected capabilities are assessed for scope, feasibility and any additional work; a points balance is not an unlimited change allowance.",
+        "whoItSuits": "Businesses beginning with a focused workflow in one function.",
+        "example": "Select lead qualification and related Sales tasks within the 30-point limit, with the exact combination checked in the builder.",
+        "scope": "One category only. The build fee and Base monthly OR Service Fee are displayed on the tier card; final scope is confirmed through review.",
+        "pointsLabel": "Up to 30 Points · one category"
+      },
+      "100": {
+        "itemLabel": "100",
+        "title": "OR ONE 100",
+        "subtitle": "A broader connected scope.",
+        "intro": "Build a coordinated system using up to 100 points of selected capabilities across the available business categories. We define how the selected workflows share information, handle exceptions and bring decisions to you. You receive a managed system and dashboard organized around that agreed combination.",
+        "inclusions": [
+          "Up to 100 points across selected categories.",
+          "Connected workflows and agreed data handovers.",
+          "Build and configuration for the confirmed scope.",
+          "Dashboard visibility and approval steps.",
+          "Managed operation within the agreed service scope."
+        ],
+        "control": "Approve proposed outcomes and sensitive actions through the agreed workflow. Changes are reviewed for feasibility and scope before implementation.",
+        "whoItSuits": "Businesses connecting a broader set of recurring tasks.",
+        "example": "Combine selected Sales and Customer Service capabilities within 100 points, so lead and customer records support a coordinated workflow.",
+        "scope": "Selected capabilities determine coverage; 100 points does not guarantee a whole department is automated. Refer to the tier card for the build fee and Base monthly OR Service Fee.",
+        "pointsLabel": "Up to 100 Points"
+      },
+      "200": {
+        "itemLabel": "200",
+        "title": "OR ONE 200",
+        "subtitle": "More workflows working together.",
+        "intro": "Build a coordinated system using up to 200 points across selected business categories. We design the connections, ownership and approval steps needed for the chosen workflows to work together. You receive consolidated activity visibility and managed operation across the confirmed scope.",
+        "inclusions": [
+          "Up to 200 points across selected categories.",
+          "Shared records and workflow handovers as scoped.",
+          "Build and configuration for the agreed combination.",
+          "Dashboard visibility and approval steps.",
+          "Managed operation within the agreed service scope."
+        ],
+        "control": "Proposed outcomes and sensitive decisions remain subject to approval. Changes to the system are reviewed before implementation.",
+        "whoItSuits": "Businesses coordinating recurring work across several functions.",
+        "example": "Connect selected Marketing, Sales and Customer Service tasks so campaign activity, leads and customer follow-up share an agreed process within 200 points.",
+        "scope": "Coverage depends on selected capabilities and connections. Refer to the tier card for the build fee and Base monthly OR Service Fee.",
+        "pointsLabel": "Up to 200 Points"
+      },
+      "400": {
+        "itemLabel": "400",
+        "title": "OR ONE 400",
+        "subtitle": "An extensive operating scope.",
+        "intro": "Build a wider coordinated system using up to 400 points across the available categories. We map the selected processes, shared information and approval responsibilities into the agreed operating design. You receive a managed system with a central view of activity, exceptions and decisions across those workflows.",
+        "inclusions": [
+          "Up to 400 points across selected categories.",
+          "Coordination of the agreed workflows and handovers.",
+          "Build and configuration for the confirmed operating scope.",
+          "Dashboard visibility and approval steps.",
+          "Managed operation within the agreed service scope."
+        ],
+        "control": "Final outcomes and sensitive actions follow agreed approval rules. Broader coverage does not remove human responsibility or permit unrestricted action.",
+        "whoItSuits": "Businesses needing extensive coordination across multiple functions.",
+        "example": "Connect selected Sales, Finance, Customer Service and Operations workflows within 400 points, with clear handovers and exception reporting.",
+        "scope": "This tier does not promise to run the entire business or every department. Refer to the tier card for the build fee and Base monthly OR Service Fee.",
+        "pointsLabel": "Up to 400 Points"
+      }
+    },
+    "scopeItem": {
+      "notEstimatedTier": "Not estimated",
+      "preliminarySystemSuffix": "preliminary system",
+      "capabilitiesSelected": "{count} capabilities selected across {categories} categories.",
+      "commercialSummary": "{points} / 400 points · {standard} standard · {controlled} controlled · {critical} critical"
+    }
+  },
+  "ScopeTray": {
+    "launcher": "MY SCOPE",
+    "closeAriaLabel": "Close scope tray",
+    "headerLabel": "ORAGROL / PRIVATE SCOPE",
+    "selectedSuffix": "SELECTED",
+    "areas": {
+      "Cybersecurity": "CYBERSECURITY",
+      "Automation": "AUTOMATION",
+      "OR ONE": "OR ONE"
+    },
+    "empty": {
+      "label": "Begin your scope",
+      "heading": "Choose what your business needs.",
+      "body": "Your selections stay together across Services, Business Automation and OR ONE."
+    },
+    "summary": {
+      "label": "PRELIMINARY SCOPE",
+      "heading": "A clearer first conversation.",
+      "body": "Review your selections, add context, then download a PDF or submit for private review."
+    },
+    "removeButton": "Remove",
+    "form": {
+      "priorityLabel": "Priority or context",
+      "priorityPlaceholder": "What should improve first?",
+      "nameLabel": "Name",
+      "emailLabel": "Business email",
+      "phoneLabel": "Phone",
+      "companyLabel": "Company",
+      "timeframeLabel": "Target timeframe",
+      "optionalSuffix": "(optional)",
+      "timeframeNotSpecified": "Not specified",
+      "timeframe30Days": "Within 30 days",
+      "timeframe1to3": "1-3 months",
+      "timeframe3to6": "3-6 months",
+      "timeframeExploring": "Exploring options",
+      "disclosure": "Your name, contact details and selected scope will be shared with ORAGROL to prepare your document and, if you request a review, to follow up with you. This is not a quotation, contract or confirmation of services.",
+      "consentLabel": "I have read the above and agree that ORAGROL may contact me about this scope.",
+      "downloadButton": "Download My Scope PDF",
+      "submittingLabel": "Submitting…",
+      "preparingPdfLabel": "Preparing your PDF…",
+      "submitButton": "Submit for Private Review",
+      "readyHint": "Enter your name, business email, phone and company above to continue.",
+      "pdfTimeout": "Your PDF is taking longer than expected to prepare. Please try again shortly."
+    },
+    "confirmation": {
+      "pdfDownloaded": "Your PDF has been downloaded. Reference: {reference}.",
+      "reviewReceived": "Your private review request has been received. Reference: {reference}.",
+      "downloadCopy": "Download a copy of your scope PDF"
+    },
+    "continueBrowsing": "Continue browsing"
+  },
+  "Contact": {
+    "nav": {
+      "startEnquiry": "Start enquiry",
+      "search": "Search",
+      "changeLanguage": "Change language"
+    },
+    "hero": {
+      "eyebrow": "Contact / ORAGROL Global",
+      "title1": "Start with a",
+      "titleEmphasis": "clear conversation.",
+      "body": "Whether you are exploring ORAGROL Global for a specific priority or a more coordinated transformation, begin with a conversation shaped around how your business operates.",
+      "chooseConversation": "Choose your conversation"
+    },
+    "conversations": {
+      "eyebrow": "01 / Begin here",
+      "title1": "Choose your",
+      "titleEmphasis": "conversation.",
+      "sub": "Select the direction closest to your current priority. You can add context before submitting.",
+      "selectedLabel": "Selected",
+      "selectLabel": "Select",
+      "options": [
+        {
+          "label": "Cybersecurity Services",
+          "summary": "Assess risk, strengthen protection or address a specific security priority."
+        },
+        {
+          "label": "Business Automation",
+          "summary": "Improve a defined business process through secure, practical automation."
+        },
+        {
+          "label": "OR ONE",
+          "summary": "Coordinate cybersecurity, automation and operational intelligence within one secure system."
+        },
+        {
+          "label": "Partnership or General Enquiry",
+          "summary": "Discuss partnerships, company information or another request."
+        }
+      ]
+    },
+    "enquiry": {
+      "eyebrow": "02 / Your enquiry",
+      "title": "Tell us what you are working on.",
+      "sub": "Share the outcome you need. We will review the context before recommending a next step.",
+      "scopeAttachedLabel": "MY SCOPE ATTACHED",
+      "selectionWord": "selection",
+      "moreSuffix": " · +{count} more"
+    },
+    "form": {
+      "conversationLabel": "Conversation",
+      "changeButton": "Change",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "businessEmail": "Business email",
+      "emailPlaceholder": "name@company.ca",
+      "company": "Company",
+      "jobTitle": "Job title",
+      "companySize": "Company size",
+      "selectPlaceholder": "Select",
+      "size1to10": "1–10 employees",
+      "size11to50": "11–50 employees",
+      "size51to200": "51–200 employees",
+      "size201plus": "201+ employees",
+      "achieveLabel": "What would you like to achieve?",
+      "achievePlaceholder": "Describe the priority, outcome or challenge in your own words.",
+      "contactMethodLabel": "Preferred contact method",
+      "methodEmail": "Email",
+      "methodVideo": "Video call",
+      "preferredTimeLabel": "Preferred time to connect",
+      "preferredTimePlaceholder": "Morning, afternoon or a specific date",
+      "consentLabel": "I agree that ORAGROL Global may contact me about this enquiry.",
+      "submitButton": "Submit Enquiry",
+      "sendingLabel": "Sending…",
+      "errorHeading": "Something went wrong.",
+      "genericSubmitError": "Could not send your message. Please try again.",
+      "networkError": "Could not send your message. Check your connection and try again.",
+      "downloadScopePdf": "Download My Scope as PDF",
+      "downloadScopeAlert": "Open My Scope on Services, Business Automation or OR ONE to download the current branded PDF.",
+      "successHeading": "Thank you.",
+      "successBody": "Your enquiry has been sent to the ORAGROL Global team for review. We aim to respond within two business days.",
+      "privacyNote": "Your information will be used only to review and respond to your request."
+    },
+    "next": {
+      "eyebrow": "03 / What happens next",
+      "title1": "A considered response.",
+      "titleEmphasis": "Not an automated sales pitch.",
+      "steps": [
+        {
+          "number": "01",
+          "title": "Review",
+          "copy": "We review your enquiry, selected scope and stated priorities."
+        },
+        {
+          "number": "02",
+          "title": "Confirm",
+          "copy": "You receive confirmation that your request has been received."
+        },
+        {
+          "number": "03",
+          "title": "Connect",
+          "copy": "We arrange the right conversation for your requirements."
+        },
+        {
+          "number": "04",
+          "title": "Scope",
+          "copy": "We define the recommended path before any commitment."
+        }
+      ],
+      "footer": "We aim to acknowledge qualified enquiries within two business days."
+    },
+    "locations": {
+      "eyebrow": "04 / ORAGROL Global",
+      "title1": "Canadian foundation.",
+      "title2": "Clear points of contact.",
+      "hq": {
+        "label": "Registered Headquarters",
+        "city": "Thunder Bay",
+        "region": "Ontario · Canada"
+      },
+      "toronto": {
+        "label": "Toronto Presence",
+        "city": "Toronto",
+        "body": "Client relationships and business development",
+        "region": "Ontario · Canada"
+      },
+      "digital": {
+        "label": "Digital enquiries",
+        "domain": "orgro.ca",
+        "body": "Our approved @orgro.ca contact email will be published when activated."
+      }
+    }
+  },
+  "Faq": {
+    "nav": {
+      "contactLink": "Contact"
+    },
+    "hero": {
+      "eyebrow": "ORAGROL / QUESTIONS",
+      "title1": "Clear answers.",
+      "titleEmphasis": "Before you begin.",
+      "sub": "Services, purchasing, support and how we work—explained without unnecessary technical language.",
+      "searchPlaceholder": "Search questions",
+      "searchAriaLabel": "Search frequently asked questions"
+    },
+    "noResults": "No matching questions. Try a shorter search.",
+    "groups": [
+      {
+        "title": "Getting started",
+        "items": [
+          {
+            "q": "How do I choose which services I need?",
+            "a": "Pick what you already know you need, or use Not sure — help me choose. Our team will help you find the right starting point without guessing."
+          },
+          {
+            "q": "Do I need to talk to someone before I sign up?",
+            "a": "No. You can use email, ORAGROL chat, the website form or meet in person. A conversation is only needed when you want one or the service requires custom scoping."
+          },
+          {
+            "q": "What if I want to talk to someone before deciding?",
+            "a": "ORAGROL chat is available 24/7. A real person is available Monday to Friday, 9am to 6pm ET, subject to availability."
+          }
+        ]
+      },
+      {
+        "title": "How you purchase",
+        "items": [
+          {
+            "q": "What happens after I reach out?",
+            "a": "We confirm what you need and prepare a proposal covering the appropriate scope."
+          },
+          {
+            "q": "How do you prepare a proposal?",
+            "a": "We use the products or services you selected to define scope, pricing and terms for your review."
+          },
+          {
+            "q": "What is in the contract?",
+            "a": "The exact products or services ordered, conditions, amount, payment method and both sides’ responsibilities."
+          },
+          {
+            "q": "How do I sign and confirm?",
+            "a": "You review, sign and return the contract. We finalize it before the order is confirmed."
+          },
+          {
+            "q": "When and how do I pay?",
+            "a": "Payment follows the signed contract, never before. It is due according to the terms stated there."
+          },
+          {
+            "q": "Do I get an invoice?",
+            "a": "Yes. Once the signed contract and payment are received, we issue a complete invoice for the order."
+          }
+        ]
+      },
+      {
+        "title": "Payment, contracts and cancellation",
+        "items": [
+          {
+            "q": "What payment methods do you accept?",
+            "a": "Card or bank transfer, as stated in your contract."
+          },
+          {
+            "q": "Is GST or HST shown separately?",
+            "a": "Yes. Applicable tax is shown as a separate line on your invoice."
+          },
+          {
+            "q": "What happens if a payment is late?",
+            "a": "Invoices are due within 30 days. Unpaid balances accrue interest at 1.5% per month, and service may be paused when payment is more than 15 days overdue."
+          },
+          {
+            "q": "Can I cancel or change services later?",
+            "a": "Yes. With 60 days’ written notice and no outstanding balance, there is no cancellation fee. Other cancellation costs and OR ONE term conditions are defined in the contract."
+          },
+          {
+            "q": "What happens to my data if I cancel?",
+            "a": "Under our standard agreement, data is returned or securely destroyed within 30 days, with written certification available on request."
+          },
+          {
+            "q": "What guarantees do you offer?",
+            "a": "Action-taking services state target response times. They remain targets, not guarantees, until proven in live operation."
+          },
+          {
+            "q": "What are my responsibilities and yours?",
+            "a": "Both sides’ responsibilities are written explicitly into the contract before signing."
+          }
+        ]
+      },
+      {
+        "title": "How the service works",
+        "items": [
+          {
+            "q": "Is this just a security report?",
+            "a": "No. Most services are designed to take action, while selected services provide ongoing expert oversight and advice."
+          },
+          {
+            "q": "Who does the work?",
+            "a": "Detection and analysis can run automatically around the clock. Nothing reaches you and no action is taken without human review."
+          },
+          {
+            "q": "How fast do you respond to a real problem?",
+            "a": "Each action-taking service has a stated target response time. The applicable target appears with the service."
+          },
+          {
+            "q": "What access do you need?",
+            "a": "Primarily read access and, for action-taking services, limited write access to approved business systems. Access can start narrow and expand when appropriate."
+          },
+          {
+            "q": "Is this one-time or ongoing?",
+            "a": "Most services provide ongoing protection rather than a one-time checkup."
+          }
+        ]
+      },
+      {
+        "title": "What you receive",
+        "items": [
+          {
+            "q": "What do I receive?",
+            "a": "Clear visibility into findings, fixes and open items, plus urgent alerts. Delivery begins through written summaries and email, with a fuller online dashboard planned."
+          },
+          {
+            "q": "Do I need a technical background?",
+            "a": "No. Information is written for business owners and decision-makers."
+          },
+          {
+            "q": "Will dangerous findings be flagged immediately?",
+            "a": "Yes. Urgent findings are not held for a scheduled update."
+          }
+        ]
+      },
+      {
+        "title": "Technical support",
+        "items": [
+          {
+            "q": "What if something is not working?",
+            "a": "Reach us through ORAGROL chat or email and our team will review it."
+          },
+          {
+            "q": "How fast do you respond to support?",
+            "a": "Urgent issues for active clients follow the target stated in their service. General questions are handled the same or next business day."
+          },
+          {
+            "q": "Do you offer support outside business hours?",
+            "a": "ORAGROL chat is available 24/7. Human support is Monday to Friday, 9am to 6pm ET, subject to availability."
+          },
+          {
+            "q": "Can chat help with an active incident if I am not a client?",
+            "a": "Chat can route your message, but it is not emergency incident response and does not create a service relationship. It does not provide remediation instructions."
+          }
+        ]
+      },
+      {
+        "title": "Company and trust",
+        "items": [
+          {
+            "q": "How do I reach ORAGROL?",
+            "a": "Use ORAGROL chat or the contact form. Department mailboxes will be published once the permanent domain is active."
+          },
+          {
+            "q": "Where are you located?",
+            "a": "Headquarters and Registered Office: Thunder Bay, Ontario. Toronto Presence: Toronto, Ontario."
+          },
+          {
+            "q": "Can I talk to a real person?",
+            "a": "Yes, Monday to Friday, 9am to 6pm ET, subject to availability."
+          },
+          {
+            "q": "Is my data safe?",
+            "a": "We handle data in line with Canadian privacy law and require appropriate insurance before taking on client-system access."
+          },
+          {
+            "q": "How much does it cost?",
+            "a": "Starting prices appear on each service page. Your exact cost depends on the selected Cybersecurity, Business Automation or OR ONE scope."
+          },
+          {
+            "q": "What if we outgrow our plan?",
+            "a": "Cybersecurity tiers and Business Automation packages can be upgraded, while OR ONE scales into custom requirements."
+          },
+          {
+            "q": "Do you replace our IT provider?",
+            "a": "Usually no. We work alongside existing IT providers or internal teams, focusing on the security and automation layer."
+          },
+          {
+            "q": "Which industries do you serve?",
+            "a": "We support Canadian small and medium-sized businesses across the industry profiles shown on our Industries page."
+          }
+        ]
+      }
+    ]
+  },
+  "Company": {
+    "nav": {
+      "getCyberHealthScore": "Get Cyber Health Score",
+      "search": "Search",
+      "changeLanguage": "Change language"
+    },
+    "hero": {
+      "eyebrow": "Company / ORAGROL Global",
+      "title": "Built to connect what business can no longer manage separately.",
+      "body": "ORAGROL Global connects cybersecurity, intelligent automation and operational thinking around how a business actually works.",
+      "discoverStory": "Discover our story",
+      "nameLine": "Orchestrated AI Governance, Risk, Operations and Learning."
+    },
+    "why": {
+      "eyebrow": "01 / Why ORAGROL exists",
+      "title": "Technology should create confidence, not more complexity.",
+      "body1": "Growing businesses are expected to protect more information, operate across more systems and make faster decisions, often without the internal specialist structure available to larger organizations.",
+      "body2": "ORAGROL begins with the reality of the business. We identify what must be protected, what work can be improved and where separate systems need to operate together."
+    },
+    "meaning": {
+      "eyebrow": "02 / The name",
+      "title": "ORAGROL",
+      "tagline": "Orchestrated AI Governance, Risk, Operations and Learning.",
+      "body": "A name created to describe a coordinated way of protecting, operating and continuously improving a modern business.",
+      "terms": [
+        "Orchestrated",
+        "AI",
+        "Governance",
+        "Risk",
+        "Operations",
+        "Learning"
+      ]
+    },
+    "orange": {
+      "eyebrow": "03 / Why orange",
+      "title": "The colour of translation, understanding and action.",
+      "body1": "Inspired by the cybersecurity Orange Team, orange represents the bridge between security insight and secure development. It reflects how ORAGROL turns discovered risk into knowledge, practical improvement and stronger decisions.",
+      "body2": "It is used with control as a signal that something important is becoming clear or ready for action."
+    },
+    "paths": [
+      {
+        "number": "01",
+        "title": "Protect",
+        "body": "Understand exposure, strengthen essential controls and respond with confidence.",
+        "linkLabel": "Cybersecurity Services"
+      },
+      {
+        "number": "02",
+        "title": "Automate",
+        "body": "Improve defined jobs where coordination and execution can create measurable value.",
+        "linkLabel": "Business Automation"
+      },
+      {
+        "number": "03",
+        "title": "Unify",
+        "body": "Connect departments, systems and decisions within one secure operating environment.",
+        "linkLabel": "OR ONE"
+      }
+    ],
+    "founder": {
+      "portraitLabel": "Founder portrait",
+      "portraitPending": "Final image pending",
+      "eyebrow": "04 / Founder",
+      "title": "Built from operating experience.",
+      "name": "Mohammad Chelouy Tabrizi",
+      "role": "Founder and CEO",
+      "body1": "Mohammad built his first cybersecurity company in Iran in 2012. Running a real security business and solving practical client problems shaped the business first philosophy behind ORAGROL Global.",
+      "body2": "Across more than fifteen years, his work has extended through cybersecurity, regional market development, partnerships and international operations. His academic background includes software engineering, an MBA and a PhD in Management.",
+      "body3": "He founded ORAGROL Global in Ontario in 2025 to give Canadian businesses practical cybersecurity and intelligent operating capability without forcing them to assemble the solution from disconnected providers.",
+      "quote": "Technology should make a business clearer, stronger and more capable. If it only adds complexity, it has not solved the right problem."
+    },
+    "operating": {
+      "eyebrow": "05 / How we operate",
+      "title": "Founder led. Specialist supported. Built to scale responsibly.",
+      "body": "Strategy, client understanding and consequential delivery decisions remain close to the founder. Specialist capabilities and delivery partners are used where they create real value, with defined human authority for important decisions.",
+      "points": [
+        "Clear outcome",
+        "Named responsibility",
+        "Human approval",
+        "Reviewable evidence"
+      ]
+    },
+    "canadian": {
+      "eyebrow": "06 / Canadian foundation",
+      "title": "Ontario, Canada",
+      "hqLabel": "Headquarters and Registered Office",
+      "hqCity": "Thunder Bay, Ontario",
+      "torontoLabel": "Toronto Office",
+      "torontoCity": "Toronto, Ontario",
+      "body": "Canada is the foundation. North America is the direction. The standard remains practical thinking, responsible technology and systems built around the businesses they serve."
+    }
+  },
+  "CyberHealth": {
+    "header": {
+      "wordmark": "ORAGROL",
+      "wordmarkSmall": "GLOBAL",
+      "introLabel": "CYBER HEALTH / PRIVATE ASSESSMENT",
+      "profileLabel": "01 / COMPANY PROFILE",
+      "qualifyLabel": "02 / BUSINESS CONTEXT",
+      "resultLabel": "YOUR RESULT"
+    },
+    "intro": {
+      "meta": "5–7 MINUTES · 42 SECURITY QUESTIONS",
+      "title1": "Know where you stand.",
+      "titleEmphasis": "Know what to do next.",
+      "body": "Build a practical baseline across identity, email, devices, cloud, people, data and governance.",
+      "cta": "Begin assessment ↗"
+    },
+    "profile": {
+      "eyebrow": "PRIVATE ASSESSMENT",
+      "title": "Tell us about your business.",
+      "sub": "These details personalize your report. They do not affect your Cyber Health Score.",
+      "fields": {
+        "company": "Company Name",
+        "industry": "Industry",
+        "province": "Province",
+        "employees": "Number of Employees",
+        "platform": "Cloud Platform",
+        "name": "Contact Name",
+        "email": "Business Email",
+        "phone": "Phone"
+      },
+      "selectPlaceholder": "Select",
+      "industries": [
+        "Retail",
+        "Professional Services",
+        "Healthcare",
+        "Construction",
+        "Manufacturing",
+        "Hospitality",
+        "Non-Profit",
+        "Other"
+      ],
+      "provinces": [
+        "Alberta",
+        "British Columbia",
+        "Manitoba",
+        "New Brunswick",
+        "Newfoundland and Labrador",
+        "Northwest Territories",
+        "Nova Scotia",
+        "Nunavut",
+        "Ontario",
+        "Prince Edward Island",
+        "Quebec",
+        "Saskatchewan",
+        "Yukon",
+        "Other"
+      ],
+      "employeeRanges": [
+        "1-10",
+        "11-25",
+        "26-50",
+        "51-100",
+        "101-200"
+      ],
+      "platformOptions": [
+        "Microsoft 365",
+        "Google Workspace",
+        "Neither",
+        "Not Sure"
+      ],
+      "back": "← Back",
+      "continue": "Continue →",
+      "disclaimer": "Your responses are used to create your report and follow up about it. We do not sell your data."
+    },
+    "qualify": {
+      "eyebrow": "QUICK QUESTIONS",
+      "title": "A little context.",
+      "sub": "Your answers help us make the next conversation relevant. They do not affect your score.",
+      "questions": [
+        {
+          "label": "Do you represent a business?",
+          "choices": [
+            "Yes",
+            "No",
+            "Not sure"
+          ]
+        },
+        {
+          "label": "Are you responsible for IT or cybersecurity decisions at your business?",
+          "choices": [
+            "Yes",
+            "No",
+            "Not sure"
+          ]
+        },
+        {
+          "label": "What's your rough budget range for improving cybersecurity in the next 12 months?",
+          "choices": [
+            "Under $2,000",
+            "$2,000–$10,000",
+            "$10,000+",
+            "Not sure yet"
+          ]
+        },
+        {
+          "label": "When are you looking to make security improvements?",
+          "choices": [
+            "Immediately",
+            "Within 3 months",
+            "Within 6 months",
+            "Just researching"
+          ]
+        }
+      ],
+      "back": "← Back",
+      "startQuestions": "Start questions →"
+    },
+    "assessment": {
+      "sectionIntro": "Select what best reflects the business today.",
+      "sections": [
+        "Identity & Access",
+        "Email & Devices",
+        "Network & Cloud",
+        "People & Access",
+        "Governance & Wrap-up"
+      ],
+      "answerOptions": [
+        "Yes",
+        "No",
+        "Not Sure"
+      ],
+      "questions": [
+        {
+          "text": "Does everyone in the business use a different password for each work account, instead of reusing the same one everywhere?"
+        },
+        {
+          "text": "Are default passwords changed immediately when new devices or software are set up?"
+        },
+        {
+          "text": "Do employees sign in using a password plus a code from their phone or an authenticator app for email and other important accounts?"
+        },
+        {
+          "text": "Is MFA required for anyone who can access company systems or data from outside the office?"
+        },
+        {
+          "text": "Does your email system filter out spam and suspicious messages before they reach employee inboxes?"
+        },
+        {
+          "text": "Have employees received any training on spotting phishing emails in the past 12 months?"
+        },
+        {
+          "text": "Is there a simple way for employees to report a suspicious email so it can be checked?"
+        },
+        {
+          "text": "Do all company computers have antivirus or anti-malware software installed and actively running?"
+        },
+        {
+          "text": "Are company laptops and desktops set to automatically lock after a short period of inactivity?"
+        },
+        {
+          "text": "Are software and operating system updates installed automatically, or within a few days of release?"
+        },
+        {
+          "text": "Has your business confirmed that all software and hardware currently in use is still supported with security updates?"
+        },
+        {
+          "text": "Is your business data backed up automatically on a regular schedule (daily or more frequently)?"
+        },
+        {
+          "text": "Has a backup restore actually been tested in the past 12 months, not just the backup itself?"
+        },
+        {
+          "text": "If ransomware locked every file tomorrow, are you confident the business could recover without paying?"
+        },
+        {
+          "text": "Is your office Wi-Fi password-protected and kept separate from any guest network?"
+        },
+        {
+          "text": "Does your business use a firewall to help protect its network from outside threats?"
+        },
+        {
+          "text": "Are security features like 2-Step Verification and suspicious sign-in alerts turned on in your Google Workspace admin settings?"
+        },
+        {
+          "text": "Does someone check periodically who has access to shared Google Drive files and folders?"
+        },
+        {
+          "text": "Are security features like multi-factor sign-in and suspicious login alerts turned on in whatever cloud email/file system you use?"
+        },
+        {
+          "text": "Does someone check periodically who has access to shared files and folders in your cloud system?"
+        },
+        {
+          "text": "Have employees received any form of cybersecurity awareness training?"
+        },
+        {
+          "text": "Is there a simple written policy employees can refer to for using company technology safely?"
+        },
+        {
+          "text": "Do employees generally only have access to the files and systems they actually need for their job?"
+        },
+        {
+          "text": "Is an employee's system access removed promptly when they leave the company?"
+        },
+        {
+          "text": "Are company-owned phones and tablets protected with a passcode or fingerprint/face lock?"
+        },
+        {
+          "text": "If a company mobile device were lost or stolen, could it be remotely locked or wiped?"
+        },
+        {
+          "text": "Do employees working remotely connect to company systems through a secure or VPN connection?"
+        },
+        {
+          "text": "Are personal devices used to access company data required to meet basic security standards, like a passcode and updated software?"
+        },
+        {
+          "text": "Is sensitive business or customer data stored only in approved systems, rather than personal email or personal cloud drives?"
+        },
+        {
+          "text": "Is sensitive data encrypted when it's stored or sent to others?"
+        },
+        {
+          "text": "Do you know which outside vendors or contractors currently have access to your systems or data?"
+        },
+        {
+          "text": "Are you aware of any security practices your key vendors follow to protect shared data?"
+        },
+        {
+          "text": "Does your website use HTTPS (the padlock icon shown in the browser address bar)?"
+        },
+        {
+          "text": "Is your website, and any customer login area, kept updated and monitored?"
+        },
+        {
+          "text": "If you accept card payments, do you use a PCI-compliant payment processor rather than storing card details yourself?"
+        },
+        {
+          "text": "Is access to online banking and financial systems limited to a small number of trusted people?"
+        },
+        {
+          "text": "Does your business have any plan for what to do if you suspect a cyberattack or data breach?"
+        },
+        {
+          "text": "Would employees know exactly who to contact immediately if something looked suspicious?"
+        },
+        {
+          "text": "Is access to servers, network equipment, or sensitive paperwork restricted to authorized staff only?"
+        },
+        {
+          "text": "Are computer screens locked or logged off when employees step away from their desks?"
+        },
+        {
+          "text": "Has a specific person or role been assigned responsibility for cybersecurity decisions in the business?"
+        },
+        {
+          "text": "Is cybersecurity spending or investment reviewed at least once a year?"
+        },
+        {
+          "text": "Does your business currently carry a cyber liability insurance policy?"
+        },
+        {
+          "text": "Are you aware of any specific regulatory or industry requirements that apply to your business (for example, PIPEDA or PCI-DSS)?"
+        }
+      ],
+      "back": "← Back",
+      "nextSection": "Next section →",
+      "calculateScore": "Calculate score →"
+    },
+    "result": {
+      "scoreLabel": "CYBER HEALTH SCORE",
+      "riskTierLabel": "Risk tier",
+      "tierNames": {
+        "Low": "Low",
+        "Medium": "Medium",
+        "High": "High",
+        "Critical": "Critical"
+      },
+      "nextStepLabel": "Recommended next step",
+      "nextStepValue": "Private Scope Review",
+      "businessFallback": "YOUR BUSINESS",
+      "tierHeadlines": {
+        "Low": "Strong foundation.",
+        "Medium": "A workable base with clear gaps.",
+        "High": "Material improvement is needed.",
+        "Critical": "Start with the essentials."
+      },
+      "disclaimer": "A directional baseline, not a certification or guarantee. Review uncertain and missing controls before deciding what to improve first.",
+      "reviewAnswers": "Review answers",
+      "reportSending": "Preparing your full report for {email}…",
+      "reportSent": "Your full report has been sent to {email}.",
+      "reportErrorGeneric": "Could not send your report. Please try again.",
+      "reportErrorNetwork": "Could not send your report. Check your connection and try again."
+    }
+  },
+  "Resources": {
+    "header": {
+      "getCyberHealthScore": "Get Cyber Health Score",
+      "search": "Search",
+      "changeLanguage": "Change language"
+    },
+    "hero": {
+      "eyebrow": "Resources / ORAGROL Intelligence",
+      "titleLine1": "Clarity for decisions",
+      "titleLine2": "that cannot wait.",
+      "body": "Practical cybersecurity intelligence for Canadian business leaders—clear, credible and built for action.",
+      "pathInsights": "01 / Insights",
+      "pathGuides": "02 / Guides",
+      "pathBriefs": "03 / Executive Briefs",
+      "cta": "Explore the latest intelligence"
+    },
+    "essential": {
+      "label": "01 / Essential reading",
+      "title": "Start with clarity.",
+      "body": "Six practical foundations for understanding and reducing business cyber risk."
+    },
+    "newGuides": {
+      "label": "02 / New guides & intelligence",
+      "title": "Go deeper.",
+      "body": "Focused guidance for protection, automation and coordinated operations."
+    },
+    "readAction": "Read",
+    "readSuffix": "read",
+    "items": [
+      {
+        "title": "What Is a Cyber Health Score?",
+        "type": "Article",
+        "summary": "A plain-language breakdown of what the score measures, how it is calculated and why a useful baseline matters more than a pass-or-fail grade."
+      },
+      {
+        "title": "MFA: The One Control That Stops Most Breaches",
+        "type": "Article",
+        "summary": "How Canadian SMBs should prioritize MFA, choose stronger authentication and avoid common implementation mistakes."
+      },
+      {
+        "title": "Ransomware Recovery: What Canadian SMBs Get Wrong",
+        "type": "Article",
+        "summary": "Why an untested backup is not a recovery plan—and which gaps should be resolved before disruption becomes a crisis."
+      },
+      {
+        "title": "Email Security Basics for Small Business",
+        "type": "Article",
+        "summary": "A practical email-security program protects the mailbox, the business domain and the people making financial decisions."
+      },
+      {
+        "title": "Cybersecurity for Professional Services Firms: A Practical Guide",
+        "type": "Guide",
+        "summary": "Cybersecurity as part of client trust, business continuity and operational discipline for professional firms."
+      },
+      {
+        "title": "Understanding PIPEDA: What It Means for Your Business",
+        "type": "Article",
+        "summary": "Where Canadian privacy obligations and practical cybersecurity safeguards meet—and where they remain different."
+      },
+      {
+        "title": "Cyber Insurance Readiness Checklist for Canadian SMBs",
+        "type": "Checklist",
+        "summary": "Organize the controls, evidence and operating information required for a stronger insurance application or renewal conversation."
+      },
+      {
+        "title": "DMARC Enforcement: From Monitoring to p=reject",
+        "type": "Guide",
+        "summary": "Move from visibility to enforcement without accidentally blocking legitimate business email."
+      },
+      {
+        "title": "The First 24 Hours of a Cyber Incident",
+        "type": "Playbook",
+        "summary": "A practical first-day structure for command, containment, evidence, communication and safe recovery."
+      },
+      {
+        "title": "Vendor Risk Before You Grant Access",
+        "type": "Checklist",
+        "summary": "Apply the right questions and controls before a supplier becomes part of your security environment."
+      },
+      {
+        "title": "A Practical AI Use Policy for Canadian Businesses",
+        "type": "Policy Guide",
+        "summary": "Define approved tools, protected information, human accountability and operating limits without stopping responsible experimentation."
+      },
+      {
+        "title": "Microsoft 365 Security Baseline for an SMB",
+        "type": "Technical Checklist",
+        "summary": "A focused baseline for identity, email, devices, collaboration, logging and recovery in Microsoft 365."
+      },
+      {
+        "title": "Cybersecurity for Accounting and Bookkeeping Firms",
+        "type": "Industry Brief",
+        "summary": "Security priorities built around trusted email, financial information, cloud accounting and payment authority."
+      },
+      {
+        "title": "Canadian SMB Cyber-Risk Brief 2026",
+        "type": "Executive Brief",
+        "summary": "What current Canadian evidence means for leadership priorities, operational resilience and security investment."
+      },
+      {
+        "title": "Business Automation Readiness Assessment",
+        "type": "Assessment",
+        "summary": "Five tests for choosing one valuable, bounded outcome before investing in tools or integrations."
+      },
+      {
+        "title": "When Separate Automations Should Become OR ONE",
+        "type": "Executive Guide",
+        "summary": "Recognize when several workflows, departments and controls need one coordinated secure operating system."
+      }
+    ]
+  },
+  "HowWeWork": {
+    "hero": {
+      "eyebrow": "How We Work",
+      "title": "A clear method, not a black box.",
+      "body": "Security work fails when it stays vague. Here is exactly how we work with you, stage by stage, from the first conversation onward."
+    },
+    "stages": {
+      "stageLabel": "Stage {n}",
+      "items": [
+        {
+          "label": "Understand",
+          "copy": "We start by learning how your business actually operates, not by running through a generic checklist. That means your systems, your data, your people, and the way work really gets done every day. A recommendation built on a real picture of your environment is worth far more than one built on assumptions."
+        },
+        {
+          "label": "Prioritize",
+          "copy": "Every finding is ranked by real risk and real business impact, not just technical severity. You receive a short, clear list of what matters most first, instead of a lengthy report that never gets opened. For a growing business, this is what turns a security review into something you can actually act on."
+        },
+        {
+          "label": "Protect",
+          "copy": "We put the right controls in place for what matters most, whether that means a specific service, a policy change, or ongoing monitoring. Our team works alongside yours so nothing is left as advice sitting on a page. This is where the plan becomes real protection."
+        },
+        {
+          "label": "Improve",
+          "copy": "Security is not something you set up once and leave alone. We check in on a regular schedule, report on real progress, and adjust as your business and the threats around it change. What worked last year may not be enough this year, and this stage is how we keep pace."
+        }
+      ]
+    },
+    "closing": {
+      "title": "Ready to see exactly where you stand.",
+      "cta": "Talk to Oragrol"
+    },
+    "cycle": {
+      "items": [
+        {
+          "label": "Understand",
+          "copy": "Assess the business, environment and current security posture."
+        },
+        {
+          "label": "Prioritize",
+          "copy": "Separate critical risks from everything else."
+        },
+        {
+          "label": "Protect",
+          "copy": "Apply the right combination of services and expertise."
+        },
+        {
+          "label": "Improve",
+          "copy": "Continue strengthening security posture."
+        }
+      ]
+    }
+  },
+  "Opportunity": {
+    "srChooseOpportunity": "Choose your opportunity",
+    "allFieldsRequired": "All fields are required unless marked optional.",
+    "optionalSuffix": "optional",
+    "formTitle": {
+      "career": "Introduce yourself",
+      "idea": "Share your idea",
+      "talent": "Introduce your expertise",
+      "other": "Start a conversation"
+    },
+    "fields": {
+      "organizationName": "Organization name",
+      "role": "Role",
+      "selectRole": "Select a role",
+      "specialty": "Specialty",
+      "selectSpecialty": "Select your specialty",
+      "otherSpecialty": "Other relevant specialty",
+      "applyingAs": "Applying as",
+      "individual": "Individual",
+      "organization": "Organization",
+      "individualSpecialist": "Individual specialist",
+      "firmTeam": "Firm / Team",
+      "fullName": "Full name",
+      "email": "Email",
+      "country": "Country",
+      "city": "City",
+      "phoneCountryCode": "Phone country code",
+      "phoneNumber": "Phone number",
+      "certifications": "Certifications or accreditation",
+      "areaOfExpertise": "Area of expertise",
+      "ideaTitle": "Idea title",
+      "categoryDiscipline": "Category / discipline (any area welcome)",
+      "proposedRegion": "Proposed country / region",
+      "marketExperience": "Local market experience",
+      "technology": "Technology or opportunity of interest",
+      "involvement": "Preferred involvement"
+    },
+    "descriptionLabel": {
+      "experience": "Relevant experience",
+      "idea": "Describe your idea and the value it could create",
+      "expertise": "Your expertise and how you would like to contribute",
+      "opportunity": "Opportunity summary and what you would bring"
+    },
+    "wordsMax": "maximum",
+    "wordsShorten": "— shorten your response to continue",
+    "ideaConfidentialNote": "Please share a non-confidential overview at this stage.",
+    "cvLabel": "CV / professional profile and supporting document",
+    "supportingDocsLabel": "Supporting documents (optional)",
+    "fileNoteBase": "Maximum 2 PDFs · 8 MB combined",
+    "fileNoteCareerSuffix": " · At least one CV or professional profile is required.",
+    "privacyNoteApplication": "We use your information to review and respond to your application.",
+    "privacyNoteSubmission": "We use your information to review and respond to your submission.",
+    "privacyPolicyLink": "Privacy Policy",
+    "termsLink": "Terms & Conditions",
+    "consentCareer": "Keep my application for future opportunities, as described in the Privacy Policy.",
+    "consentOther": "Contact me about future relevant collaboration opportunities, as described in the Privacy Policy.",
+    "partnershipsDisclaimer": "Submitting an enquiry does not establish a partnership, branch appointment or investment agreement.",
+    "submissionsNotOpen": "Online submissions are not open yet.",
+    "submitting": "Submitting…",
+    "submitApplication": "Submit Application",
+    "sendIntroduction": "Send Introduction",
+    "submitEnquiry": "Submit Enquiry",
+    "errorCheckDescription": "Check the description and required PDF attachment before submitting.",
+    "successMessage": "Your submission has been received. Thank you for your interest.",
+    "errorGeneric": "We couldn’t complete your submission. Your details remain here so you can try again.",
+    "fileErrors": {
+      "tooMany": "Choose no more than 2 PDFs.",
+      "onlyPdf": "Only PDF files are accepted.",
+      "tooLarge": "The combined file size must not exceed 8 MB.",
+      "empty": "Empty files are not accepted."
+    },
+    "specialties": [
+      {
+        "title": "Certified Penetration Tester",
+        "credential": "OSCP / GPEN"
+      },
+      {
+        "title": "SOC 2 Audit Partner",
+        "credential": "CPA firm · AICPA SOC practice"
+      },
+      {
+        "title": "PCI-DSS QSA",
+        "credential": "PCI SSC accredited"
+      },
+      {
+        "title": "Certified Forensic Examiner",
+        "credential": "GCFA / GCFE"
+      }
+    ],
+    "pages": {
+      "careers": {
+        "eyebrow": "CAREERS",
+        "title": "Build what comes next.",
+        "intro": "Join ORAGROL through employment or paid project-based work. Bring your expertise, initiative and commitment to meaningful outcomes.",
+        "categories": [
+          "Sales & Growth",
+          "Certified Specialists",
+          "Current Vacancies"
+        ],
+        "salesGrowth": {
+          "body": "Applications are always open for people who can build relationships, develop opportunities and help businesses grow."
+        },
+        "certifiedSpecialists": {
+          "title": "Certified Specialists & Audit Partners",
+          "body": "Project-based opportunities for independent specialists and qualified firms.",
+          "otherNote": "Other relevant expertise is welcome."
+        },
+        "currentVacancies": {
+          "applyBelow": "Apply for a confirmed role below.",
+          "noneListed": "There are no other vacancies listed at present. Sales and specialist project applications remain open."
+        }
+      },
+      "talent": {
+        "eyebrow": "TALENT",
+        "title": "Bring your expertise. Share what comes next.",
+        "intro": "Introduce your expertise or an idea worth exploring. This is a place for exploratory collaboration without a defined job or project role.",
+        "categories": [
+          "Share Your Expertise",
+          "Propose an Idea"
+        ],
+        "shareExpertise": {
+          "body": "Tell us what you do, where you could contribute and how you would like to collaborate."
+        },
+        "proposeIdea": {
+          "body": "Introduce a problem, possibility or new approach and the value you believe it could create."
+        },
+        "sharedNote": "AI, intelligent agents, automation, sales and marketing are areas of interest—not limits. All relevant disciplines and ideas are welcome."
+      },
+      "partnerships": {
+        "eyebrow": "PARTNERSHIPS",
+        "title": "Stronger outcomes, built together.",
+        "intro": "Explore collaboration, regional growth or investment in new technology. Individuals and organizations in Canada and internationally are welcome.",
+        "categories": [
+          "Business Collaboration",
+          "Regional or Branch",
+          "Technology Investment",
+          "Other Opportunity"
+        ],
+        "businessCollaboration": {
+          "body": "Explore technology, delivery, referral, channel or strategic collaboration—or another way of working together."
+        },
+        "regionalOrBranch": {
+          "body": "Express interest in developing an ORAGROL presence in a Canadian region or another country."
+        },
+        "technologyInvestment": {
+          "body": "Tell us about your interest in investing in new technology or supporting its development and growth."
+        },
+        "otherOpportunity": {
+          "body": "Have a different opportunity in mind? Tell us what you would like to build together."
+        }
+      }
+    }
+  }
+}

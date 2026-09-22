@@ -1,0 +1,2760 @@
+{
+  "Home": {
+    "nav": {
+      "getCyberHealthScore": "Obtenez votre Cyber Health Score",
+      "search": "Rechercher",
+      "changeLanguage": "Changer de langue",
+      "homeAriaLabel": "Accueil ORAGROL Global"
+    },
+    "hero": {
+      "kicker": "LA CYBERSÉCURITÉ D'ABORD. GUIDÉE PAR L'INTELLIGENCE.",
+      "headline1": "Une cybersécurité qui agit.",
+      "headline2": "Une automatisation qui évolue.",
+      "headline3": "Un seul système qui réunit le tout.",
+      "sub": "Conçu pour faire le travail, pas seulement pour en rendre compte.",
+      "ariaCapabilities": "Capacités ORAGROL"
+    },
+    "entryPoints": {
+      "protectName": "Services",
+      "protectSub": "Protégez ce qui compte.",
+      "automateName": "Business Automation",
+      "automateSub": "Éliminez ce qui freine la croissance.",
+      "unifyName": "OR ONE",
+      "unifySub": "Une intelligence conçue autour de votre entreprise."
+    },
+    "reality": {
+      "label": "LA RÉALITÉ D'AFFAIRES",
+      "headline1": "La croissance crée des capacités.",
+      "headline2": "Elle crée aussi de l'exposition.",
+      "p1": "Un plus grand nombre de systèmes, de fournisseurs, de données et d'outils d'IA peut faire progresser une entreprise, tout en rendant son environnement opérationnel plus difficile à surveiller et à protéger.",
+      "p2": "ORAGROL relie ce qui est trop souvent géré de façon séparée, offrant aux dirigeants une façon plus claire de protéger, d'améliorer et de coordonner leur entreprise.",
+      "line": "Moins de bruit. Moins d'outils déconnectés.",
+      "lineStrong": "Plus d'actions utiles."
+    },
+    "capabilities": {
+      "label": "PROTÉGER. AUTOMATISER. UNIFIER.",
+      "headline1": "Trois capacités.",
+      "headline2": "Une seule direction d'affaires.",
+      "ariaSelect": "Sélectionner une capacité",
+      "protect": {
+        "name": "Protéger",
+        "title": "Une cybersécurité qui agit.",
+        "text": "Comprenez les risques, renforcez votre protection et intervenez grâce à des services choisis selon la façon dont votre entreprise fonctionne.",
+        "link": "Explorer les services"
+      },
+      "automate": {
+        "name": "Automatiser",
+        "title": "Une automatisation qui évolue.",
+        "text": "Éliminez les tâches répétitives, reliez les flux de travail importants et créez plus de capacité opérationnelle sans complexité inutile.",
+        "link": "Explorer Business Automation"
+      },
+      "unify": {
+        "name": "Unifier",
+        "title": "Un seul système qui réunit le tout.",
+        "text": "Coordonnez la sécurité, l'automatisation et l'intelligence opérationnelle grâce à OR ONE, conçu autour de votre entreprise.",
+        "link": "Explorer OR ONE"
+      }
+    },
+    "method": {
+      "label": "COMMENT ORAGROL FONCTIONNE",
+      "headline1": "La clarté d'abord.",
+      "headline2": "Puis une action coordonnée.",
+      "sub": "Parcourez les étapes pour voir comment ORAGROL transforme le contexte d'affaires en progrès concret.",
+      "ariaSelect": "Méthode de travail ORAGROL",
+      "understand": {
+        "name": "Comprendre",
+        "line": "Voir clairement l'entreprise avant de prescrire une technologie."
+      },
+      "prioritize": {
+        "name": "Prioriser",
+        "line": "Concentrer l'attention et les investissements là où ils créent le plus de valeur."
+      },
+      "protect": {
+        "name": "Protéger",
+        "line": "Appliquer les bons contrôles de sécurité, services et une supervision adéquate."
+      },
+      "automate": {
+        "name": "Automatiser",
+        "line": "Améliorer le travail défini grâce à une automatisation pratique et responsable."
+      },
+      "evolve": {
+        "name": "Évoluer",
+        "line": "Renforcer le système à mesure que l'entreprise évolue."
+      }
+    },
+    "cybersecurity": {
+      "eyebrow": "CYBERSÉCURITÉ",
+      "headline1": "Une protection conçue",
+      "headline2": "autour de votre entreprise.",
+      "intro": "Choisissez un forfait, répondez à un besoin précis ou définissez le cadre d'un mandat spécialisé.",
+      "packages": {
+        "count": "04",
+        "title": "Forfaits",
+        "description1": "Quatre niveaux de protection.",
+        "description2": "Foundation, Advanced,",
+        "description3": "Comprehensive et Elite.",
+        "link": "Explorer les forfaits"
+      },
+      "alaCarte": {
+        "count": "12",
+        "title": "À La Carte",
+        "description": "Des services individuels pour des besoins précis. Offerts seuls ou avec un forfait.",
+        "link": "Explorer les services individuels"
+      },
+      "specialist": {
+        "count": "04",
+        "title1": "Mandats",
+        "title2": "spécialisés",
+        "description": "Test d'intrusion, attestation SOC 2, évaluation PCI-DSS et intervention judiciaire en cas d'incident.",
+        "link": "Discuter d'un mandat"
+      }
+    },
+    "cyberHealthCta": {
+      "label": "COMMENCEZ AVEC CLARTÉ",
+      "headline1": "Sachez où vous en êtes.",
+      "headline2": "Sachez quoi faire ensuite.",
+      "sub": "Une évaluation guidée vous donne un portrait concret de votre posture en cybersécurité, de vos priorités et des prochaines étapes.",
+      "link": "Obtenez votre Cyber Health Score",
+      "illustrativeLabel": "CYBER HEALTH / À TITRE ILLUSTRATIF",
+      "currentPosition": "Position actuelle",
+      "clearerPriorities": "Des priorités plus claires"
+    },
+    "industries": {
+      "eyebrow": "SECTEURS D'ACTIVITÉ + CANADA",
+      "returnHome": "Retour à la page d'accueil",
+      "label": "CONÇU AUTOUR DE VOTRE RÉALITÉ",
+      "headline1": "Des entreprises différentes.",
+      "headline2": "Des risques différents.",
+      "selectLabel": "CHOISISSEZ UN SECTEUR",
+      "canadaWide": "UNE PERSPECTIVE",
+      "canadaPerspective": "PANCANADIENNE",
+      "exploreIndustry": "Explorer ce secteur",
+      "ariaLabel": "Secteurs d'activité",
+      "west": "OUEST",
+      "central": "CENTRE",
+      "east": "EST",
+      "north": "NORD",
+      "footerEyebrow": "CYBERSÉCURITÉ D'ABORD",
+      "footerLine1": "L'entreprise d'abord.",
+      "footerLine2": "Pratique, pas compliqué.",
+      "footerLine3": "Conçu pour ce qui vient.",
+      "footerStrong": "D'UN OCÉAN À L'AUTRE, À L'AUTRE",
+      "list": {
+        "professionalServices": {
+          "name": "Services professionnels",
+          "risk": "Protégez les données, les communications et la confiance de vos clients."
+        },
+        "healthcare": {
+          "name": "Santé",
+          "risk": "Renforcez la confidentialité, l'accès et la résilience opérationnelle."
+        },
+        "financialServices": {
+          "name": "Services financiers",
+          "risk": "Réduisez l'exposition à la fraude, aux enjeux réglementaires et aux transactions."
+        },
+        "retail": {
+          "name": "Commerce de détail et commerce électronique",
+          "risk": "Protégez les paiements, les clients et les revenus numériques."
+        },
+        "manufacturing": {
+          "name": "Fabrication",
+          "risk": "Sécurisez les opérations connectées et la continuité de la production."
+        },
+        "technology": {
+          "name": "Technologie",
+          "risk": "Protégez les environnements infonuagiques, les produits et la propriété intellectuelle."
+        },
+        "construction": {
+          "name": "Construction et immobilier",
+          "risk": "Sécurisez les paiements, les équipes mobiles et l'accès des partenaires."
+        },
+        "education": {
+          "name": "Éducation",
+          "risk": "Priorisez la protection des utilisateurs, des données et des systèmes partagés."
+        },
+        "otherSmbs": {
+          "name": "Autres PME canadiennes",
+          "risk": "Adaptez la protection à la façon dont votre entreprise fonctionne."
+        }
+      }
+    }
+  },
+  "Services": {
+    "nav": {
+      "myScope": "Ma portée",
+      "getCyberHealthScore": "Obtenez votre Cyber Health Score",
+      "search": "Rechercher",
+      "changeLanguage": "Changer de langue"
+    },
+    "money": {
+      "moSuffix": "/mois",
+      "appSuffix": "/application"
+    },
+    "hero": {
+      "kicker1": "SERVICES / CYBERSÉCURITÉ",
+      "kicker2": "PROTÉGER / AUTOMATISER / UNIFIER",
+      "headline1": "CYBERSÉCURITÉ.",
+      "headline2a": "CONÇUE AUTOUR",
+      "headline2b": "DE VOTRE ENTREPRISE.",
+      "sub1": "ORAGROL offre la cybersécurité sous forme de quatre forfaits fixes, de douze services individuels ou de mandats spécialisés.",
+      "sub2": "Choisissez la portée qui correspond réellement au fonctionnement de votre entreprise.",
+      "packagesCount": "04",
+      "packagesLabel": "Forfaits",
+      "packagesDetail": "De Foundation à Elite",
+      "alaCarteCount": "12",
+      "alaCarteLabel": "À La Carte",
+      "alaCarteDetail": "Offerts séparément",
+      "specialistCount": "04",
+      "specialistLabel": "Services spécialisés",
+      "specialistDetail": "Offerts sur mandat",
+      "footerKicker": "CONÇU POUR LES ENTREPRISES CANADIENNES",
+      "footerCta": "LA CLARTÉ AVANT LA COMPLEXITÉ"
+    },
+    "clarity": {
+      "eyebrow": "VOUS NE SAVEZ PAS PAR OÙ COMMENCER?",
+      "headline1": "La clarté avant",
+      "headline2": "la complexité.",
+      "body": "Commencez par vos priorités. Votre évaluation Cyber Health Score peut aider à cerner les points à examiner avant de choisir un forfait, un service individuel ou un mandat spécialisé.",
+      "step1": "Comprenez votre position",
+      "step2": "Priorisez ce qui mérite votre attention",
+      "step3": "Choisissez la portée qui vous convient"
+    },
+    "packages": {
+      "eyebrow": "04 / CHOISISSEZ VOTRE PROTECTION",
+      "headline1": "Quatre forfaits.",
+      "headline2": "Un point de départ clair.",
+      "sub": "Sélectionnez un forfait pour découvrir s'il vous convient et les services qu'il inclut. Ajoutez la portée souhaitée pour révision.",
+      "priceNote": "Prix en dollars canadiens. Les tarifs ci-dessous sont des tarifs mensuels pour un contrat de 12 mois.",
+      "servicesCount": "{n} SERVICES",
+      "includedServicesCount": "{n} SERVICES INCLUS",
+      "idealFit": "PROFIL IDÉAL",
+      "monthlyRateLabel": "TARIF MENSUEL · CONTRAT DE 12 MOIS",
+      "whatsIncluded": "CE QUI EST INCLUS",
+      "initialOption": "Option initiale de trois mois : {price}. Passe ensuite à un contrat standard de 12 mois.",
+      "addToScope": "Ajouter à ma portée",
+      "addedToScope": "Ajouté à ma portée",
+      "list": {
+        "foundation": {
+          "value": "Établissez votre protection de base.",
+          "fit": "Entreprises qui mettent en place des contrôles de sécurité essentiels autour de leur personnel, de leurs appareils et de leur travail quotidien."
+        },
+        "advanced": {
+          "value": "Étendez votre visibilité et renforcez vos accès.",
+          "fit": "Entreprises ayant besoin d'une surveillance élargie, d'une gouvernance des accès et d'une supervision des fournisseurs et des exigences de conformité."
+        },
+        "comprehensive": {
+          "value": "Reliez la protection à l'ensemble de votre environnement.",
+          "fit": "Entreprises dont les charges de travail infonuagiques, les applications et les données exigent une portée de protection plus large et coordonnée."
+        },
+        "elite": {
+          "value": "Réunissez protection et intervention.",
+          "fit": "Entreprises recherchant la portée de forfait la plus large, incluant la réponse gérée aux menaces, la réponse en sécurité et la surveillance des données."
+        }
+      }
+    },
+    "serviceNames": {
+      "Security Rules Setup": "Configuration des règles de sécurité",
+      "Security Weakness Check": "Analyse des vulnérabilités",
+      "Device Guard": "Protection des appareils",
+      "Mail Shield": "Bouclier courriel",
+      "Staff Security": "Sécurité du personnel",
+      "Login Shield": "Bouclier d'authentification",
+      "Compliance Check": "Vérification de conformité",
+      "Vendor Watch": "Surveillance des fournisseurs",
+      "AI Security Monitoring": "Surveillance de sécurité IA",
+      "Threat Watch": "Veille des menaces",
+      "Access Manager": "Gestion des accès",
+      "Access Governance": "Gouvernance des accès",
+      "Cloud Guard": "Protection infonuagique",
+      "Workload Shield": "Bouclier des charges de travail",
+      "Infra Guard": "Protection de l'infrastructure",
+      "Cloud Compliance": "Conformité infonuagique",
+      "App Shield": "Bouclier applicatif",
+      "Web Shield": "Bouclier Web",
+      "API Guard": "Protection API",
+      "Data Shield": "Bouclier des données",
+      "Data Guard": "Protection des données",
+      "Data Classifier": "Classification des données",
+      "Managed Threat Response": "Réponse gérée aux menaces",
+      "Security Response": "Réponse en sécurité",
+      "Data Watch": "Surveillance des données"
+    },
+    "individual": {
+      "eyebrow": "12 / À LA CARTE",
+      "headline1": "La capacité",
+      "headline2": "dont vous avez besoin.",
+      "sub": "Choisissez un service individuel, offert seul ou avec un forfait.",
+      "priceNote": "TARIF MENSUEL · CONTRAT DE 12 MOIS",
+      "monthlyService": "SERVICE MENSUEL",
+      "projectService": "SERVICE PROJET",
+      "monthlyBilling": "Tarif mensuel · contrat de 12 mois",
+      "oneTimeBilling": "Ponctuel / projet",
+      "perApplicationBilling": "Ponctuel / projet · par application",
+      "availableStandalone": "Offert séparément.",
+      "addToScope": "Ajouter à ma portée",
+      "addedToScope": "Ajouté à ma portée",
+      "list": {
+        "C01-S04": {
+          "line": "Un leadership en sécurité pour orienter vos priorités, vos décisions et votre supervision."
+        },
+        "C07-S04": {
+          "line": "Intégrez des pratiques de sécurité à votre processus de développement logiciel."
+        },
+        "C08-S03": {
+          "line": "Coordonnez la façon dont les renseignements personnels sont traités et protégés."
+        },
+        "C09-S01": {
+          "line": "Évaluez les risques de sécurité liés à votre utilisation de l'IA et déterminez les prochaines étapes concrètes."
+        },
+        "C09-S02": {
+          "line": "Définissez les responsabilités et gérez les risques liés à l'utilisation de l'IA en entreprise."
+        },
+        "C05-S03": {
+          "line": "Renforcez la supervision des comptes disposant de droits d'accès élevés."
+        },
+        "C05-S05": {
+          "line": "Appliquez des vérifications d'identité et de contexte à vos décisions d'accès."
+        },
+        "C06-S04": {
+          "line": "Renforcez les contrôles réseau dans votre environnement infonuagique."
+        },
+        "C09-S03": {
+          "line": "Traitez les risques de sécurité touchant vos modèles d'IA et leur utilisation."
+        },
+        "C09-S04": {
+          "line": "Protégez les renseignements sensibles utilisés par vos systèmes et flux de travail en IA."
+        },
+        "C09-S05": {
+          "line": "Détectez et traitez les menaces touchant votre environnement d'IA."
+        },
+        "C07-S05": {
+          "line": "Testez la sécurité d'une application et priorisez les constats."
+        }
+      }
+    },
+    "specialists": {
+      "eyebrow": "04 / MANDATS SPÉCIALISÉS",
+      "headline1": "Une expertise spécialisée.",
+      "headline2": "Des mandats définis.",
+      "sub": "Offerts sur mandat. Les exigences, les limites et le spécialiste approprié sont confirmés avant le début des travaux.",
+      "priceNote": "Tous les tarifs sont en dollars canadiens. Les tarifs de départ s'appliquent à une portée définie. La portée et les tarifs finaux sont confirmés dans votre proposition.",
+      "discussEngagement": "Discuter de votre mandat",
+      "list": {
+        "C10-S01": {
+          "line": "Un mandat défini visant à tester les vulnérabilités exploitables et à prioriser les correctifs."
+        },
+        "C10-S02": {
+          "line": "Un mandat mené avec un partenaire d'audit CPA qualifié, adapté à votre organisation et à vos besoins de reddition de comptes."
+        },
+        "C10-S03": {
+          "line": "Une évaluation définie, menée par un QSA qualifié, pour votre environnement de paiement."
+        },
+        "C10-S04": {
+          "line": "Une enquête judiciaire spécialisée et une intervention en cas d'incident, avec une portée convenue pour l'incident."
+        }
+      }
+    }
+  },
+  "SharedCta": {
+    "home": {
+      "eyebrow": "La clarté avant la complexité",
+      "headline": "Protection en cybersécurité. Automatisation intelligente des affaires. Un système coordonné, OR ONE.",
+      "secondaryLabel": "Découvrir ce que fait ORAGROL"
+    },
+    "services": {
+      "eyebrow": "Votre prochaine étape la plus claire",
+      "headline": "La bonne protection commence par comprendre ce qui compte le plus.",
+      "secondaryLabel": "Construisez votre portée"
+    },
+    "business-automation": {
+      "eyebrow": "Votre prochaine étape la plus claire",
+      "headline": "Repérez où le temps se perd et où une automatisation intelligente peut créer une valeur mesurable.",
+      "secondaryLabel": "Explorer les forfaits d'automatisation"
+    },
+    "or-one": {
+      "eyebrow": "Commencez en privé",
+      "headline": "Réunissez la sécurité, l'automatisation et l'intelligence opérationnelle dans un seul système coordonné.",
+      "secondaryLabel": "Explorer OR ONE"
+    },
+    "industries": {
+      "eyebrow": "Votre prochaine étape la plus claire",
+      "headline": "La protection fonctionne mieux lorsqu'elle reflète la façon dont votre secteur fonctionne réellement.",
+      "secondaryLabel": "Trouvez votre secteur"
+    },
+    "resources": {
+      "eyebrow": "Un point de départ utile",
+      "headline": "Transformez une analyse crédible en décisions plus claires et en actions concrètes.",
+      "secondaryLabel": "Explorez nos ressources"
+    },
+    "company": {
+      "eyebrow": "Un point de départ clair",
+      "headline": "Découvrez la réflexion, l'expérience et la raison d'être derrière ORAGROL Global.",
+      "secondaryLabel": "Démarrer une conversation"
+    },
+    "contact": {
+      "eyebrow": "Un point de départ clair",
+      "headline": "Commencez avec clarté. Nous vous aiderons à cerner la prochaine étape la plus utile.",
+      "secondaryLabel": "Soumettre une demande"
+    },
+    "faq": {
+      "eyebrow": "Vous avez encore une question?",
+      "headline": "Vous cherchez encore des réponses claires? Laissez-nous vous aider à trouver la bonne réponse.",
+      "secondaryLabel": "Contacter ORAGROL"
+    },
+    "getCyberHealthScore": "Obtenez votre Cyber Health Score"
+  },
+  "BusinessAutomation": {
+    "nav": {
+      "myScope": "Ma portée",
+      "getCyberHealthScore": "Obtenez votre Cyber Health Score",
+      "search": "Rechercher",
+      "changeLanguage": "Changer de langue"
+    },
+    "hero": {
+      "markLabel": "Cinq tâches d'automatisation définies",
+      "meta1": "Business Automation",
+      "meta2": "Conçu autour de résultats mesurables",
+      "title1": "Automatisez le travail",
+      "title2": "qui freine votre croissance.",
+      "support": "BA transforme chaque fonction d'affaires grâce à une automatisation ciblée et adaptée. Elle fonctionne avec vos logiciels existants pour améliorer les ventes, le marketing, le service à la clientèle, les finances ou les TI — réduisant le travail manuel et livrant des résultats mesurables.",
+      "exploreLink": "Explorer les cinq systèmes + le sur mesure",
+      "noPlatform": "Aucune nouvelle plateforme requise"
+    },
+    "jobSelector": {
+      "eyebrow": "OR5 / Choisissez le résultat",
+      "title1": "Cinq tâches.",
+      "title2": "Un résultat clair pour chacune.",
+      "sub": "Sélectionnez une tâche pour en comprendre le résultat, la pertinence et la structure commerciale. Ajoutez toute tâche pertinente à Ma portée.",
+      "commercialNote": "Les prix sont indiqués en dollars canadiens. L'utilisation des API, les abonnements logiciels et l'infrastructure tierce demeurent la responsabilité du client et ne sont pas inclus."
+    },
+    "jobs": {
+      "sales-flow": {
+        "name": "Ventes",
+        "short": "Ventes",
+        "outcome": "Captez, qualifiez et suivez chaque occasion — de la première demande jusqu'à un transfert clair et la conclusion.",
+        "fit": "Les équipes qui perdent des prospects entre les boîtes de courriels, les feuilles de calcul et le suivi du CRM.",
+        "tools": "Votre CRM, vos courriels, votre calendrier et vos outils de proposition.",
+        "accent": "Flux de revenus",
+        "kickerTag": "Tâche d'automatisation définie"
+      },
+      "customer-support": {
+        "name": "Service à la clientèle",
+        "short": "Service à la clientèle",
+        "outcome": "Répondez plus rapidement, orientez correctement les demandes et gardez chaque conversation client en mouvement.",
+        "fit": "Les équipes qui gèrent des questions répétitives, un acheminement lent ou un soutien incohérent selon les canaux.",
+        "tools": "Votre service d'assistance, votre boîte partagée, votre base de connaissances et vos outils de messagerie.",
+        "accent": "Continuité du service",
+        "kickerTag": "Tâche d'automatisation définie"
+      },
+      "operational-intelligence": {
+        "name": "Finances",
+        "short": "Finances",
+        "outcome": "Regroupez des données d'affaires dispersées en une seule vue fiable pour les rapports, alertes et décisions.",
+        "fit": "Les dirigeants qui attendent des rapports manuels ou qui prennent des décisions à partir de systèmes déconnectés.",
+        "tools": "Vos outils de comptabilité, de CRM, d'opérations et de rapports.",
+        "accent": "Clarté décisionnelle",
+        "kickerTag": "Tâche d'automatisation définie"
+      },
+      "managed-it": {
+        "name": "TI",
+        "short": "TI",
+        "outcome": "Ajoutez une couche d'opérations et de surveillance TI pilotée par l'IA pour le travail courant lié aux appareils, comptes, billets et infrastructure.",
+        "fit": "Les entreprises en croissance qui ont besoin de coordination et de surveillance opérationnelles, pas d'un MSP de dépannage TI complet.",
+        "tools": "Vos outils Microsoft 365, de billetterie, d'appareils et d'infrastructure.",
+        "accent": "Opérations pilotées par l'IA · pas un service TI géré complet",
+        "kickerTag": "Tâche d'automatisation définie"
+      },
+      "customer-growth": {
+        "name": "Marketing",
+        "short": "Marketing",
+        "outcome": "Renforcez l'accueil, la rétention, la réactivation et les occasions de revenus tout au long du cycle de vie client.",
+        "fit": "Les entreprises ayant des clients de valeur mais un suivi incohérent après la première vente.",
+        "tools": "Votre CRM, votre facturation, vos courriels et vos outils de succès client.",
+        "accent": "Valeur client",
+        "kickerTag": "Tâche d'automatisation définie"
+      },
+      "tailored": {
+        "name": "Automatisation sur mesure",
+        "short": "Un résultat délimité",
+        "outcome": "Concevez une automatisation ciblée autour d'une tâche opérationnelle qui ne correspond pas aux cinq systèmes définis.",
+        "fit": "Les entreprises ayant une exigence claire et mesurable nécessitant une portée établie en privé.",
+        "tools": "Conçue autour des outils approuvés que votre entreprise utilise déjà.",
+        "accent": "Conçu sur mesure",
+        "kickerTag": "Établi en privé"
+      }
+    },
+    "jobFacts": {
+      "idealFit": "Profil idéal",
+      "worksThrough": "Fonctionne via",
+      "buildFee": "Frais de construction",
+      "buildFeeNote": "Conception, configuration et connexion, à frais unique.",
+      "monthlyManagement": "Gestion mensuelle",
+      "monthlyManagementNote": "Surveillance, entretien et amélioration continue."
+    },
+    "scopeAdd": {
+      "add": "Vérifier ma pertinence · Ajouter à ma portée",
+      "added": "Ajouté à ma portée ✓"
+    },
+    "existingTools": {
+      "eyebrow": "Conçu autour de votre réalité",
+      "title1": "Vos outils restent.",
+      "title2": "C'est le travail qui bouge.",
+      "body": "Le moteur d'automatisation d'ORAGROL fonctionne à travers les systèmes que votre entreprise utilise déjà. Votre équipe continue de travailler dans son CRM, sa boîte de courriels, son service d'assistance, sa comptabilité et ses outils de collaboration — sans être forcée d'adopter une nouvelle plateforme.",
+      "tool1": "CRM",
+      "tool2": "Boîte de courriels",
+      "tool3": "Opérations",
+      "tool4": "Rapports"
+    },
+    "journey": {
+      "eyebrow": "Comment ça commence",
+      "steps": [
+        {
+          "title": "Évaluer",
+          "body": "Confirmez la tâche, le résultat attendu et les outils actuels."
+        },
+        {
+          "title": "Concevoir",
+          "body": "Cartographiez le flux de travail, les contrôles et les mesures de succès."
+        },
+        {
+          "title": "Construire",
+          "body": "Connectez et configurez l'automatisation approuvée."
+        },
+        {
+          "title": "Exploiter",
+          "body": "Surveillez, entretenez et améliorez la tâche en fonction."
+        }
+      ]
+    },
+    "feeExplainer": {
+      "eyebrow": "Deux frais. Deux responsabilités.",
+      "title1": "Construit une fois.",
+      "title2": "Entretenu en continu.",
+      "buildLabel": "01 / Frais de construction",
+      "buildTitle": "Connectez-la à votre façon de travailler.",
+      "buildBody": "Le frais unique couvre la conception, la configuration, l'intégration, les tests et le lancement dans la portée convenue.",
+      "monthlyLabel": "02 / Gestion mensuelle",
+      "monthlyTitle": "Gardez-la fiable.",
+      "monthlyBody": "Le frais récurrent couvre la surveillance, l'entretien et l'amélioration responsable à mesure que votre environnement opérationnel évolue."
+    },
+    "detailsLabels": {
+      "detailsButton": "Détails",
+      "viewWhatsIncluded": "Voir ce qui est inclus",
+      "viewDetailsFor": "Voir les détails pour",
+      "close": "Fermer",
+      "whatsIncluded": "Ce qui est inclus",
+      "youStayInControl": "Vous gardez le contrôle",
+      "whoItSuitsHeading": "À qui ça convient",
+      "illustrativeExample": "Exemple illustratif"
+    },
+    "details": {
+      "sales-flow": {
+        "itemLabel": "VENTES",
+        "title": "BA Ventes",
+        "subtitle": "Gardez votre pipeline en mouvement.",
+        "intro": "Connectez votre CRM et votre boîte de courriels pour organiser les prospects entrants, tenir à jour vos dossiers de vente et coordonner le suivi. Le service prépare des devis, des propositions et des prochaines étapes suggérées selon votre processus de vente convenu. Vous obtenez un pipeline plus clair, des rapports réguliers et des ébauches prêtes à réviser, tandis que l'activité courante suit les règles convenues à la configuration.",
+        "inclusions": [
+          "Qualification et pointage des prospects selon des critères convenus.",
+          "Mises à jour du CRM et registres d'activité.",
+          "Ébauches de devis et de propositions.",
+          "Suivi planifié auprès des clients existants.",
+          "Suggestions de vente incitative et croisée.",
+          "Prévisions et rapports de ventes basés sur les données de pipeline disponibles.",
+          "Rappels de référencement et préparation des demandes."
+        ],
+        "control": "Les devis, propositions et nouvelles offres vous sont soumis pour approbation. Les suivis courants s'exécutent selon des règles convenues; les demandes hors de ces règles sont escaladées pour votre décision.",
+        "whoItSuits": "Les entreprises qui veulent un suivi constant et une vision plus claire de leur pipeline de ventes.",
+        "example": "Un prospect arrive pendant la nuit. Ses coordonnées sont organisées dans votre CRM, pointées selon vos critères et jumelées à une prochaine étape suggérée pour révision.",
+        "scope": "Les connexions CRM et courriel prises en charge, les règles de messagerie et la couverture du flux de travail sont confirmées avant la configuration."
+      },
+      "customer-support": {
+        "itemLabel": "SERVICE À LA CLIENTÈLE",
+        "title": "BA Service à la clientèle",
+        "subtitle": "Donnez à chaque demande une prochaine étape claire.",
+        "intro": "Connectez votre service d'assistance, votre boîte de courriels et vos canaux de service à la clientèle convenus pour organiser les demandes et coordonner les réponses. Le service utilise vos connaissances et politiques approuvées pour répondre aux questions courantes, suivre les billets et repérer les cas nécessitant une personne. Vous obtenez un flux de travail de soutien plus cohérent, les exceptions et décisions sensibles étant portées à votre attention.",
+        "inclusions": [
+          "Traitement des demandes courantes par téléphone, courriel et clavardage convenus.",
+          "Tri et escalade des plaintes.",
+          "Traitement des problèmes de commande et de service selon les politiques approuvées.",
+          "Préparation des mises à jour de la FAQ et de la base de connaissances.",
+          "Sondages de satisfaction.",
+          "Suivi des billets de soutien.",
+          "Suivi après-vente.",
+          "Préparation des retours et remboursements pour approbation."
+        ],
+        "control": "Les remboursements, retours et exceptions hors des politiques approuvées vous sont soumis pour décision. Les réponses non vérifiées sont escaladées plutôt que présentées comme des faits.",
+        "whoItSuits": "Les entreprises qui ont besoin d'un soutien constant à mesure que le volume de demandes augmente.",
+        "example": "Un client s'informe d'une commande retardée. Le service consulte le dossier de commande connecté et fournit le statut disponible, ou achemine le cas pour enquête lorsque l'information manque.",
+        "scope": "Les canaux, les sources de connaissances, les heures de couverture et les modalités d'escalade sont convenus avant le lancement."
+      },
+      "operational-intelligence": {
+        "itemLabel": "FINANCES",
+        "title": "BA Finances",
+        "subtitle": "Gardez vos finances quotidiennes organisées.",
+        "intro": "Connectez vos logiciels comptables et sources de données financières pris en charge pour coordonner la facturation, le suivi des paiements et l'administration financière courante. Le service prépare les registres, signale les exceptions et rassemble la paie, les comptes fournisseurs et les rapports pour révision. Vous obtenez un portrait financier plus clair, tandis que les décisions touchant les paiements ou les changements sensibles demeurent régies par vos règles d'approbation.",
+        "inclusions": [
+          "Préparation et envoi des factures selon des règles convenues.",
+          "Flux de travail de recouvrement des paiements via des outils de paiement approuvés.",
+          "Surveillance des flux de trésorerie et signalement des exceptions.",
+          "Suivi et enregistrement des dépenses.",
+          "Registres des paiements entrants et sortants et soutien à la réconciliation.",
+          "Suivi des abonnements et frais récurrents.",
+          "Suivi des paiements de prêts.",
+          "Préparation de la paie pour approbation.",
+          "Préparation des comptes fournisseurs pour approbation.",
+          "Rappels des échéances fiscales.",
+          "Application des taxes sur facture selon votre configuration confirmée.",
+          "Rapports financiers courants."
+        ],
+        "control": "La paie, les comptes fournisseurs et les actions financières sensibles requièrent une approbation. Les paramètres fiscaux et le jugement comptable requièrent une révision appropriée; l'automatisation ne remplace pas le jugement professionnel de votre comptable.",
+        "whoItSuits": "Les propriétaires qui veulent une facturation, un recouvrement, des dépenses et des rapports coordonnés, avec moins de tâches administratives répétitives.",
+        "example": "Des factures à venir et des revenus enregistrés indiquent un possible manque de liquidités. Le service le signale afin que vous puissiez revoir le calendrier et agir.",
+        "scope": "Les flux disponibles, la fréquence de réconciliation et les autorisations de paiement sont confirmés lors de la configuration."
+      },
+      "managed-it": {
+        "itemLabel": "TI",
+        "title": "BA TI",
+        "subtitle": "Gardez le travail technologique courant sous contrôle.",
+        "intro": "Connectez vos systèmes pris en charge pour coordonner l'entretien, le travail de soutien technique et l'administration TI quotidienne. Le service suit les problèmes, prépare ou exécute les actions courantes permises et signale les changements nécessitant une révision. Vous obtenez une visibilité sur l'entretien et un rapport des exceptions, les changements aux systèmes critiques étant gérés selon des contrôles convenus.",
+        "inclusions": [
+          "Entretien logiciel et coordination des correctifs.",
+          "Gestion des licences logicielles.",
+          "Flux de travail du soutien technique, des mots de passe et des demandes d'accès.",
+          "Exploitation et vérification des sauvegardes dans la portée convenue.",
+          "Surveillance de base de l'hygiène cybernétique.",
+          "Entretien courant du site Web et de l'hébergement.",
+          "Connexions entre les outils logiciels pris en charge."
+        ],
+        "control": "Les changements aux systèmes critiques et les actions d'accès sensibles requièrent une approbation. Les changements courants suivent les fenêtres d'entretien, la vérification et les procédures de récupération convenues.",
+        "whoItSuits": "Les entreprises qui ont besoin d'un soutien TI courant structuré et d'une responsabilité plus claire des tâches techniques récurrentes.",
+        "example": "Un correctif pertinent devient disponible. Le service repère les systèmes touchés et prépare la mise à jour pour le processus de test et d'approbation convenu.",
+        "scope": "Les systèmes pris en charge, la profondeur de vérification des sauvegardes et la couverture d'entretien sont convenus avant le lancement. Cela n'inclut pas automatiquement la cybersécurité spécialisée ou la réponse judiciaire."
+      },
+      "customer-growth": {
+        "itemLabel": "MARKETING",
+        "title": "BA Marketing",
+        "subtitle": "Transformez votre plan marketing en activité constante.",
+        "intro": "Coordonnez le contenu, les courriels, les réseaux sociaux et les flux de travail publicitaires via vos comptes pris en charge. Le service prépare le matériel dans le ton de votre marque, organise votre calendrier et rend compte de l'activité des campagnes. Vous révisez les décisions de publication et de dépenses, tandis que le travail approuvé se poursuit selon le plan convenu.",
+        "inclusions": [
+          "Préparation et coordination des mises à jour courantes du site Web.",
+          "Entretien du référencement (SEO) et recommandations d'amélioration.",
+          "Ébauches de blogues et d'articles.",
+          "Planification et publication sur les réseaux sociaux après approbation.",
+          "Campagnes courriel et infolettres pour les publics admissibles.",
+          "Gestion des campagnes payantes selon les budgets approuvés.",
+          "Préparation courante de graphisme.",
+          "Recherche sur le marché et la concurrence.",
+          "Rapports de performance marketing.",
+          "Préparation et coordination des campagnes de génération de prospects."
+        ],
+        "control": "Le matériel destiné au public requiert une approbation avant publication. Les dépenses suivent votre budget approuvé; les hausses proposées requièrent une nouvelle décision. Les autorisations du public et les préférences de désabonnement doivent être respectées.",
+        "whoItSuits": "Les entreprises qui recherchent une cadence marketing constante sans avoir à gérer chaque étape répétitive elles-mêmes.",
+        "example": "Une recherche repère un changement de marché pertinent. Le service rédige un ajustement de campagne et du contenu de soutien pour votre révision avant toute publication.",
+        "scope": "Les canaux, les volumes de contenu, les comptes publicitaires et les autorisations de publication sont convenus à la configuration. Le classement dans les moteurs de recherche et les résultats de campagne ne sont pas garantis."
+      },
+      "tailored": {
+        "itemLabel": "AUTOMATISATION SUR MESURE",
+        "title": "BA Automatisation sur mesure",
+        "subtitle": "Automatisez un flux de travail propre à votre entreprise.",
+        "intro": "Décrivez une tâche répétitive qui ne correspond pas aux services BA standards. Nous évaluons le flux de travail, confirmons les intrants et décisions dont il a besoin, et établissons la portée d'une automatisation autour de ce processus précis. Vous obtenez un flux de travail testé avec des limites définies, une gestion des exceptions et des points d'approbation.",
+        "inclusions": [
+          "Examen de la tâche et de sa pertinence pour l'automatisation.",
+          "Détermination des données, connexions logicielles et responsables requis.",
+          "Une portée définie couvrant les actions incluses et exclues.",
+          "Construction et tests selon le flux de travail convenu.",
+          "Règles d'approbation et de gestion des exceptions.",
+          "Une soumission basée sur la portée confirmée."
+        ],
+        "control": "Les actions sensibles et les exceptions suivent des règles d'approbation convenues. Les changements au-delà du flux de travail convenu sont révisés avant leur mise en œuvre.",
+        "whoItSuits": "Les entreprises ayant une tâche récurrente précise qui ne correspond à aucun forfait standard.",
+        "example": "Un gestionnaire immobilier a besoin que les demandes d'entretien soient jumelées aux bons entrepreneurs. Un flux de travail sur mesure prépare les jumelages selon le type de tâche et l'information disponible, les exceptions étant soumises pour révision.",
+        "scope": "Soumission personnalisée. Une demande couvrant une opération connectée plus large pourrait mieux convenir à OR ONE; cela est évalué avant de s'engager dans une construction."
+      }
+    }
+  },
+  "Industries": {
+    "nav": {
+      "getCyberHealthScore": "Obtenez votre Cyber Health Score",
+      "search": "Rechercher",
+      "changeLanguage": "Changer de langue"
+    },
+    "hero": {
+      "eyebrow": "Secteurs d'activité / Canada",
+      "title1": "Chaque secteur fonctionne différemment.",
+      "title2": "Sa protection aussi devrait l'être.",
+      "sub": "Découvrez comment ORAGROL harmonise la cybersécurité, l'automatisation intelligente et OR ONE avec les risques, les flux de travail et les priorités de votre secteur.",
+      "pillarProtect": "Protéger",
+      "pillarAutomate": "Automatiser",
+      "pillarUnify": "Unifier",
+      "pillarsAriaLabel": "Approche ORAGROL",
+      "chooseIndustry": "Choisissez votre secteur"
+    },
+    "navigator": {
+      "eyebrow": "01 / Choisissez un secteur",
+      "selectedLabel": "Secteur sélectionné",
+      "ringAriaLabel": "Secteurs d'activité"
+    },
+    "editorial": {
+      "heading": "La réalité opérationnelle.",
+      "viewPath": "Voir la voie coordonnée"
+    },
+    "journey": {
+      "eyebrow": "02 / Une voie coordonnée",
+      "protectLabel": "01 / Protéger",
+      "protectHeading": "Protégez ce qui compte.",
+      "automateLabel": "02 / Automatiser",
+      "automateHeading": "Automatisez les bonnes tâches.",
+      "unifyLabel": "03 / Unifier",
+      "unifyHeading": "Sachez quand cela devient OR ONE."
+    },
+    "evidence": {
+      "labelPrefix": "Preuve phare / Comptabilité et tenue de livres",
+      "openDrawer": "Ouvrir le tiroir de preuves",
+      "stat1": {
+        "value": "28,1 %",
+        "prefix": "des domaines canadiens échantillonnés dans une étude de fournisseur de 2026 appliquaient le DMARC en mode ",
+        "suffix": "."
+      },
+      "stat1Source": "PowerDMARC · 2026",
+      "stat2": {
+        "value": "26 milliards $+",
+        "prefix": "volés à l'échelle mondiale par la compromission de courriels d'affaires, y compris des entreprises canadiennes.",
+        "suffix": ""
+      },
+      "stat2Source": "GRC · Mis à jour en 2025",
+      "stat3": {
+        "value": "2 ans",
+        "prefix": "période minimale de conservation des dossiers en cas d'atteinte, selon les lignes directrices fédérales de la LPRPDE.",
+        "suffix": ""
+      },
+      "stat3Source": "Lignes directrices du CPVP",
+      "disclaimer": "Les contrôles renforcent la conversation lors du renouvellement de l'assurance, mais ne garantissent pas la couverture, l'approbation ni des primes réduites."
+    },
+    "fullProfile": {
+      "eyebrow": "03 / Détails du secteur",
+      "heading": "Ce que les dirigeants doivent savoir.",
+      "sub": "N'ouvrez que les détails pertinents à votre décision.",
+      "accordionRisk": "Risques et contexte canadien",
+      "accordionProtect": "Protéger",
+      "accordionAutomate": "Automatiser",
+      "accordionUnify": "Unifier avec OR ONE",
+      "detailsAriaSuffix": "détails",
+      "scopeNote": "Les lois, normes et obligations contractuelles applicables varient selon la province, l'activité, l'organisme de réglementation et les données traitées. ORAGROL confirme la portée avant de recommander des contrôles ou de l'automatisation."
+    },
+    "jobShortNames": {
+      "sales-flow": "Ventes",
+      "customer-support": "Service à la clientèle",
+      "operational-intelligence": "Finances",
+      "managed-it": "TI",
+      "customer-growth": "Marketing"
+    },
+    "list": {
+      "professionalServices": {
+        "name": "Services professionnels",
+        "subBrand": "Cabinets de comptabilité et de tenue de livres",
+        "overview": "Les cabinets de comptabilité et de tenue de livres se trouvent au cœur de la vie financière de leurs clients — déclarations fiscales, dossiers de paie, coordonnées bancaires et, souvent, l'autorité de déplacer les fonds des clients. Cette concentration de données sensibles et d'autorité de paiement fait des cabinets une cible de grande valeur, peu importe leur taille.",
+        "risks": [
+          "Compromission de courriels d'affaires et modifications frauduleuses de coordonnées bancaires",
+          "Prise de contrôle de comptes sur les plateformes de courriel et de comptabilité infonuagique",
+          "Appareils à distance non gérés et accès de tiers non révisés",
+          "Lacunes de sauvegarde et de restauration touchant les dossiers financiers des clients",
+          "Application insuffisante de SPF, DKIM ou DMARC"
+        ],
+        "priorities": [
+          "AMF sur chaque compte de courriel et de comptabilité infonuagique",
+          "Vérification indépendante des modifications de coordonnées de paiement",
+          "DMARC passé du mode de surveillance à l'application stricte",
+          "Révisions régulières de l'accès du personnel et des fournisseurs",
+          "Sauvegardes testées et sensibilisation à la sécurité documentée"
+        ],
+        "jobs": [
+          {
+            "jobKind": "sales-flow",
+            "why": "Faites avancer chaque référence, demande, proposition et suivi de lettre de mission — même pendant la haute saison."
+          },
+          {
+            "jobKind": "operational-intelligence",
+            "why": "Transformez les données dispersées du cabinet en une vue à jour de la capacité, de la réalisation et de la rentabilité des clients."
+          }
+        ],
+        "unify": "Lorsque l'accueil de nouveaux clients, la mission et la facturation, la capacité du personnel et les communications avec les clients doivent fonctionner comme un système coordonné — et non comme des automatisations distinctes — c'est le territoire d'OR ONE.",
+        "detail": {
+          "context": "La LPRPDE peut exiger des mesures de protection adaptées à la sensibilité des renseignements personnels, la déclaration des atteintes lorsqu'il existe un risque réel de préjudice grave, la notification et la tenue de dossiers sur les atteintes. Des règles provinciales en matière de protection de la vie privée et des règles professionnelles peuvent également s'appliquer. Les cabinets de comptabilité, juridiques et de conseil devraient confirmer leurs obligations exactes lors de la définition de la portée.",
+          "protect": [
+            "Appliquez l'AMF sur tous les comptes de courriel, infonuagiques, comptables et privilégiés.",
+            "Validez les expéditeurs légitimes avant de faire progresser SPF, DKIM et DMARC vers l'application stricte.",
+            "Vérifiez de façon indépendante les instructions de paiement et les modifications de coordonnées bancaires.",
+            "Révisez l'accès du personnel, des sous-traitants et des fournisseurs lors des départs et selon un calendrier défini.",
+            "Protégez l'échange de documents avec les clients, testez la restauration des sauvegardes et documentez la réponse aux incidents."
+          ],
+          "automate": [
+            "Ventes pour les références, les propositions et le suivi des mandats.",
+            "Accueil sécurisé des clients avec suivi de l'état des documents et étapes d'intégration approuvées.",
+            "Finances pour la capacité, les travaux en cours, la facturation et la visibilité du service à la clientèle."
+          ],
+          "question": "Quel est le risque cybernétique pratique le plus courant pour un cabinet de services professionnels?",
+          "answer": "Le courriel et l'identité compromis représentent des risques à fort impact, car ils peuvent exposer des renseignements confidentiels et permettre une fraude convaincante liée aux paiements ou aux modifications de compte."
+        }
+      },
+      "healthcare": {
+        "name": "Santé",
+        "subBrand": "Cliniques et PME de santé",
+        "overview": "Les cliniques travaillent avec des systèmes de rendez-vous, de dossiers médicaux électroniques, de facturation et de communication maintenus par plusieurs fournisseurs, tandis que le roulement du personnel crée un travail récurrent de contrôle d'accès autour de renseignements de patients hautement sensibles.",
+        "risks": [
+          "Hameçonnage ciblant les équipes de réception et de facturation",
+          "Séparation insuffisante entre l'accès clinique et administratif",
+          "Appareils non gérés ayant accès aux renseignements des patients"
+        ],
+        "priorities": [
+          "AMF sur les systèmes cliniques et de facturation",
+          "Révisions d'accès à chaque changement de personnel",
+          "Protection gérée pour chaque point d'accès connecté"
+        ],
+        "jobs": [
+          {
+            "jobKind": "customer-support",
+            "why": "Améliorez la prise de rendez-vous à volume élevé, l'accueil et les communications de suivi."
+          },
+          {
+            "jobKind": "managed-it",
+            "why": "Gardez les systèmes de rendez-vous et de dossiers fiables sans bâtir une équipe TI interne complète."
+          }
+        ],
+        "unify": "Lorsque l'accueil des patients, la facturation, les horaires du personnel et les communications doivent se coordonner entre plusieurs fournisseurs ou emplacements, le besoin est passé dans le territoire d'OR ONE.",
+        "detail": {
+          "context": "En Ontario, la LPRPS régit les dépositaires de renseignements sur la santé et leurs agents. Les dépositaires demeurent responsables lorsque des fournisseurs tiers sont utilisés, et des obligations de notification d'atteinte et de déclaration statistique annuelle peuvent s'appliquer. Les autres provinces ont leurs propres régimes de protection de la vie privée en matière de santé.",
+          "protect": [
+            "Appliquez l'AMF pour les comptes cliniques, de facturation, à distance et privilégiés.",
+            "Utilisez un accès basé sur les rôles et révisez-le après chaque changement de personnel.",
+            "Gérez et corrigez chaque point d'accès ayant contact avec les renseignements des patients.",
+            "Testez la restauration des systèmes critiques et maintenez des procédures en cas d'interruption.",
+            "Révisez les mesures de protection, l'accès, l'avis d'atteinte et les conditions d'élimination des données des fournisseurs."
+          ],
+          "automate": [
+            "Rappels approuvés, état de l'accueil et suivi non clinique avec escalade au personnel.",
+            "Accueil administratif qui vérifie l'exhaustivité sans automatiser les décisions cliniques.",
+            "TI pour la santé des points d'accès, les billets, le cycle de vie des appareils et le travail d'accès récurrent."
+          ],
+          "question": "Un fournisseur infonuagique de soins de santé retire-t-il la responsabilité de la protection de la vie privée à une clinique ontarienne?",
+          "answer": "Non. Les lignes directrices ontariennes précisent clairement qu'un dépositaire demeure responsable des renseignements personnels sur la santé sous sa garde ou son contrôle, même lorsque des fournisseurs sont impliqués."
+        }
+      },
+      "financialServices": {
+        "name": "Services financiers",
+        "subBrand": "Conseillers, courtiers et prêteurs",
+        "overview": "Les entreprises financières traitent des données réglementées, des transactions de grande valeur et des plateformes tierces, tout en maintenant des preuves et des pistes de vérification dans le cadre de leurs opérations quotidiennes.",
+        "risks": [
+          "Prise de contrôle de comptes par identifiants compromis",
+          "Exposition de données financières réglementées",
+          "Risque lié aux fournisseurs de garde, de prêt et de CRM"
+        ],
+        "priorities": [
+          "Contrôles stricts de l'identité et des accès privilégiés",
+          "Preuves de conformité continues",
+          "Surveillance continue du risque fournisseur"
+        ],
+        "jobs": [
+          {
+            "jobKind": "operational-intelligence",
+            "why": "Créez une visibilité fiable sur les données de rapports, de portefeuille et de pipeline."
+          },
+          {
+            "jobKind": "managed-it",
+            "why": "Maintenez une infrastructure surveillée et fiable autour des flux de travail critiques."
+          }
+        ],
+        "unify": "Lorsque les rapports de conformité, les communications avec les clients et les opérations des conseillers nécessitent un système coordonné et vérifiable, cela devient le territoire d'OR ONE.",
+        "detail": {
+          "context": "Le cadre applicable dépend de l'activité. Les lignes directrices B-13 et B-10 du BSIF s'appliquent aux institutions financières sous réglementation fédérale, et non à toutes les PME financières. CANAFE s'applique aux entités déclarantes définies et aux activités visées. Des règles provinciales, contractuelles et professionnelles peuvent également s'appliquer.",
+          "protect": [
+            "Utilisez une AMF robuste pour les comptes privilégiés, de courriel, financiers et à distance.",
+            "Séparez et surveillez les privilèges administratifs.",
+            "Exigez une vérification indépendante pour les modifications de paiement et de coordonnées de compte.",
+            "Maintenez des inventaires de fournisseurs, des évaluations de risques, des contrôles contractuels et des plans de sortie.",
+            "Testez la réponse aux incidents, la continuité et la reprise autour des flux de travail critiques."
+          ],
+          "automate": [
+            "Soutien aux flux de conformité pour les preuves, les révisions, les exceptions et les approbations.",
+            "Intégration contrôlée des clients avec révision humaine obligatoire.",
+            "Finances pour les vues autorisées du pipeline, du service, des exceptions et des risques."
+          ],
+          "question": "La ligne directrice B-13 du BSIF s'applique-t-elle à toutes les entreprises financières canadiennes?",
+          "answer": "Non. La B-13 s'applique aux institutions financières sous réglementation fédérale. Les autres entreprises financières peuvent être soumises à des obligations fédérales, provinciales, contractuelles ou professionnelles différentes."
+        }
+      },
+      "retail": {
+        "name": "Commerce de détail et commerce électronique",
+        "subBrand": "Commerce multicanal",
+        "overview": "Les détaillants et commerçants en ligne gèrent des données de paiement, une demande saisonnière et un parcours client toujours actif, couvrant le marketing, le paiement, l'exécution des commandes et le soutien.",
+        "risks": [
+          "Compromission des paiements et du processus de paiement",
+          "Exposition Web et API",
+          "Perte ou utilisation abusive de données clients"
+        ],
+        "priorities": [
+          "Sécurité des applications et des API",
+          "Hygiène de sécurité pertinente pour la PCI",
+          "Visibilité continue sur les systèmes publics"
+        ],
+        "jobs": [
+          {
+            "jobKind": "customer-growth",
+            "why": "Renforcez les achats répétés, la rétention et la réactivation à grande échelle."
+          },
+          {
+            "jobKind": "sales-flow",
+            "why": "Faites avancer les prospects et le suivi des paniers abandonnés sans effort manuel."
+          }
+        ],
+        "unify": "Lorsque le marketing, les ventes, l'exécution des commandes et le service à la clientèle doivent fonctionner comme un système connecté unique entre les canaux, c'est le territoire d'OR ONE.",
+        "detail": {
+          "context": "La loi canadienne sur la protection de la vie privée peut régir les renseignements sur les clients. La norme PCI DSS est une norme de l'industrie des cartes de paiement, et non une loi canadienne. La version PCI DSS v4.0.1 accorde une attention particulière, pour le commerce électronique, aux scripts des pages de paiement et à la détection des modifications ou altérations.",
+          "protect": [
+            "Appliquez l'AMF pour l'administration de la boutique, le courriel, les paiements et l'accès à distance.",
+            "Minimisez le stockage et l'exposition des renseignements de paiement et personnels.",
+            "Contrôlez les modules complémentaires, les scripts, les intégrations et les mises à jour.",
+            "Surveillez les modifications des pages de paiement, les applications publiques, les API et la disponibilité.",
+            "Révisez l'accès des tiers et testez la restauration avant les périodes de pointe."
+          ],
+          "automate": [
+            "Service à la clientèle pour les réponses approuvées, l'acheminement et l'escalade humaine.",
+            "Marketing pour les parcours post-achat, de fidélisation et de réactivation respectueux du consentement.",
+            "Finances pour la visibilité des stocks, de l'exécution des commandes, des retours et des campagnes."
+          ],
+          "question": "La norme PCI DSS est-elle une loi canadienne sur la protection de la vie privée?",
+          "answer": "Non. La PCI DSS est une norme de sécurité de l'industrie des cartes de paiement. Les lois canadiennes sur la protection de la vie privée peuvent séparément régir les renseignements personnels traités par un détaillant."
+        }
+      },
+      "manufacturing": {
+        "name": "Fabrication",
+        "subBrand": "Continuité de la production et de l'approvisionnement",
+        "overview": "Les fabricants combinent la TI de bureau, des systèmes liés à la production, des équipements hérités et l'accès des fournisseurs — où un incident technologique ordinaire peut se traduire par un temps d'arrêt de production mesurable.",
+        "risks": [
+          "Exposition liée à l'accès des fournisseurs",
+          "Points d'accès vieillissants ou non gérés",
+          "Séparation insuffisante entre les systèmes de bureau et de production"
+        ],
+        "priorities": [
+          "Révision de l'accès des fournisseurs",
+          "Couverture complète des points d'accès",
+          "Segmentation réseau autour des opérations critiques"
+        ],
+        "jobs": [
+          {
+            "jobKind": "managed-it",
+            "why": "Reliez directement la fiabilité de l'infrastructure à la continuité de la production."
+          },
+          {
+            "jobKind": "operational-intelligence",
+            "why": "Remplacez les rapports d'inventaire, de fournisseurs et de production tardifs par une vue à jour."
+          }
+        ],
+        "unify": "Lorsque les données de chaîne d'approvisionnement, d'inventaire et d'exploitation nécessitent un système coordonné de planification et d'exécution, le besoin devient OR ONE.",
+        "detail": {
+          "context": "Les lignes directrices canadiennes en cybersécurité mettent en évidence les menaces liées à la chaîne d'approvisionnement, les rançongiciels et une sécurité basée sur les risques pour les petites organisations. Les obligations exactes dépendent des produits, des clients, de la sécurité, des contrôles à l'exportation, du rôle d'infrastructure essentielle et des renseignements traités.",
+          "protect": [
+            "Inventoriez la TI, la TO, les équipements connectés, les voies d'accès à distance et les dépendances critiques.",
+            "Séparez les environnements d'affaires et de production lorsque possible.",
+            "Utilisez un accès fournisseur approuvé, limité dans le temps et surveillé.",
+            "Priorisez les vulnérabilités selon l'exposition, l'exploitabilité, la sécurité et l'impact sur la production.",
+            "Testez la reprise des systèmes d'affaires et des configurations critiques pour la production."
+          ],
+          "automate": [
+            "TI pour les points d'accès, l'accès, les demandes de service et les preuves récurrentes.",
+            "Finances pour les indicateurs autorisés d'inventaire, de qualité, de temps d'arrêt et de fournisseurs.",
+            "Flux de travail fournisseurs pour les approbations, les preuves, les dates d'expiration et les exceptions."
+          ],
+          "question": "Pourquoi l'accès des fournisseurs constitue-t-il un risque cybernétique majeur en fabrication?",
+          "answer": "Un accès fournisseur permanent, excessif ou non surveillé peut créer une voie d'accès aux environnements d'affaires ou de production lorsqu'une identité ou un système fournisseur est compromis."
+        }
+      },
+      "technology": {
+        "name": "Technologie",
+        "subBrand": "Entreprises en croissance",
+        "overview": "Les entreprises technologiques font souvent croître leurs revenus et leurs effectifs plus rapidement que leurs processus internes, accumulant au passage des outils SaaS, des intégrations et une gouvernance d'accès incohérente.",
+        "risks": [
+          "Prolifération SaaS et départ du personnel mal géré",
+          "Exposition liée aux API et aux intégrations",
+          "Utilisation incontrôlée d'outils d'IA"
+        ],
+        "priorities": [
+          "Gouvernance de l'identité sur l'ensemble de la pile technologique",
+          "Sécurité des applications et des API",
+          "Gouvernance pratique de l'IA"
+        ],
+        "jobs": [
+          {
+            "jobKind": "sales-flow",
+            "why": "Faites croître l'exécution du pipeline sans faire croître l'administration au même rythme."
+          },
+          {
+            "jobKind": "operational-intelligence",
+            "why": "Reliez les renseignements sur les produits, les clients et les revenus à des décisions à jour."
+          }
+        ],
+        "unify": "Lorsque les ventes, les données produits et les opérations clients nécessitent un seul système plutôt qu'une collection grandissante d'outils, c'est le territoire d'OR ONE.",
+        "detail": {
+          "context": "La protection de la vie privée, les contrats clients, les conditions des assureurs et les exigences de la chaîne d'approvisionnement comptent tous. La Loi sur l'intelligence artificielle et les données proposée au Canada ne doit pas être présentée comme une loi en vigueur; les conseils actuels devraient porter sur la protection de la vie privée, la sécurité, l'utilisation approuvée, la supervision humaine et la reddition de comptes.",
+          "protect": [
+            "Centralisez l'identité, appliquez l'AMF et contrôlez les événements d'arrivée, de mutation et de départ du personnel.",
+            "Protégez l'administration infonuagique, le code source, l'intégration/déploiement continus et les secrets.",
+            "Établissez des pratiques sécurisées de développement, de gestion des dépendances, des vulnérabilités et des mises en production.",
+            "Inventoriez les API, les intégrations, les flux de données et les composants tiers.",
+            "Définissez les utilisations approuvées de l'IA, les données interdites et les exigences de révision humaine."
+          ],
+          "automate": [
+            "Ventes pour la demande, la qualification, les propositions et le transfert.",
+            "Service à la clientèle pour les connaissances approuvées, l'acheminement et l'escalade.",
+            "Finances pour les indicateurs de produits, de services, de clients et de revenus."
+          ],
+          "question": "La Loi sur l'intelligence artificielle et les données proposée au Canada est-elle actuellement en vigueur?",
+          "answer": "Non. Les entreprises technologiques devraient tout de même établir une gouvernance pratique de l'IA autour de la protection de la vie privée, de la sécurité, de l'utilisation approuvée, de la supervision humaine et de la reddition de comptes."
+        }
+      },
+      "construction": {
+        "name": "Construction et immobilier",
+        "subBrand": "Équipes et projets répartis",
+        "overview": "Les entreprises de construction et d'immobilier coordonnent les équipes de bureau, de terrain et de chantier par courriel, appareils mobiles et un ensemble de systèmes de gestion de projets, de transactions et de clients.",
+        "risks": [
+          "Exposition liée au terrain et aux appareils mobiles",
+          "Fraude liée aux factures et aux modifications de paiement",
+          "Accès incohérent entre les chantiers et les équipes"
+        ],
+        "priorities": [
+          "Appareils mobiles gérés",
+          "Vérification indépendante des paiements",
+          "Authentification du courriel appliquée"
+        ],
+        "jobs": [
+          {
+            "jobKind": "managed-it",
+            "why": "Soutenez de façon fiable une main-d'œuvre répartie et ses appareils."
+          },
+          {
+            "jobKind": "customer-growth",
+            "why": "Maintenez un suivi rigoureux tout au long des longs cycles d'acheteurs, de locataires et de clients."
+          }
+        ],
+        "unify": "Lorsque la gestion de projet, les communications avec les clients et les finances administratives doivent se coordonner entre plusieurs chantiers ou inscriptions, c'est le territoire d'OR ONE.",
+        "detail": {
+          "context": "Les courtiers, représentants et promoteurs immobiliers peuvent avoir des obligations envers CANAFE lorsqu'ils exercent des activités visées. Les obligations diffèrent selon l'entité et l'activité. Des exigences en matière de protection de la vie privée et de contrats peuvent également s'appliquer.",
+          "protect": [
+            "Appliquez l'AMF sur les systèmes de courriel, de projets, immobiliers, financiers et à distance.",
+            "Vérifiez de façon indépendante les modifications de paiement et de coordonnées bancaires.",
+            "Gérez les appareils mobiles et protégez les renseignements d'affaires.",
+            "Accordez aux sous-traitants un accès limité dans le temps et au moindre privilège.",
+            "Révisez l'accès à la fin des projets et conservez les dossiers requis."
+          ],
+          "automate": [
+            "Ventes pour les demandes, les rendez-vous, les propositions et le suivi des cycles longs.",
+            "Accueil de projets pour les documents approuvés, les éléments manquants, l'acheminement et l'état.",
+            "TI pour les appareils répartis, les comptes et le travail de service récurrent."
+          ],
+          "question": "Toutes les entreprises canadiennes de construction et d'immobilier ont-elles les mêmes obligations envers CANAFE?",
+          "answer": "Non. Les obligations dépendent de l'entité et des activités exercées; les entreprises visées doivent évaluer les lignes directrices actuelles qui leur sont propres."
+        }
+      },
+      "education": {
+        "name": "Éducation",
+        "subBrand": "Écoles et fournisseurs de services éducatifs",
+        "overview": "Les fournisseurs de services éducatifs détiennent des données sur les élèves et les familles dans des systèmes administratifs et d'apprentissage, tout en gérant un volume constant de communications avec les parents, les élèves et le personnel.",
+        "risks": [
+          "Hameçonnage ciblant le personnel administratif",
+          "Exposition des données des élèves",
+          "Accès incohérent entre les systèmes d'apprentissage et administratifs"
+        ],
+        "priorities": [
+          "Sensibilisation à la sécurité pour le personnel",
+          "Accès régi sur toutes les plateformes",
+          "Politique claire de gestion des données"
+        ],
+        "jobs": [
+          {
+            "jobKind": "customer-support",
+            "why": "Gérez les demandes répétées des parents et des élèves de façon plus cohérente."
+          },
+          {
+            "jobKind": "managed-it",
+            "why": "Soutenez les systèmes administratifs et d'apprentissage comme un seul environnement fiable."
+          }
+        ],
+        "unify": "Lorsque les admissions, les communications et l'administration doivent se coordonner entre plusieurs programmes ou campus, le besoin opérationnel devient OR ONE.",
+        "detail": {
+          "context": "Les obligations en matière de protection de la vie privée dépendent de la province et du caractère public ou privé de l'établissement. Les conclusions du régulateur ontarien concernant PowerSchool soulignent la surveillance des fournisseurs, les mesures de protection contractuelles et la responsabilité continue des renseignements sous la garde ou le contrôle d'un établissement.",
+          "protect": [
+            "Appliquez l'AMF pour les comptes du personnel, des administrateurs, à distance et privilégiés.",
+            "Révisez les rôles à l'arrivée et au départ des élèves, du personnel et des sous-traitants.",
+            "Protégez les points d'accès, particulièrement les appareils administratifs et partagés.",
+            "Évaluez les fournisseurs de technologie éducative, les contrats, l'accès et l'élimination des données.",
+            "Testez la restauration et maintenez des plans de continuité de l'apprentissage et d'incident."
+          ],
+          "automate": [
+            "Renseignements et soutien courants approuvés, avec escalade au personnel.",
+            "Administration des admissions pour l'état des documents, les rappels et les transferts autorisés.",
+            "TI pour les appareils, les comptes, les billets et le travail d'accès."
+          ],
+          "question": "Un établissement d'enseignement transfère-t-il sa responsabilité en matière de protection de la vie privée à son fournisseur de logiciels?",
+          "answer": "Pas automatiquement. La loi applicable et le type d'organisation comptent, mais des conclusions récentes de l'Ontario soulignent une surveillance active des fournisseurs et une responsabilité continue."
+        }
+      },
+      "otherSmbs": {
+        "name": "Autres PME canadiennes",
+        "subBrand": "Un point de départ clair",
+        "overview": "Les entreprises qui ne correspondent à aucun secteur nommé dépendent tout de même des mêmes éléments essentiels : le courriel, les outils infonuagiques, une poignée de fournisseurs et un travail opérationnel souvent plus manuel qu'il ne devrait l'être.",
+        "risks": [
+          "Hameçonnage et prise de contrôle de comptes",
+          "Couverture AMF incomplète",
+          "Accès fournisseur non géré"
+        ],
+        "priorities": [
+          "AMF sur chaque compte critique",
+          "Une base de référence des risques documentée",
+          "Révision de base des fournisseurs et des accès"
+        ],
+        "jobs": [
+          {
+            "jobKind": "sales-flow",
+            "why": "Créez un parcours fiable, de la demande jusqu'à la conclusion."
+          },
+          {
+            "jobKind": "customer-support",
+            "why": "Répondez, acheminez et assurez un suivi de façon cohérente à mesure que la demande augmente."
+          }
+        ],
+        "unify": "Lorsque les ventes, le soutien et les opérations doivent véritablement fonctionner comme un système coordonné plutôt que comme des fonctions distinctes, c'est le territoire d'OR ONE.",
+        "detail": {
+          "context": "La LPRPDE peut s'appliquer aux renseignements personnels traités dans le cadre d'une activité commerciale. L'Alberta, la Colombie-Britannique et le Québec ont des lois du secteur privé essentiellement similaires, tandis que des obligations sectorielles et provinciales peuvent également s'appliquer. Les contrôles de base canadiens offrent un point de départ pratique fondé sur les risques.",
+          "protect": [
+            "Documentez les actifs, comptes, données et fournisseurs critiques.",
+            "Appliquez l'AMF sur le courriel, l'infonuagique, les finances et l'administration.",
+            "Gérez les points d'accès, les mises à jour, les sauvegardes et l'accès privilégié.",
+            "Protégez le courriel et formez le personnel contre l'hameçonnage et la fraude liée aux paiements.",
+            "Testez la reprise et définissez la responsabilité décisionnelle en cas d'incident."
+          ],
+          "automate": [
+            "Flux de travail de vente pour que les demandes et les propositions ne restent pas sans suite.",
+            "Service à la clientèle pour un acheminement, des réponses et une escalade cohérents.",
+            "Finances pour des rapports régis et à jour.",
+            "TI pour les appareils, comptes, billets et accès courants."
+          ],
+          "question": "Par où une PME canadienne devrait-elle commencer en cybersécurité?",
+          "answer": "Commencez par une base de référence des risques couvrant les comptes, appareils, données, fournisseurs, sauvegardes et processus d'affaires critiques, puis priorisez l'AMF, la protection du courriel, les mises à jour gérées et une reprise testée."
+        }
+      }
+    }
+  },
+  "OrOne": {
+    "nav": {
+      "getCyberHealthScore": "Obtenez votre Cyber Health Score",
+      "search": "Recherche",
+      "changeLanguage": "Changer de langue",
+      "myScope": "Ma portée"
+    },
+    "hero": {
+      "meta1": "OR ONE / Système d'affaires coordonné",
+      "meta2": "Sécurité · Automatisation · Intelligence",
+      "model": "Un modèle d'exploitation connecté",
+      "title1": "Un système sécurisé",
+      "title2": "pour le fonctionnement de",
+      "titleEmphasis": "votre entreprise.",
+      "support": "OR ONE relie les systèmes de votre entreprise et coordonne des travailleurs IA dans toute votre organisation grâce à une seule couche opérationnelle sécurisée. Il centralise les approbations, la supervision et la performance, tout en gardant chaque décision importante sous autorité humaine.",
+      "discover": "Découvrir OR ONE",
+      "pillar1": "Protégez ce qui compte",
+      "pillar2": "Automatisez ce qui vous ralentit",
+      "pillar3": "Comprenez ce qui fait avancer l'entreprise",
+      "pillar4": "Fonctionnez comme un seul système"
+    },
+    "intro": {
+      "eyebrow": "Une gamme de produits distincte",
+      "title1": "Votre entreprise,",
+      "titleEmphasis": "exploitée intelligemment.",
+      "body1": "OR ONE est une main-d'œuvre IA dédiée, conçue pour une seule organisation. Elle se connecte aux outils que votre entreprise utilise déjà et fonctionne par un accès clairement autorisé.",
+      "body2": "Elle est entièrement distincte des 67 services standards d'ORAGROL — avec son propre modèle d'ingénierie, sa propre structure de responsabilité et ses propres conditions commerciales.",
+      "quote": "Conçu par ORAGROL Global."
+    },
+    "signature": {
+      "label": "OR / ONE SIGNATURE",
+      "heading": "Votre vision, conçue avec précision.",
+      "body1": "Dites-nous ce que votre entreprise doit accomplir. Nous concevrons et créerons un système sur mesure autour de vos ambitions — des flux de travail intelligents et de l'automatisation aux intégrations, aux contrôles, aux rapports et aux capacités spécialisées.",
+      "body2": "Chaque mandat Signature est examiné en privé et façonné en une architecture personnalisée, une portée définie, un plan de mise en œuvre et une structure de service continue.",
+      "cta": "DÉMARRER VOTRE PROJET SIGNATURE"
+    },
+    "process": {
+      "eyebrow": "DE LA PORTÉE À L'OPÉRATION",
+      "title1": "Une voie claire.",
+      "titleEmphasis": "Un système fonctionnel.",
+      "sub": "Définissez le travail, connectez les bons outils et convenez des contrôles avant le lancement.",
+      "steps": [
+        {
+          "number": "01",
+          "title": "Définir la portée",
+          "copy": "Convenez des flux de travail, des outils, des accès et des résultats que votre système doit soutenir.",
+          "result": "Une portée définie"
+        },
+        {
+          "number": "02",
+          "title": "Construire et connecter",
+          "copy": "Concevez les flux de travail convenus et connectez-les à vos systèmes d'affaires approuvés.",
+          "result": "Des flux de travail connectés"
+        },
+        {
+          "number": "03",
+          "title": "Tester et approuver",
+          "copy": "Passez en revue des scénarios réels avec votre équipe, y compris les exceptions et les points d'approbation.",
+          "result": "Prêt pour le lancement"
+        },
+        {
+          "number": "04",
+          "title": "Lancer et maintenir",
+          "copy": "Mettez en service les flux de travail approuvés avec le suivi et le soutien convenus.",
+          "result": "Un système opérationnel"
+        }
+      ]
+    },
+    "builder": {
+      "eyebrow": "Outil interactif / 77 éléments",
+      "title1": "Bâtissez votre équipe.",
+      "titleEmphasis": "Visualisez la forme du système.",
+      "sub": "Sélectionnez des capacités pour créer une portée préliminaire. L'estimation indique des points et un palier probable — pas un prix final ni une proposition. Les sélections s'arrêtent à 400 points.",
+      "categoryLabel": "Catégorie",
+      "ptsSuffix": "pts",
+      "limitReached": "Limite de 400 points atteinte",
+      "tierStandard": "Standard",
+      "tierControlled": "Contrôlé",
+      "tierCritical": "Critique",
+      "preliminaryScope": "Portée préliminaire",
+      "pointsSelected": "Points sélectionnés",
+      "itemsLabel": "éléments",
+      "estimatedTierLabel": "palier estimé",
+      "notEstimated": "Non estimé",
+      "reviewInMyScope": "Consulter dans Ma portée ↗",
+      "clearSelection": "Effacer la sélection",
+      "categories": {
+        "sales": {
+          "name": "Ventes",
+          "benefit": "Bâtissez une opération de vente qui trouve, qualifie et suit les occasions de façon constante.",
+          "items": [
+            {
+              "name": "Génération de prospects et prospection"
+            },
+            {
+              "name": "Sollicitation par courriel à froid"
+            },
+            {
+              "name": "Qualification des prospects"
+            },
+            {
+              "name": "Rédaction de devis et de propositions"
+            },
+            {
+              "name": "Saisie de données CRM et suivi du pipeline"
+            },
+            {
+              "name": "Suivi auprès des clients existants"
+            },
+            {
+              "name": "Génération d'offres de vente additionnelle et croisée"
+            },
+            {
+              "name": "Prévisions et rapports de vente"
+            },
+            {
+              "name": "Gestion des références"
+            }
+          ]
+        },
+        "marketingBranding": {
+          "name": "Marketing et image de marque",
+          "benefit": "Créez, diffusez et mesurez l'activité de marque sans perdre en cohérence.",
+          "items": [
+            {
+              "name": "Gestion du site Web"
+            },
+            {
+              "name": "Référencement (SEO)"
+            },
+            {
+              "name": "Rédaction de contenu"
+            },
+            {
+              "name": "Publication sur les réseaux sociaux"
+            },
+            {
+              "name": "Marketing par courriel"
+            },
+            {
+              "name": "Gestion de campagnes publicitaires payantes"
+            },
+            {
+              "name": "Conception graphique (routine)"
+            },
+            {
+              "name": "Recherche de marché et concurrentielle"
+            },
+            {
+              "name": "Analytique et rapports marketing"
+            },
+            {
+              "name": "Campagnes de génération de prospects"
+            }
+          ]
+        },
+        "financeAccounting": {
+          "name": "Finances et comptabilité",
+          "benefit": "Transformez l'administration financière courante en un système opérationnel contrôlé et vérifiable.",
+          "items": [
+            {
+              "name": "Tenue de livres"
+            },
+            {
+              "name": "Comptes fournisseurs"
+            },
+            {
+              "name": "Comptes clients et facturation"
+            },
+            {
+              "name": "Traitement de la paie"
+            },
+            {
+              "name": "Rapprochement bancaire"
+            },
+            {
+              "name": "États financiers"
+            },
+            {
+              "name": "Budgétisation et prévisions"
+            },
+            {
+              "name": "Suivi des dépenses et remboursements"
+            },
+            {
+              "name": "Gestion des flux de trésorerie"
+            },
+            {
+              "name": "Rapports financiers à la direction"
+            },
+            {
+              "name": "Préparation fiscale (production validée par le client)"
+            }
+          ]
+        },
+        "hrPeople": {
+          "name": "RH et personnel",
+          "benefit": "Soutenez le cycle de vie des employés grâce à une automatisation structurée et responsable.",
+          "items": [
+            {
+              "name": "Recrutement et affichage de postes"
+            },
+            {
+              "name": "Présélection des CV"
+            },
+            {
+              "name": "Intégration"
+            },
+            {
+              "name": "Dossiers des employés"
+            },
+            {
+              "name": "Administration des avantages sociaux"
+            },
+            {
+              "name": "Formation et perfectionnement"
+            },
+            {
+              "name": "Suivi des congés"
+            },
+            {
+              "name": "Gestion des politiques du milieu de travail"
+            },
+            {
+              "name": "Départ des employés"
+            },
+            {
+              "name": "Suivi de la conformité au droit du travail"
+            }
+          ]
+        },
+        "customerService": {
+          "name": "Service à la clientèle",
+          "benefit": "Répondez plus rapidement et maintenez une expérience cohérente, de la demande initiale jusqu'au suivi.",
+          "items": [
+            {
+              "name": "Réponse aux demandes"
+            },
+            {
+              "name": "Tri et traitement des plaintes"
+            },
+            {
+              "name": "Résolution des problèmes de commande et de service"
+            },
+            {
+              "name": "Retours et remboursements"
+            },
+            {
+              "name": "Mise à jour de la FAQ et de la base de connaissances"
+            },
+            {
+              "name": "Sondages de satisfaction"
+            },
+            {
+              "name": "Suivi des billets de soutien"
+            },
+            {
+              "name": "Suivi après-vente"
+            }
+          ]
+        },
+        "operationsAdmin": {
+          "name": "Opérations et administration",
+          "benefit": "Reliez le travail quotidien qui fait avancer l'entreprise.",
+          "items": [
+            {
+              "name": "Gestion des horaires et des calendriers"
+            },
+            {
+              "name": "Classement de documents"
+            },
+            {
+              "name": "Saisie de données entre systèmes"
+            },
+            {
+              "name": "Communications internes"
+            },
+            {
+              "name": "Coordination des réunions et prise de notes"
+            },
+            {
+              "name": "Documentation des procédures normalisées (PON)"
+            },
+            {
+              "name": "Suivi des projets et des tâches"
+            },
+            {
+              "name": "Suivi des stocks et alertes de réapprovisionnement"
+            },
+            {
+              "name": "Coordination des expéditions"
+            }
+          ]
+        },
+        "itTechnology": {
+          "name": "TI et technologie",
+          "benefit": "Gardez la technologie connectée, entretenue et opérationnelle sans surcharge inutile.",
+          "items": [
+            {
+              "name": "Entretien et correctifs logiciels"
+            },
+            {
+              "name": "Gestion des licences logicielles"
+            },
+            {
+              "name": "Assistance informatique"
+            },
+            {
+              "name": "Sauvegarde des données"
+            },
+            {
+              "name": "Surveillance de base de l'hygiène cybernétique"
+            },
+            {
+              "name": "Entretien du site Web et de l'hébergement"
+            },
+            {
+              "name": "Interconnexion des outils logiciels"
+            }
+          ]
+        },
+        "procurementVendor": {
+          "name": "Approvisionnement et fournisseurs",
+          "benefit": "Apportez de la structure et de la visibilité aux achats et à la performance des fournisseurs.",
+          "items": [
+            {
+              "name": "Recherche et présélection de fournisseurs"
+            },
+            {
+              "name": "Bons de commande"
+            },
+            {
+              "name": "Gestion du réapprovisionnement et des stocks"
+            },
+            {
+              "name": "Suivi de la performance des fournisseurs"
+            }
+          ]
+        },
+        "legalCompliance": {
+          "name": "Juridique et conformité",
+          "benefit": "Suivez les obligations récurrentes et gardez les preuves organisées pour un examen responsable.",
+          "items": [
+            {
+              "name": "Suivi et dépôt des renouvellements de permis et licences"
+            },
+            {
+              "name": "Suivi de la conformité réglementaire"
+            },
+            {
+              "name": "Gestion des assurances"
+            },
+            {
+              "name": "Tenue des registres corporatifs"
+            },
+            {
+              "name": "Suivi de la conformité en matière de confidentialité et de données"
+            }
+          ]
+        },
+        "leadershipStrategy": {
+          "name": "Direction et stratégie",
+          "benefit": "Donnez à la direction une vue connectée de la performance, des occasions et des risques.",
+          "items": [
+            {
+              "name": "Tableaux de bord des indicateurs de performance (KPI)"
+            },
+            {
+              "name": "Rapports aux investisseurs et au conseil d'administration"
+            },
+            {
+              "name": "Analytique à l'échelle de l'entreprise"
+            },
+            {
+              "name": "Surveillance et signalement des risques"
+            }
+          ]
+        }
+      }
+    },
+    "pricing": {
+      "eyebrow": "OR ONE / FRAIS DU SYSTÈME",
+      "title1": "Connaissez l'investissement.",
+      "titleEmphasis": "Définissez la portée.",
+      "sub": "Des frais de construction uniques pour votre système. Des frais mensuels de base pour l'exploitation continue.",
+      "buildFeeLabel": "FRAIS DE CONSTRUCTION",
+      "monthlyFeeLabel": "FRAIS MENSUELS DE BASE DU SERVICE OR",
+      "perMonthSuffix": "/mois",
+      "note1": "Tous les frais sont en CAD. Les points mesurent la complexité de vos capacités sélectionnées et aident à déterminer le palier de votre système. La portée finale et les frais mensuels sont confirmés lors d'un examen privé.",
+      "note2": "L'outil fournit un palier préliminaire, et non un devis contraignant."
+    },
+    "control": {
+      "eyebrow": "RESPONSABILITÉ / ACTION AUTORISÉE",
+      "title1": "Vous gardez",
+      "titleEmphasis": "le contrôle.",
+      "sub": "Convenez de ce que le système peut faire, où votre équipe examine son travail et quelles actions demeurent restreintes.",
+      "rows": [
+        {
+          "number": "01",
+          "title": "Travail courant",
+          "tag": "Dans les limites convenues",
+          "copy": "La recherche, les rapports et l'administration réversible peuvent être configurés pour fonctionner selon les accès et règles approuvés."
+        },
+        {
+          "number": "02",
+          "title": "Points de révision",
+          "tag": "Votre équipe décide où",
+          "copy": "Les communications avec les clients, les ébauches de factures et les mises à jour opérationnelles nécessitent des règles d'examen et d'approbation clairement définies."
+        },
+        {
+          "number": "03",
+          "title": "Actions sensibles",
+          "tag": "Autorité explicite requise",
+          "copy": "Les paiements, la paie, les décisions d'embauche et les changements de sécurité nécessitent des contrôles et une autorisation spécifiques. La sélection d'une capacité n'accorde pas cette autorité."
+        }
+      ],
+      "footnote": "Les règles d'approbation, les limites d'accès et les responsabilités d'escalade sont convenues lors de la définition de la portée et validées avant le lancement."
+    },
+    "management": {
+      "eyebrow": "GESTION MENSUELLE / FRAIS DU SERVICE OR",
+      "title1": "Construit une fois.",
+      "titleEmphasis": "Entretenu en continu.",
+      "sub": "Les frais de construction couvrent l'ingénierie. Les frais mensuels du service OR soutiennent le système en fonction dans le cadre de votre portée convenue.",
+      "items": [
+        {
+          "title": "Surveiller",
+          "copy": "Examinez l'état des flux de travail et faites ressortir les exceptions qui nécessitent une attention."
+        },
+        {
+          "title": "Maintenir",
+          "copy": "Maintenez les intégrations et configurations approuvées à mesure que les systèmes connectés évoluent."
+        },
+        {
+          "title": "Tester",
+          "copy": "Vérifiez les flux de travail et les contrôles convenus lorsque des changements sont apportés."
+        },
+        {
+          "title": "Soutien",
+          "copy": "Aidez votre équipe à résoudre les problèmes d'exploitation grâce au processus de soutien convenu."
+        }
+      ],
+      "footnote": "La couverture, la fréquence des examens, les modalités de soutien et les frais mensuels finaux sont confirmés dans votre proposition."
+    },
+    "detailsLabels": {
+      "detailsButton": "Détails",
+      "viewWhatsIncluded": "Voir ce qui est inclus",
+      "viewDetailsFor": "Voir les détails pour",
+      "close": "Fermer",
+      "whatsIncluded": "Ce qui est inclus",
+      "whoItSuitsHeading": "À qui cela convient",
+      "illustrativeExample": "Exemple illustratif",
+      "youStayInControl": "Vous gardez le contrôle"
+    },
+    "details": {
+      "STARTER": {
+        "itemLabel": "STARTER",
+        "title": "OR ONE Starter",
+        "subtitle": "Un premier système ciblé.",
+        "intro": "Construisez un système d'automatisation connecté pour des tâches sélectionnées au sein d'une seule catégorie d'affaires, jusqu'à 30 points. Nous définissons la portée des capacités, des connexions requises et des étapes d'approbation, puis nous construisons et gérons le système convenu. Vous recevez un tableau de bord pour examiner l'activité et les décisions au sein de cette portée ciblée.",
+        "inclusions": [
+          "Jusqu'à 30 points de capacités sélectionnées, dans une seule catégorie.",
+          "Construction et configuration du flux de travail convenu.",
+          "Connexions requises identifiées lors de la définition de la portée.",
+          "Visibilité par tableau de bord et étapes d'approbation définies.",
+          "Exploitation gérée dans le cadre de la portée de service convenue."
+        ],
+        "control": "Passez en revue les résultats proposés dans le tableau de bord et approuvez les actions sensibles. Les changements aux capacités sélectionnées sont évalués en fonction de la portée, de la faisabilité et de tout travail supplémentaire; un solde de points ne constitue pas une allocation de changement illimitée.",
+        "whoItSuits": "Les entreprises qui débutent avec un flux de travail ciblé dans une seule fonction.",
+        "example": "Sélectionnez la qualification des prospects et les tâches de vente connexes dans la limite de 30 points, la combinaison exacte étant vérifiée dans l'outil.",
+        "scope": "Une seule catégorie. Les frais de construction et les frais mensuels de base du service OR sont indiqués sur la fiche du palier; la portée finale est confirmée lors de l'examen.",
+        "pointsLabel": "Jusqu'à 30 points · une catégorie"
+      },
+      "100": {
+        "itemLabel": "100",
+        "title": "OR ONE 100",
+        "subtitle": "Une portée connectée plus large.",
+        "intro": "Construisez un système coordonné en utilisant jusqu'à 100 points de capacités sélectionnées parmi les catégories d'affaires disponibles. Nous définissons comment les flux de travail sélectionnés partagent l'information, gèrent les exceptions et vous soumettent les décisions. Vous recevez un système géré et un tableau de bord organisés autour de cette combinaison convenue.",
+        "inclusions": [
+          "Jusqu'à 100 points répartis dans les catégories sélectionnées.",
+          "Flux de travail connectés et transferts de données convenus.",
+          "Construction et configuration pour la portée confirmée.",
+          "Visibilité par tableau de bord et étapes d'approbation.",
+          "Exploitation gérée dans le cadre de la portée de service convenue."
+        ],
+        "control": "Approuvez les résultats proposés et les actions sensibles selon le flux de travail convenu. Les changements sont examinés pour leur faisabilité et leur portée avant leur mise en œuvre.",
+        "whoItSuits": "Les entreprises qui relient un ensemble plus large de tâches récurrentes.",
+        "example": "Combinez des capacités sélectionnées de Ventes et de Service à la clientèle dans une limite de 100 points, afin que les dossiers de prospects et de clients soutiennent un flux de travail coordonné.",
+        "scope": "Les capacités sélectionnées déterminent la couverture; 100 points ne garantit pas qu'un département entier soit automatisé. Consultez la fiche du palier pour les frais de construction et les frais mensuels de base du service OR.",
+        "pointsLabel": "Jusqu'à 100 points"
+      },
+      "200": {
+        "itemLabel": "200",
+        "title": "OR ONE 200",
+        "subtitle": "Plus de flux de travail fonctionnant ensemble.",
+        "intro": "Construisez un système coordonné en utilisant jusqu'à 200 points répartis dans les catégories d'affaires sélectionnées. Nous concevons les connexions, la responsabilité et les étapes d'approbation nécessaires pour que les flux de travail choisis fonctionnent ensemble. Vous obtenez une visibilité consolidée de l'activité et une exploitation gérée sur l'ensemble de la portée confirmée.",
+        "inclusions": [
+          "Jusqu'à 200 points répartis dans les catégories sélectionnées.",
+          "Dossiers partagés et transferts entre flux de travail, selon la portée définie.",
+          "Construction et configuration pour la combinaison convenue.",
+          "Visibilité par tableau de bord et étapes d'approbation.",
+          "Exploitation gérée dans le cadre de la portée de service convenue."
+        ],
+        "control": "Les résultats proposés et les décisions sensibles demeurent soumis à approbation. Les changements au système sont examinés avant leur mise en œuvre.",
+        "whoItSuits": "Les entreprises qui coordonnent du travail récurrent dans plusieurs fonctions.",
+        "example": "Reliez des tâches sélectionnées de Marketing, de Ventes et de Service à la clientèle afin que l'activité des campagnes, les prospects et le suivi des clients partagent un processus convenu, dans une limite de 200 points.",
+        "scope": "La couverture dépend des capacités et des connexions sélectionnées. Consultez la fiche du palier pour les frais de construction et les frais mensuels de base du service OR.",
+        "pointsLabel": "Jusqu'à 200 points"
+      },
+      "400": {
+        "itemLabel": "400",
+        "title": "OR ONE 400",
+        "subtitle": "Une portée opérationnelle étendue.",
+        "intro": "Construisez un système coordonné plus vaste en utilisant jusqu'à 400 points parmi les catégories disponibles. Nous cartographions les processus sélectionnés, l'information partagée et les responsabilités d'approbation dans la conception opérationnelle convenue. Vous obtenez un système géré offrant une vue centrale de l'activité, des exceptions et des décisions pour l'ensemble de ces flux de travail.",
+        "inclusions": [
+          "Jusqu'à 400 points répartis dans les catégories sélectionnées.",
+          "Coordination des flux de travail et des transferts convenus.",
+          "Construction et configuration pour la portée opérationnelle confirmée.",
+          "Visibilité par tableau de bord et étapes d'approbation.",
+          "Exploitation gérée dans le cadre de la portée de service convenue."
+        ],
+        "control": "Les résultats finaux et les actions sensibles suivent les règles d'approbation convenues. Une couverture plus large ne supprime pas la responsabilité humaine ni ne permet une action sans restriction.",
+        "whoItSuits": "Les entreprises qui ont besoin d'une coordination étendue entre plusieurs fonctions.",
+        "example": "Reliez des flux de travail sélectionnés de Ventes, Finances, Service à la clientèle et Opérations dans une limite de 400 points, avec des transferts clairs et des rapports d'exception.",
+        "scope": "Ce palier ne promet pas de gérer l'ensemble de l'entreprise ou chaque département. Consultez la fiche du palier pour les frais de construction et les frais mensuels de base du service OR.",
+        "pointsLabel": "Jusqu'à 400 points"
+      }
+    },
+    "scopeItem": {
+      "notEstimatedTier": "Non estimé",
+      "preliminarySystemSuffix": "système préliminaire",
+      "capabilitiesSelected": "{count} capacités sélectionnées dans {categories} catégories.",
+      "commercialSummary": "{points} / 400 points · {standard} standard · {controlled} contrôlé · {critical} critique"
+    }
+  },
+  "ScopeTray": {
+    "launcher": "MA PORTÉE",
+    "closeAriaLabel": "Fermer le panneau de portée",
+    "headerLabel": "ORAGROL / PORTÉE PRIVÉE",
+    "selectedSuffix": "SÉLECTIONNÉ(S)",
+    "areas": {
+      "Cybersecurity": "CYBERSÉCURITÉ",
+      "Automation": "AUTOMATISATION",
+      "OR ONE": "OR ONE"
+    },
+    "empty": {
+      "label": "Commencez votre portée",
+      "heading": "Choisissez ce dont votre entreprise a besoin.",
+      "body": "Vos sélections restent regroupées entre Services, Business Automation et OR ONE."
+    },
+    "summary": {
+      "label": "PORTÉE PRÉLIMINAIRE",
+      "heading": "Une première conversation plus claire.",
+      "body": "Passez en revue vos sélections, ajoutez du contexte, puis téléchargez un PDF ou soumettez une demande d'examen privé."
+    },
+    "removeButton": "Retirer",
+    "form": {
+      "priorityLabel": "Priorité ou contexte",
+      "priorityPlaceholder": "Qu'est-ce qui devrait s'améliorer en premier?",
+      "nameLabel": "Nom",
+      "emailLabel": "Courriel professionnel",
+      "phoneLabel": "Téléphone",
+      "companyLabel": "Entreprise",
+      "timeframeLabel": "Échéancier visé",
+      "optionalSuffix": "(optionnel)",
+      "timeframeNotSpecified": "Non précisé",
+      "timeframe30Days": "Dans les 30 jours",
+      "timeframe1to3": "1 à 3 mois",
+      "timeframe3to6": "3 à 6 mois",
+      "timeframeExploring": "En exploration",
+      "disclosure": "Votre nom, vos coordonnées et la portée sélectionnée seront partagés avec ORAGROL pour préparer votre document et, si vous demandez un examen, pour assurer un suivi auprès de vous. Ceci n'est ni une soumission, ni un contrat, ni une confirmation de services.",
+      "consentLabel": "J'ai lu ce qui précède et j'accepte qu'ORAGROL communique avec moi au sujet de cette portée.",
+      "downloadButton": "Télécharger le PDF de ma portée",
+      "submittingLabel": "Envoi en cours…",
+      "preparingPdfLabel": "Préparation de votre PDF…",
+      "submitButton": "Soumettre pour examen privé",
+      "readyHint": "Entrez votre nom, votre courriel professionnel, votre téléphone et votre entreprise ci-dessus pour continuer.",
+      "pdfTimeout": "La préparation de votre PDF prend plus de temps que prévu. Veuillez réessayer sous peu."
+    },
+    "confirmation": {
+      "pdfDownloaded": "Votre PDF a été téléchargé. Référence : {reference}.",
+      "reviewReceived": "Votre demande d'examen privé a été reçue. Référence : {reference}.",
+      "downloadCopy": "Télécharger une copie du PDF de votre portée"
+    },
+    "continueBrowsing": "Continuer la navigation"
+  },
+  "Contact": {
+    "nav": {
+      "startEnquiry": "Commencer une demande",
+      "search": "Recherche",
+      "changeLanguage": "Changer de langue"
+    },
+    "hero": {
+      "eyebrow": "Contact / ORAGROL Global",
+      "title1": "Commencez par une",
+      "titleEmphasis": "conversation claire.",
+      "body": "Que vous exploriez ORAGROL Global pour une priorité précise ou pour une transformation plus coordonnée, commencez par une conversation adaptée au fonctionnement de votre entreprise.",
+      "chooseConversation": "Choisissez votre conversation"
+    },
+    "conversations": {
+      "eyebrow": "01 / Commencez ici",
+      "title1": "Choisissez votre",
+      "titleEmphasis": "conversation.",
+      "sub": "Sélectionnez l'orientation la plus proche de votre priorité actuelle. Vous pouvez ajouter du contexte avant de soumettre votre demande.",
+      "selectedLabel": "Sélectionné",
+      "selectLabel": "Sélectionner",
+      "options": [
+        {
+          "label": "Services de cybersécurité",
+          "summary": "Évaluez les risques, renforcez la protection ou répondez à une priorité de sécurité précise."
+        },
+        {
+          "label": "Business Automation",
+          "summary": "Améliorez un processus d'affaires défini grâce à une automatisation sécurisée et pratique."
+        },
+        {
+          "label": "OR ONE",
+          "summary": "Coordonnez la cybersécurité, l'automatisation et l'intelligence opérationnelle au sein d'un seul système sécurisé."
+        },
+        {
+          "label": "Partenariat ou demande générale",
+          "summary": "Discutez de partenariats, d'information sur l'entreprise ou d'une autre demande."
+        }
+      ]
+    },
+    "enquiry": {
+      "eyebrow": "02 / Votre demande",
+      "title": "Dites-nous sur quoi vous travaillez.",
+      "sub": "Partagez le résultat que vous recherchez. Nous examinerons le contexte avant de recommander une prochaine étape.",
+      "scopeAttachedLabel": "MA PORTÉE JOINTE",
+      "selectionWord": "sélection",
+      "moreSuffix": " · +{count} de plus"
+    },
+    "form": {
+      "conversationLabel": "Conversation",
+      "changeButton": "Modifier",
+      "firstName": "Prénom",
+      "lastName": "Nom de famille",
+      "businessEmail": "Courriel professionnel",
+      "emailPlaceholder": "nom@entreprise.ca",
+      "company": "Entreprise",
+      "jobTitle": "Titre du poste",
+      "companySize": "Taille de l'entreprise",
+      "selectPlaceholder": "Sélectionner",
+      "size1to10": "1 à 10 employés",
+      "size11to50": "11 à 50 employés",
+      "size51to200": "51 à 200 employés",
+      "size201plus": "201 employés et plus",
+      "achieveLabel": "Que souhaitez-vous accomplir?",
+      "achievePlaceholder": "Décrivez la priorité, le résultat ou le défi dans vos propres mots.",
+      "contactMethodLabel": "Méthode de contact préférée",
+      "methodEmail": "Courriel",
+      "methodVideo": "Appel vidéo",
+      "preferredTimeLabel": "Moment préféré pour vous joindre",
+      "preferredTimePlaceholder": "Matin, après-midi ou une date précise",
+      "consentLabel": "J'accepte qu'ORAGROL Global communique avec moi au sujet de cette demande.",
+      "submitButton": "Soumettre la demande",
+      "sendingLabel": "Envoi en cours…",
+      "errorHeading": "Un problème est survenu.",
+      "genericSubmitError": "Impossible d'envoyer votre message. Veuillez réessayer.",
+      "networkError": "Impossible d'envoyer votre message. Vérifiez votre connexion et réessayez.",
+      "downloadScopePdf": "Télécharger ma portée en PDF",
+      "downloadScopeAlert": "Ouvrez Ma portée sur Services, Business Automation ou OR ONE pour télécharger le PDF de marque actuel.",
+      "successHeading": "Merci.",
+      "successBody": "Votre demande a été envoyée à l'équipe d'ORAGROL Global pour examen. Nous visons à répondre dans un délai de deux jours ouvrables.",
+      "privacyNote": "Vos renseignements ne seront utilisés que pour examiner et répondre à votre demande."
+    },
+    "next": {
+      "eyebrow": "03 / Les prochaines étapes",
+      "title1": "Une réponse réfléchie.",
+      "titleEmphasis": "Pas un argumentaire de vente automatisé.",
+      "steps": [
+        {
+          "number": "01",
+          "title": "Examen",
+          "copy": "Nous examinons votre demande, la portée sélectionnée et les priorités énoncées."
+        },
+        {
+          "number": "02",
+          "title": "Confirmation",
+          "copy": "Vous recevez une confirmation que votre demande a été reçue."
+        },
+        {
+          "number": "03",
+          "title": "Mise en contact",
+          "copy": "Nous organisons la bonne conversation en fonction de vos besoins."
+        },
+        {
+          "number": "04",
+          "title": "Portée",
+          "copy": "Nous définissons la voie recommandée avant tout engagement."
+        }
+      ],
+      "footer": "Nous visons à accuser réception des demandes admissibles dans un délai de deux jours ouvrables."
+    },
+    "locations": {
+      "eyebrow": "04 / ORAGROL Global",
+      "title1": "Une fondation canadienne.",
+      "title2": "Des points de contact clairs.",
+      "hq": {
+        "label": "Siège social enregistré",
+        "city": "Thunder Bay",
+        "region": "Ontario · Canada"
+      },
+      "toronto": {
+        "label": "Présence à Toronto",
+        "city": "Toronto",
+        "body": "Relations avec la clientèle et développement des affaires",
+        "region": "Ontario · Canada"
+      },
+      "digital": {
+        "label": "Demandes numériques",
+        "domain": "orgro.ca",
+        "body": "Notre adresse courriel de contact approuvée @orgro.ca sera publiée dès son activation."
+      }
+    }
+  },
+  "Faq": {
+    "nav": {
+      "contactLink": "Contact"
+    },
+    "hero": {
+      "eyebrow": "ORAGROL / QUESTIONS",
+      "title1": "Des réponses claires.",
+      "titleEmphasis": "Avant de commencer.",
+      "sub": "Services, achat, soutien et notre façon de travailler — expliqués sans jargon technique inutile.",
+      "searchPlaceholder": "Rechercher des questions",
+      "searchAriaLabel": "Rechercher dans les questions fréquentes"
+    },
+    "noResults": "Aucune question correspondante. Essayez une recherche plus courte.",
+    "groups": [
+      {
+        "title": "Pour commencer",
+        "items": [
+          {
+            "q": "Comment choisir les services dont j'ai besoin?",
+            "a": "Choisissez ce que vous savez déjà nécessaire, ou utilisez l'option « Pas certain — aidez-moi à choisir ». Notre équipe vous aidera à trouver le bon point de départ sans avoir à deviner."
+          },
+          {
+            "q": "Dois-je parler à quelqu'un avant de m'inscrire?",
+            "a": "Non. Vous pouvez utiliser le courriel, le clavardage ORAGROL, le formulaire du site Web ou une rencontre en personne. Une conversation n'est nécessaire que si vous le souhaitez ou si le service exige une définition de portée personnalisée."
+          },
+          {
+            "q": "Et si je veux parler à quelqu'un avant de décider?",
+            "a": "Le clavardage ORAGROL est disponible 24 heures sur 24, 7 jours sur 7. Une personne réelle est disponible du lundi au vendredi, de 9 h à 18 h HE, selon la disponibilité."
+          }
+        ]
+      },
+      {
+        "title": "Comment vous achetez",
+        "items": [
+          {
+            "q": "Que se passe-t-il après que je vous contacte?",
+            "a": "Nous confirmons ce dont vous avez besoin et préparons une proposition couvrant la portée appropriée."
+          },
+          {
+            "q": "Comment préparez-vous une proposition?",
+            "a": "Nous utilisons les produits ou services que vous avez sélectionnés pour définir la portée, les prix et les modalités, aux fins de votre examen."
+          },
+          {
+            "q": "Que contient le contrat?",
+            "a": "Les produits ou services exacts commandés, les conditions, le montant, le mode de paiement et les responsabilités des deux parties."
+          },
+          {
+            "q": "Comment signer et confirmer?",
+            "a": "Vous examinez, signez et retournez le contrat. Nous le finalisons avant que la commande soit confirmée."
+          },
+          {
+            "q": "Quand et comment dois-je payer?",
+            "a": "Le paiement suit la signature du contrat, jamais avant. Il est dû selon les modalités qui y sont énoncées."
+          },
+          {
+            "q": "Vais-je recevoir une facture?",
+            "a": "Oui. Une fois le contrat signé et le paiement reçus, nous émettons une facture complète pour la commande."
+          }
+        ]
+      },
+      {
+        "title": "Paiement, contrats et annulation",
+        "items": [
+          {
+            "q": "Quels modes de paiement acceptez-vous?",
+            "a": "Carte ou virement bancaire, tel qu'indiqué dans votre contrat."
+          },
+          {
+            "q": "La TPS ou la TVH est-elle indiquée séparément?",
+            "a": "Oui. La taxe applicable apparaît comme une ligne distincte sur votre facture."
+          },
+          {
+            "q": "Que se passe-t-il si un paiement est en retard?",
+            "a": "Les factures sont dues dans les 30 jours. Les soldes impayés portent intérêt à 1,5 % par mois, et le service peut être suspendu lorsque le paiement accuse plus de 15 jours de retard."
+          },
+          {
+            "q": "Puis-je annuler ou modifier mes services plus tard?",
+            "a": "Oui. Avec un préavis écrit de 60 jours et aucun solde impayé, aucuns frais d'annulation ne s'appliquent. Les autres coûts d'annulation et les conditions de durée d'OR ONE sont définis dans le contrat."
+          },
+          {
+            "q": "Qu'advient-il de mes données si j'annule?",
+            "a": "Conformément à notre entente standard, les données sont retournées ou détruites de façon sécurisée dans les 30 jours, avec une attestation écrite disponible sur demande."
+          },
+          {
+            "q": "Quelles garanties offrez-vous?",
+            "a": "Les services qui prennent des mesures indiquent des délais de réponse cibles. Ils demeurent des cibles, et non des garanties, jusqu'à ce qu'ils soient éprouvés en exploitation réelle."
+          },
+          {
+            "q": "Quelles sont mes responsabilités et les vôtres?",
+            "a": "Les responsabilités des deux parties sont énoncées explicitement dans le contrat avant la signature."
+          }
+        ]
+      },
+      {
+        "title": "Comment fonctionne le service",
+        "items": [
+          {
+            "q": "S'agit-il simplement d'un rapport de sécurité?",
+            "a": "Non. La plupart des services sont conçus pour passer à l'action, tandis que certains services offrent une supervision et des conseils d'experts en continu."
+          },
+          {
+            "q": "Qui effectue le travail?",
+            "a": "La détection et l'analyse peuvent fonctionner automatiquement en tout temps. Rien ne vous parvient et aucune mesure n'est prise sans révision humaine."
+          },
+          {
+            "q": "À quelle vitesse répondez-vous à un problème réel?",
+            "a": "Chaque service qui prend des mesures a un délai de réponse cible indiqué. La cible applicable est précisée avec le service."
+          },
+          {
+            "q": "De quel accès avez-vous besoin?",
+            "a": "Principalement un accès en lecture et, pour les services qui prennent des mesures, un accès en écriture limité aux systèmes d'affaires approuvés. L'accès peut commencer de façon restreinte et s'élargir lorsque c'est approprié."
+          },
+          {
+            "q": "S'agit-il d'un service ponctuel ou continu?",
+            "a": "La plupart des services offrent une protection continue plutôt qu'une vérification ponctuelle."
+          }
+        ]
+      },
+      {
+        "title": "Ce que vous recevez",
+        "items": [
+          {
+            "q": "Que vais-je recevoir?",
+            "a": "Une visibilité claire sur les constats, les correctifs et les éléments en suspens, ainsi que des alertes urgentes. La livraison commence par des résumés écrits et des courriels, avec un tableau de bord en ligne plus complet à venir."
+          },
+          {
+            "q": "Ai-je besoin de connaissances techniques?",
+            "a": "Non. L'information est rédigée pour les propriétaires d'entreprise et les décideurs."
+          },
+          {
+            "q": "Les constats dangereux seront-ils signalés immédiatement?",
+            "a": "Oui. Les constats urgents ne sont pas retenus pour une mise à jour planifiée."
+          }
+        ]
+      },
+      {
+        "title": "Soutien technique",
+        "items": [
+          {
+            "q": "Que faire si quelque chose ne fonctionne pas?",
+            "a": "Contactez-nous par le clavardage ORAGROL ou par courriel, et notre équipe l'examinera."
+          },
+          {
+            "q": "À quelle vitesse répondez-vous aux demandes de soutien?",
+            "a": "Les problèmes urgents pour les clients actifs suivent la cible indiquée dans leur service. Les questions générales sont traitées le jour même ou le jour ouvrable suivant."
+          },
+          {
+            "q": "Offrez-vous du soutien en dehors des heures d'ouverture?",
+            "a": "Le clavardage ORAGROL est disponible 24 heures sur 24, 7 jours sur 7. Le soutien humain est offert du lundi au vendredi, de 9 h à 18 h HE, selon la disponibilité."
+          },
+          {
+            "q": "Le clavardage peut-il m'aider en cas d'incident actif si je ne suis pas client?",
+            "a": "Le clavardage peut acheminer votre message, mais il ne s'agit pas d'une intervention d'urgence en cas d'incident et cela ne crée pas de relation de service. Il ne fournit pas d'instructions de remédiation."
+          }
+        ]
+      },
+      {
+        "title": "Entreprise et confiance",
+        "items": [
+          {
+            "q": "Comment puis-je joindre ORAGROL?",
+            "a": "Utilisez le clavardage ORAGROL ou le formulaire de contact. Les boîtes de courriel des services seront publiées une fois le domaine permanent activé."
+          },
+          {
+            "q": "Où êtes-vous situés?",
+            "a": "Siège social et bureau enregistré : Thunder Bay, Ontario. Présence à Toronto : Toronto, Ontario."
+          },
+          {
+            "q": "Puis-je parler à une personne réelle?",
+            "a": "Oui, du lundi au vendredi, de 9 h à 18 h HE, selon la disponibilité."
+          },
+          {
+            "q": "Mes données sont-elles en sécurité?",
+            "a": "Nous traitons les données conformément à la loi canadienne sur la protection de la vie privée et exigeons une assurance appropriée avant d'obtenir un accès aux systèmes des clients."
+          },
+          {
+            "q": "Combien cela coûte-t-il?",
+            "a": "Les prix de départ apparaissent sur chaque page de service. Votre coût exact dépend de la portée sélectionnée en cybersécurité, en Business Automation ou en OR ONE."
+          },
+          {
+            "q": "Que se passe-t-il si nous dépassons notre forfait?",
+            "a": "Les paliers de cybersécurité et les forfaits Business Automation peuvent être mis à niveau, tandis qu'OR ONE évolue selon des besoins personnalisés."
+          },
+          {
+            "q": "Remplacez-vous notre fournisseur de services TI?",
+            "a": "Habituellement non. Nous travaillons aux côtés des fournisseurs de services TI existants ou des équipes internes, en nous concentrant sur la couche de sécurité et d'automatisation."
+          },
+          {
+            "q": "Quels secteurs desservez-vous?",
+            "a": "Nous accompagnons les petites et moyennes entreprises canadiennes dans les profils sectoriels présentés sur notre page Secteurs d'activité."
+          }
+        ]
+      }
+    ]
+  },
+  "Company": {
+    "nav": {
+      "getCyberHealthScore": "Obtenez votre Cyber Health Score",
+      "search": "Recherche",
+      "changeLanguage": "Changer de langue"
+    },
+    "hero": {
+      "eyebrow": "Entreprise / ORAGROL Global",
+      "title": "Conçu pour relier ce que les entreprises ne peuvent plus gérer séparément.",
+      "body": "ORAGROL Global relie la cybersécurité, l'automatisation intelligente et la réflexion opérationnelle à la façon dont une entreprise fonctionne réellement.",
+      "discoverStory": "Découvrez notre histoire",
+      "nameLine": "Orchestrated AI Governance, Risk, Operations and Learning."
+    },
+    "why": {
+      "eyebrow": "01 / Pourquoi ORAGROL existe",
+      "title": "La technologie devrait créer de la confiance, pas plus de complexité.",
+      "body1": "On attend des entreprises en croissance qu'elles protègent davantage de renseignements, fonctionnent avec plus de systèmes et prennent des décisions plus rapidement, souvent sans la structure de spécialistes internes dont disposent les grandes organisations.",
+      "body2": "ORAGROL part de la réalité de l'entreprise. Nous déterminons ce qui doit être protégé, quel travail peut être amélioré et où des systèmes distincts doivent fonctionner ensemble."
+    },
+    "meaning": {
+      "eyebrow": "02 / Le nom",
+      "title": "ORAGROL",
+      "tagline": "Orchestrated AI Governance, Risk, Operations and Learning.",
+      "body": "Un nom créé pour décrire une façon coordonnée de protéger, d'exploiter et d'améliorer continuellement une entreprise moderne.",
+      "terms": [
+        "Orchestrated",
+        "AI",
+        "Governance",
+        "Risk",
+        "Operations",
+        "Learning"
+      ]
+    },
+    "orange": {
+      "eyebrow": "03 / Pourquoi l'orange",
+      "title": "La couleur de la traduction, de la compréhension et de l'action.",
+      "body1": "Inspiré de l'équipe Orange en cybersécurité, l'orange représente le pont entre la perspicacité en matière de sécurité et le développement sécurisé. Il reflète la façon dont ORAGROL transforme les risques découverts en connaissances, en améliorations pratiques et en décisions plus solides.",
+      "body2": "Il est utilisé avec retenue comme signal qu'un élément important devient clair ou prêt à l'action."
+    },
+    "paths": [
+      {
+        "number": "01",
+        "title": "Protéger",
+        "body": "Comprenez votre exposition, renforcez les contrôles essentiels et intervenez avec confiance.",
+        "linkLabel": "Services de cybersécurité"
+      },
+      {
+        "number": "02",
+        "title": "Automatiser",
+        "body": "Améliorez des tâches définies où la coordination et l'exécution peuvent créer une valeur mesurable.",
+        "linkLabel": "Business Automation"
+      },
+      {
+        "number": "03",
+        "title": "Unifier",
+        "body": "Reliez les départements, les systèmes et les décisions au sein d'un seul environnement d'exploitation sécurisé.",
+        "linkLabel": "OR ONE"
+      }
+    ],
+    "founder": {
+      "portraitLabel": "Portrait du fondateur",
+      "portraitPending": "Image finale en attente",
+      "eyebrow": "04 / Fondateur",
+      "title": "Fondé sur l'expérience opérationnelle.",
+      "name": "Mohammad Chelouy Tabrizi",
+      "role": "Fondateur et chef de la direction",
+      "body1": "Mohammad a fondé sa première entreprise de cybersécurité en Iran en 2012. Diriger une véritable entreprise de sécurité et résoudre des problèmes concrets de clients ont façonné la philosophie « l'entreprise d'abord » derrière ORAGROL Global.",
+      "body2": "Sur plus de quinze ans, son travail s'est étendu à la cybersécurité, au développement de marchés régionaux, aux partenariats et aux opérations internationales. Sa formation académique comprend le génie logiciel, un MBA et un doctorat en gestion.",
+      "body3": "Il a fondé ORAGROL Global en Ontario en 2025 pour offrir aux entreprises canadiennes une cybersécurité pratique et une capacité d'exploitation intelligente, sans les obliger à assembler la solution à partir de fournisseurs déconnectés.",
+      "quote": "La technologie devrait rendre une entreprise plus claire, plus forte et plus capable. Si elle ne fait qu'ajouter de la complexité, elle n'a pas résolu le bon problème."
+    },
+    "operating": {
+      "eyebrow": "05 / Comment nous fonctionnons",
+      "title": "Dirigé par le fondateur. Soutenu par des spécialistes. Conçu pour croître de façon responsable.",
+      "body": "La stratégie, la compréhension des clients et les décisions de livraison importantes demeurent proches du fondateur. Les capacités spécialisées et les partenaires de livraison sont utilisés là où ils créent une valeur réelle, avec une autorité humaine définie pour les décisions importantes.",
+      "points": [
+        "Résultat clair",
+        "Responsabilité nommée",
+        "Approbation humaine",
+        "Preuves vérifiables"
+      ]
+    },
+    "canadian": {
+      "eyebrow": "06 / Fondation canadienne",
+      "title": "Ontario, Canada",
+      "hqLabel": "Siège social et bureau enregistré",
+      "hqCity": "Thunder Bay, Ontario",
+      "torontoLabel": "Bureau de Toronto",
+      "torontoCity": "Toronto, Ontario",
+      "body": "Le Canada est la fondation. L'Amérique du Nord est la direction. La norme demeure une réflexion pratique, une technologie responsable et des systèmes conçus autour des entreprises qu'ils servent."
+    }
+  },
+  "CyberHealth": {
+    "header": {
+      "wordmark": "ORAGROL",
+      "wordmarkSmall": "GLOBAL",
+      "introLabel": "CYBER HEALTH / ÉVALUATION CONFIDENTIELLE",
+      "profileLabel": "01 / PROFIL DE L'ENTREPRISE",
+      "qualifyLabel": "02 / CONTEXTE DE L'ENTREPRISE",
+      "resultLabel": "VOTRE RÉSULTAT"
+    },
+    "intro": {
+      "meta": "5 À 7 MINUTES · 42 QUESTIONS DE SÉCURITÉ",
+      "title1": "Sachez où vous en êtes.",
+      "titleEmphasis": "Sachez quoi faire ensuite.",
+      "body": "Établissez une base concrète couvrant l'identité, le courriel, les appareils, l'infonuagique, le personnel, les données et la gouvernance.",
+      "cta": "Commencer l'évaluation ↗"
+    },
+    "profile": {
+      "eyebrow": "ÉVALUATION CONFIDENTIELLE",
+      "title": "Parlez-nous de votre entreprise.",
+      "sub": "Ces renseignements personnalisent votre rapport. Ils n'ont aucune incidence sur votre Cyber Health Score.",
+      "fields": {
+        "company": "Nom de l'entreprise",
+        "industry": "Secteur d'activité",
+        "province": "Province",
+        "employees": "Nombre d'employés",
+        "platform": "Plateforme infonuagique",
+        "name": "Nom du contact",
+        "email": "Courriel professionnel",
+        "phone": "Téléphone"
+      },
+      "selectPlaceholder": "Sélectionner",
+      "industries": [
+        "Commerce de détail",
+        "Services professionnels",
+        "Santé",
+        "Construction",
+        "Fabrication",
+        "Hôtellerie et restauration",
+        "Organisme à but non lucratif",
+        "Autre"
+      ],
+      "provinces": [
+        "Alberta",
+        "Colombie-Britannique",
+        "Manitoba",
+        "Nouveau-Brunswick",
+        "Terre-Neuve-et-Labrador",
+        "Territoires du Nord-Ouest",
+        "Nouvelle-Écosse",
+        "Nunavut",
+        "Ontario",
+        "Île-du-Prince-Édouard",
+        "Québec",
+        "Saskatchewan",
+        "Yukon",
+        "Autre"
+      ],
+      "employeeRanges": [
+        "1 à 10",
+        "11 à 25",
+        "26 à 50",
+        "51 à 100",
+        "101 à 200"
+      ],
+      "platformOptions": [
+        "Microsoft 365",
+        "Google Workspace",
+        "Aucune des deux",
+        "Incertain"
+      ],
+      "back": "← Retour",
+      "continue": "Continuer →",
+      "disclaimer": "Vos réponses servent à créer votre rapport et à assurer le suivi. Nous ne vendons pas vos données."
+    },
+    "qualify": {
+      "eyebrow": "QUESTIONS RAPIDES",
+      "title": "Un peu de contexte.",
+      "sub": "Vos réponses nous aident à rendre la prochaine conversation pertinente. Elles n'ont aucune incidence sur votre pointage.",
+      "questions": [
+        {
+          "label": "Représentez-vous une entreprise?",
+          "choices": [
+            "Oui",
+            "Non",
+            "Incertain"
+          ]
+        },
+        {
+          "label": "Êtes-vous responsable des décisions en TI ou en cybersécurité au sein de votre entreprise?",
+          "choices": [
+            "Oui",
+            "Non",
+            "Incertain"
+          ]
+        },
+        {
+          "label": "Quel est votre budget approximatif pour améliorer la cybersécurité au cours des 12 prochains mois?",
+          "choices": [
+            "Moins de 2 000 $",
+            "2 000 $ à 10 000 $",
+            "10 000 $ et plus",
+            "Pas encore certain"
+          ]
+        },
+        {
+          "label": "Quand comptez-vous apporter des améliorations en matière de sécurité?",
+          "choices": [
+            "Immédiatement",
+            "Dans les 3 mois",
+            "Dans les 6 mois",
+            "Simple recherche pour l'instant"
+          ]
+        }
+      ],
+      "back": "← Retour",
+      "startQuestions": "Commencer les questions →"
+    },
+    "assessment": {
+      "sectionIntro": "Sélectionnez ce qui reflète le mieux la situation actuelle de l'entreprise.",
+      "sections": [
+        "Identité et accès",
+        "Courriel et appareils",
+        "Réseau et infonuagique",
+        "Personnel et accès",
+        "Gouvernance et conclusion"
+      ],
+      "answerOptions": [
+        "Oui",
+        "Non",
+        "Incertain"
+      ],
+      "questions": [
+        {
+          "text": "Chaque personne dans l'entreprise utilise-t-elle un mot de passe différent pour chaque compte professionnel, plutôt que de réutiliser le même partout?"
+        },
+        {
+          "text": "Les mots de passe par défaut sont-ils changés immédiatement lors de la configuration de nouveaux appareils ou logiciels?"
+        },
+        {
+          "text": "Les employés se connectent-ils avec un mot de passe en plus d'un code provenant de leur téléphone ou d'une application d'authentification pour le courriel et les autres comptes importants?"
+        },
+        {
+          "text": "L'authentification multifacteur (MFA) est-elle exigée pour quiconque peut accéder aux systèmes ou aux données de l'entreprise depuis l'extérieur du bureau?"
+        },
+        {
+          "text": "Votre système de courriel filtre-t-il les pourriels et les messages suspects avant qu'ils n'atteignent les boîtes de réception des employés?"
+        },
+        {
+          "text": "Les employés ont-ils reçu une formation sur la détection des courriels d'hameçonnage au cours des 12 derniers mois?"
+        },
+        {
+          "text": "Existe-t-il un moyen simple pour les employés de signaler un courriel suspect afin qu'il soit vérifié?"
+        },
+        {
+          "text": "Tous les ordinateurs de l'entreprise sont-ils munis d'un logiciel antivirus ou antimaliciel installé et actif?"
+        },
+        {
+          "text": "Les ordinateurs portables et de bureau de l'entreprise sont-ils configurés pour se verrouiller automatiquement après une courte période d'inactivité?"
+        },
+        {
+          "text": "Les mises à jour des logiciels et du système d'exploitation sont-elles installées automatiquement, ou dans les quelques jours suivant leur publication?"
+        },
+        {
+          "text": "Votre entreprise a-t-elle confirmé que tous les logiciels et le matériel actuellement utilisés reçoivent encore des mises à jour de sécurité?"
+        },
+        {
+          "text": "Les données de votre entreprise sont-elles sauvegardées automatiquement selon un calendrier régulier (quotidiennement ou plus souvent)?"
+        },
+        {
+          "text": "Une restauration de sauvegarde a-t-elle réellement été testée au cours des 12 derniers mois, et pas seulement la sauvegarde elle-même?"
+        },
+        {
+          "text": "Si un rançongiciel verrouillait tous vos fichiers demain, êtes-vous confiant que l'entreprise pourrait s'en remettre sans payer?"
+        },
+        {
+          "text": "Le réseau Wi-Fi de votre bureau est-il protégé par mot de passe et séparé de tout réseau invité?"
+        },
+        {
+          "text": "Votre entreprise utilise-t-elle un pare-feu pour aider à protéger son réseau contre les menaces externes?"
+        },
+        {
+          "text": "Les fonctions de sécurité comme la validation en deux étapes et les alertes de connexion suspecte sont-elles activées dans les paramètres d'administration de votre Google Workspace?"
+        },
+        {
+          "text": "Quelqu'un vérifie-t-il périodiquement les personnes ayant accès aux fichiers et dossiers partagés sur Google Drive?"
+        },
+        {
+          "text": "Les fonctions de sécurité comme la connexion multifacteur et les alertes de connexion suspecte sont-elles activées dans le système de courriel ou de fichiers infonuagique que vous utilisez?"
+        },
+        {
+          "text": "Quelqu'un vérifie-t-il périodiquement qui a accès aux fichiers et dossiers partagés dans votre système infonuagique?"
+        },
+        {
+          "text": "Les employés ont-ils reçu une forme quelconque de formation de sensibilisation à la cybersécurité?"
+        },
+        {
+          "text": "Existe-t-il une politique écrite simple que les employés peuvent consulter pour utiliser la technologie de l'entreprise de façon sécuritaire?"
+        },
+        {
+          "text": "Les employés n'ont-ils généralement accès qu'aux fichiers et systèmes dont ils ont réellement besoin pour leur travail?"
+        },
+        {
+          "text": "L'accès aux systèmes d'un employé est-il révoqué rapidement lorsqu'il quitte l'entreprise?"
+        },
+        {
+          "text": "Les téléphones et tablettes appartenant à l'entreprise sont-ils protégés par un code d'accès ou un verrouillage par empreinte digitale ou reconnaissance faciale?"
+        },
+        {
+          "text": "Si un appareil mobile de l'entreprise était perdu ou volé, pourrait-il être verrouillé ou effacé à distance?"
+        },
+        {
+          "text": "Les employés qui travaillent à distance se connectent-ils aux systèmes de l'entreprise par une connexion sécurisée ou VPN?"
+        },
+        {
+          "text": "Les appareils personnels utilisés pour accéder aux données de l'entreprise doivent-ils respecter des normes de sécurité de base, comme un code d'accès et des logiciels à jour?"
+        },
+        {
+          "text": "Les données sensibles de l'entreprise ou des clients sont-elles stockées uniquement dans des systèmes approuvés, plutôt que dans un courriel personnel ou un espace infonuagique personnel?"
+        },
+        {
+          "text": "Les données sensibles sont-elles chiffrées lorsqu'elles sont stockées ou envoyées à d'autres personnes?"
+        },
+        {
+          "text": "Savez-vous quels fournisseurs ou entrepreneurs externes ont actuellement accès à vos systèmes ou à vos données?"
+        },
+        {
+          "text": "Connaissez-vous les pratiques de sécurité que suivent vos fournisseurs clés pour protéger les données partagées?"
+        },
+        {
+          "text": "Votre site Web utilise-t-il le protocole HTTPS (l'icône de cadenas affichée dans la barre d'adresse du navigateur)?"
+        },
+        {
+          "text": "Votre site Web, ainsi que toute zone de connexion client, est-il maintenu à jour et surveillé?"
+        },
+        {
+          "text": "Si vous acceptez les paiements par carte, utilisez-vous un processeur de paiement conforme à la norme PCI-DSS plutôt que de conserver vous-même les données de carte?"
+        },
+        {
+          "text": "L'accès aux services bancaires en ligne et aux systèmes financiers est-il limité à un petit nombre de personnes de confiance?"
+        },
+        {
+          "text": "Votre entreprise a-t-elle un plan sur la marche à suivre en cas de soupçon de cyberattaque ou d'atteinte à la protection des données?"
+        },
+        {
+          "text": "Les employés sauraient-ils exactement qui contacter immédiatement si quelque chose semblait suspect?"
+        },
+        {
+          "text": "L'accès aux serveurs, à l'équipement réseau ou aux documents sensibles est-il restreint au personnel autorisé seulement?"
+        },
+        {
+          "text": "Les écrans d'ordinateur sont-ils verrouillés ou fermés lorsque les employés s'éloignent de leur poste de travail?"
+        },
+        {
+          "text": "Une personne ou un rôle précis a-t-il été désigné responsable des décisions en cybersécurité dans l'entreprise?"
+        },
+        {
+          "text": "Les dépenses ou les investissements en cybersécurité sont-ils révisés au moins une fois par année?"
+        },
+        {
+          "text": "Votre entreprise détient-elle actuellement une police d'assurance responsabilité cybernétique?"
+        },
+        {
+          "text": "Connaissez-vous des exigences réglementaires ou sectorielles précises qui s'appliquent à votre entreprise (par exemple, la LPRPDE ou la norme PCI-DSS)?"
+        }
+      ],
+      "back": "← Retour",
+      "nextSection": "Section suivante →",
+      "calculateScore": "Calculer le pointage →"
+    },
+    "result": {
+      "scoreLabel": "Cyber Health Score",
+      "riskTierLabel": "Niveau de risque",
+      "tierNames": {
+        "Low": "Faible",
+        "Medium": "Moyen",
+        "High": "Élevé",
+        "Critical": "Critique"
+      },
+      "nextStepLabel": "Prochaine étape recommandée",
+      "nextStepValue": "Examen confidentiel de la portée",
+      "businessFallback": "VOTRE ENTREPRISE",
+      "tierHeadlines": {
+        "Low": "Une base solide.",
+        "Medium": "Une base fonctionnelle avec des lacunes claires.",
+        "High": "Des améliorations importantes sont nécessaires.",
+        "Critical": "Commencez par l'essentiel."
+      },
+      "disclaimer": "Une base directionnelle, non une certification ni une garantie. Passez en revue les contrôles incertains ou manquants avant de décider par où commencer.",
+      "reviewAnswers": "Revoir les réponses",
+      "reportSending": "Préparation de votre rapport complet pour {email}…",
+      "reportSent": "Votre rapport complet a été envoyé à {email}.",
+      "reportErrorGeneric": "Impossible d'envoyer votre rapport. Veuillez réessayer.",
+      "reportErrorNetwork": "Impossible d'envoyer votre rapport. Vérifiez votre connexion et réessayez."
+    }
+  },
+  "Resources": {
+    "header": {
+      "getCyberHealthScore": "Obtenez votre Cyber Health Score",
+      "search": "Rechercher",
+      "changeLanguage": "Changer de langue"
+    },
+    "hero": {
+      "eyebrow": "Ressources / Intelligence ORAGROL",
+      "titleLine1": "De la clarté pour les décisions",
+      "titleLine2": "qui ne peuvent pas attendre.",
+      "body": "Une intelligence pratique en cybersécurité pour les dirigeants d'entreprises canadiennes — claire, crédible et conçue pour passer à l'action.",
+      "pathInsights": "01 / Analyses",
+      "pathGuides": "02 / Guides",
+      "pathBriefs": "03 / Notes de synthèse",
+      "cta": "Explorez les dernières analyses"
+    },
+    "essential": {
+      "label": "01 / Lectures essentielles",
+      "title": "Commencez par la clarté.",
+      "body": "Six bases concrètes pour comprendre et réduire le cyberrisque de votre entreprise."
+    },
+    "newGuides": {
+      "label": "02 / Nouveaux guides et analyses",
+      "title": "Allez plus loin.",
+      "body": "Des conseils ciblés pour la protection, l'automatisation et les opérations coordonnées."
+    },
+    "readAction": "Lire",
+    "readSuffix": "de lecture",
+    "items": [
+      {
+        "title": "Qu'est-ce que le Cyber Health Score?",
+        "type": "Article",
+        "summary": "Une explication en langage clair de ce que mesure le pointage, de son mode de calcul et de la raison pour laquelle une base de référence utile compte plus qu'une note de réussite ou d'échec."
+      },
+      {
+        "title": "MFA : le seul contrôle qui arrête la plupart des cyberattaques",
+        "type": "Article",
+        "summary": "Comment les PME canadiennes devraient prioriser l'authentification multifacteur, choisir une authentification plus robuste et éviter les erreurs de mise en œuvre courantes."
+      },
+      {
+        "title": "Récupération après un rançongiciel : ce que les PME canadiennes font mal",
+        "type": "Article",
+        "summary": "Pourquoi une sauvegarde jamais testée n'est pas un plan de récupération — et quelles lacunes corriger avant qu'une interruption ne devienne une crise."
+      },
+      {
+        "title": "Les bases de la sécurité du courriel pour les petites entreprises",
+        "type": "Article",
+        "summary": "Un programme pratique de sécurité du courriel protège la boîte de réception, le domaine de l'entreprise et les personnes qui prennent les décisions financières."
+      },
+      {
+        "title": "La cybersécurité pour les cabinets de services professionnels : un guide pratique",
+        "type": "Guide",
+        "summary": "La cybersécurité comme composante de la confiance des clients, de la continuité des activités et de la discipline opérationnelle pour les cabinets professionnels."
+      },
+      {
+        "title": "Comprendre la LPRPDE (PIPEDA) : ce qu'elle signifie pour votre entreprise",
+        "type": "Article",
+        "summary": "Là où les obligations canadiennes en matière de protection de la vie privée et les mesures pratiques de cybersécurité se rejoignent — et là où elles demeurent distinctes."
+      },
+      {
+        "title": "Liste de vérification de préparation à l'assurance cyberrisque pour les PME canadiennes",
+        "type": "Liste de vérification",
+        "summary": "Organisez les contrôles, les preuves et les renseignements opérationnels nécessaires à une demande d'assurance ou à une conversation de renouvellement plus solide."
+      },
+      {
+        "title": "Application du DMARC : de la surveillance au p=reject",
+        "type": "Guide",
+        "summary": "Passez de la simple visibilité à l'application sans bloquer par erreur des courriels professionnels légitimes."
+      },
+      {
+        "title": "Les premières 24 heures d'un cyberincident",
+        "type": "Guide d'intervention",
+        "summary": "Une structure concrète pour la première journée : commandement, confinement, preuves, communication et récupération sécuritaire."
+      },
+      {
+        "title": "Le risque fournisseur avant d'accorder l'accès",
+        "type": "Liste de vérification",
+        "summary": "Posez les bonnes questions et appliquez les bons contrôles avant qu'un fournisseur ne devienne partie intégrante de votre environnement de sécurité."
+      },
+      {
+        "title": "Une politique pratique d'utilisation de l'IA pour les entreprises canadiennes",
+        "type": "Guide de politique",
+        "summary": "Définissez les outils approuvés, les renseignements protégés, l'imputabilité humaine et les limites opérationnelles sans freiner l'expérimentation responsable."
+      },
+      {
+        "title": "Base de référence de sécurité Microsoft 365 pour une PME",
+        "type": "Liste de vérification technique",
+        "summary": "Une base de référence ciblée pour l'identité, le courriel, les appareils, la collaboration, la journalisation et la récupération dans Microsoft 365."
+      },
+      {
+        "title": "La cybersécurité pour les cabinets de comptabilité et de tenue de livres",
+        "type": "Note sectorielle",
+        "summary": "Des priorités de sécurité bâties autour du courriel de confiance, des renseignements financiers, de la comptabilité infonuagique et de l'autorité de paiement."
+      },
+      {
+        "title": "Note de synthèse sur le cyberrisque des PME canadiennes 2026",
+        "type": "Note de synthèse",
+        "summary": "Ce que les données canadiennes actuelles signifient pour les priorités de la direction, la résilience opérationnelle et l'investissement en sécurité."
+      },
+      {
+        "title": "Évaluation de préparation à l'automatisation d'entreprise",
+        "type": "Évaluation",
+        "summary": "Cinq tests pour choisir un résultat précis et à forte valeur avant d'investir dans des outils ou des intégrations."
+      },
+      {
+        "title": "Quand des automatisations séparées devraient devenir OR ONE",
+        "type": "Guide pour dirigeants",
+        "summary": "Reconnaissez le moment où plusieurs flux de travail, départements et contrôles ont besoin d'un seul système d'exploitation sécurisé et coordonné."
+      }
+    ]
+  },
+  "HowWeWork": {
+    "hero": {
+      "eyebrow": "Comment nous travaillons",
+      "title": "Une méthode claire, pas une boîte noire.",
+      "body": "Le travail de sécurité échoue lorsqu'il demeure vague. Voici exactement comment nous travaillons avec vous, étape par étape, dès la première conversation."
+    },
+    "stages": {
+      "stageLabel": "Étape {n}",
+      "items": [
+        {
+          "label": "Comprendre",
+          "copy": "Nous commençons par apprendre comment votre entreprise fonctionne réellement, et non en suivant une liste de vérification générique. Cela signifie vos systèmes, vos données, vos employés et la façon dont le travail se fait réellement au quotidien. Une recommandation fondée sur un portrait réel de votre environnement vaut bien plus qu'une recommandation fondée sur des suppositions."
+        },
+        {
+          "label": "Prioriser",
+          "copy": "Chaque constat est classé selon le risque réel et l'impact réel sur l'entreprise, et non seulement selon la gravité technique. Vous recevez une liste courte et claire de ce qui compte le plus en premier, plutôt qu'un long rapport qui ne sera jamais ouvert. Pour une entreprise en croissance, c'est ce qui transforme une révision de sécurité en quelque chose sur lequel vous pouvez réellement agir."
+        },
+        {
+          "label": "Protéger",
+          "copy": "Nous mettons en place les bons contrôles pour ce qui compte le plus, que ce soit un service précis, un changement de politique ou une surveillance continue. Notre équipe travaille aux côtés de la vôtre afin que rien ne reste un simple conseil sur papier. C'est à cette étape que le plan devient une protection réelle."
+        },
+        {
+          "label": "Améliorer",
+          "copy": "La sécurité n'est pas quelque chose que l'on met en place une seule fois et que l'on laisse ensuite de côté. Nous effectuons un suivi selon un calendrier régulier, rendons compte des progrès réels et ajustons le tir à mesure que votre entreprise et les menaces qui l'entourent évoluent. Ce qui fonctionnait l'an dernier pourrait ne plus suffire cette année, et c'est cette étape qui nous permet de suivre le rythme."
+        }
+      ]
+    },
+    "closing": {
+      "title": "Prêt à savoir exactement où vous en êtes.",
+      "cta": "Discutez avec Oragrol"
+    },
+    "cycle": {
+      "items": [
+        {
+          "label": "Comprendre",
+          "copy": "Évaluer l'entreprise, l'environnement et la posture de sécurité actuelle."
+        },
+        {
+          "label": "Prioriser",
+          "copy": "Distinguer les risques critiques de tout le reste."
+        },
+        {
+          "label": "Protéger",
+          "copy": "Appliquer la bonne combinaison de services et d'expertise."
+        },
+        {
+          "label": "Améliorer",
+          "copy": "Continuer à renforcer la posture de sécurité."
+        }
+      ]
+    }
+  },
+  "Opportunity": {
+    "srChooseOpportunity": "Choisissez votre occasion",
+    "allFieldsRequired": "Tous les champs sont obligatoires, sauf indication contraire.",
+    "optionalSuffix": "facultatif",
+    "formTitle": {
+      "career": "Présentez-vous",
+      "idea": "Partagez votre idée",
+      "talent": "Présentez votre expertise",
+      "other": "Amorcez une conversation"
+    },
+    "fields": {
+      "organizationName": "Nom de l'organisation",
+      "role": "Poste",
+      "selectRole": "Sélectionnez un poste",
+      "specialty": "Spécialité",
+      "selectSpecialty": "Sélectionnez votre spécialité",
+      "otherSpecialty": "Autre spécialité pertinente",
+      "applyingAs": "Vous postulez en tant que",
+      "individual": "Particulier",
+      "organization": "Organisation",
+      "individualSpecialist": "Spécialiste individuel",
+      "firmTeam": "Cabinet / Équipe",
+      "fullName": "Nom complet",
+      "email": "Courriel",
+      "country": "Pays",
+      "city": "Ville",
+      "phoneCountryCode": "Indicatif de pays du téléphone",
+      "phoneNumber": "Numéro de téléphone",
+      "certifications": "Certifications ou accréditation",
+      "areaOfExpertise": "Domaine d'expertise",
+      "ideaTitle": "Titre de l'idée",
+      "categoryDiscipline": "Catégorie / discipline (tout domaine est bienvenu)",
+      "proposedRegion": "Pays / région proposé",
+      "marketExperience": "Expérience du marché local",
+      "technology": "Technologie ou occasion d'intérêt",
+      "involvement": "Type de participation souhaité"
+    },
+    "descriptionLabel": {
+      "experience": "Expérience pertinente",
+      "idea": "Décrivez votre idée et la valeur qu'elle pourrait créer",
+      "expertise": "Votre expertise et comment vous aimeriez contribuer",
+      "opportunity": "Résumé de l'occasion et ce que vous apporteriez"
+    },
+    "wordsMax": "maximum",
+    "wordsShorten": "— raccourcissez votre réponse pour continuer",
+    "ideaConfidentialNote": "Veuillez fournir un aperçu non confidentiel à cette étape.",
+    "cvLabel": "CV / profil professionnel et document à l'appui",
+    "supportingDocsLabel": "Documents à l'appui (facultatif)",
+    "fileNoteBase": "Maximum de 2 fichiers PDF · 8 Mo au total",
+    "fileNoteCareerSuffix": " · Au moins un CV ou profil professionnel est requis.",
+    "privacyNoteApplication": "Nous utilisons vos renseignements pour examiner votre candidature et y répondre.",
+    "privacyNoteSubmission": "Nous utilisons vos renseignements pour examiner votre soumission et y répondre.",
+    "privacyPolicyLink": "Politique de confidentialité",
+    "termsLink": "Conditions générales",
+    "consentCareer": "Conserver ma candidature pour de futures occasions, comme décrit dans la politique de confidentialité.",
+    "consentOther": "Me contacter au sujet de futures occasions de collaboration pertinentes, comme décrit dans la politique de confidentialité.",
+    "partnershipsDisclaimer": "Soumettre une demande de renseignements n'établit ni partenariat, ni nomination de succursale, ni entente d'investissement.",
+    "submissionsNotOpen": "Les soumissions en ligne ne sont pas encore ouvertes.",
+    "submitting": "Envoi en cours…",
+    "submitApplication": "Soumettre la candidature",
+    "sendIntroduction": "Envoyer la présentation",
+    "submitEnquiry": "Soumettre la demande",
+    "errorCheckDescription": "Vérifiez la description et la pièce jointe PDF requise avant de soumettre.",
+    "successMessage": "Votre soumission a été reçue. Merci de votre intérêt.",
+    "errorGeneric": "Nous n'avons pas pu compléter votre soumission. Vos renseignements demeurent ici pour que vous puissiez réessayer.",
+    "fileErrors": {
+      "tooMany": "Choisissez au maximum 2 fichiers PDF.",
+      "onlyPdf": "Seuls les fichiers PDF sont acceptés.",
+      "tooLarge": "La taille combinée des fichiers ne doit pas dépasser 8 Mo.",
+      "empty": "Les fichiers vides ne sont pas acceptés."
+    },
+    "specialties": [
+      {
+        "title": "Testeur d'intrusion certifié",
+        "credential": "OSCP / GPEN"
+      },
+      {
+        "title": "Partenaire d'audit SOC 2",
+        "credential": "Cabinet CPA · Pratique SOC de l'AICPA"
+      },
+      {
+        "title": "Évaluateur de sécurité qualifié (QSA) PCI-DSS",
+        "credential": "Accrédité par le PCI SSC"
+      },
+      {
+        "title": "Examinateur judiciaire certifié",
+        "credential": "GCFA / GCFE"
+      }
+    ],
+    "pages": {
+      "careers": {
+        "eyebrow": "CARRIÈRES",
+        "title": "Bâtissez ce qui vient ensuite.",
+        "intro": "Joignez-vous à ORAGROL par un emploi ou un travail rémunéré à la pièce. Apportez votre expertise, votre initiative et votre engagement envers des résultats significatifs.",
+        "categories": [
+          "Ventes et croissance",
+          "Spécialistes certifiés",
+          "Postes actuellement vacants"
+        ],
+        "salesGrowth": {
+          "body": "Les candidatures sont toujours ouvertes pour les personnes capables de bâtir des relations, de développer des occasions d'affaires et d'aider les entreprises à croître."
+        },
+        "certifiedSpecialists": {
+          "title": "Spécialistes certifiés et partenaires d'audit",
+          "body": "Des occasions à la pièce pour les spécialistes indépendants et les cabinets qualifiés.",
+          "otherNote": "Toute autre expertise pertinente est la bienvenue."
+        },
+        "currentVacancies": {
+          "applyBelow": "Postulez pour un poste confirmé ci-dessous.",
+          "noneListed": "Aucun autre poste n'est actuellement affiché. Les candidatures pour les ventes et les mandats de spécialistes demeurent ouvertes."
+        }
+      },
+      "talent": {
+        "eyebrow": "TALENT",
+        "title": "Apportez votre expertise. Partagez ce qui vient ensuite.",
+        "intro": "Présentez votre expertise ou une idée qui mérite d'être explorée. C'est un espace pour une collaboration exploratoire, sans poste ou rôle de projet défini.",
+        "categories": [
+          "Partagez votre expertise",
+          "Proposez une idée"
+        ],
+        "shareExpertise": {
+          "body": "Dites-nous ce que vous faites, où vous pourriez contribuer et comment vous aimeriez collaborer."
+        },
+        "proposeIdea": {
+          "body": "Présentez un problème, une possibilité ou une nouvelle approche, ainsi que la valeur que vous croyez qu'elle pourrait créer."
+        },
+        "sharedNote": "L'IA, les agents intelligents, l'automatisation, les ventes et le marketing sont des domaines d'intérêt — pas des limites. Toutes les disciplines et idées pertinentes sont les bienvenues."
+      },
+      "partnerships": {
+        "eyebrow": "PARTENARIATS",
+        "title": "Des résultats plus solides, bâtis ensemble.",
+        "intro": "Explorez la collaboration, la croissance régionale ou l'investissement dans de nouvelles technologies. Les particuliers et organisations du Canada et de l'étranger sont les bienvenus.",
+        "categories": [
+          "Collaboration d'affaires",
+          "Régional ou succursale",
+          "Investissement technologique",
+          "Autre occasion"
+        ],
+        "businessCollaboration": {
+          "body": "Explorez une collaboration technologique, de prestation, de référencement, de distribution ou stratégique — ou une autre façon de travailler ensemble."
+        },
+        "regionalOrBranch": {
+          "body": "Manifestez votre intérêt à développer une présence d'ORAGROL dans une région canadienne ou un autre pays."
+        },
+        "technologyInvestment": {
+          "body": "Parlez-nous de votre intérêt à investir dans une nouvelle technologie ou à soutenir son développement et sa croissance."
+        },
+        "otherOpportunity": {
+          "body": "Vous avez une autre occasion en tête ? Dites-nous ce que vous aimeriez bâtir ensemble."
+        }
+      }
+    }
+  }
+}

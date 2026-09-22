@@ -1,6 +1,16 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+// Locale-aware usePathname (not the raw next/navigation one): it strips
+// the /fr prefix, returning the same canonical pathname ("/", "/services",
+// ...) regardless of which locale is being viewed. This match against
+// REDESIGNED_ROUTES below has to stay locale-agnostic — using the raw
+// next/navigation usePathname would return "/fr" on the French homepage,
+// fail every REDESIGNED_ROUTES.has() check, and wrap every redesigned
+// French page in the old SiteHeader/SiteFooter/EmergencyCta *on top of*
+// that page's own chrome (confirmed via a live dev-server diff: the French
+// homepage was rendering a duplicate header and footer the English one
+// never got, before this fix).
+import { usePathname } from "@/i18n/navigation";
 import { SiteHeader } from "./site-header";
 import { SiteFooter } from "./site-footer";
 import { EmergencyCta } from "./emergency-cta";
