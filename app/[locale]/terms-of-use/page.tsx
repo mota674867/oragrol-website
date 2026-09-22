@@ -6,28 +6,61 @@
 // Industries/Contact, above the existing breadcrumb, which stays put beneath
 // it. Terms of Use is deliberately not one of that nav's links -- it stays
 // reachable only through the footer's Legal column, same as Privacy Policy.
+//
+// Bilingual (Phase 2l, ORAGROL_Legal_Pages_FR_Translation.md): same
+// conversion as privacy-policy/page.tsx -- async Server Component, locale
+// from `params`, content from `getTermsOfUse(locale)` (see that content
+// file's own header comment), locale-aware header/breadcrumb/language-toggle
+// links, and `renderInline`'s new `isFr` param to prefix internal body links.
 
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Fragment, type ReactNode } from "react";
 import SiteFooter from "@/app/components/site/footer";
 import OragrolMegaNav from "@/app/components/site/oragrol-mega-nav";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
+import { languageAlternates } from "@/app/lib/seo";
 import "@/app/gpt-pages.css";
-import { TERMS_OF_USE, type TermsBlock } from "./ORAGROL_TermsOfUseContent";
+import { getTermsOfUse, type TermsBlock, type TermsOfUseContent } from "./ORAGROL_TermsOfUseContent";
 
-export const metadata: Metadata = {
-  title: "Terms of Use | ORAGROL Global",
-  description: "The terms governing access to and use of the ORAGROL Global website.",
-  alternates: { canonical: "/terms-of-use" },
-  robots: { index: true, follow: true },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const isFr = locale === "fr";
+  const canonicalPath = isFr ? "/fr/terms-of-use" : "/terms-of-use";
+
+  return {
+    title: isFr ? "Conditions d'utilisation | ORAGROL Global" : "Terms of Use | ORAGROL Global",
+    description: isFr
+      ? "Les conditions régissant l'accès et l'utilisation du site Web d'ORAGROL Global."
+      : "The terms governing access to and use of the ORAGROL Global website.",
+    alternates: {
+      canonical: canonicalPath,
+      languages: languageAlternates("/terms-of-use"),
+    },
+    robots: { index: true, follow: true },
+    openGraph: {
+      title: isFr ? "Conditions d'utilisation | ORAGROL Global" : "Terms of Use | ORAGROL Global",
+      description: isFr
+        ? "Les conditions régissant l'accès et l'utilisation du site Web d'ORAGROL Global."
+        : "The terms governing access to and use of the ORAGROL Global website.",
+      url: canonicalPath,
+      siteName: "ORAGROL Global",
+      locale: isFr ? "fr_CA" : "en_CA",
+      alternateLocale: isFr ? "en_CA" : "fr_CA",
+      type: "website",
+    },
+  };
+}
 
 function sectionId(number: string, title: string) {
   return `${number}-${title}`.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-function renderInline(text: string): ReactNode[] {
+function renderInline(text: string, isFr: boolean): ReactNode[] {
   const pattern = /(\*\*[^*]+\*\*|\*[^*]+\*|\[[^\]]+\]\([^)]+\)|  \n)/g;
   return text.split(pattern).filter(Boolean).map((part, index) => {
     if (part === "  \n") return <br key={index} />;
@@ -37,28 +70,39 @@ function renderInline(text: string): ReactNode[] {
     const link = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
     if (link) {
       const external = /^https?:\/\//.test(link[2]);
-      return <a key={index} href={link[2]} {...(external ? { target: "_blank", rel: "noreferrer" } : {})}>{link[1]}{external ? " ↗" : ""}</a>;
+      const href = external ? link[2] : isFr ? `/fr${link[2]}` : link[2];
+      return <a key={index} href={href} {...(external ? { target: "_blank", rel: "noreferrer" } : {})}>{link[1]}{external ? " ↗" : ""}</a>;
     }
     return <Fragment key={index}>{part}</Fragment>;
   });
 }
 
-function TermsBlocks({ blocks }: { blocks: TermsBlock[] }) {
+function TermsBlocks({ blocks, isFr }: { blocks: TermsBlock[]; isFr: boolean }) {
   return <>{blocks.map((block, index) => block.type === "paragraph"
-    ? <p key={index}>{renderInline(block.text)}</p>
-    : <ul key={index}>{block.items.map((item) => <li key={item}>{renderInline(item)}</li>)}</ul>
+    ? <p key={index}>{renderInline(block.text, isFr)}</p>
+    : <ul key={index}>{block.items.map((item) => <li key={item}>{renderInline(item, isFr)}</li>)}</ul>
   )}</>;
 }
 
-function ContentsLinks() {
-  return <nav aria-label="Terms of Use sections">{TERMS_OF_USE.sections.map((section) => (
+function ContentsLinks({ content, label }: { content: TermsOfUseContent; label: string }) {
+  return <nav aria-label={label}>{content.sections.map((section) => (
     <a href={`#${sectionId(section.number, section.title)}`} key={section.number}>
       <span>{section.number}</span><span>{section.title}</span>
     </a>
   ))}</nav>;
 }
 
-export default function TermsOfUsePage() {
+export default async function TermsOfUsePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const isFr = locale === "fr";
+  const otherLocale = isFr ? "en" : "fr";
+  const content = getTermsOfUse(locale);
+  const tocLabel = isFr ? "Sections des Conditions d'utilisation" : "Terms of Use sections";
+
   return <>
     <main className="terms-page">
       <header className="industry-header terms-header">
@@ -68,26 +112,33 @@ export default function TermsOfUsePage() {
         </Link>
         <OragrolMegaNav items={NAV_ITEMS} />
         <div>
-          <button className="search" aria-label="Search">
+          <button className="search" aria-label={isFr ? "Recherche" : "Search"}>
             <span />
           </button>
-          <button className="language">EN / FR</button>
+          <Link
+            className="language"
+            href="/terms-of-use"
+            locale={otherLocale}
+            aria-label={isFr ? "Changer de langue" : "Change language"}
+          >
+            {locale.toUpperCase()} / {otherLocale.toUpperCase()}
+          </Link>
         </div>
       </header>
 
       <header className="terms-hero">
         <div className="terms-shell">
           <nav className="terms-breadcrumb" aria-label="Breadcrumb">
-            <Link href="/">Home</Link><span>/</span><span>Legal</span><span>/</span><span aria-current="page">Terms of Use</span>
+            <Link href="/">{isFr ? "Accueil" : "Home"}</Link><span>/</span><span>{isFr ? "Mentions légales" : "Legal"}</span><span>/</span><span aria-current="page">{content.title}</span>
           </nav>
           <div className="terms-hero__layout">
             <div className="terms-hero__content">
-              <p className="terms-eyebrow">LEGAL · WEBSITE TERMS</p>
-              <h1>{TERMS_OF_USE.title}</h1>
-              <p className="terms-subtitle">{TERMS_OF_USE.subtitle}</p>
+              <p className="terms-eyebrow">{isFr ? "MENTIONS LÉGALES · CONDITIONS D'UTILISATION DU SITE" : "LEGAL · WEBSITE TERMS"}</p>
+              <h1>{content.title}</h1>
+              <p className="terms-subtitle">{content.subtitle}</p>
               <div className="terms-dates">
-                <span>EFFECTIVE {TERMS_OF_USE.effectiveDate.toUpperCase()}</span>
-                <span>LAST UPDATED {TERMS_OF_USE.lastUpdated.toUpperCase()}</span>
+                <span>{(isFr ? "EN VIGUEUR DEPUIS LE " : "EFFECTIVE ") + content.effectiveDate.toUpperCase()}</span>
+                <span>{(isFr ? "DERNIÈRE MISE À JOUR LE " : "LAST UPDATED ") + content.lastUpdated.toUpperCase()}</span>
               </div>
             </div>
             <span className="terms-hero__number" aria-hidden="true">02</span>
@@ -97,17 +148,17 @@ export default function TermsOfUsePage() {
 
       <div className="terms-content-surface">
         <div className="terms-shell terms-layout">
-          <aside className="terms-toc"><h2>ON THIS PAGE</h2><ContentsLinks /></aside>
+          <aside className="terms-toc"><h2>{isFr ? "SUR CETTE PAGE" : "ON THIS PAGE"}</h2><ContentsLinks content={content} label={tocLabel} /></aside>
           <article className="terms-document">
-            <details className="terms-toc-mobile"><summary>ON THIS PAGE <span aria-hidden="true">+</span></summary><ContentsLinks /></details>
+            <details className="terms-toc-mobile"><summary>{isFr ? "SUR CETTE PAGE" : "ON THIS PAGE"} <span aria-hidden="true">+</span></summary><ContentsLinks content={content} label={tocLabel} /></details>
             <section className="terms-plain" aria-labelledby="plain-language-heading">
-              <h2 id="plain-language-heading">IN PLAIN LANGUAGE</h2>
-              <TermsBlocks blocks={TERMS_OF_USE.plainLanguage} />
+              <h2 id="plain-language-heading">{isFr ? "EN LANGAGE SIMPLE" : "IN PLAIN LANGUAGE"}</h2>
+              <TermsBlocks blocks={content.plainLanguage} isFr={isFr} />
             </section>
-            {TERMS_OF_USE.sections.map((section) => (
+            {content.sections.map((section) => (
               <section className={`terms-section${section.number === "15" ? " terms-section--contact" : ""}`} id={sectionId(section.number, section.title)} key={section.number}>
                 <span className="terms-section__number" aria-hidden="true">{section.number}</span>
-                <div className="terms-section__body"><h2>{section.title}</h2><TermsBlocks blocks={section.blocks} /></div>
+                <div className="terms-section__body"><h2>{section.title}</h2><TermsBlocks blocks={section.blocks} isFr={isFr} /></div>
               </section>
             ))}
           </article>

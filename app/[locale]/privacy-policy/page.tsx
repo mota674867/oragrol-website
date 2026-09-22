@@ -9,26 +9,68 @@
 // beneath it, unchanged. `.privacy-header` below is this page's own tint
 // modifier, matching its titanium/graphite palette the same way
 // `.company-header`/`.res-header` match theirs.
+//
+// Bilingual (Phase 2l, ORAGROL_Legal_Pages_FR_Translation.md): converted from
+// a static server component to a locale-aware one. Kept as an (async) Server
+// Component rather than splitting into page.tsx + *-client.tsx (the pattern
+// used elsewhere) — next-intl's `Link` from `@/i18n/navigation` works fine
+// server-side, and this page needs no client interactivity beyond the
+// `<details>` mobile TOC, which needs no JS. Locale comes straight from
+// `params`, and the document content comes from `getPrivacyPolicy(locale)`
+// (see that file's own header comment for why the EN/FR text lives there,
+// not in messages/{en,fr}.json). The header wordmark/breadcrumb links now
+// use the locale-aware `Link`, the language toggle is now a real link (was
+// a dead `aria-hidden` button), and internal body links (the `/contact`
+// cross-references inside the legal text) get a manual `/fr` prefix via
+// `renderInline`'s new `isFr` param since they're rendered from arbitrary
+// markdown-ish text, not through `Link` itself.
 
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Fragment, type ReactNode } from "react";
 import SiteFooter from "@/app/components/site/footer";
 import OragrolMegaNav from "@/app/components/site/oragrol-mega-nav";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
+import { languageAlternates } from "@/app/lib/seo";
 import "@/app/gpt-pages.css";
 import {
-  PRIVACY_POLICY,
+  getPrivacyPolicy,
   type PrivacyBlock,
+  type PrivacyPolicyContent,
 } from "./ORAGROL_PrivacyPolicyContent";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy | ORAGROL Global",
-  description:
-    "How ORAGROL Global collects, uses, stores and protects personal information under applicable Canadian privacy law.",
-  alternates: { canonical: "/privacy-policy" },
-  robots: { index: true, follow: true },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const isFr = locale === "fr";
+  const canonicalPath = isFr ? "/fr/privacy-policy" : "/privacy-policy";
+
+  return {
+    title: isFr ? "Politique de confidentialité | ORAGROL Global" : "Privacy Policy | ORAGROL Global",
+    description: isFr
+      ? "Comment ORAGROL Global recueille, utilise, conserve et protège les renseignements personnels conformément à la loi canadienne applicable."
+      : "How ORAGROL Global collects, uses, stores and protects personal information under applicable Canadian privacy law.",
+    alternates: {
+      canonical: canonicalPath,
+      languages: languageAlternates("/privacy-policy"),
+    },
+    robots: { index: true, follow: true },
+    openGraph: {
+      title: isFr ? "Politique de confidentialité | ORAGROL Global" : "Privacy Policy | ORAGROL Global",
+      description: isFr
+        ? "Comment ORAGROL Global recueille, utilise, conserve et protège les renseignements personnels."
+        : "How ORAGROL Global collects, uses, stores and protects personal information.",
+      url: canonicalPath,
+      siteName: "ORAGROL Global",
+      locale: isFr ? "fr_CA" : "en_CA",
+      alternateLocale: isFr ? "en_CA" : "fr_CA",
+      type: "website",
+    },
+  };
+}
 
 function sectionId(number: string, title: string) {
   return `${number}-${title}`
@@ -37,7 +79,7 @@ function sectionId(number: string, title: string) {
     .replace(/^-|-$/g, "");
 }
 
-function renderInline(text: string): ReactNode[] {
+function renderInline(text: string, isFr: boolean): ReactNode[] {
   const pattern = /(\*\*[^*]+\*\*|\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g;
   return text.split(pattern).filter(Boolean).map((part, index) => {
     if (part.startsWith("**") && part.endsWith("**")) {
@@ -51,10 +93,11 @@ function renderInline(text: string): ReactNode[] {
     const link = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
     if (link) {
       const external = /^https?:\/\//.test(link[2]);
+      const href = external ? link[2] : isFr ? `/fr${link[2]}` : link[2];
       return (
         <a
           key={index}
-          href={link[2]}
+          href={href}
           {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
         >
           {link[1]}{external ? " ↗" : ""}
@@ -66,18 +109,18 @@ function renderInline(text: string): ReactNode[] {
   });
 }
 
-function PolicyBlocks({ blocks }: { blocks: PrivacyBlock[] }) {
+function PolicyBlocks({ blocks, isFr }: { blocks: PrivacyBlock[]; isFr: boolean }) {
   return (
     <>
       {blocks.map((block, index) => {
         if (block.type === "paragraph") {
-          return <p key={index}>{renderInline(block.text)}</p>;
+          return <p key={index}>{renderInline(block.text, isFr)}</p>;
         }
 
         if (block.type === "list") {
           return (
             <ul key={index}>
-              {block.items.map((item) => <li key={item}>{renderInline(item)}</li>)}
+              {block.items.map((item) => <li key={item}>{renderInline(item, isFr)}</li>)}
             </ul>
           );
         }
@@ -103,10 +146,10 @@ function PolicyBlocks({ blocks }: { blocks: PrivacyBlock[] }) {
   );
 }
 
-function ContentsLinks() {
+function ContentsLinks({ content, label }: { content: PrivacyPolicyContent; label: string }) {
   return (
-    <nav aria-label="Privacy Policy sections">
-      {PRIVACY_POLICY.sections.map((section) => (
+    <nav aria-label={label}>
+      {content.sections.map((section) => (
         <a href={`#${sectionId(section.number, section.title)}`} key={section.number}>
           <span>{section.number}</span>
           <span>{section.title}</span>
@@ -116,7 +159,17 @@ function ContentsLinks() {
   );
 }
 
-export default function PrivacyPolicyPage() {
+export default async function PrivacyPolicyPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const isFr = locale === "fr";
+  const otherLocale = isFr ? "en" : "fr";
+  const content = getPrivacyPolicy(locale);
+  const tocLabel = isFr ? "Sections de la Politique de confidentialité" : "Privacy Policy sections";
+
   return (
     <>
       <main className="privacy-page">
@@ -127,28 +180,35 @@ export default function PrivacyPolicyPage() {
           </Link>
           <OragrolMegaNav items={NAV_ITEMS} />
           <div>
-            <button className="search" aria-label="Search">
+            <button className="search" aria-label={isFr ? "Recherche" : "Search"}>
               <span />
             </button>
-            <button className="language">EN / FR</button>
+            <Link
+              className="language"
+              href="/privacy-policy"
+              locale={otherLocale}
+              aria-label={isFr ? "Changer de langue" : "Change language"}
+            >
+              {locale.toUpperCase()} / {otherLocale.toUpperCase()}
+            </Link>
           </div>
         </header>
 
         <header className="privacy-hero">
           <div className="privacy-shell">
             <nav className="privacy-breadcrumb" aria-label="Breadcrumb">
-              <Link href="/">Home</Link><span>/</span><span>Legal</span><span>/</span>
-              <span aria-current="page">Privacy Policy</span>
+              <Link href="/">{isFr ? "Accueil" : "Home"}</Link><span>/</span><span>{isFr ? "Mentions légales" : "Legal"}</span><span>/</span>
+              <span aria-current="page">{content.title}</span>
             </nav>
 
             <div className="privacy-hero__layout">
               <div className="privacy-hero__content">
-                <p className="privacy-eyebrow">LEGAL · PRIVACY</p>
-                <h1>{PRIVACY_POLICY.title}</h1>
-                <p className="privacy-subtitle">{PRIVACY_POLICY.subtitle}</p>
+                <p className="privacy-eyebrow">{isFr ? "MENTIONS LÉGALES · CONFIDENTIALITÉ" : "LEGAL · PRIVACY"}</p>
+                <h1>{content.title}</h1>
+                <p className="privacy-subtitle">{content.subtitle}</p>
                 <div className="privacy-dates">
-                  <span>EFFECTIVE {PRIVACY_POLICY.effectiveDate.toUpperCase()}</span>
-                  <span>LAST UPDATED {PRIVACY_POLICY.lastUpdated.toUpperCase()}</span>
+                  <span>{(isFr ? "EN VIGUEUR DEPUIS LE " : "EFFECTIVE ") + content.effectiveDate.toUpperCase()}</span>
+                  <span>{(isFr ? "DERNIÈRE MISE À JOUR LE " : "LAST UPDATED ") + content.lastUpdated.toUpperCase()}</span>
                 </div>
               </div>
               <span className="privacy-hero__number" aria-hidden="true">01</span>
@@ -158,22 +218,22 @@ export default function PrivacyPolicyPage() {
 
         <div className="privacy-shell privacy-layout">
           <aside className="privacy-toc">
-            <h2>ON THIS PAGE</h2>
-            <ContentsLinks />
+            <h2>{isFr ? "SUR CETTE PAGE" : "ON THIS PAGE"}</h2>
+            <ContentsLinks content={content} label={tocLabel} />
           </aside>
 
           <article className="privacy-document">
             <details className="privacy-toc-mobile">
-              <summary>ON THIS PAGE <span aria-hidden="true">+</span></summary>
-              <ContentsLinks />
+              <summary>{isFr ? "SUR CETTE PAGE" : "ON THIS PAGE"} <span aria-hidden="true">+</span></summary>
+              <ContentsLinks content={content} label={tocLabel} />
             </details>
 
             <section className="plain-language" aria-labelledby="plain-language-heading">
-              <h2 id="plain-language-heading">IN PLAIN LANGUAGE</h2>
-              <PolicyBlocks blocks={PRIVACY_POLICY.plainLanguage} />
+              <h2 id="plain-language-heading">{isFr ? "EN LANGAGE SIMPLE" : "IN PLAIN LANGUAGE"}</h2>
+              <PolicyBlocks blocks={content.plainLanguage} isFr={isFr} />
             </section>
 
-            {PRIVACY_POLICY.sections.map((section) => (
+            {content.sections.map((section) => (
               <section
                 className={`privacy-section${section.number === "15" ? " privacy-section--contact" : ""}`}
                 id={sectionId(section.number, section.title)}
@@ -184,7 +244,7 @@ export default function PrivacyPolicyPage() {
                 </span>
                 <div className="privacy-section__body">
                   <h2>{section.title}</h2>
-                  <PolicyBlocks blocks={section.blocks} />
+                  <PolicyBlocks blocks={section.blocks} isFr={isFr} />
                 </div>
               </section>
             ))}

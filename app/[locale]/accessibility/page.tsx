@@ -7,28 +7,67 @@
 // stays put beneath it. Accessibility is deliberately not one of that nav's
 // links -- it stays reachable only through the footer's Legal column, same
 // as the other two legal pages.
+//
+// Bilingual (Phase 2l, ORAGROL_Legal_Pages_FR_Translation.md): same
+// conversion as privacy-policy/page.tsx and terms-of-use/page.tsx -- async
+// Server Component, locale from `params`, content from
+// `getAccessibilityStatement(locale)` (see that content file's own header
+// comment), locale-aware header/breadcrumb/language-toggle/contact-card
+// links, and `renderInline`'s new `isFr` param to prefix internal body
+// links.
 
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Fragment, type ReactNode } from "react";
 import SiteFooter from "@/app/components/site/footer";
 import OragrolMegaNav from "@/app/components/site/oragrol-mega-nav";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
+import { languageAlternates } from "@/app/lib/seo";
 import "@/app/gpt-pages.css";
-import { ACCESSIBILITY_STATEMENT, type AccessibilityBlock } from "./ORAGROL_AccessibilityContent";
+import {
+  getAccessibilityStatement,
+  type AccessibilityBlock,
+  type AccessibilityStatementContent,
+} from "./ORAGROL_AccessibilityContent";
 
-export const metadata: Metadata = {
-  title: "Accessibility Statement | ORAGROL Global",
-  description: "ORAGROL Global's commitment to an accessible and inclusive website.",
-  alternates: { canonical: "/accessibility" },
-  robots: { index: true, follow: true },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const isFr = locale === "fr";
+  const canonicalPath = isFr ? "/fr/accessibility" : "/accessibility";
+
+  return {
+    title: isFr ? "Déclaration d'accessibilité | ORAGROL Global" : "Accessibility Statement | ORAGROL Global",
+    description: isFr
+      ? "L'engagement d'ORAGROL Global envers un site Web accessible et inclusif."
+      : "ORAGROL Global's commitment to an accessible and inclusive website.",
+    alternates: {
+      canonical: canonicalPath,
+      languages: languageAlternates("/accessibility"),
+    },
+    robots: { index: true, follow: true },
+    openGraph: {
+      title: isFr ? "Déclaration d'accessibilité | ORAGROL Global" : "Accessibility Statement | ORAGROL Global",
+      description: isFr
+        ? "L'engagement d'ORAGROL Global envers un site Web accessible et inclusif."
+        : "ORAGROL Global's commitment to an accessible and inclusive website.",
+      url: canonicalPath,
+      siteName: "ORAGROL Global",
+      locale: isFr ? "fr_CA" : "en_CA",
+      alternateLocale: isFr ? "en_CA" : "fr_CA",
+      type: "website",
+    },
+  };
+}
 
 function sectionId(number: string, title: string) {
   return `${number}-${title}`.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-function renderInline(text: string): ReactNode[] {
+function renderInline(text: string, isFr: boolean): ReactNode[] {
   const pattern = /(\*\*[^*]+\*\*|\*[^*]+\*|\[[^\]]+\]\([^)]+\)|  \n)/g;
   return text.split(pattern).filter(Boolean).map((part, index) => {
     if (part === "  \n") return <br key={index} />;
@@ -38,28 +77,40 @@ function renderInline(text: string): ReactNode[] {
     const link = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
     if (link) {
       const external = /^https?:\/\//.test(link[2]);
-      return <a key={index} href={link[2]} {...(external ? { target: "_blank", rel: "noreferrer" } : {})}>{link[1]}{external ? " ↗" : ""}</a>;
+      const href = external ? link[2] : isFr ? `/fr${link[2]}` : link[2];
+      return <a key={index} href={href} {...(external ? { target: "_blank", rel: "noreferrer" } : {})}>{link[1]}{external ? " ↗" : ""}</a>;
     }
     return <Fragment key={index}>{part}</Fragment>;
   });
 }
 
-function AccessibilityBlocks({ blocks }: { blocks: AccessibilityBlock[] }) {
+function AccessibilityBlocks({ blocks, isFr }: { blocks: AccessibilityBlock[]; isFr: boolean }) {
   return <>{blocks.map((block, index) => block.type === "paragraph"
-    ? <p key={index}>{renderInline(block.text)}</p>
-    : <ul key={index}>{block.items.map((item) => <li key={item}>{renderInline(item)}</li>)}</ul>
+    ? <p key={index}>{renderInline(block.text, isFr)}</p>
+    : <ul key={index}>{block.items.map((item) => <li key={item}>{renderInline(item, isFr)}</li>)}</ul>
   )}</>;
 }
 
-function ContentsLinks() {
-  return <nav aria-label="Accessibility Statement sections">{ACCESSIBILITY_STATEMENT.sections.map((section) => (
+function ContentsLinks({ content, label }: { content: AccessibilityStatementContent; label: string }) {
+  return <nav aria-label={label}>{content.sections.map((section) => (
     <a href={`#${sectionId(section.number, section.title)}`} key={section.number}>
       <span>{section.number}</span><span>{section.title}</span>
     </a>
   ))}</nav>;
 }
 
-export default function AccessibilityPage() {
+export default async function AccessibilityPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const isFr = locale === "fr";
+  const otherLocale = isFr ? "en" : "fr";
+  const content = getAccessibilityStatement(locale);
+  const tocLabel = isFr ? "Sections de la Déclaration d'accessibilité" : "Accessibility Statement sections";
+  const contactHref = isFr ? `/fr${content.contact.href}` : content.contact.href;
+
   return <>
     <main className="accessibility-page">
       <header className="industry-header accessibility-header">
@@ -69,26 +120,33 @@ export default function AccessibilityPage() {
         </Link>
         <OragrolMegaNav items={NAV_ITEMS} />
         <div>
-          <button className="search" aria-label="Search">
+          <button className="search" aria-label={isFr ? "Recherche" : "Search"}>
             <span />
           </button>
-          <button className="language">EN / FR</button>
+          <Link
+            className="language"
+            href="/accessibility"
+            locale={otherLocale}
+            aria-label={isFr ? "Changer de langue" : "Change language"}
+          >
+            {locale.toUpperCase()} / {otherLocale.toUpperCase()}
+          </Link>
         </div>
       </header>
 
       <header className="accessibility-hero">
         <div className="accessibility-shell">
           <nav className="accessibility-breadcrumb" aria-label="Breadcrumb">
-            <Link href="/">Home</Link><span>/</span><span>Legal</span><span>/</span><span aria-current="page">Accessibility Statement</span>
+            <Link href="/">{isFr ? "Accueil" : "Home"}</Link><span>/</span><span>{isFr ? "Mentions légales" : "Legal"}</span><span>/</span><span aria-current="page">{content.title}</span>
           </nav>
           <div className="accessibility-hero__layout">
             <div className="accessibility-hero__content">
-              <p className="accessibility-eyebrow">LEGAL · ACCESSIBILITY</p>
-              <h1>{ACCESSIBILITY_STATEMENT.title}</h1>
-              <p className="accessibility-subtitle">{ACCESSIBILITY_STATEMENT.subtitle}</p>
+              <p className="accessibility-eyebrow">{isFr ? "MENTIONS LÉGALES · ACCESSIBILITÉ" : "LEGAL · ACCESSIBILITY"}</p>
+              <h1>{content.title}</h1>
+              <p className="accessibility-subtitle">{content.subtitle}</p>
               <div className="accessibility-dates">
-                <span>EFFECTIVE {ACCESSIBILITY_STATEMENT.effectiveDate.toUpperCase()}</span>
-                <span>LAST UPDATED {ACCESSIBILITY_STATEMENT.lastUpdated.toUpperCase()}</span>
+                <span>{(isFr ? "EN VIGUEUR DEPUIS LE " : "EFFECTIVE ") + content.effectiveDate.toUpperCase()}</span>
+                <span>{(isFr ? "DERNIÈRE MISE À JOUR LE " : "LAST UPDATED ") + content.lastUpdated.toUpperCase()}</span>
               </div>
             </div>
             <span className="accessibility-hero__number" aria-hidden="true">03</span>
@@ -98,24 +156,24 @@ export default function AccessibilityPage() {
 
       <div className="accessibility-content-surface">
         <div className="accessibility-shell accessibility-layout">
-          <aside className="accessibility-toc"><h2>ON THIS PAGE</h2><ContentsLinks /></aside>
+          <aside className="accessibility-toc"><h2>{isFr ? "SUR CETTE PAGE" : "ON THIS PAGE"}</h2><ContentsLinks content={content} label={tocLabel} /></aside>
           <article className="accessibility-document">
-            <details className="accessibility-toc-mobile"><summary>ON THIS PAGE <span aria-hidden="true">+</span></summary><ContentsLinks /></details>
+            <details className="accessibility-toc-mobile"><summary>{isFr ? "SUR CETTE PAGE" : "ON THIS PAGE"} <span aria-hidden="true">+</span></summary><ContentsLinks content={content} label={tocLabel} /></details>
             <section className="accessibility-plain" aria-labelledby="plain-language-heading">
-              <h2 id="plain-language-heading">IN PLAIN LANGUAGE</h2>
-              <AccessibilityBlocks blocks={ACCESSIBILITY_STATEMENT.plainLanguage} />
+              <h2 id="plain-language-heading">{isFr ? "EN LANGAGE SIMPLE" : "IN PLAIN LANGUAGE"}</h2>
+              <AccessibilityBlocks blocks={content.plainLanguage} isFr={isFr} />
             </section>
-            {ACCESSIBILITY_STATEMENT.sections.map((section) => (
+            {content.sections.map((section) => (
               <section className="accessibility-section" id={sectionId(section.number, section.title)} key={section.number}>
                 <span className="accessibility-section__number" aria-hidden="true">{section.number}</span>
-                <div className="accessibility-section__body"><h2>{section.title}</h2><AccessibilityBlocks blocks={section.blocks} /></div>
+                <div className="accessibility-section__body"><h2>{section.title}</h2><AccessibilityBlocks blocks={section.blocks} isFr={isFr} /></div>
               </section>
             ))}
             <section className="accessibility-contact-card" aria-labelledby="accessibility-contact-heading">
-              <h2 id="accessibility-contact-heading">{ACCESSIBILITY_STATEMENT.contact.heading}</h2>
-              <p>{ACCESSIBILITY_STATEMENT.contact.description}</p>
-              <p className="accessibility-contact-card__location">{ACCESSIBILITY_STATEMENT.contact.location}</p>
-              <a href={ACCESSIBILITY_STATEMENT.contact.href}>{ACCESSIBILITY_STATEMENT.contact.linkLabel} <span aria-hidden="true">↗</span></a>
+              <h2 id="accessibility-contact-heading">{content.contact.heading}</h2>
+              <p>{content.contact.description}</p>
+              <p className="accessibility-contact-card__location">{content.contact.location}</p>
+              <a href={contactHref}>{content.contact.linkLabel} <span aria-hidden="true">↗</span></a>
             </section>
           </article>
         </div>

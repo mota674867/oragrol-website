@@ -5,6 +5,16 @@
 // and Terms of Use Section 01. Location intentionally stays city-level only
 // (Thunder Bay / Toronto) -- no street address is published anywhere on this
 // page.
+//
+// Bilingual (Phase 2l, ORAGROL_Legal_Pages_FR_Translation.md):
+// ACCESSIBILITY_STATEMENT_FR added below, same rationale as the other two
+// legal pages' content files (structured legal-document content kept as one
+// reviewable object per language rather than flattened into
+// messages/{en,fr}.json). NEEDS A REAL LEGAL/TRANSLATION REVIEW before being
+// treated as binding (Bill 96). Terminology: AODA kept as AODA with the
+// French title given alongside (+ "LAPHO", the term used in the doc's own
+// body translation), WCAG kept as WCAG per the doc's own note that
+// French-language accessibility resources commonly use the same acronym.
 
 export type AccessibilityBlock =
   | { type: "paragraph"; text: string }
@@ -32,7 +42,7 @@ export type AccessibilityStatementContent = {
   };
 };
 
-export const ACCESSIBILITY_STATEMENT: AccessibilityStatementContent = {
+export const ACCESSIBILITY_STATEMENT_EN: AccessibilityStatementContent = {
   title: "Accessibility Statement",
   subtitle: "Our commitment to an accessible and inclusive ORAGROL Global website.",
   effectiveDate: "September 5, 2026",
@@ -158,3 +168,134 @@ export const ACCESSIBILITY_STATEMENT: AccessibilityStatementContent = {
     location: "Thunder Bay, Ontario, Canada · Business presence: Toronto, Ontario, Canada",
   },
 };
+
+export const ACCESSIBILITY_STATEMENT_FR: AccessibilityStatementContent = {
+  title: "Déclaration d'accessibilité",
+  subtitle: "Notre engagement envers un site Web ORAGROL Global accessible et inclusif.",
+  effectiveDate: "5 septembre 2026",
+  lastUpdated: "5 septembre 2026",
+  plainLanguage: [
+    {
+      type: "paragraph",
+      text: "Nous voulons que tout le monde, y compris les personnes qui utilisent des technologies d'assistance, puisse utiliser ce site Web et profiter de son contenu et de ses services. Nous intégrons l'accessibilité au site dès le départ, mais nous ne prétendons pas à une conformité certifiée à l'heure actuelle. Si vous rencontrez un obstacle, veuillez nous en informer. Nous examinerons la question et travaillerons à fournir une solution raisonnable ou une solution de rechange accessible.",
+    },
+  ],
+  sections: [
+    {
+      number: "01",
+      title: "Notre engagement",
+      blocks: [
+        {
+          type: "paragraph",
+          text: "ORAGROL Global, le nom commercial d'Oragrol Global Inc., s'engage à offrir un site Web accessible au plus large public possible, peu importe les capacités ou la technologie utilisée pour y accéder. L'accessibilité est traitée comme une responsabilité continue, et non comme une tâche ponctuelle, et elle est prise en compte à mesure que notre site continue d'évoluer.",
+        },
+      ],
+    },
+    {
+      number: "02",
+      title: "Normes qui guident notre travail",
+      blocks: [
+        {
+          type: "paragraph",
+          text: "En tant qu'entreprise exploitée en Ontario, nous tenons compte des exigences de la *Loi de 2005 sur l'accessibilité pour les personnes handicapées de l'Ontario* (LAPHO / AODA) et de son Règlement sur les normes d'accessibilité intégrées. Le règlement utilise les Règles pour l'accessibilité des contenus Web (WCAG) 2.0, niveau AA, comme référence applicable aux sites Web pour les organisations visées par ses exigences d'accessibilité des sites Web. Notre cible interne de conception et de développement est la norme plus récente WCAG 2.1, niveau AA, qui s'appuie sur les normes WCAG 2.0, niveau AA, et les inclut.",
+        },
+        {
+          type: "paragraph",
+          text: "Nous n'avons pas encore effectué d'audit d'accessibilité formel par un tiers pour le site. Nous ne prétendons donc pas, à l'heure actuelle, que le site est entièrement conforme aux normes WCAG 2.1, niveau AA. Cette déclaration décrit nos pratiques actuelles et notre cible continue; il ne s'agit pas d'une certification ni d'une déclaration formelle de conformité.",
+        },
+      ],
+    },
+    {
+      number: "03",
+      title: "Ce que nous intégrons",
+      blocks: [
+        { type: "paragraph", text: "Lorsque cela est possible, nous nous efforçons de construire notre site avec :" },
+        {
+          type: "list",
+          items: [
+            "une structure HTML sémantique pour soutenir les lecteurs d'écran et autres technologies d'assistance;",
+            "une navigation et des contrôles accessibles au clavier, y compris les menus, les formulaires et les outils interactifs comme l'évaluation Cyber Health Score;",
+            "des états de focus visibles et un ordre de focus logique;",
+            "un texte alternatif significatif pour les images informatives;",
+            "des choix de couleurs et de contraste conçus pour favoriser la lisibilité;",
+            "des étiquettes, instructions, messages de validation et identifications d'erreurs clairs pour les formulaires; et",
+            "un contenu clair, en langage simple, conforme à notre approche générale visant à éviter le jargon inutile.",
+          ],
+        },
+      ],
+    },
+    {
+      number: "04",
+      title: "Limites connues et travaux en cours",
+      blocks: [
+        {
+          type: "paragraph",
+          text: "Notre site a fait l'objet d'une refonte importante en 2026, et l'examen de l'accessibilité de la nouvelle conception est un processus actif. Certains outils interactifs plus récents, composants tiers, documents ou pages récemment ajoutées peuvent ne pas encore répondre entièrement à notre cible WCAG 2.1, niveau AA.",
+        },
+        {
+          type: "paragraph",
+          text: "Nous examinons l'accessibilité à mesure que le site évolue et priorisons les améliorations selon leur incidence sur les utilisateurs. Lorsqu'un obstacle signalé ne peut être corrigé immédiatement, nous travaillerons avec la personne à l'origine de la demande pour trouver une solution de rechange accessible raisonnable, dans la mesure du possible.",
+        },
+      ],
+    },
+    {
+      number: "05",
+      title: "Exigences en évolution",
+      blocks: [
+        {
+          type: "paragraph",
+          text: "Les obligations en matière d'accessibilité en vertu de la loi ontarienne peuvent varier selon le type, la taille, les activités et d'autres circonstances propres à une organisation. ORAGROL surveille les exigences applicables à ses activités et mettra à jour ses politiques, ses pratiques et la présente déclaration à mesure que l'entreprise et les obligations applicables évoluent.",
+        },
+        {
+          type: "paragraph",
+          text: "Cette déclaration est une description publique de notre approche en matière d'accessibilité du site Web. Elle ne vise pas à remplacer toute politique, tout plan, tout dossier de formation, tout rapport de conformité ou tout autre document en matière d'accessibilité qui pourrait être exigé par la loi applicable.",
+        },
+      ],
+    },
+    {
+      number: "06",
+      title: "Signalez-nous un obstacle à l'accessibilité",
+      blocks: [
+        {
+          type: "paragraph",
+          text: "Si vous éprouvez de la difficulté à utiliser le site, ou si un contenu ou une fonctionnalité ne vous est pas accessible, veuillez nous contacter par l'entremise de notre [page Contact](/contact) et commencer votre message par **« Demande d'accessibilité »**.",
+        },
+        {
+          type: "paragraph",
+          text: "Dans la mesure du possible, précisez la page ou la fonctionnalité concernée, une description de l'obstacle, ainsi que le navigateur, l'appareil ou la technologie d'assistance que vous utilisiez. Vous n'êtes pas tenu de divulguer un handicap ou de fournir des renseignements qui ne sont pas nécessaires à la compréhension de la demande. Nous accuserons réception de vos commentaires sur l'accessibilité, les examinerons et travaillerons à répondre dans un délai raisonnable, selon la nature et la complexité de la question.",
+        },
+      ],
+    },
+    {
+      number: "07",
+      title: "Formats accessibles et aides à la communication",
+      blocks: [
+        {
+          type: "paragraph",
+          text: "Si vous avez besoin des renseignements du site dans un format accessible ou d'une aide à la communication, contactez-nous par l'entremise de la [page Contact](/contact) et commencez votre message par **« Demande d'accessibilité »**. Nous nous entretiendrons avec vous pour comprendre vos besoins et travaillerons à fournir un format ou une aide adéquate dans un délai raisonnable, dans la mesure du possible.",
+        },
+      ],
+    },
+    {
+      number: "08",
+      title: "Modifications à cette déclaration",
+      blocks: [
+        {
+          type: "paragraph",
+          text: "Nous examinerons et mettrons à jour cette déclaration à mesure que le site, nos pratiques en matière d'accessibilité et les exigences applicables évoluent. La date de **« Dernière mise à jour »** en haut de cette page indique la révision la plus récente.",
+        },
+      ],
+    },
+  ],
+  contact: {
+    heading: "Commentaires sur l'accessibilité — ORAGROL Global",
+    description: "Pour des commentaires sur l'accessibilité, des signalements d'obstacles, des formats accessibles ou des demandes d'aide à la communication, commencez votre message par « Demande d'accessibilité ».",
+    linkLabel: "Soumettre une demande d'accessibilité",
+    href: "/contact",
+    location: "Thunder Bay, Ontario, Canada · Présence d'affaires : Toronto, Ontario, Canada",
+  },
+};
+
+export function getAccessibilityStatement(locale: string): AccessibilityStatementContent {
+  return locale === "fr" ? ACCESSIBILITY_STATEMENT_FR : ACCESSIBILITY_STATEMENT_EN;
+}
