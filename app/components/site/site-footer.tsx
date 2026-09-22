@@ -1,4 +1,7 @@
-import { Link } from "@/i18n/navigation";
+"use client";
+
+import { useLocale } from "next-intl";
+import { Link, usePathname } from "@/i18n/navigation";
 import { Container, Grid, NavLink, Section, Text } from "../ui";
 import { OragrolLogo } from "../brand/oragrol-logo";
 import { LinkedInIcon, InstagramIcon } from "./social-icons";
@@ -69,6 +72,14 @@ function FooterNavColumn({ label, links }: { label: string; links: { label: stri
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
+  // Bilingual (Phase 2j): same fix as SiteHeader's own "EN | FR" -- a
+  // real, working locale switch instead of a static label. Nav-link
+  // labels (Company/Resources/Legal columns) stay English on both
+  // locales, matching the site-wide convention.
+  const locale = useLocale();
+  const isFr = locale === "fr";
+  const otherLocale = isFr ? "en" : "fr";
+  const pathname = usePathname();
 
   return (
     <Section environment="dark" as="footer">
@@ -79,7 +90,9 @@ export function SiteFooter() {
               <OragrolLogo height={36} />
             </Link>
             <Text size="sm" tone="secondary" className="max-w-sm">
-              Cybersecurity clarity for modern businesses.
+              {isFr
+                ? "Une clarté en cybersécurité pour les entreprises modernes."
+                : "Cybersecurity clarity for modern businesses."}
             </Text>
             <div className="flex items-center gap-4 pt-2">
               <a
@@ -100,7 +113,14 @@ export function SiteFooter() {
               >
                 <InstagramIcon className="h-5 w-5" />
               </a>
-              <span className="font-body text-sm text-text-secondary">EN | FR</span>
+              <Link
+                href={pathname}
+                locale={otherLocale}
+                className="font-body text-sm text-text-secondary transition-colors duration-150 hover:text-accent"
+                aria-label={isFr ? "Changer de langue" : "Change language"}
+              >
+                {locale.toUpperCase()} | {otherLocale.toUpperCase()}
+              </Link>
             </div>
           </div>
 
@@ -111,7 +131,9 @@ export function SiteFooter() {
 
         <div className="mt-12 border-t border-border pt-6">
           <Text size="sm" tone="muted">
-            © {year} Oragrol Global. All rights reserved.
+            {isFr
+              ? `© ${year} Oragrol Global. Tous droits réservés.`
+              : `© ${year} Oragrol Global. All rights reserved.`}
           </Text>
         </div>
       </Container>

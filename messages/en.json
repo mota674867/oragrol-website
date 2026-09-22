@@ -2551,5 +2551,57 @@
         "summary": "Recognize when several workflows, departments and controls need one coordinated secure operating system."
       }
     ]
+  },
+  "HowWeWork": {
+    "hero": {
+      "eyebrow": "How We Work",
+      "title": "A clear method, not a black box.",
+      "body": "Security work fails when it stays vague. Here is exactly how we work with you, stage by stage, from the first conversation onward."
+    },
+    "stages": {
+      "stageLabel": "Stage {n}",
+      "items": [
+        {
+          "label": "Understand",
+          "copy": "We start by learning how your business actually operates, not by running through a generic checklist. That means your systems, your data, your people, and the way work really gets done every day. A recommendation built on a real picture of your environment is worth far more than one built on assumptions."
+        },
+        {
+          "label": "Prioritize",
+          "copy": "Every finding is ranked by real risk and real business impact, not just technical severity. You receive a short, clear list of what matters most first, instead of a lengthy report that never gets opened. For a growing business, this is what turns a security review into something you can actually act on."
+        },
+        {
+          "label": "Protect",
+          "copy": "We put the right controls in place for what matters most, whether that means a specific service, a policy change, or ongoing monitoring. Our team works alongside yours so nothing is left as advice sitting on a page. This is where the plan becomes real protection."
+        },
+        {
+          "label": "Improve",
+          "copy": "Security is not something you set up once and leave alone. We check in on a regular schedule, report on real progress, and adjust as your business and the threats around it change. What worked last year may not be enough this year, and this stage is how we keep pace."
+        }
+      ]
+    },
+    "closing": {
+      "title": "Ready to see exactly where you stand.",
+      "cta": "Talk to Oragrol"
+    },
+    "cycle": {
+      "items": [
+        {
+          "label": "Understand",
+          "copy": "Assess the business, environment and current security posture."
+        },
+        {
+          "label": "Prioritize",
+          "copy": "Separate critical risks from everything else."
+        },
+        {
+          "label": "Protect",
+          "copy": "Apply the right combination of services and expertise."
+        },
+        {
+          "label": "Improve",
+          "copy": "Continue strengthening security posture."
+        }
+      ]
+    }
   }
 }

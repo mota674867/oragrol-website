@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Caption, Text } from "../../ui";
 import { GlowEffect } from "../services/glow-effect";
 
@@ -47,11 +50,11 @@ import { GlowEffect } from "../services/glow-effect";
  * actual page copy block, not yet supplied.
  */
 
-const STAGES = [
-  { n: "01", label: "Understand", copy: "Assess the business, environment and current security posture.", angle: 270 },
-  { n: "02", label: "Prioritize", copy: "Separate critical risks from everything else.", angle: 0 },
-  { n: "03", label: "Protect", copy: "Apply the right combination of services and expertise.", angle: 90 },
-  { n: "04", label: "Improve", copy: "Continue strengthening security posture.", angle: 180 },
+const STAGE_STRUCTURE = [
+  { n: "01", angle: 270 },
+  { n: "02", angle: 0 },
+  { n: "03", angle: 90 },
+  { n: "04", angle: 180 },
 ] as const;
 
 const CX = 260;
@@ -74,12 +77,16 @@ function arcPath(fromAngle: number, toAngle: number): string {
   return `M ${x1},${y1} A ${R},${R} 0 0 1 ${x2},${y2}`;
 }
 
-const ARCS = STAGES.map((stage, i) => {
-  const next = STAGES[(i + 1) % STAGES.length];
+const ARCS = STAGE_STRUCTURE.map((stage, i) => {
+  const next = STAGE_STRUCTURE[(i + 1) % STAGE_STRUCTURE.length];
   return { id: `${stage.n}-${next.n}`, d: arcPath(stage.angle, next.angle) };
 });
 
 export function HowWeWorkCycleVisual({ className }: { className?: string }) {
+  const t = useTranslations("HowWeWork.cycle");
+  const items = t.raw("items") as { label: string; copy: string }[];
+  const STAGES = STAGE_STRUCTURE.map((s, i) => ({ ...s, ...items[i] }));
+
   return (
     <div
       className={

@@ -2551,5 +2551,57 @@
         "summary": "Reconnaissez le moment où plusieurs flux de travail, départements et contrôles ont besoin d'un seul système d'exploitation sécurisé et coordonné."
       }
     ]
+  },
+  "HowWeWork": {
+    "hero": {
+      "eyebrow": "Comment nous travaillons",
+      "title": "Une méthode claire, pas une boîte noire.",
+      "body": "Le travail de sécurité échoue lorsqu'il demeure vague. Voici exactement comment nous travaillons avec vous, étape par étape, dès la première conversation."
+    },
+    "stages": {
+      "stageLabel": "Étape {n}",
+      "items": [
+        {
+          "label": "Comprendre",
+          "copy": "Nous commençons par apprendre comment votre entreprise fonctionne réellement, et non en suivant une liste de vérification générique. Cela signifie vos systèmes, vos données, vos employés et la façon dont le travail se fait réellement au quotidien. Une recommandation fondée sur un portrait réel de votre environnement vaut bien plus qu'une recommandation fondée sur des suppositions."
+        },
+        {
+          "label": "Prioriser",
+          "copy": "Chaque constat est classé selon le risque réel et l'impact réel sur l'entreprise, et non seulement selon la gravité technique. Vous recevez une liste courte et claire de ce qui compte le plus en premier, plutôt qu'un long rapport qui ne sera jamais ouvert. Pour une entreprise en croissance, c'est ce qui transforme une révision de sécurité en quelque chose sur lequel vous pouvez réellement agir."
+        },
+        {
+          "label": "Protéger",
+          "copy": "Nous mettons en place les bons contrôles pour ce qui compte le plus, que ce soit un service précis, un changement de politique ou une surveillance continue. Notre équipe travaille aux côtés de la vôtre afin que rien ne reste un simple conseil sur papier. C'est à cette étape que le plan devient une protection réelle."
+        },
+        {
+          "label": "Améliorer",
+          "copy": "La sécurité n'est pas quelque chose que l'on met en place une seule fois et que l'on laisse ensuite de côté. Nous effectuons un suivi selon un calendrier régulier, rendons compte des progrès réels et ajustons le tir à mesure que votre entreprise et les menaces qui l'entourent évoluent. Ce qui fonctionnait l'an dernier pourrait ne plus suffire cette année, et c'est cette étape qui nous permet de suivre le rythme."
+        }
+      ]
+    },
+    "closing": {
+      "title": "Prêt à savoir exactement où vous en êtes.",
+      "cta": "Discutez avec Oragrol"
+    },
+    "cycle": {
+      "items": [
+        {
+          "label": "Comprendre",
+          "copy": "Évaluer l'entreprise, l'environnement et la posture de sécurité actuelle."
+        },
+        {
+          "label": "Prioriser",
+          "copy": "Distinguer les risques critiques de tout le reste."
+        },
+        {
+          "label": "Protéger",
+          "copy": "Appliquer la bonne combinaison de services et d'expertise."
+        },
+        {
+          "label": "Améliorer",
+          "copy": "Continuer à renforcer la posture de sécurité."
+        }
+      ]
+    }
   }
 }
