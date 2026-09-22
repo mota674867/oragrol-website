@@ -1,158 +1,138 @@
 "use client";
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { Link, usePathname } from "@/i18n/navigation";
 import { ScopeTray, useScope } from "@/app/components/ScopeTray";
 import PreFooterCta from "@/app/components/site/pre-footer-cta";
 import SiteFooter from "@/app/components/site/footer";
 import OragrolMegaNav from "@/app/components/site/oragrol-mega-nav";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
-import { DetailsDialog } from "@/app/components/DetailsDialog";
-import { baDetailsContent } from "@/app/lib/ba-details-content";
+import { DetailsDialog, type DetailsDialogLabels } from "@/app/components/DetailsDialog";
 import "@/app/gpt-pages.css";
 
-type Job = {
-  id: string;
-  index: string;
-  name: string;
-  short: string;
-  outcome: string;
-  fit: string;
-  build: string;
-  monthly: string;
-  tools: string;
-  accent: string;
-};
-const jobs: Job[] = [
-  {
-    id: "sales-flow",
-    index: "01",
-    name: "Sales",
-    short: "Sales",
-    outcome:
-      "Capture, qualify and follow every opportunity—from first enquiry to a clean handoff and close.",
-    fit: "Teams losing leads between inboxes, spreadsheets and CRM follow-up.",
-    build: "$9,500",
-    monthly: "$2,200/mo",
-    tools: "Your CRM, email, calendar and proposal tools.",
-    accent: "Revenue flow",
-  },
-  {
-    id: "customer-support",
-    index: "02",
-    name: "Customer Service",
-    short: "Customer Service",
-    outcome:
-      "Respond faster, route requests correctly and keep every customer conversation moving.",
-    fit: "Teams handling repeat questions, slow routing or inconsistent support across channels.",
-    build: "$7,000",
-    monthly: "$2,800/mo",
-    tools: "Your helpdesk, shared inbox, knowledge base and messaging tools.",
-    accent: "Service continuity",
-  },
-  {
-    id: "operational-intelligence",
-    index: "03",
-    name: "Finance",
-    short: "Finance",
-    outcome:
-      "Bring scattered business data into one dependable view for reporting, alerts and decisions.",
-    fit: "Leaders waiting on manual reports or making decisions from disconnected systems.",
-    build: "$7,500",
-    monthly: "$3,500/mo",
-    tools: "Your accounting, CRM, operations and reporting tools.",
-    accent: "Decision clarity",
-  },
-  {
-    id: "managed-it",
-    index: "04",
-    name: "IT",
-    short: "IT",
-    outcome:
-      "Add an AI-driven IT operations and monitoring layer for routine device, account, ticket and infrastructure work.",
-    fit: "Growing businesses that need operational coordination and monitoring, not a full break-fix helpdesk MSP.",
-    build: "$4,000",
-    monthly: "$700/mo base + $110/user/mo",
-    tools: "Your Microsoft 365, ticketing, device and infrastructure tools.",
-    accent: "AI-driven operations · not full managed IT",
-  },
-  {
-    id: "customer-growth",
-    index: "05",
-    name: "Marketing",
-    short: "Marketing",
-    outcome:
-      "Strengthen onboarding, retention, reactivation and revenue opportunities across the customer lifecycle.",
-    fit: "Businesses with valuable customers but inconsistent follow-up after the first sale.",
-    build: "$7,000",
-    monthly: "$4,500/mo",
-    tools: "Your CRM, billing, email and customer-success tools.",
-    accent: "Customer value",
-  },
-  {
-    id: "tailored",
-    index: "06",
-    name: "Tailored Automation",
-    short: "One bounded outcome",
-    outcome:
-      "Design one focused automation around an operational job that does not fit the five defined systems.",
-    fit: "Businesses with a clear, measurable requirement that needs private scoping.",
-    build: "Privately scoped",
-    monthly: "Confirmed after scoping",
-    tools: "Designed around the approved tools your business already uses.",
-    accent: "Purpose-built",
-  },
+/**
+ * Bilingual (D-086, Task #21): rewired to consume the `BusinessAutomation`
+ * namespace in messages/{en,fr}.json instead of hardcoded English —
+ * same pattern as home-client.tsx and services-client.tsx. The 6 jobs'
+ * stable identity (id, index, build/monthly prices, tools-list) stays in
+ * `jobIds`/`jobMeta` below; every display string is resolved through
+ * `t()` at render time using that job's id as the key, so English and
+ * French can never drift into different job orderings or prices.
+ *
+ * The DetailsDialog deep content (What's included / You stay in control
+ * / Who it suits / Illustrative example) IS translated this pass —
+ * unlike Services' still-deferred details accordion, the approved
+ * translation doc (ORAGROL_BusinessAutomation_FR_Translation.md)
+ * actually covers this content, so `messages.BusinessAutomation.details`
+ * carries the full bilingual set and DetailsDialog's own chrome labels
+ * (`detailsLabels`) are passed through too. See DetailsDialog.tsx's own
+ * comment for why those labels are optional props defaulting to English
+ * — this page is the first caller to actually pass translated ones.
+ */
+
+type JobId =
+  | "sales-flow"
+  | "customer-support"
+  | "operational-intelligence"
+  | "managed-it"
+  | "customer-growth"
+  | "tailored";
+
+const jobIds: JobId[] = [
+  "sales-flow",
+  "customer-support",
+  "operational-intelligence",
+  "managed-it",
+  "customer-growth",
+  "tailored",
 ];
+
+// Stable, language-neutral facts: index/build/monthly (currency-
+// formatted at render time per locale) and which job has DetailsDialog
+// content at all (all 6 do here).
+const jobMeta: Record<JobId, { index: string; buildCAD: number; monthlyLabel: { en: string; fr: string } }> = {
+  "sales-flow": { index: "01", buildCAD: 9500, monthlyLabel: { en: "$2,200/mo", fr: "2 200 $/mois" } },
+  "customer-support": { index: "02", buildCAD: 7000, monthlyLabel: { en: "$2,800/mo", fr: "2 800 $/mois" } },
+  "operational-intelligence": { index: "03", buildCAD: 7500, monthlyLabel: { en: "$3,500/mo", fr: "3 500 $/mois" } },
+  "managed-it": {
+    index: "04",
+    buildCAD: 4000,
+    monthlyLabel: { en: "$700/mo base + $110/user/mo", fr: "700 $/mois de base + 110 $/utilisateur/mois" },
+  },
+  "customer-growth": { index: "05", buildCAD: 7000, monthlyLabel: { en: "$4,500/mo", fr: "4 500 $/mois" } },
+  tailored: { index: "06", buildCAD: 0, monthlyLabel: { en: "Confirmed after scoping", fr: "Confirmé après l'établissement de la portée" } },
+};
+
+const money = (value: number, locale: string) =>
+  locale === "fr" ? `${value.toLocaleString("fr-CA")} $` : `$${value.toLocaleString("en-CA")}`;
+
 function BusinessAutomationClient() {
+  const t = useTranslations("BusinessAutomation");
+  const locale = useLocale();
+  const otherLocale = locale === "fr" ? "en" : "fr";
   const pathname = usePathname();
   const [active, setActive] = useState(0);
   const [trayOpen, setTrayOpen] = useState(false);
   const scope = useScope();
-  const job = jobs[active];
+  const activeId = jobIds[active];
+
+  const detailsLabels: DetailsDialogLabels = {
+    detailsButton: t("detailsLabels.detailsButton"),
+    viewWhatsIncluded: t("detailsLabels.viewWhatsIncluded"),
+    viewDetailsFor: t("detailsLabels.viewDetailsFor"),
+    close: t("detailsLabels.close"),
+    whatsIncluded: t("detailsLabels.whatsIncluded"),
+    whoItSuitsHeading: t("detailsLabels.whoItSuitsHeading"),
+    illustrativeExample: t("detailsLabels.illustrativeExample"),
+  };
 
   // Deep-link support for the nav dropdown's per-job links
-  // (/business-automation#ba-job-<id>) — selects the matching job on load.
-  // Deliberately an effect, not a lazy useState initializer: window.location
-  // isn't available during SSR, and computing this eagerly on the client's
-  // first render would mismatch the server-rendered markup. Running it
-  // post-mount, after hydration, is the correct pattern here.
+  // (/business-automation#ba-job-<id>) — selects the matching job on
+  // load. Deliberately an effect, not a lazy useState initializer:
+  // window.location isn't available during SSR, and computing this
+  // eagerly on the client's first render would mismatch the
+  // server-rendered markup. Running it post-mount, after hydration, is
+  // the correct pattern here.
   useEffect(() => {
     const match = window.location.hash.match(/^#ba-job-(.+)$/);
     if (!match) return;
-    const index = jobs.findIndex((j) => j.id === match[1]);
+    const index = jobIds.findIndex((id) => id === match[1]);
     // eslint-disable-next-line react-hooks/set-state-in-effect -- see comment above
     if (index >= 0) setActive(index);
   }, []);
-  const scopeItem = (j: Job) => ({
-    id: `automation:${j.id}`,
-    area: "Automation" as const,
-    code: j.index,
-    title: j.name,
-    detail: j.outcome,
-    commercial: `Build Fee ${j.build} / Monthly Management ${j.monthly}`,
-  });
+
+  const buildFeeDisplay = (id: JobId) =>
+    id === "tailored" ? t("jobs.tailored.kickerTag") : money(jobMeta[id].buildCAD, locale);
+
+  const scopeItem = (id: JobId) => {
+    const meta = jobMeta[id];
+    const commercial = `${t("jobFacts.buildFee")} ${buildFeeDisplay(id)} / ${t("jobFacts.monthlyManagement")} ${meta.monthlyLabel[locale === "fr" ? "fr" : "en"]}`;
+    return {
+      id: `automation:${id}`,
+      area: "Automation" as const,
+      code: meta.index,
+      title: t(`jobs.${id}.name`),
+      detail: t(`jobs.${id}.outcome`),
+      commercial,
+    };
+  };
 
   // Reconcile stale cart data: a returning visitor may have an
-  // `automation:<id>` item added under the pre-2026-09-08 job names
-  // (e.g. "Lead-to-Close Automation" is now "Sales"). Same id — job.id is
-  // unchanged, so this still correctly reads as "already added", no
-  // duplicate — but the stored title/detail/commercial were frozen at
-  // add-time and won't update on their own. Patch them in place on mount
-  // so the ScopeTray, any submitted enquiry and the downloaded PDF show
-  // the current name rather than a stale one. Same pattern as the
-  // /services Virtual CISO reconciliation.
+  // `automation:<id>` item added under a previous job name or in the
+  // other language. Same id (job id is unchanged, still reads as
+  // "already added"), but title/detail/commercial were frozen at
+  // add-time. Patch them in place on mount so the ScopeTray, any
+  // submitted enquiry and the downloaded PDF reflect the current
+  // locale's copy. Runs once per hydration (length-based dep). Same
+  // pattern as the /services Virtual CISO reconciliation.
   useEffect(() => {
-    const canonical = new Map(jobs.map((j) => [`automation:${j.id}`, j]));
+    const canonical = new Map(jobIds.map((id) => [`automation:${id}`, id]));
     let changed = false;
     const next = scope.items.map((item) => {
-      const current = canonical.get(item.id);
-      if (!current) return item;
-      const fresh = scopeItem(current);
-      if (
-        item.title === fresh.title &&
-        item.detail === fresh.detail &&
-        item.commercial === fresh.commercial
-      ) {
+      const id = canonical.get(item.id);
+      if (!id) return item;
+      const fresh = scopeItem(id);
+      if (item.title === fresh.title && item.detail === fresh.detail && item.commercial === fresh.commercial) {
         return item;
       }
       changed = true;
@@ -162,12 +142,13 @@ function BusinessAutomationClient() {
       scope.setItems(next);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scope.items.length]);
+  }, [scope.items.length, locale]);
 
-  const toggleScope = (j: Job) => {
-    scope.toggle(scopeItem(j));
+  const toggleScope = (id: JobId) => {
+    scope.toggle(scopeItem(id));
     setTrayOpen(true);
   };
+
   return (
     <main className="ba-full-page ba-jobs-page">
       <header className="ba-header">
@@ -177,146 +158,136 @@ function BusinessAutomationClient() {
         </Link>
         <OragrolMegaNav items={NAV_ITEMS} activePath={pathname} />
         <div className="header-actions">
-          <button
-            className="scope-nav-button"
-            onClick={() => setTrayOpen(true)}
-          >
-            My Scope <b>{scope.items.length}</b>
+          <button className="scope-nav-button" onClick={() => setTrayOpen(true)}>
+            {t("nav.myScope")} <b>{scope.items.length}</b>
           </button>
           <Link className="score-link" href="/cyber-health">
-            Get Cyber Health Score
+            {t("nav.getCyberHealthScore")}
           </Link>
-          <button className="search" aria-label="Search">
+          <button className="search" aria-label={t("nav.search")}>
             <span />
           </button>
-          <button className="language">EN / FR</button>
+          <Link className="language" href={pathname} locale={otherLocale} aria-label={t("nav.changeLanguage")}>
+            {locale.toUpperCase()} / {otherLocale.toUpperCase()}
+          </Link>
         </div>
       </header>
       <section className="ba-hero" aria-labelledby="ba-title">
         <div className="ba-mark" aria-hidden="true">
           <span className="ba-or">OR</span>
           <span className="ba-five">5</span>
-          <small>Five defined automation jobs</small>
+          <small>{t("hero.markLabel")}</small>
         </div>
         <div className="ba-content">
           <div className="ba-meta">
-            <span>Business Automation</span>
-            <span>Built around measurable outcomes</span>
+            <span>{t("hero.meta1")}</span>
+            <span>{t("hero.meta2")}</span>
           </div>
           <div className="ba-statement">
             <h1 id="ba-title">
-              Automate the work<span>that&apos;s capping your growth.</span>
+              {t("hero.title1")}
+              <span>{t("hero.title2")}</span>
             </h1>
             <div className="ba-support">
-              <p>
-                BA transforms individual business functions through focused,
-                tailored automation. It works with your existing software to
-                improve sales, marketing, customer service, finance or
-                IT—reducing manual work and delivering measurable results.
-              </p>
+              <p>{t("hero.support")}</p>
               <a href="#job-selector">
-                Explore five systems + tailored <span>↘</span>
+                {t("hero.exploreLink")} <span>↘</span>
               </a>
             </div>
           </div>
           <div className="ba-footer">
             <div>
-              {jobs.slice(0, 5).map((j) => (
-                <b key={j.id}>
-                  <i>{j.index}</i>
-                  {j.short}
+              {jobIds.slice(0, 5).map((id) => (
+                <b key={id}>
+                  <i>{jobMeta[id].index}</i>
+                  {t(`jobs.${id}.short`)}
                 </b>
               ))}
             </div>
-            <span>No new platform required</span>
+            <span>{t("hero.noPlatform")}</span>
           </div>
         </div>
       </section>
       <section className="job-selector" id="job-selector">
         <div className="job-selector-head">
-          <p>OR5 / Choose the outcome</p>
+          <p>{t("jobSelector.eyebrow")}</p>
           <h2>
-            Five jobs.
+            {t("jobSelector.title1")}
             <br />
-            <span>One clear result each.</span>
+            <span>{t("jobSelector.title2")}</span>
           </h2>
-          <p>
-            Select a job to understand the outcome, fit and commercial
-            structure. Add any relevant job to My Scope.
-          </p>
+          <p>{t("jobSelector.sub")}</p>
         </div>
         <div className="job-stage">
           <nav>
-            {jobs.map((j, i) => (
+            {jobIds.map((id, i) => (
               <button
-                id={`ba-job-${j.id}`}
+                id={`ba-job-${id}`}
                 className={active === i ? "active" : ""}
                 onClick={() => setActive(i)}
-                key={j.id}
+                key={id}
               >
-                <span>{j.index}</span>
-                <b>{j.name}</b>
-                <small>{j.short}</small>
+                <span>{jobMeta[id].index}</span>
+                <b>{t(`jobs.${id}.name`)}</b>
+                <small>{t(`jobs.${id}.short`)}</small>
               </button>
             ))}
           </nav>
-          <article className={job.id === "tailored" ? "tailored-job" : ""}>
+          <article className={activeId === "tailored" ? "tailored-job" : ""}>
             <div className="job-kicker">
               <span>
-                {job.index} / {job.accent}
+                {jobMeta[activeId].index} / {t(`jobs.${activeId}.accent`)}
               </span>
-              <small>
-                {job.id === "tailored"
-                  ? "Privately scoped"
-                  : "Defined automation job"}
-              </small>
+              <small>{t(`jobs.${activeId}.kickerTag`)}</small>
             </div>
-            <h3>{job.name}</h3>
-            <p className="job-outcome">{job.outcome}</p>
-            {baDetailsContent[job.id] && (
-              <DetailsDialog
-                category="BUSINESS AUTOMATION"
-                {...baDetailsContent[job.id]}
-                action={{
-                  label: scope.has(`automation:${job.id}`) ? "Added to My Scope ✓" : "Check My Fit · Add to Scope",
-                  onClick: () => toggleScope(job),
-                  disabled: false,
-                }}
-              />
-            )}
+            <h3>{t(`jobs.${activeId}.name`)}</h3>
+            <p className="job-outcome">{t(`jobs.${activeId}.outcome`)}</p>
+            <DetailsDialog
+              category={t("hero.meta1")}
+              itemLabel={t(`details.${activeId}.itemLabel`)}
+              title={t(`details.${activeId}.title`)}
+              subtitle={t(`details.${activeId}.subtitle`)}
+              intro={t(`details.${activeId}.intro`)}
+              inclusions={t.raw(`details.${activeId}.inclusions`) as string[]}
+              controlHeading={t("detailsLabels.youStayInControl")}
+              control={t(`details.${activeId}.control`)}
+              whoItSuits={t(`details.${activeId}.whoItSuits`)}
+              example={t(`details.${activeId}.example`)}
+              scope={t(`details.${activeId}.scope`)}
+              labels={detailsLabels}
+              action={{
+                label: scope.has(`automation:${activeId}`) ? t("scopeAdd.added") : t("scopeAdd.add"),
+                onClick: () => toggleScope(activeId),
+                disabled: false,
+              }}
+            />
             <div className="job-facts">
               <div>
-                <span>Ideal fit</span>
-                <p>{job.fit}</p>
+                <span>{t("jobFacts.idealFit")}</span>
+                <p>{t(`jobs.${activeId}.fit`)}</p>
               </div>
               <div>
-                <span>Works through</span>
-                <p>{job.tools}</p>
+                <span>{t("jobFacts.worksThrough")}</span>
+                <p>{t(`jobs.${activeId}.tools`)}</p>
               </div>
             </div>
             <div className="job-commercial">
               <div>
-                <span>Build Fee</span>
-                <strong>{job.build}</strong>
-                <small>One-time design, configuration and connection.</small>
+                <span>{t("jobFacts.buildFee")}</span>
+                <strong>{buildFeeDisplay(activeId)}</strong>
+                <small>{t("jobFacts.buildFeeNote")}</small>
               </div>
               <div>
-                <span>Monthly Management</span>
-                <strong>{job.monthly}</strong>
-                <small>Monitoring, maintenance and ongoing improvement.</small>
+                <span>{t("jobFacts.monthlyManagement")}</span>
+                <strong>{jobMeta[activeId].monthlyLabel[locale === "fr" ? "fr" : "en"]}</strong>
+                <small>{t("jobFacts.monthlyManagementNote")}</small>
               </div>
             </div>
             <button
-              className={
-                scope.has(`automation:${job.id}`)
-                  ? "scope-add added"
-                  : "scope-add"
-              }
-              onClick={() => toggleScope(job)}
+              className={scope.has(`automation:${activeId}`) ? "scope-add added" : "scope-add"}
+              onClick={() => toggleScope(activeId)}
             >
-              {scope.has(`automation:${job.id}`)
-                ? "Added to My Scope ✓"
-                : "Check My Fit · Add to Scope"}
+              {scope.has(`automation:${activeId}`) ? t("scopeAdd.added") : t("scopeAdd.add")}
               <span>↗</span>
             </button>
           </article>
@@ -329,92 +300,78 @@ function BusinessAutomationClient() {
               job's full detail panel at a time; without this, the
               other 5 jobs' descriptions wouldn't exist in the page at
               all unless that job is the active selection. */}
-          {jobs
-            .filter((j) => j.id !== job.id)
-            .map((j) =>
-              baDetailsContent[j.id] ? (
-                <span
-                  key={j.id}
-                  style={{
-                    position: "absolute",
-                    width: "1px",
-                    height: "1px",
-                    padding: 0,
-                    margin: "-1px",
-                    overflow: "hidden",
-                    clipPath: "inset(50%)",
-                    whiteSpace: "nowrap",
-                    border: 0,
+          {jobIds
+            .filter((id) => id !== activeId)
+            .map((id) => (
+              <span
+                key={id}
+                style={{
+                  position: "absolute",
+                  width: "1px",
+                  height: "1px",
+                  padding: 0,
+                  margin: "-1px",
+                  overflow: "hidden",
+                  clipPath: "inset(50%)",
+                  whiteSpace: "nowrap",
+                  border: 0,
+                }}
+              >
+                <DetailsDialog
+                  category={t("hero.meta1")}
+                  itemLabel={t(`details.${id}.itemLabel`)}
+                  title={t(`details.${id}.title`)}
+                  subtitle={t(`details.${id}.subtitle`)}
+                  intro={t(`details.${id}.intro`)}
+                  inclusions={t.raw(`details.${id}.inclusions`) as string[]}
+                  controlHeading={t("detailsLabels.youStayInControl")}
+                  control={t(`details.${id}.control`)}
+                  whoItSuits={t(`details.${id}.whoItSuits`)}
+                  example={t(`details.${id}.example`)}
+                  scope={t(`details.${id}.scope`)}
+                  labels={detailsLabels}
+                  action={{
+                    label: scope.has(`automation:${id}`) ? t("scopeAdd.added") : t("scopeAdd.add"),
+                    onClick: () => toggleScope(id),
+                    disabled: false,
                   }}
-                >
-                  <DetailsDialog
-                    category="BUSINESS AUTOMATION"
-                    {...baDetailsContent[j.id]}
-                    action={{
-                      label: scope.has(`automation:${j.id}`) ? "Added to My Scope ✓" : "Check My Fit · Add to Scope",
-                      onClick: () => toggleScope(j),
-                      disabled: false,
-                    }}
-                  />
-                </span>
-              ) : null,
-            )}
+                />
+              </span>
+            ))}
         </div>
-        <p className="commercial-note">
-          Prices are shown in Canadian dollars. API usage, software subscriptions
-          and third-party infrastructure remain the client&apos;s responsibility and
-          are not included.
-        </p>
+        <p className="commercial-note">{t("jobSelector.commercialNote")}</p>
       </section>
       <section className="existing-tools">
         <div>
-          <p>Built around your reality</p>
+          <p>{t("existingTools.eyebrow")}</p>
           <h2>
-            Your tools stay.
+            {t("existingTools.title1")}
             <br />
-            <span>The work moves.</span>
+            <span>{t("existingTools.title2")}</span>
           </h2>
         </div>
         <div>
-          <p>
-            ORAGROL&apos;s automation engine works through the systems your
-            business already uses. Your team continues working in its CRM,
-            inbox, helpdesk, accounting and collaboration tools—without being
-            forced onto a new platform.
-          </p>
+          <p>{t("existingTools.body")}</p>
           <div className="tool-line">
-            <span>CRM</span>
+            <span>{t("existingTools.tool1")}</span>
             <i>→</i>
-            <span>Inbox</span>
+            <span>{t("existingTools.tool2")}</span>
             <i>→</i>
-            <span>Operations</span>
+            <span>{t("existingTools.tool3")}</span>
             <i>→</i>
-            <span>Reporting</span>
+            <span>{t("existingTools.tool4")}</span>
           </div>
         </div>
       </section>
       <section className="ba-job-journey">
-        <p>How it starts</p>
+        <p>{t("journey.eyebrow")}</p>
         <div>
-          {[
-            [
-              "01",
-              "Assess",
-              "Confirm the job, expected outcome and current tools.",
-            ],
-            [
-              "02",
-              "Design",
-              "Map the workflow, controls and measures of success.",
-            ],
-            ["03", "Build", "Connect and configure the approved automation."],
-            ["04", "Operate", "Monitor, maintain and improve the live job."],
-          ].map((x, i) => (
-            <article key={x[0]}>
-              <span>{x[0]}</span>
+          {([0, 1, 2, 3] as const).map((i) => (
+            <article key={i}>
+              <span>{String(i + 1).padStart(2, "0")}</span>
               <div>
-                <h3>{x[1]}</h3>
-                <p>{x[2]}</p>
+                <h3>{t(`journey.steps.${i}.title`)}</h3>
+                <p>{t(`journey.steps.${i}.body`)}</p>
               </div>
               {i < 3 && <i>→</i>}
             </article>
@@ -423,34 +380,28 @@ function BusinessAutomationClient() {
       </section>
       <section className="fee-explainer" id="packages">
         <div>
-          <p>Two fees. Two responsibilities.</p>
+          <p>{t("feeExplainer.eyebrow")}</p>
           <h2>
-            Built once.
+            {t("feeExplainer.title1")}
             <br />
-            <span>Looked after continuously.</span>
+            <span>{t("feeExplainer.title2")}</span>
           </h2>
         </div>
         <div className="fee-pair">
           <article>
-            <span>01 / Build Fee</span>
-            <h3>Connect it to how you work.</h3>
-            <p>
-              The one-time fee covers design, configuration, integration,
-              testing and launch within the agreed scope.
-            </p>
+            <span>{t("feeExplainer.buildLabel")}</span>
+            <h3>{t("feeExplainer.buildTitle")}</h3>
+            <p>{t("feeExplainer.buildBody")}</p>
           </article>
           <article>
-            <span>02 / Monthly Management</span>
-            <h3>Keep it dependable.</h3>
-            <p>
-              The recurring fee covers monitoring, maintenance and responsible
-              improvement as your operating environment changes.
-            </p>
+            <span>{t("feeExplainer.monthlyLabel")}</span>
+            <h3>{t("feeExplainer.monthlyTitle")}</h3>
+            <p>{t("feeExplainer.monthlyBody")}</p>
           </article>
         </div>
       </section>
       <PreFooterCta page="business-automation" />
-      <SiteFooter/>
+      <SiteFooter />
       <ScopeTray
         items={scope.items}
         remove={scope.remove}

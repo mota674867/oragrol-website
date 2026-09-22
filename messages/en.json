@@ -61,11 +61,26 @@
       "headline2": "Then coordinated action.",
       "sub": "Move across the sequence to see how ORAGROL turns business context into practical progress.",
       "ariaSelect": "ORAGROL working method",
-      "understand": { "name": "Understand", "line": "See the business clearly before prescribing technology." },
-      "prioritize": { "name": "Prioritize", "line": "Focus attention and investment where they create the greatest value." },
-      "protect": { "name": "Protect", "line": "Apply the right security controls, services and oversight." },
-      "automate": { "name": "Automate", "line": "Improve defined work through practical, responsible automation." },
-      "evolve": { "name": "Evolve", "line": "Strengthen the system as the business changes." }
+      "understand": {
+        "name": "Understand",
+        "line": "See the business clearly before prescribing technology."
+      },
+      "prioritize": {
+        "name": "Prioritize",
+        "line": "Focus attention and investment where they create the greatest value."
+      },
+      "protect": {
+        "name": "Protect",
+        "line": "Apply the right security controls, services and oversight."
+      },
+      "automate": {
+        "name": "Automate",
+        "line": "Improve defined work through practical, responsible automation."
+      },
+      "evolve": {
+        "name": "Evolve",
+        "line": "Strengthen the system as the business changes."
+      }
     },
     "cybersecurity": {
       "eyebrow": "Cybersecurity",
@@ -125,15 +140,42 @@
       "footerLine3": "Built for what's next.",
       "footerStrong": "COAST TO COAST TO COAST",
       "list": {
-        "professionalServices": { "name": "Professional Services", "risk": "Protect client data, communication and trust." },
-        "healthcare": { "name": "Healthcare", "risk": "Strengthen privacy, access and operational resilience." },
-        "financialServices": { "name": "Financial Services", "risk": "Reduce fraud, regulatory and transaction exposure." },
-        "retail": { "name": "Retail & E-commerce", "risk": "Protect payments, customers and digital revenue." },
-        "manufacturing": { "name": "Manufacturing", "risk": "Secure connected operations and production continuity." },
-        "technology": { "name": "Technology", "risk": "Protect cloud environments, products and intellectual property." },
-        "construction": { "name": "Construction & Real Estate", "risk": "Secure payments, mobile teams and partner access." },
-        "education": { "name": "Education", "risk": "Prioritize protection across users, data and shared systems." },
-        "otherSmbs": { "name": "Other Canadian SMBs", "risk": "Shape protection around the way your business operates." }
+        "professionalServices": {
+          "name": "Professional Services",
+          "risk": "Protect client data, communication and trust."
+        },
+        "healthcare": {
+          "name": "Healthcare",
+          "risk": "Strengthen privacy, access and operational resilience."
+        },
+        "financialServices": {
+          "name": "Financial Services",
+          "risk": "Reduce fraud, regulatory and transaction exposure."
+        },
+        "retail": {
+          "name": "Retail & E-commerce",
+          "risk": "Protect payments, customers and digital revenue."
+        },
+        "manufacturing": {
+          "name": "Manufacturing",
+          "risk": "Secure connected operations and production continuity."
+        },
+        "technology": {
+          "name": "Technology",
+          "risk": "Protect cloud environments, products and intellectual property."
+        },
+        "construction": {
+          "name": "Construction & Real Estate",
+          "risk": "Secure payments, mobile teams and partner access."
+        },
+        "education": {
+          "name": "Education",
+          "risk": "Prioritize protection across users, data and shared systems."
+        },
+        "otherSmbs": {
+          "name": "Other Canadian SMBs",
+          "risk": "Shape protection around the way your business operates."
+        }
       }
     }
   },
@@ -192,10 +234,22 @@
       "addToScope": "Add to My Scope",
       "addedToScope": "Added to My Scope",
       "list": {
-        "foundation": { "value": "Establish your core protection.", "fit": "Businesses putting essential security controls around their people, devices and everyday work." },
-        "advanced": { "value": "Extend visibility and strengthen access.", "fit": "Businesses that need broader monitoring, access governance and oversight of vendors and compliance needs." },
-        "comprehensive": { "value": "Connect protection across your environment.", "fit": "Businesses with cloud workloads, applications and data that require a wider, coordinated scope of protection." },
-        "elite": { "value": "Bring protection and response together.", "fit": "Businesses seeking the broadest package scope, including managed threat response, security response and data monitoring." }
+        "foundation": {
+          "value": "Establish your core protection.",
+          "fit": "Businesses putting essential security controls around their people, devices and everyday work."
+        },
+        "advanced": {
+          "value": "Extend visibility and strengthen access.",
+          "fit": "Businesses that need broader monitoring, access governance and oversight of vendors and compliance needs."
+        },
+        "comprehensive": {
+          "value": "Connect protection across your environment.",
+          "fit": "Businesses with cloud workloads, applications and data that require a wider, coordinated scope of protection."
+        },
+        "elite": {
+          "value": "Bring protection and response together.",
+          "fit": "Businesses seeking the broadest package scope, including managed threat response, security response and data monitoring."
+        }
       }
     },
     "serviceNames": {
@@ -240,18 +294,42 @@
       "addToScope": "Add to My Scope",
       "addedToScope": "Added to My Scope",
       "list": {
-        "C01-S04": { "line": "Security leadership to guide priorities, decisions and oversight." },
-        "C07-S04": { "line": "Bring security practices into your software delivery process." },
-        "C08-S03": { "line": "Coordinate how personal information is handled and protected." },
-        "C09-S01": { "line": "Assess security risks in your AI use and identify practical next steps." },
-        "C09-S02": { "line": "Define responsibilities and manage risks around business use of AI." },
-        "C05-S03": { "line": "Strengthen oversight of accounts with elevated permissions." },
-        "C05-S05": { "line": "Apply identity and context checks to access decisions." },
-        "C06-S04": { "line": "Strengthen network controls across your cloud environment." },
-        "C09-S03": { "line": "Address security risks affecting AI models and their use." },
-        "C09-S04": { "line": "Protect sensitive information used by AI systems and workflows." },
-        "C09-S05": { "line": "Identify and address threats involving your AI environment." },
-        "C07-S05": { "line": "Test an application's security and prioritize the findings." }
+        "C01-S04": {
+          "line": "Security leadership to guide priorities, decisions and oversight."
+        },
+        "C07-S04": {
+          "line": "Bring security practices into your software delivery process."
+        },
+        "C08-S03": {
+          "line": "Coordinate how personal information is handled and protected."
+        },
+        "C09-S01": {
+          "line": "Assess security risks in your AI use and identify practical next steps."
+        },
+        "C09-S02": {
+          "line": "Define responsibilities and manage risks around business use of AI."
+        },
+        "C05-S03": {
+          "line": "Strengthen oversight of accounts with elevated permissions."
+        },
+        "C05-S05": {
+          "line": "Apply identity and context checks to access decisions."
+        },
+        "C06-S04": {
+          "line": "Strengthen network controls across your cloud environment."
+        },
+        "C09-S03": {
+          "line": "Address security risks affecting AI models and their use."
+        },
+        "C09-S04": {
+          "line": "Protect sensitive information used by AI systems and workflows."
+        },
+        "C09-S05": {
+          "line": "Identify and address threats involving your AI environment."
+        },
+        "C07-S05": {
+          "line": "Test an application's security and prioritize the findings."
+        }
       }
     },
     "specialists": {
@@ -262,10 +340,335 @@
       "priceNote": "All fees in CAD. Starting fees apply to a defined scope. Final scope and fees are confirmed in your proposal.",
       "discussEngagement": "Discuss Your Engagement",
       "list": {
-        "C10-S01": { "line": "A scoped engagement to test for exploitable weaknesses and prioritize remediation." },
-        "C10-S02": { "line": "An engagement with a qualified CPA audit partner, scoped to your organization and reporting needs." },
-        "C10-S03": { "line": "A scoped assessment with a qualified QSA for your payment environment." },
-        "C10-S04": { "line": "Specialist forensic investigation and incident response, with scope agreed for the incident." }
+        "C10-S01": {
+          "line": "A scoped engagement to test for exploitable weaknesses and prioritize remediation."
+        },
+        "C10-S02": {
+          "line": "An engagement with a qualified CPA audit partner, scoped to your organization and reporting needs."
+        },
+        "C10-S03": {
+          "line": "A scoped assessment with a qualified QSA for your payment environment."
+        },
+        "C10-S04": {
+          "line": "Specialist forensic investigation and incident response, with scope agreed for the incident."
+        }
+      }
+    }
+  },
+  "SharedCta": {
+    "home": {
+      "eyebrow": "Clarity before complexity",
+      "headline": "Cybersecurity protection. Intelligent business automation. OR ONE coordinated system.",
+      "secondaryLabel": "Explore What ORAGROL Does"
+    },
+    "services": {
+      "eyebrow": "Your clearest next step",
+      "headline": "The right protection begins with understanding what matters most.",
+      "secondaryLabel": "Build Your Scope"
+    },
+    "business-automation": {
+      "eyebrow": "Your clearest next step",
+      "headline": "Find where time is being lost and where intelligent automation can create measurable value.",
+      "secondaryLabel": "Explore Automation Packages"
+    },
+    "or-one": {
+      "eyebrow": "Begin privately",
+      "headline": "Bring security, automation and operational intelligence into one coordinated system.",
+      "secondaryLabel": "Explore OR ONE"
+    },
+    "industries": {
+      "eyebrow": "Your clearest next step",
+      "headline": "Protection works better when it reflects how your industry actually operates.",
+      "secondaryLabel": "Find Your Industry"
+    },
+    "resources": {
+      "eyebrow": "One useful starting point",
+      "headline": "Turn credible insight into clearer decisions and practical action.",
+      "secondaryLabel": "Explore Our Resources"
+    },
+    "company": {
+      "eyebrow": "One clear starting point",
+      "headline": "Discover the thinking, experience and purpose behind ORAGROL Global.",
+      "secondaryLabel": "Start a Conversation"
+    },
+    "contact": {
+      "eyebrow": "One clear starting point",
+      "headline": "Start with clarity. We will help you identify the most valuable next step.",
+      "secondaryLabel": "Submit an Enquiry"
+    },
+    "faq": {
+      "eyebrow": "Still have a question?",
+      "headline": "Still looking for clarity? Let us help you find the right answer.",
+      "secondaryLabel": "Contact ORAGROL"
+    },
+    "getCyberHealthScore": "Get Your Cyber Health Score"
+  },
+  "BusinessAutomation": {
+    "nav": {
+      "myScope": "My Scope",
+      "getCyberHealthScore": "Get Cyber Health Score",
+      "search": "Search",
+      "changeLanguage": "Change language"
+    },
+    "hero": {
+      "markLabel": "Five defined automation jobs",
+      "meta1": "Business Automation",
+      "meta2": "Built around measurable outcomes",
+      "title1": "Automate the work",
+      "title2": "that's capping your growth.",
+      "support": "BA transforms individual business functions through focused, tailored automation. It works with your existing software to improve sales, marketing, customer service, finance or IT—reducing manual work and delivering measurable results.",
+      "exploreLink": "Explore five systems + tailored",
+      "noPlatform": "No new platform required"
+    },
+    "jobSelector": {
+      "eyebrow": "OR5 / Choose the outcome",
+      "title1": "Five jobs.",
+      "title2": "One clear result each.",
+      "sub": "Select a job to understand the outcome, fit and commercial structure. Add any relevant job to My Scope.",
+      "commercialNote": "Prices are shown in Canadian dollars. API usage, software subscriptions and third-party infrastructure remain the client's responsibility and are not included."
+    },
+    "jobs": {
+      "sales-flow": {
+        "name": "Sales",
+        "short": "Sales",
+        "outcome": "Capture, qualify and follow every opportunity—from first enquiry to a clean handoff and close.",
+        "fit": "Teams losing leads between inboxes, spreadsheets and CRM follow-up.",
+        "tools": "Your CRM, email, calendar and proposal tools.",
+        "accent": "Revenue flow",
+        "kickerTag": "Defined automation job"
+      },
+      "customer-support": {
+        "name": "Customer Service",
+        "short": "Customer Service",
+        "outcome": "Respond faster, route requests correctly and keep every customer conversation moving.",
+        "fit": "Teams handling repeat questions, slow routing or inconsistent support across channels.",
+        "tools": "Your helpdesk, shared inbox, knowledge base and messaging tools.",
+        "accent": "Service continuity",
+        "kickerTag": "Defined automation job"
+      },
+      "operational-intelligence": {
+        "name": "Finance",
+        "short": "Finance",
+        "outcome": "Bring scattered business data into one dependable view for reporting, alerts and decisions.",
+        "fit": "Leaders waiting on manual reports or making decisions from disconnected systems.",
+        "tools": "Your accounting, CRM, operations and reporting tools.",
+        "accent": "Decision clarity",
+        "kickerTag": "Defined automation job"
+      },
+      "managed-it": {
+        "name": "IT",
+        "short": "IT",
+        "outcome": "Add an AI-driven IT operations and monitoring layer for routine device, account, ticket and infrastructure work.",
+        "fit": "Growing businesses that need operational coordination and monitoring, not a full break-fix helpdesk MSP.",
+        "tools": "Your Microsoft 365, ticketing, device and infrastructure tools.",
+        "accent": "AI-driven operations · not full managed IT",
+        "kickerTag": "Defined automation job"
+      },
+      "customer-growth": {
+        "name": "Marketing",
+        "short": "Marketing",
+        "outcome": "Strengthen onboarding, retention, reactivation and revenue opportunities across the customer lifecycle.",
+        "fit": "Businesses with valuable customers but inconsistent follow-up after the first sale.",
+        "tools": "Your CRM, billing, email and customer-success tools.",
+        "accent": "Customer value",
+        "kickerTag": "Defined automation job"
+      },
+      "tailored": {
+        "name": "Tailored Automation",
+        "short": "One bounded outcome",
+        "outcome": "Design one focused automation around an operational job that does not fit the five defined systems.",
+        "fit": "Businesses with a clear, measurable requirement that needs private scoping.",
+        "tools": "Designed around the approved tools your business already uses.",
+        "accent": "Purpose-built",
+        "kickerTag": "Privately scoped"
+      }
+    },
+    "jobFacts": {
+      "idealFit": "Ideal fit",
+      "worksThrough": "Works through",
+      "buildFee": "Build Fee",
+      "buildFeeNote": "One-time design, configuration and connection.",
+      "monthlyManagement": "Monthly Management",
+      "monthlyManagementNote": "Monitoring, maintenance and ongoing improvement."
+    },
+    "scopeAdd": {
+      "add": "Check My Fit · Add to Scope",
+      "added": "Added to My Scope ✓"
+    },
+    "existingTools": {
+      "eyebrow": "Built around your reality",
+      "title1": "Your tools stay.",
+      "title2": "The work moves.",
+      "body": "ORAGROL's automation engine works through the systems your business already uses. Your team continues working in its CRM, inbox, helpdesk, accounting and collaboration tools—without being forced onto a new platform.",
+      "tool1": "CRM",
+      "tool2": "Inbox",
+      "tool3": "Operations",
+      "tool4": "Reporting"
+    },
+    "journey": {
+      "eyebrow": "How it starts",
+      "steps": [
+        {
+          "title": "Assess",
+          "body": "Confirm the job, expected outcome and current tools."
+        },
+        {
+          "title": "Design",
+          "body": "Map the workflow, controls and measures of success."
+        },
+        {
+          "title": "Build",
+          "body": "Connect and configure the approved automation."
+        },
+        {
+          "title": "Operate",
+          "body": "Monitor, maintain and improve the live job."
+        }
+      ]
+    },
+    "feeExplainer": {
+      "eyebrow": "Two fees. Two responsibilities.",
+      "title1": "Built once.",
+      "title2": "Looked after continuously.",
+      "buildLabel": "01 / Build Fee",
+      "buildTitle": "Connect it to how you work.",
+      "buildBody": "The one-time fee covers design, configuration, integration, testing and launch within the agreed scope.",
+      "monthlyLabel": "02 / Monthly Management",
+      "monthlyTitle": "Keep it dependable.",
+      "monthlyBody": "The recurring fee covers monitoring, maintenance and responsible improvement as your operating environment changes."
+    },
+    "detailsLabels": {
+      "detailsButton": "Details",
+      "viewWhatsIncluded": "View what's included",
+      "viewDetailsFor": "View details for",
+      "close": "Close",
+      "whatsIncluded": "What's included",
+      "youStayInControl": "You stay in control",
+      "whoItSuitsHeading": "Who it suits",
+      "illustrativeExample": "Illustrative example"
+    },
+    "details": {
+      "sales-flow": {
+        "itemLabel": "SALES",
+        "title": "BA Sales",
+        "subtitle": "Keep your pipeline moving.",
+        "intro": "Connect your CRM and inbox to organize incoming leads, maintain sales records and coordinate follow-up. The service prepares quotes, proposals and suggested next steps using your agreed sales process. You receive a clearer pipeline, regular reporting and drafts ready for review, while routine activity follows the rules agreed at setup.",
+        "inclusions": [
+          "Lead qualification and scoring against agreed criteria.",
+          "CRM updates and activity records.",
+          "Quote and proposal drafts.",
+          "Scheduled follow-up with existing clients.",
+          "Upsell and cross-sell suggestions.",
+          "Sales forecasts and reports based on available pipeline data.",
+          "Referral reminders and request preparation."
+        ],
+        "control": "Quotes, proposals and new offers come to you for approval. Routine follow-ups run within agreed rules; requests outside those rules are escalated for your decision.",
+        "whoItSuits": "Businesses that want consistent follow-up and a clearer view of their sales pipeline.",
+        "example": "A lead arrives overnight. Its details are organized in your CRM, scored against your criteria and paired with a suggested next step for review.",
+        "scope": "Supported CRM and inbox connections, messaging rules and workflow coverage are confirmed before setup."
+      },
+      "customer-support": {
+        "itemLabel": "CUSTOMER SERVICE",
+        "title": "BA Customer Service",
+        "subtitle": "Give every enquiry a clear next step.",
+        "intro": "Connect supported helpdesk, inbox and agreed customer-service channels to organize enquiries and coordinate responses. The service uses your approved knowledge and policies to answer routine questions, track tickets and identify cases needing a person. You receive a more consistent support workflow, with exceptions and sensitive decisions brought to your attention.",
+        "inclusions": [
+          "Routine enquiry handling across agreed phone, email and chat connections.",
+          "Complaint triage and escalation.",
+          "Order and service issue handling within approved policies.",
+          "FAQ and knowledge-base update preparation.",
+          "Satisfaction surveys.",
+          "Support-ticket tracking.",
+          "After-sales follow-up.",
+          "Return and refund preparation for approval."
+        ],
+        "control": "Refunds, returns and exceptions outside approved policies are referred for your decision. Unverified answers are escalated rather than presented as facts.",
+        "whoItSuits": "Businesses that need consistent support as enquiry volumes grow.",
+        "example": "A customer asks about a delayed order. The service checks the connected order record and provides the available status, or routes the case for investigation when information is missing.",
+        "scope": "Channels, knowledge sources, coverage hours and escalation arrangements are agreed before launch."
+      },
+      "operational-intelligence": {
+        "itemLabel": "FINANCE",
+        "title": "BA Finance",
+        "subtitle": "Keep everyday finance organized.",
+        "intro": "Connect supported accounting software and financial data sources to coordinate invoicing, payment tracking and routine finance administration. The service prepares records, highlights exceptions and brings payroll, payables and reporting together for review. You receive a clearer financial picture while decisions involving payments or sensitive changes remain within your approval rules.",
+        "inclusions": [
+          "Invoice preparation and sending under agreed rules.",
+          "Payment collection workflows through approved payment tools.",
+          "Cash-flow monitoring and exception flags.",
+          "Expense tracking and recording.",
+          "Incoming and outgoing payment records and reconciliation support.",
+          "Subscription and recurring-charge tracking.",
+          "Loan-payment tracking.",
+          "Payroll preparation for approval.",
+          "Accounts-payable preparation for approval.",
+          "Tax-deadline reminders.",
+          "Invoice-tax application using your confirmed configuration.",
+          "Routine financial reports."
+        ],
+        "control": "Payroll, payables and sensitive financial actions require approval. Tax settings and accounting judgments require appropriate review; automation does not replace your accountant's professional judgment.",
+        "whoItSuits": "Owners who want coordinated invoicing, collections, expenses and reporting with less repetitive administration.",
+        "example": "Upcoming bills and recorded income indicate a possible cash shortfall. The service flags it so you can review timing and take action.",
+        "scope": "Available feeds, reconciliation frequency and payment permissions are confirmed during setup."
+      },
+      "managed-it": {
+        "itemLabel": "IT",
+        "title": "BA IT",
+        "subtitle": "Keep routine technology work under control.",
+        "intro": "Connect supported systems to coordinate maintenance, helpdesk work and everyday IT administration. The service tracks issues, prepares or performs permitted routine actions and flags changes that need review. You receive maintenance visibility and exception reporting, with critical-system changes handled through agreed controls.",
+        "inclusions": [
+          "Software maintenance and patch coordination.",
+          "Software-license management.",
+          "Helpdesk, password and access-request workflows.",
+          "Backup operation and verification within the agreed scope.",
+          "Basic cyber-hygiene monitoring.",
+          "Routine website and hosting maintenance.",
+          "Connections between supported software tools."
+        ],
+        "control": "Critical-system changes and sensitive access actions require approval. Routine changes follow agreed maintenance windows, verification and recovery procedures.",
+        "whoItSuits": "Businesses needing structured routine IT support and clearer ownership of recurring technical tasks.",
+        "example": "A relevant patch becomes available. The service identifies affected systems and prepares the update for the agreed testing and approval process.",
+        "scope": "Supported systems, backup verification depth and maintenance coverage are agreed before launch. This does not automatically include specialist cybersecurity or forensic response."
+      },
+      "customer-growth": {
+        "itemLabel": "MARKETING",
+        "title": "BA Marketing",
+        "subtitle": "Turn your marketing plan into consistent activity.",
+        "intro": "Coordinate content, email, social and advertising workflows through your supported accounts. The service prepares material in your brand voice, organizes your calendar and reports on campaign activity. You review publication and spending decisions, while approved work proceeds within the agreed plan.",
+        "inclusions": [
+          "Routine website-update preparation and coordination.",
+          "SEO maintenance and improvement recommendations.",
+          "Blog and article drafts.",
+          "Social scheduling and publication after approval.",
+          "Email campaigns and newsletters for eligible audiences.",
+          "Paid-campaign management within approved budgets.",
+          "Routine graphic-design preparation.",
+          "Market and competitor research.",
+          "Marketing performance reports.",
+          "Lead-generation campaign preparation and coordination."
+        ],
+        "control": "Public material requires approval before publication. Spending follows your approved budget; proposed increases require a new decision. Audience permissions and unsubscribe preferences must be respected.",
+        "whoItSuits": "Businesses seeking a consistent marketing cadence without managing every repetitive step themselves.",
+        "example": "Research identifies a relevant market change. The service drafts a campaign adjustment and supporting content for your review before anything is published.",
+        "scope": "Channels, content volumes, ad accounts and publishing permissions are agreed at setup. Search rankings and campaign results are not guaranteed."
+      },
+      "tailored": {
+        "itemLabel": "TAILORED AUTOMATION",
+        "title": "BA Tailored Automation",
+        "subtitle": "Automate a workflow unique to your business.",
+        "intro": "Describe a repetitive task that does not fit the standard BA services. We assess the workflow, confirm the inputs and decisions it needs, and scope an automation around that specific process. You receive a tested workflow with defined boundaries, exception handling and approval points.",
+        "inclusions": [
+          "Review of the task and its suitability for automation.",
+          "Identification of required data, software connections and owners.",
+          "A defined scope covering included actions and exclusions.",
+          "Build and testing against the agreed workflow.",
+          "Approval and exception-handling rules.",
+          "A quotation based on the confirmed scope."
+        ],
+        "control": "Sensitive actions and exceptions follow agreed approval rules. Changes beyond the agreed workflow are reviewed before implementation.",
+        "whoItSuits": "Businesses with a specific recurring task that does not fit a standard package.",
+        "example": "A property manager needs maintenance requests matched to suitable contractors. A tailored workflow prepares matches using job type and available information, with exceptions referred for review.",
+        "scope": "Custom quotation. A request spanning a broader connected operation may be better suited to OR ONE; this is assessed before committing to a build."
       }
     }
   }

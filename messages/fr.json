@@ -61,11 +61,26 @@
       "headline2": "Puis une action coordonnée.",
       "sub": "Parcourez les étapes pour voir comment ORAGROL transforme le contexte d'affaires en progrès concret.",
       "ariaSelect": "Méthode de travail ORAGROL",
-      "understand": { "name": "Comprendre", "line": "Voir clairement l'entreprise avant de prescrire une technologie." },
-      "prioritize": { "name": "Prioriser", "line": "Concentrer l'attention et les investissements là où ils créent le plus de valeur." },
-      "protect": { "name": "Protéger", "line": "Appliquer les bons contrôles de sécurité, services et une supervision adéquate." },
-      "automate": { "name": "Automatiser", "line": "Améliorer le travail défini grâce à une automatisation pratique et responsable." },
-      "evolve": { "name": "Évoluer", "line": "Renforcer le système à mesure que l'entreprise évolue." }
+      "understand": {
+        "name": "Comprendre",
+        "line": "Voir clairement l'entreprise avant de prescrire une technologie."
+      },
+      "prioritize": {
+        "name": "Prioriser",
+        "line": "Concentrer l'attention et les investissements là où ils créent le plus de valeur."
+      },
+      "protect": {
+        "name": "Protéger",
+        "line": "Appliquer les bons contrôles de sécurité, services et une supervision adéquate."
+      },
+      "automate": {
+        "name": "Automatiser",
+        "line": "Améliorer le travail défini grâce à une automatisation pratique et responsable."
+      },
+      "evolve": {
+        "name": "Évoluer",
+        "line": "Renforcer le système à mesure que l'entreprise évolue."
+      }
     },
     "cybersecurity": {
       "eyebrow": "CYBERSÉCURITÉ",
@@ -125,15 +140,42 @@
       "footerLine3": "Conçu pour ce qui vient.",
       "footerStrong": "D'UN OCÉAN À L'AUTRE, À L'AUTRE",
       "list": {
-        "professionalServices": { "name": "Services professionnels", "risk": "Protégez les données, les communications et la confiance de vos clients." },
-        "healthcare": { "name": "Santé", "risk": "Renforcez la confidentialité, l'accès et la résilience opérationnelle." },
-        "financialServices": { "name": "Services financiers", "risk": "Réduisez l'exposition à la fraude, aux enjeux réglementaires et aux transactions." },
-        "retail": { "name": "Commerce de détail et commerce électronique", "risk": "Protégez les paiements, les clients et les revenus numériques." },
-        "manufacturing": { "name": "Fabrication", "risk": "Sécurisez les opérations connectées et la continuité de la production." },
-        "technology": { "name": "Technologie", "risk": "Protégez les environnements infonuagiques, les produits et la propriété intellectuelle." },
-        "construction": { "name": "Construction et immobilier", "risk": "Sécurisez les paiements, les équipes mobiles et l'accès des partenaires." },
-        "education": { "name": "Éducation", "risk": "Priorisez la protection des utilisateurs, des données et des systèmes partagés." },
-        "otherSmbs": { "name": "Autres PME canadiennes", "risk": "Adaptez la protection à la façon dont votre entreprise fonctionne." }
+        "professionalServices": {
+          "name": "Services professionnels",
+          "risk": "Protégez les données, les communications et la confiance de vos clients."
+        },
+        "healthcare": {
+          "name": "Santé",
+          "risk": "Renforcez la confidentialité, l'accès et la résilience opérationnelle."
+        },
+        "financialServices": {
+          "name": "Services financiers",
+          "risk": "Réduisez l'exposition à la fraude, aux enjeux réglementaires et aux transactions."
+        },
+        "retail": {
+          "name": "Commerce de détail et commerce électronique",
+          "risk": "Protégez les paiements, les clients et les revenus numériques."
+        },
+        "manufacturing": {
+          "name": "Fabrication",
+          "risk": "Sécurisez les opérations connectées et la continuité de la production."
+        },
+        "technology": {
+          "name": "Technologie",
+          "risk": "Protégez les environnements infonuagiques, les produits et la propriété intellectuelle."
+        },
+        "construction": {
+          "name": "Construction et immobilier",
+          "risk": "Sécurisez les paiements, les équipes mobiles et l'accès des partenaires."
+        },
+        "education": {
+          "name": "Éducation",
+          "risk": "Priorisez la protection des utilisateurs, des données et des systèmes partagés."
+        },
+        "otherSmbs": {
+          "name": "Autres PME canadiennes",
+          "risk": "Adaptez la protection à la façon dont votre entreprise fonctionne."
+        }
       }
     }
   },
@@ -192,10 +234,22 @@
       "addToScope": "Ajouter à ma portée",
       "addedToScope": "Ajouté à ma portée",
       "list": {
-        "foundation": { "value": "Établissez votre protection de base.", "fit": "Entreprises qui mettent en place des contrôles de sécurité essentiels autour de leur personnel, de leurs appareils et de leur travail quotidien." },
-        "advanced": { "value": "Étendez votre visibilité et renforcez vos accès.", "fit": "Entreprises ayant besoin d'une surveillance élargie, d'une gouvernance des accès et d'une supervision des fournisseurs et des exigences de conformité." },
-        "comprehensive": { "value": "Reliez la protection à l'ensemble de votre environnement.", "fit": "Entreprises dont les charges de travail infonuagiques, les applications et les données exigent une portée de protection plus large et coordonnée." },
-        "elite": { "value": "Réunissez protection et intervention.", "fit": "Entreprises recherchant la portée de forfait la plus large, incluant la réponse gérée aux menaces, la réponse en sécurité et la surveillance des données." }
+        "foundation": {
+          "value": "Établissez votre protection de base.",
+          "fit": "Entreprises qui mettent en place des contrôles de sécurité essentiels autour de leur personnel, de leurs appareils et de leur travail quotidien."
+        },
+        "advanced": {
+          "value": "Étendez votre visibilité et renforcez vos accès.",
+          "fit": "Entreprises ayant besoin d'une surveillance élargie, d'une gouvernance des accès et d'une supervision des fournisseurs et des exigences de conformité."
+        },
+        "comprehensive": {
+          "value": "Reliez la protection à l'ensemble de votre environnement.",
+          "fit": "Entreprises dont les charges de travail infonuagiques, les applications et les données exigent une portée de protection plus large et coordonnée."
+        },
+        "elite": {
+          "value": "Réunissez protection et intervention.",
+          "fit": "Entreprises recherchant la portée de forfait la plus large, incluant la réponse gérée aux menaces, la réponse en sécurité et la surveillance des données."
+        }
       }
     },
     "serviceNames": {
@@ -240,18 +294,42 @@
       "addToScope": "Ajouter à ma portée",
       "addedToScope": "Ajouté à ma portée",
       "list": {
-        "C01-S04": { "line": "Un leadership en sécurité pour orienter vos priorités, vos décisions et votre supervision." },
-        "C07-S04": { "line": "Intégrez des pratiques de sécurité à votre processus de développement logiciel." },
-        "C08-S03": { "line": "Coordonnez la façon dont les renseignements personnels sont traités et protégés." },
-        "C09-S01": { "line": "Évaluez les risques de sécurité liés à votre utilisation de l'IA et déterminez les prochaines étapes concrètes." },
-        "C09-S02": { "line": "Définissez les responsabilités et gérez les risques liés à l'utilisation de l'IA en entreprise." },
-        "C05-S03": { "line": "Renforcez la supervision des comptes disposant de droits d'accès élevés." },
-        "C05-S05": { "line": "Appliquez des vérifications d'identité et de contexte à vos décisions d'accès." },
-        "C06-S04": { "line": "Renforcez les contrôles réseau dans votre environnement infonuagique." },
-        "C09-S03": { "line": "Traitez les risques de sécurité touchant vos modèles d'IA et leur utilisation." },
-        "C09-S04": { "line": "Protégez les renseignements sensibles utilisés par vos systèmes et flux de travail en IA." },
-        "C09-S05": { "line": "Détectez et traitez les menaces touchant votre environnement d'IA." },
-        "C07-S05": { "line": "Testez la sécurité d'une application et priorisez les constats." }
+        "C01-S04": {
+          "line": "Un leadership en sécurité pour orienter vos priorités, vos décisions et votre supervision."
+        },
+        "C07-S04": {
+          "line": "Intégrez des pratiques de sécurité à votre processus de développement logiciel."
+        },
+        "C08-S03": {
+          "line": "Coordonnez la façon dont les renseignements personnels sont traités et protégés."
+        },
+        "C09-S01": {
+          "line": "Évaluez les risques de sécurité liés à votre utilisation de l'IA et déterminez les prochaines étapes concrètes."
+        },
+        "C09-S02": {
+          "line": "Définissez les responsabilités et gérez les risques liés à l'utilisation de l'IA en entreprise."
+        },
+        "C05-S03": {
+          "line": "Renforcez la supervision des comptes disposant de droits d'accès élevés."
+        },
+        "C05-S05": {
+          "line": "Appliquez des vérifications d'identité et de contexte à vos décisions d'accès."
+        },
+        "C06-S04": {
+          "line": "Renforcez les contrôles réseau dans votre environnement infonuagique."
+        },
+        "C09-S03": {
+          "line": "Traitez les risques de sécurité touchant vos modèles d'IA et leur utilisation."
+        },
+        "C09-S04": {
+          "line": "Protégez les renseignements sensibles utilisés par vos systèmes et flux de travail en IA."
+        },
+        "C09-S05": {
+          "line": "Détectez et traitez les menaces touchant votre environnement d'IA."
+        },
+        "C07-S05": {
+          "line": "Testez la sécurité d'une application et priorisez les constats."
+        }
       }
     },
     "specialists": {
@@ -262,10 +340,335 @@
       "priceNote": "Tous les tarifs sont en dollars canadiens. Les tarifs de départ s'appliquent à une portée définie. La portée et les tarifs finaux sont confirmés dans votre proposition.",
       "discussEngagement": "Discuter de votre mandat",
       "list": {
-        "C10-S01": { "line": "Un mandat défini visant à tester les vulnérabilités exploitables et à prioriser les correctifs." },
-        "C10-S02": { "line": "Un mandat mené avec un partenaire d'audit CPA qualifié, adapté à votre organisation et à vos besoins de reddition de comptes." },
-        "C10-S03": { "line": "Une évaluation définie, menée par un QSA qualifié, pour votre environnement de paiement." },
-        "C10-S04": { "line": "Une enquête judiciaire spécialisée et une intervention en cas d'incident, avec une portée convenue pour l'incident." }
+        "C10-S01": {
+          "line": "Un mandat défini visant à tester les vulnérabilités exploitables et à prioriser les correctifs."
+        },
+        "C10-S02": {
+          "line": "Un mandat mené avec un partenaire d'audit CPA qualifié, adapté à votre organisation et à vos besoins de reddition de comptes."
+        },
+        "C10-S03": {
+          "line": "Une évaluation définie, menée par un QSA qualifié, pour votre environnement de paiement."
+        },
+        "C10-S04": {
+          "line": "Une enquête judiciaire spécialisée et une intervention en cas d'incident, avec une portée convenue pour l'incident."
+        }
+      }
+    }
+  },
+  "SharedCta": {
+    "home": {
+      "eyebrow": "La clarté avant la complexité",
+      "headline": "Protection en cybersécurité. Automatisation intelligente des affaires. Un système coordonné, OR ONE.",
+      "secondaryLabel": "Découvrir ce que fait ORAGROL"
+    },
+    "services": {
+      "eyebrow": "Votre prochaine étape la plus claire",
+      "headline": "La bonne protection commence par comprendre ce qui compte le plus.",
+      "secondaryLabel": "Construisez votre portée"
+    },
+    "business-automation": {
+      "eyebrow": "Votre prochaine étape la plus claire",
+      "headline": "Repérez où le temps se perd et où une automatisation intelligente peut créer une valeur mesurable.",
+      "secondaryLabel": "Explorer les forfaits d'automatisation"
+    },
+    "or-one": {
+      "eyebrow": "Begin privately",
+      "headline": "Bring security, automation and operational intelligence into one coordinated system.",
+      "secondaryLabel": "Explore OR ONE"
+    },
+    "industries": {
+      "eyebrow": "Your clearest next step",
+      "headline": "Protection works better when it reflects how your industry actually operates.",
+      "secondaryLabel": "Find Your Industry"
+    },
+    "resources": {
+      "eyebrow": "One useful starting point",
+      "headline": "Turn credible insight into clearer decisions and practical action.",
+      "secondaryLabel": "Explore Our Resources"
+    },
+    "company": {
+      "eyebrow": "One clear starting point",
+      "headline": "Discover the thinking, experience and purpose behind ORAGROL Global.",
+      "secondaryLabel": "Start a Conversation"
+    },
+    "contact": {
+      "eyebrow": "One clear starting point",
+      "headline": "Start with clarity. We will help you identify the most valuable next step.",
+      "secondaryLabel": "Submit an Enquiry"
+    },
+    "faq": {
+      "eyebrow": "Still have a question?",
+      "headline": "Still looking for clarity? Let us help you find the right answer.",
+      "secondaryLabel": "Contact ORAGROL"
+    },
+    "getCyberHealthScore": "Obtenez votre Cyber Health Score"
+  },
+  "BusinessAutomation": {
+    "nav": {
+      "myScope": "Ma portée",
+      "getCyberHealthScore": "Obtenez votre Cyber Health Score",
+      "search": "Rechercher",
+      "changeLanguage": "Changer de langue"
+    },
+    "hero": {
+      "markLabel": "Cinq tâches d'automatisation définies",
+      "meta1": "Business Automation",
+      "meta2": "Conçu autour de résultats mesurables",
+      "title1": "Automatisez le travail",
+      "title2": "qui freine votre croissance.",
+      "support": "BA transforme chaque fonction d'affaires grâce à une automatisation ciblée et adaptée. Elle fonctionne avec vos logiciels existants pour améliorer les ventes, le marketing, le service à la clientèle, les finances ou les TI — réduisant le travail manuel et livrant des résultats mesurables.",
+      "exploreLink": "Explorer les cinq systèmes + le sur mesure",
+      "noPlatform": "Aucune nouvelle plateforme requise"
+    },
+    "jobSelector": {
+      "eyebrow": "OR5 / Choisissez le résultat",
+      "title1": "Cinq tâches.",
+      "title2": "Un résultat clair pour chacune.",
+      "sub": "Sélectionnez une tâche pour en comprendre le résultat, la pertinence et la structure commerciale. Ajoutez toute tâche pertinente à Ma portée.",
+      "commercialNote": "Les prix sont indiqués en dollars canadiens. L'utilisation des API, les abonnements logiciels et l'infrastructure tierce demeurent la responsabilité du client et ne sont pas inclus."
+    },
+    "jobs": {
+      "sales-flow": {
+        "name": "Ventes",
+        "short": "Ventes",
+        "outcome": "Captez, qualifiez et suivez chaque occasion — de la première demande jusqu'à un transfert clair et la conclusion.",
+        "fit": "Les équipes qui perdent des prospects entre les boîtes de courriels, les feuilles de calcul et le suivi du CRM.",
+        "tools": "Votre CRM, vos courriels, votre calendrier et vos outils de proposition.",
+        "accent": "Flux de revenus",
+        "kickerTag": "Tâche d'automatisation définie"
+      },
+      "customer-support": {
+        "name": "Service à la clientèle",
+        "short": "Service à la clientèle",
+        "outcome": "Répondez plus rapidement, orientez correctement les demandes et gardez chaque conversation client en mouvement.",
+        "fit": "Les équipes qui gèrent des questions répétitives, un acheminement lent ou un soutien incohérent selon les canaux.",
+        "tools": "Votre service d'assistance, votre boîte partagée, votre base de connaissances et vos outils de messagerie.",
+        "accent": "Continuité du service",
+        "kickerTag": "Tâche d'automatisation définie"
+      },
+      "operational-intelligence": {
+        "name": "Finances",
+        "short": "Finances",
+        "outcome": "Regroupez des données d'affaires dispersées en une seule vue fiable pour les rapports, alertes et décisions.",
+        "fit": "Les dirigeants qui attendent des rapports manuels ou qui prennent des décisions à partir de systèmes déconnectés.",
+        "tools": "Vos outils de comptabilité, de CRM, d'opérations et de rapports.",
+        "accent": "Clarté décisionnelle",
+        "kickerTag": "Tâche d'automatisation définie"
+      },
+      "managed-it": {
+        "name": "TI",
+        "short": "TI",
+        "outcome": "Ajoutez une couche d'opérations et de surveillance TI pilotée par l'IA pour le travail courant lié aux appareils, comptes, billets et infrastructure.",
+        "fit": "Les entreprises en croissance qui ont besoin de coordination et de surveillance opérationnelles, pas d'un MSP de dépannage TI complet.",
+        "tools": "Vos outils Microsoft 365, de billetterie, d'appareils et d'infrastructure.",
+        "accent": "Opérations pilotées par l'IA · pas un service TI géré complet",
+        "kickerTag": "Tâche d'automatisation définie"
+      },
+      "customer-growth": {
+        "name": "Marketing",
+        "short": "Marketing",
+        "outcome": "Renforcez l'accueil, la rétention, la réactivation et les occasions de revenus tout au long du cycle de vie client.",
+        "fit": "Les entreprises ayant des clients de valeur mais un suivi incohérent après la première vente.",
+        "tools": "Votre CRM, votre facturation, vos courriels et vos outils de succès client.",
+        "accent": "Valeur client",
+        "kickerTag": "Tâche d'automatisation définie"
+      },
+      "tailored": {
+        "name": "Automatisation sur mesure",
+        "short": "Un résultat délimité",
+        "outcome": "Concevez une automatisation ciblée autour d'une tâche opérationnelle qui ne correspond pas aux cinq systèmes définis.",
+        "fit": "Les entreprises ayant une exigence claire et mesurable nécessitant une portée établie en privé.",
+        "tools": "Conçue autour des outils approuvés que votre entreprise utilise déjà.",
+        "accent": "Conçu sur mesure",
+        "kickerTag": "Établi en privé"
+      }
+    },
+    "jobFacts": {
+      "idealFit": "Profil idéal",
+      "worksThrough": "Fonctionne via",
+      "buildFee": "Frais de construction",
+      "buildFeeNote": "Conception, configuration et connexion, à frais unique.",
+      "monthlyManagement": "Gestion mensuelle",
+      "monthlyManagementNote": "Surveillance, entretien et amélioration continue."
+    },
+    "scopeAdd": {
+      "add": "Vérifier ma pertinence · Ajouter à ma portée",
+      "added": "Ajouté à ma portée ✓"
+    },
+    "existingTools": {
+      "eyebrow": "Conçu autour de votre réalité",
+      "title1": "Vos outils restent.",
+      "title2": "C'est le travail qui bouge.",
+      "body": "Le moteur d'automatisation d'ORAGROL fonctionne à travers les systèmes que votre entreprise utilise déjà. Votre équipe continue de travailler dans son CRM, sa boîte de courriels, son service d'assistance, sa comptabilité et ses outils de collaboration — sans être forcée d'adopter une nouvelle plateforme.",
+      "tool1": "CRM",
+      "tool2": "Boîte de courriels",
+      "tool3": "Opérations",
+      "tool4": "Rapports"
+    },
+    "journey": {
+      "eyebrow": "Comment ça commence",
+      "steps": [
+        {
+          "title": "Évaluer",
+          "body": "Confirmez la tâche, le résultat attendu et les outils actuels."
+        },
+        {
+          "title": "Concevoir",
+          "body": "Cartographiez le flux de travail, les contrôles et les mesures de succès."
+        },
+        {
+          "title": "Construire",
+          "body": "Connectez et configurez l'automatisation approuvée."
+        },
+        {
+          "title": "Exploiter",
+          "body": "Surveillez, entretenez et améliorez la tâche en fonction."
+        }
+      ]
+    },
+    "feeExplainer": {
+      "eyebrow": "Deux frais. Deux responsabilités.",
+      "title1": "Construit une fois.",
+      "title2": "Entretenu en continu.",
+      "buildLabel": "01 / Frais de construction",
+      "buildTitle": "Connectez-la à votre façon de travailler.",
+      "buildBody": "Le frais unique couvre la conception, la configuration, l'intégration, les tests et le lancement dans la portée convenue.",
+      "monthlyLabel": "02 / Gestion mensuelle",
+      "monthlyTitle": "Gardez-la fiable.",
+      "monthlyBody": "Le frais récurrent couvre la surveillance, l'entretien et l'amélioration responsable à mesure que votre environnement opérationnel évolue."
+    },
+    "detailsLabels": {
+      "detailsButton": "Détails",
+      "viewWhatsIncluded": "Voir ce qui est inclus",
+      "viewDetailsFor": "Voir les détails pour",
+      "close": "Fermer",
+      "whatsIncluded": "Ce qui est inclus",
+      "youStayInControl": "Vous gardez le contrôle",
+      "whoItSuitsHeading": "À qui ça convient",
+      "illustrativeExample": "Exemple illustratif"
+    },
+    "details": {
+      "sales-flow": {
+        "itemLabel": "VENTES",
+        "title": "BA Ventes",
+        "subtitle": "Gardez votre pipeline en mouvement.",
+        "intro": "Connectez votre CRM et votre boîte de courriels pour organiser les prospects entrants, tenir à jour vos dossiers de vente et coordonner le suivi. Le service prépare des devis, des propositions et des prochaines étapes suggérées selon votre processus de vente convenu. Vous obtenez un pipeline plus clair, des rapports réguliers et des ébauches prêtes à réviser, tandis que l'activité courante suit les règles convenues à la configuration.",
+        "inclusions": [
+          "Qualification et pointage des prospects selon des critères convenus.",
+          "Mises à jour du CRM et registres d'activité.",
+          "Ébauches de devis et de propositions.",
+          "Suivi planifié auprès des clients existants.",
+          "Suggestions de vente incitative et croisée.",
+          "Prévisions et rapports de ventes basés sur les données de pipeline disponibles.",
+          "Rappels de référencement et préparation des demandes."
+        ],
+        "control": "Les devis, propositions et nouvelles offres vous sont soumis pour approbation. Les suivis courants s'exécutent selon des règles convenues; les demandes hors de ces règles sont escaladées pour votre décision.",
+        "whoItSuits": "Les entreprises qui veulent un suivi constant et une vision plus claire de leur pipeline de ventes.",
+        "example": "Un prospect arrive pendant la nuit. Ses coordonnées sont organisées dans votre CRM, pointées selon vos critères et jumelées à une prochaine étape suggérée pour révision.",
+        "scope": "Les connexions CRM et courriel prises en charge, les règles de messagerie et la couverture du flux de travail sont confirmées avant la configuration."
+      },
+      "customer-support": {
+        "itemLabel": "SERVICE À LA CLIENTÈLE",
+        "title": "BA Service à la clientèle",
+        "subtitle": "Donnez à chaque demande une prochaine étape claire.",
+        "intro": "Connectez votre service d'assistance, votre boîte de courriels et vos canaux de service à la clientèle convenus pour organiser les demandes et coordonner les réponses. Le service utilise vos connaissances et politiques approuvées pour répondre aux questions courantes, suivre les billets et repérer les cas nécessitant une personne. Vous obtenez un flux de travail de soutien plus cohérent, les exceptions et décisions sensibles étant portées à votre attention.",
+        "inclusions": [
+          "Traitement des demandes courantes par téléphone, courriel et clavardage convenus.",
+          "Tri et escalade des plaintes.",
+          "Traitement des problèmes de commande et de service selon les politiques approuvées.",
+          "Préparation des mises à jour de la FAQ et de la base de connaissances.",
+          "Sondages de satisfaction.",
+          "Suivi des billets de soutien.",
+          "Suivi après-vente.",
+          "Préparation des retours et remboursements pour approbation."
+        ],
+        "control": "Les remboursements, retours et exceptions hors des politiques approuvées vous sont soumis pour décision. Les réponses non vérifiées sont escaladées plutôt que présentées comme des faits.",
+        "whoItSuits": "Les entreprises qui ont besoin d'un soutien constant à mesure que le volume de demandes augmente.",
+        "example": "Un client s'informe d'une commande retardée. Le service consulte le dossier de commande connecté et fournit le statut disponible, ou achemine le cas pour enquête lorsque l'information manque.",
+        "scope": "Les canaux, les sources de connaissances, les heures de couverture et les modalités d'escalade sont convenus avant le lancement."
+      },
+      "operational-intelligence": {
+        "itemLabel": "FINANCES",
+        "title": "BA Finances",
+        "subtitle": "Gardez vos finances quotidiennes organisées.",
+        "intro": "Connectez vos logiciels comptables et sources de données financières pris en charge pour coordonner la facturation, le suivi des paiements et l'administration financière courante. Le service prépare les registres, signale les exceptions et rassemble la paie, les comptes fournisseurs et les rapports pour révision. Vous obtenez un portrait financier plus clair, tandis que les décisions touchant les paiements ou les changements sensibles demeurent régies par vos règles d'approbation.",
+        "inclusions": [
+          "Préparation et envoi des factures selon des règles convenues.",
+          "Flux de travail de recouvrement des paiements via des outils de paiement approuvés.",
+          "Surveillance des flux de trésorerie et signalement des exceptions.",
+          "Suivi et enregistrement des dépenses.",
+          "Registres des paiements entrants et sortants et soutien à la réconciliation.",
+          "Suivi des abonnements et frais récurrents.",
+          "Suivi des paiements de prêts.",
+          "Préparation de la paie pour approbation.",
+          "Préparation des comptes fournisseurs pour approbation.",
+          "Rappels des échéances fiscales.",
+          "Application des taxes sur facture selon votre configuration confirmée.",
+          "Rapports financiers courants."
+        ],
+        "control": "La paie, les comptes fournisseurs et les actions financières sensibles requièrent une approbation. Les paramètres fiscaux et le jugement comptable requièrent une révision appropriée; l'automatisation ne remplace pas le jugement professionnel de votre comptable.",
+        "whoItSuits": "Les propriétaires qui veulent une facturation, un recouvrement, des dépenses et des rapports coordonnés, avec moins de tâches administratives répétitives.",
+        "example": "Des factures à venir et des revenus enregistrés indiquent un possible manque de liquidités. Le service le signale afin que vous puissiez revoir le calendrier et agir.",
+        "scope": "Les flux disponibles, la fréquence de réconciliation et les autorisations de paiement sont confirmés lors de la configuration."
+      },
+      "managed-it": {
+        "itemLabel": "TI",
+        "title": "BA TI",
+        "subtitle": "Gardez le travail technologique courant sous contrôle.",
+        "intro": "Connectez vos systèmes pris en charge pour coordonner l'entretien, le travail de soutien technique et l'administration TI quotidienne. Le service suit les problèmes, prépare ou exécute les actions courantes permises et signale les changements nécessitant une révision. Vous obtenez une visibilité sur l'entretien et un rapport des exceptions, les changements aux systèmes critiques étant gérés selon des contrôles convenus.",
+        "inclusions": [
+          "Entretien logiciel et coordination des correctifs.",
+          "Gestion des licences logicielles.",
+          "Flux de travail du soutien technique, des mots de passe et des demandes d'accès.",
+          "Exploitation et vérification des sauvegardes dans la portée convenue.",
+          "Surveillance de base de l'hygiène cybernétique.",
+          "Entretien courant du site Web et de l'hébergement.",
+          "Connexions entre les outils logiciels pris en charge."
+        ],
+        "control": "Les changements aux systèmes critiques et les actions d'accès sensibles requièrent une approbation. Les changements courants suivent les fenêtres d'entretien, la vérification et les procédures de récupération convenues.",
+        "whoItSuits": "Les entreprises qui ont besoin d'un soutien TI courant structuré et d'une responsabilité plus claire des tâches techniques récurrentes.",
+        "example": "Un correctif pertinent devient disponible. Le service repère les systèmes touchés et prépare la mise à jour pour le processus de test et d'approbation convenu.",
+        "scope": "Les systèmes pris en charge, la profondeur de vérification des sauvegardes et la couverture d'entretien sont convenus avant le lancement. Cela n'inclut pas automatiquement la cybersécurité spécialisée ou la réponse judiciaire."
+      },
+      "customer-growth": {
+        "itemLabel": "MARKETING",
+        "title": "BA Marketing",
+        "subtitle": "Transformez votre plan marketing en activité constante.",
+        "intro": "Coordonnez le contenu, les courriels, les réseaux sociaux et les flux de travail publicitaires via vos comptes pris en charge. Le service prépare le matériel dans le ton de votre marque, organise votre calendrier et rend compte de l'activité des campagnes. Vous révisez les décisions de publication et de dépenses, tandis que le travail approuvé se poursuit selon le plan convenu.",
+        "inclusions": [
+          "Préparation et coordination des mises à jour courantes du site Web.",
+          "Entretien du référencement (SEO) et recommandations d'amélioration.",
+          "Ébauches de blogues et d'articles.",
+          "Planification et publication sur les réseaux sociaux après approbation.",
+          "Campagnes courriel et infolettres pour les publics admissibles.",
+          "Gestion des campagnes payantes selon les budgets approuvés.",
+          "Préparation courante de graphisme.",
+          "Recherche sur le marché et la concurrence.",
+          "Rapports de performance marketing.",
+          "Préparation et coordination des campagnes de génération de prospects."
+        ],
+        "control": "Le matériel destiné au public requiert une approbation avant publication. Les dépenses suivent votre budget approuvé; les hausses proposées requièrent une nouvelle décision. Les autorisations du public et les préférences de désabonnement doivent être respectées.",
+        "whoItSuits": "Les entreprises qui recherchent une cadence marketing constante sans avoir à gérer chaque étape répétitive elles-mêmes.",
+        "example": "Une recherche repère un changement de marché pertinent. Le service rédige un ajustement de campagne et du contenu de soutien pour votre révision avant toute publication.",
+        "scope": "Les canaux, les volumes de contenu, les comptes publicitaires et les autorisations de publication sont convenus à la configuration. Le classement dans les moteurs de recherche et les résultats de campagne ne sont pas garantis."
+      },
+      "tailored": {
+        "itemLabel": "AUTOMATISATION SUR MESURE",
+        "title": "BA Automatisation sur mesure",
+        "subtitle": "Automatisez un flux de travail propre à votre entreprise.",
+        "intro": "Décrivez une tâche répétitive qui ne correspond pas aux services BA standards. Nous évaluons le flux de travail, confirmons les intrants et décisions dont il a besoin, et établissons la portée d'une automatisation autour de ce processus précis. Vous obtenez un flux de travail testé avec des limites définies, une gestion des exceptions et des points d'approbation.",
+        "inclusions": [
+          "Examen de la tâche et de sa pertinence pour l'automatisation.",
+          "Détermination des données, connexions logicielles et responsables requis.",
+          "Une portée définie couvrant les actions incluses et exclues.",
+          "Construction et tests selon le flux de travail convenu.",
+          "Règles d'approbation et de gestion des exceptions.",
+          "Une soumission basée sur la portée confirmée."
+        ],
+        "control": "Les actions sensibles et les exceptions suivent des règles d'approbation convenues. Les changements au-delà du flux de travail convenu sont révisés avant leur mise en œuvre.",
+        "whoItSuits": "Les entreprises ayant une tâche récurrente précise qui ne correspond à aucun forfait standard.",
+        "example": "Un gestionnaire immobilier a besoin que les demandes d'entretien soient jumelées aux bons entrepreneurs. Un flux de travail sur mesure prépare les jumelages selon le type de tâche et l'information disponible, les exceptions étant soumises pour révision.",
+        "scope": "Soumission personnalisée. Une demande couvrant une opération connectée plus large pourrait mieux convenir à OR ONE; cela est évalué avant de s'engager dans une construction."
       }
     }
   }

@@ -4,6 +4,52 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 
 ---
 
+### 2026-09-22 — Bilingual EN/FR build, Phase 2c: Business Automation fully wired (incl. Details dialogs) + a second shared-chrome gap found and fixed (PreFooterCta)
+
+**Completed:**
+- Confirmed patch `0008` (Services) is now actually applied and pushed by Mohammad — verified via `git fetch` + checking `origin/feat/fr-locale`'s log directly, not just his say-so. Reset this sandbox's working branch to match (`git reset --hard origin/feat/fr-locale`) so all further work builds on the real pushed state, not a locally-diverged one.
+- Confirmed with Mohammad, via screenshot, that PR #13's "Merge conflicts" badge is gone and shows green "Ready to merge" — the Phase 2b branch-drift fix (see that entry below) is fully closed out. Advised holding off on the actual merge until the whole site is bilingual (a partial-French live site would read worse than no French at all); Mohammad agreed and is using the PR's Vercel preview link to review as we go instead.
+- Built out Task #21's next page: `/business-automation` and `/fr/business-automation`, following the established pattern (`messages.BusinessAutomation` namespace; `generateMetadata({params})`; `useTranslations`/`Link`/`usePathname` from `@/i18n/navigation`; real language switcher; locale-aware currency via the same `money()` helper pattern as Services). Sourced from `ORAGROL_BusinessAutomation_FR_Translation.md`.
+- **Went further than Homepage/Services and fully translated the DetailsDialog deep-accordion content this time** (the "What's included / You stay in control / Who it suits / Illustrative example" panel for all 6 jobs), rather than deferring it the way Services' equivalent content still is. This was possible because `app/lib/ba-details-content.tsx` holds the complete, un-truncated English source (the translation doc's own `[...]` gaps were an artifact of the scraping tool used to build it, not a real content gap) — completed the handful of partial sentences by translating the full English source directly, consistent with the doc's already-approved terminology for the untruncated 90%.
+- Extended `DetailsDialog.tsx` (the shared component also used — untranslated — by Services) with an optional `labels` prop carrying its 7 chrome strings (Details button, "View what's included", Close, "What's included" heading, etc.), defaulting to the exact original English literals. Zero risk to any other caller: only Business Automation's page passes translated labels; Services' still-English "Details" dialogs are byte-identical to before.
+- **Found and fixed a second real site-wide gap while building this page, same as the Phase 2 chrome bug**: `PreFooterCta` (the shared CTA block rendered immediately before the footer on every redesigned page — Homepage and Services included) had never been converted in any prior phase, so both of those "done" French pages were silently showing this exact English block right at the bottom the whole time. Fixed by adding a `SharedCta` messages namespace (all 9 `CTAKey`s, so every page — translated or not — resolves without a missing-message error) and converting the component to a small Client Component using `useTranslations` — deliberately NOT `getTranslations`/async, because most call sites (`home-client.tsx`, `services-client.tsx`, `ba-client.tsx`, and four more not yet translated) are Client Components, and an async Server Component can't be rendered via direct JSX import from a Client Component (the exact bug already hit once with `HomeCybersecurity` in Phase 2). Verified this retroactively fixed Homepage's and Services' French CTA text with no other change needed, and confirmed the six not-yet-translated pages' `/fr/*` routes still render cleanly (English placeholder copy in `SharedCta`, not a crash) since they need all 9 keys present even before their own turn in Task #21.
+- Verified, not assumed: `npx tsc --noEmit` clean; `npm run lint` 0 errors (same 7 pre-existing warnings); live dev-server diff of `/business-automation` vs `/fr/business-automation` — title/meta/hreflang, hero, job-selector nav (all 6 tabs), the active job's full DetailsDialog JSON payload (all 6 jobs' complete FR translations confirmed present in the page data, English page confirmed still byte-identical to pre-session source), job-facts/commercial fee display (`9 500 $` / `2 200 $/mois` correct fr-CA formatting), existing-tools/journey/fee-explainer sections, language-switcher href (`/fr/business-automation` → `/en/business-automation`, matching the documented forced-prefix behavior). Also re-diffed `/`, `/fr`, `/services`, `/fr/services` to confirm the PreFooterCta fix landed cleanly with no regressions, and hit all 6 not-yet-translated pages' `/fr/*` routes (industries, or-one, contact, resources, faq, company) to confirm no missing-message crash. Sitemap already covered `/business-automation` with a correct hreflang pair from Phase 2's sitemap work — no sitemap change needed.
+
+**Files changed:**
+- Content: `messages/en.json`, `messages/fr.json` (new `BusinessAutomation` namespace, new `SharedCta` namespace)
+- `app/[locale]/business-automation/page.tsx`, `ba-client.tsx`
+- `app/components/DetailsDialog.tsx` (optional translated `labels` prop, English-default, non-breaking)
+- `app/components/site/pre-footer-cta.tsx` (Server → Client Component, hardcoded `CTA_CONTENT` → `SharedCta` messages lookup)
+- `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- `PreFooterCta`'s untranslated state on Homepage and Services — same class of gap as the Phase 2 chrome bug (a shared component nobody thought to re-check once the "big" per-page work was done), caught only because this session's live-diff habit extended to the CTA block, not just hero/nav text.
+- A near-miss self-inflicted bug in `ba-client.tsx`'s cart-reconciliation `scopeItem()` helper — first draft had dead conditional code left over from an edit; caught and cleaned up before commit by reviewing the diff, not just relying on tsc (this specific pattern doesn't throw a type error, just always evaluates to the same branch).
+
+**Problems solved:**
+- Business Automation is now the second fully bilingual page, and — uniquely among the pages done so far — its deep accordion content is translated too, not deferred.
+- The `PreFooterCta` fix is a second foundational, shared-component-level fix (after Phase 2's chrome bug) that protects every future Task #21 page automatically, and retroactively completes Homepage and Services rather than leaving a known gap to circle back to.
+- `DetailsDialog`'s new optional `labels` prop means Services' translation debt (its own Details accordion) is now a pure content task, not a component-refactor task, whenever that gets picked up.
+
+**Still open / needs verification:**
+- Services' own DetailsDialog content (`app/lib/services-details-content.tsx`, ~370 lines) is still untranslated — now trivially unblockable via the same `labels` prop this session added, but not done yet.
+- `SharedCta`'s 6 not-yet-relevant keys (or-one, industries, resources, company, contact, faq) hold English placeholder text — fine for now since those pages aren't translated either, but needs real translations when each page's turn comes, not to be forgotten as "already handled."
+- Business Automation's `[code]` detail pages (`business-automation/[code]/page.tsx`, shares `ServiceDetail` with `/services/[code]`) remain untranslated — same deferral as Services' own `[code]` pages, consistent precedent, not an oversight.
+- Not yet delivered to Mohammad as a patch — that's the immediate next step before anything else.
+- Task #21 otherwise fully pending: OR ONE, Industries, Company, Contact+FAQ, Cyber Health quiz, Resources, Careers/Talent/Partnerships, How We Work, chat widget.
+
+**Next recommended step:**
+1. Commit this work, generate patch `0009` against the current pushed branch tip, verify via fresh-clone `git am`, deliver to Mohammad with the same literal-filename `git am` instructions.
+2. Once applied and pushed, proceed to the next Task #21 page — per Mohammad's standing "research and pick the best option autonomously" preference, no need to wait for sign-off on the pattern itself.
+
+---
+
+### 2026-09-22 — Bilingual EN/FR build, Phase 2b: Services page delivered + PR #13 branch-drift merge conflict diagnosed and resolved
+
+**Summary (condensed — this session's own local log entry for this phase was lost to a `git reset --hard` sync-up and is reconstructed here from memory of the work actually done and verified at the time):** Delivered patch `0008` (Services page, hero/packages/à-la-carte/specialists, fully bilingual) to Mohammad. Diagnosed two real Windows/git issues on his machine (a leftover branch from a prior session; `cmd.exe` not expanding `*` wildcards for external programs like `git.exe`, unlike bash) and walked him through fixes one command at a time. PR #13 then showed a genuine "Merge conflicts" badge — root-caused (not assumed) as real branch drift: Mohammad's pushed branch's merge-base with `origin/main` was stale, missing 3 real upstream commits. Verified via `git merge-tree` that there were zero actual content conflicts (an initial grep false-positived on the word "conflict" inside Terms-of-Service legal text, not a git marker), verified the fix end-to-end in a disposable clone, then gave Mohammad the exact fix: `git fetch origin main` → `git merge origin/main --no-edit` → `git push origin feat/fr-locale`. He ran it successfully. Both patch `0008` and the merge fix are confirmed live on `origin/feat/fr-locale` as of the start of Phase 2c above.
+
+---
+
 ### 2026-09-22 — Bilingual EN/FR build, Phase 2: Homepage wired with real French content + a real site-wide chrome bug found and fixed
 **Completed:**
 - Continuation of the same session/branch as Phase 1 below (infra was already in place; this phase is the first real content + the first real bugs). Built `messages/en.json`/`messages/fr.json`'s full "Home" namespace (nav/hero/entryPoints/reality/capabilities/method/cybersecurity/cyberHealthCta/industries incl. the 9-item industries list), sourced verbatim from `ORAGROL_Homepage_FR_Translation.md` — nothing invented. Verified casing fidelity against the live JSX/CSS before finalizing (8 industries fields are literal ALL-CAPS in source with no backing `text-transform` CSS rule, unlike the rest of the file which is CSS-driven).
