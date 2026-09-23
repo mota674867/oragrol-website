@@ -21,10 +21,11 @@ function MsgText({text}:{text:string}){
     <p style={{fontSize:"13px",lineHeight:1.6,margin:"4px 0 0",overflowWrap:"break-word",wordBreak:"break-word",whiteSpace:"pre-wrap",minWidth:0,padding:0}}>
       {parts.map((part,i)=>{
         if(i%2===1)return<strong key={i}>{part}</strong>;
-        // Match full URLs and relative paths like /contact /services /or-one etc
-        const segs=part.split(/(https?:\/\/[^\s),]+|\/[a-z][a-z0-9-]*(?:\/[a-z0-9-]*)*)/g);
+        // Match full URLs, orgro.ca/... bare domains, and /path style links
+        const segs=part.split(/(https?:\/\/[^\s),]+|(?:orgro\.ca|oragrolglobal\.com)\/[^\s),]*|\/[a-z][a-z0-9-]*(?:\/[a-z0-9-]*)*)/g);
         return segs.map((seg,j)=>{
           if(seg.startsWith("http"))return<a key={i+"-"+j} href={seg} target="_blank" rel="noopener noreferrer" style={{color:"#ef4d00",textDecoration:"underline",wordBreak:"break-all"}}>{seg}</a>;
+          if(/^(?:orgro\.ca|oragrolglobal\.com)\//.test(seg))return<a key={i+"-"+j} href={"https://"+seg} target="_blank" rel="noopener noreferrer" style={{color:"#ef4d00",textDecoration:"underline"}}>{seg}</a>;
           if(seg.startsWith("/")&&seg.length>1)return<a key={i+"-"+j} href={seg} style={{color:"#ef4d00",textDecoration:"underline"}}>{seg}</a>;
           return<span key={i+"-"+j}>{seg}</span>;
         });
@@ -308,12 +309,9 @@ export default function ChatWidget(){
                 </div>
               )}
               <form onSubmit={submit} style={{display:"flex",gap:"8px",alignItems:"flex-end"}}>
-                <div style={{display:"flex",flexDirection:"column",gap:"3px",flexShrink:0}}>
-                  <button type="button" onClick={()=>fileInputRef.current?.click()}
-                    style={{border:"1px solid #aaa7a0",background:"#f4f1ea",padding:"8px 10px",cursor:"pointer",fontSize:"14px",lineHeight:1}}
-                    title="Attach image">📎</button>
-                  <span style={{fontSize:"9px",color:"#999",textAlign:"center",lineHeight:1.3}}>JPG PNG<br/>WEBP 5MB</span>
-                </div>
+                <button type="button" onClick={()=>fileInputRef.current?.click()}
+                  style={{border:"1px solid #aaa7a0",background:"#f4f1ea",padding:"8px 10px",cursor:"pointer",fontSize:"14px",flexShrink:0,lineHeight:1,height:"40px"}}
+                  title="Attach image — JPG, PNG or WEBP, max 5MB">📎</button>
                 <textarea rows={2} value={value} onChange={e=>setValue(e.target.value)}
                   onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit(e as unknown as FormEvent);}}}
                   placeholder="Write your question..."
