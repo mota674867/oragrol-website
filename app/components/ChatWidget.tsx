@@ -20,17 +20,44 @@ function localEscalation(value:string):{text:string;reason:"urgent"|"human-reque
   return null;
 }
 
-// Render markdown-style text as safe HTML with clickable links
-function renderText(text:string):string{
-  // Convert **bold** to <strong>
-  let html=text.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>");
-  // Convert [text](url) to clickable links
-  html=html.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-  // Convert bare URLs that aren't already in an <a> tag
-  html=html.replace(/(?<!href="|">)(https?:\/\/[^\s<>"]+)/g,'<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
-  // Convert line breaks
-  html=html.replace(/\n/g,"<br/>");
-  return html;
+// Render text safely — bold only, no HTML injection risk
+function renderText(text:string):React.ReactNode[]{
+  // Split by **bold** markers and render as React nodes
+  const parts=text.split(/\*\*(.+?)\*\*/g);
+  return parts.map((part,i)=>{
+    if(i%2===1)return <strong key={i}>{part}</strong>;
+    // Split by newlines
+    const lines=part.split("\n");
+    return lines.map((line,j)=>(
+      <span key={i+"-"+j}>
+        {convertLinks(line)}
+        {j<lines.length-1&&<br/>}
+      </span>
+    ));
+  }).flat();
+}
+
+// Convert markdown links [text](url) and bare https:// URLs to <a> tags
+function convertLinks(text:string):React.ReactNode[]{
+  const mdLink=/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g;
+  const bareUrl=/https?:\/\/[^\s)]+/g;
+  const result:React.ReactNode[]=[];
+  let last=0;
+  const allMatches:[number,number,string,string|undefined][]=[];
+  let m;
+  while((m=mdLink.exec(text))!==null)allMatches.push([m.index,m.index+m[0].length,m[2],m[1]]);
+  while((m=bareUrl.exec(text))!==null){
+    const overlap=allMatches.some(([s,e])=>m!.index>=s&&m!.index<e);
+    if(!overlap)allMatches.push([m.index,m.index+m[0].length,m[0],undefined]);
+  }
+  allMatches.sort((a,b)=>a[0]-b[0]);
+  for(const [start,end,url,label] of allMatches){
+    if(start>last)result.push(text.slice(last,start));
+    result.push(<a key={start} href={url} target="_blank" rel="noopener noreferrer" style={{color:"#ef4d00"}}>{label||url}</a>);
+    last=end;
+  }
+  if(last<text.length)result.push(text.slice(last));
+  return result;
 }
 
 export default function ChatWidget(){
@@ -217,7 +244,7 @@ export default function ChatWidget(){
                 ):(
                   <article className={m.from} key={i}>
                     <small>{m.from==="oragrol"?"ORAGROL":"YOU"}</small>
-                    <p dangerouslySetInnerHTML={{__html:renderText(m.text)}}/>
+                    <p>{renderText(m.text)}</p>
                     {m.email&&<a href="mailto:info@orgro.ca?subject=Priority ORAGROL enquiry">Email priority summary ↗</a>}
                   </article>
                 )
