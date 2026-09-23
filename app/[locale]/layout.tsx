@@ -7,7 +7,7 @@ import "@/app/globals.css";
 import { SiteChrome } from "@/app/components/site/site-chrome";
 import { SITE_URL } from "@/app/lib/site-config";
 import { routing } from "@/i18n/routing";
-import ChatWidget from "@/app/components/chat/ChatWidget";
+import ChatWidget from "@/app/components/ChatWidget";
 
 // Design-token typefaces (D-068 visual-system migration — see
 // app/styles/tokens.css). Changing a typeface only requires editing the
