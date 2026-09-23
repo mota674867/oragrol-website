@@ -7,6 +7,7 @@ import "@/app/globals.css";
 import { SiteChrome } from "@/app/components/site/site-chrome";
 import { SITE_URL } from "@/app/lib/site-config";
 import { routing } from "@/i18n/routing";
+import ChatWidget from "@/app/components/chat/ChatWidget";
 
 // Design-token typefaces (D-068 visual-system migration — see
 // app/styles/tokens.css). Changing a typeface only requires editing the
@@ -84,6 +85,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider messages={messages}>
           <SiteChrome>{children}</SiteChrome>
+          <ChatWidget />
         </NextIntlClientProvider>
       </body>
     </html>
