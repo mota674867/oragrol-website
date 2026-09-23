@@ -318,9 +318,9 @@ export default function ChatWidget() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const inactivityTimer = useRef<ReturnType<typeof setTimeout>>();
-  const escalationFallbackTimer = useRef<ReturnType<typeof setTimeout>>();
-  const greetingTimer = useRef<ReturnType<typeof setTimeout>>();
+  const inactivityTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const escalationFallbackTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const greetingTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Auto-scroll to latest message
   useEffect(() => {
