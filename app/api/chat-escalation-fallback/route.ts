@@ -6,7 +6,7 @@
 // Also fires during after-hours for any escalation attempt.
 
 import { NextRequest, NextResponse } from 'next/server';
-import { isBusinessHours } from '@/lib/chat-utils';
+import { isBusinessHours } from '../../lib/chat-utils';
 
 interface FallbackRequest {
   sessionId: string;

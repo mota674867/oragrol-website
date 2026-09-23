@@ -13,8 +13,8 @@ import React, {
   useEffect,
   useCallback,
 } from 'react';
-import { generateSessionId } from '@/lib/chat-utils';
-import type { ChatMessage, ChatIntakeData } from '@/types/chat';
+import { generateSessionId } from '../../lib/chat-utils';
+import type { ChatMessage, ChatIntakeData } from '../../types/chat';
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 const ESCALATION_FALLBACK_DELAY_MS = 3.5 * 60 * 1000; // 3.5 minutes
