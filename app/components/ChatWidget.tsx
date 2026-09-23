@@ -308,16 +308,16 @@ export default function ChatWidget(){
                   <button onClick={()=>setPendingFile(null)} style={{border:0,background:"none",cursor:"pointer",color:"#666",fontSize:"14px"}}>×</button>
                 </div>
               )}
-              <form onSubmit={submit} style={{display:"flex",gap:"8px",alignItems:"flex-end"}}>
+              <form onSubmit={submit} style={{display:"flex",gap:"6px",alignItems:"stretch"}}>
                 <button type="button" onClick={()=>fileInputRef.current?.click()}
-                  style={{border:"1px solid #aaa7a0",background:"#f4f1ea",padding:"8px 10px",cursor:"pointer",fontSize:"14px",flexShrink:0,lineHeight:1,height:"40px"}}
+                  style={{border:"1px solid #aaa7a0",background:"#f4f1ea",padding:"0 10px",cursor:"pointer",fontSize:"16px",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",minHeight:"40px"}}
                   title="Attach image — JPG, PNG or WEBP, max 5MB">📎</button>
                 <textarea rows={2} value={value} onChange={e=>setValue(e.target.value)}
                   onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit(e as unknown as FormEvent);}}}
                   placeholder="Write your question..."
                   style={{flex:1,resize:"none",border:"1px solid #aaa7a0",padding:"8px 10px",fontSize:"13px",fontFamily:"inherit",background:"#fff",outline:"none",minHeight:"40px",maxHeight:"100px"}}/>
                 <button type="submit" disabled={sending||(!value.trim()&&!pendingFile)}
-                  style={{border:0,background:"#111315",color:"#fff",padding:"0 16px",cursor:"pointer",fontSize:"13px",fontWeight:600,height:"40px",flexShrink:0,opacity:(sending||(!value.trim()&&!pendingFile))?0.5:1}}>
+                  style={{border:0,background:"#111315",color:"#fff",padding:"0 14px",cursor:"pointer",fontSize:"13px",fontWeight:600,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",minHeight:"40px",opacity:(sending||(!value.trim()&&!pendingFile))?0.5:1}}>
                   Send
                 </button>
               </form>
