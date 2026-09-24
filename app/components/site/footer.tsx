@@ -62,6 +62,7 @@ const sitemapLinks: [string, string][] = [
   ["OR ONE", "/or-one"],
   ["Industries", "/industries"],
   ["Resources", "/resources"],
+  ["Free Scan", "/scan"],
 ];
 
 // Careers, Talent and Partnerships shipped 2026-09-06 as standalone

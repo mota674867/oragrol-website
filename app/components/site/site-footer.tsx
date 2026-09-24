@@ -44,7 +44,10 @@ const COMPANY_LINKS = [
 
 /** Just the one real page (Step 10, built — D-052) — not padded with
  * invented links to fill out the column. */
-const RESOURCES_LINKS = [{ label: "Resources", href: "/resources" }];
+const RESOURCES_LINKS = [
+  { label: "Resources", href: "/resources" },
+  { label: "Free Scan", href: "/scan" },
+];
 
 const LEGAL_LINKS = [
   { label: "Privacy Policy", href: "/legal/privacy" },

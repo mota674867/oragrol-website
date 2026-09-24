@@ -112,14 +112,29 @@ export default function UtilityBar() {
                 </p>
               </a>
 
+              <div style={{ borderTop: "1px solid #1f1f1f", padding: "8px 16px 2px" }}>
+                <p style={{ fontSize: "9px", color: "#444", letterSpacing: ".12em", margin: 0, fontWeight: 600 }}>
+                  {isFr ? "NOUVEAU CLIENT" : "NEW CLIENT"}
+                </p>
+              </div>
               <Link
-                href="/contact"
-                style={{ display: "block", padding: "10px 16px", textDecoration: "none" }}
+                href="/scan"
+                style={{ display: "block", padding: "8px 16px", textDecoration: "none", borderBottom: "1px solid #1a1a1a" }}
                 onMouseEnter={e => (e.currentTarget.style.background = "#1a1a1a")}
                 onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
               >
                 <p style={{ fontSize: "12px", color: "#e0e0e0", margin: 0 }}>
-                  {isFr ? "Nouveau client ? Commencez ici →" : "New client? Start here →"}
+                  {isFr ? "Démarrer avec un scan gratuit →" : "Start with a free scan →"}
+                </p>
+              </Link>
+              <Link
+                href="/contact"
+                style={{ display: "block", padding: "8px 16px 12px", textDecoration: "none" }}
+                onMouseEnter={e => (e.currentTarget.style.background = "#1a1a1a")}
+                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+              >
+                <p style={{ fontSize: "12px", color: "#e0e0e0", margin: 0 }}>
+                  {isFr ? "Contacter notre équipe →" : "Contact our team →"}
                 </p>
               </Link>
             </div>
