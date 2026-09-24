@@ -143,7 +143,7 @@ export default function OdoDiscoveryPopup({ onEvent = (_e: OdoEvent) => {} }: { 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") { markSeen(); emit("dismissed", { method: "escape" }); setVisible(false); return; }
       if (event.key !== "Tab") return;
-      const focusables = [closeButtonRef.current, ctaRef.current, learnRef.current, noThanksRef.current].filter((el): el is HTMLElement => el !== null);
+      const focusables = [closeButtonRef.current, ctaRef.current, learnRef.current, noThanksRef.current].filter((el): el is NonNullable<typeof el> => el !== null) as HTMLElement[];
       const first = focusables[0];
       const last = focusables[focusables.length - 1];
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
