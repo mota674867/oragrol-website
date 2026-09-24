@@ -183,9 +183,6 @@ export default async function PrivacyPolicyPage({
             <button className="search" aria-label={isFr ? "Recherche" : "Search"}>
               <span />
             </button>
-            <span className="language">
-              <span className="language-current">{locale.toUpperCase()}</span> / <Link href="/privacy-policy" locale={otherLocale} aria-label={isFr ? "Changer de langue" : "Change language"}>{otherLocale.toUpperCase()}</Link>
-            </span>
           </div>
         </header>
 

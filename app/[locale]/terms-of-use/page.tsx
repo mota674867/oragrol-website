@@ -115,9 +115,6 @@ export default async function TermsOfUsePage({
           <button className="search" aria-label={isFr ? "Recherche" : "Search"}>
             <span />
           </button>
-          <span className="language">
-            <span className="language-current">{locale.toUpperCase()}</span> / <Link href="/terms-of-use" locale={otherLocale} aria-label={isFr ? "Changer de langue" : "Change language"}>{otherLocale.toUpperCase()}</Link>
-          </span>
         </div>
       </header>
 

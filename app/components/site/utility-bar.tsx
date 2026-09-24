@@ -118,7 +118,7 @@ export default function UtilityBar() {
                 onMouseEnter={e => (e.currentTarget.style.background = "#1a1a1a")}
                 onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
               >
-                <p style={{ fontSize: "11px", color: "#e86b1f", margin: 0 }}>
+                <p style={{ fontSize: "12px", color: "#e0e0e0", margin: 0 }}>
                   {isFr ? "Nouveau client ? Commencez ici →" : "New client? Start here →"}
                 </p>
               </Link>

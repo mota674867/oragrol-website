@@ -241,9 +241,6 @@ function ResourcesPageClient() {
           <button className="search" aria-label={t("header.search")}>
             <span />
           </button>
-          <span className="language">
-            <span className="language-current">{locale.toUpperCase()}</span> / <Link href={pathname} locale={otherLocale} aria-label={t("header.changeLanguage")}>{otherLocale.toUpperCase()}</Link>
-          </span>
         </div>
       </header>
 

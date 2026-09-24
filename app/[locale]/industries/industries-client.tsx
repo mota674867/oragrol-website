@@ -101,9 +101,6 @@ function IndustriesClient() {
           <button className="search" aria-label={t("nav.search")}>
             <span />
           </button>
-          <span className="language">
-            <span className="language-current">{locale.toUpperCase()}</span> / <Link href={pathname} locale={otherLocale} aria-label={t("nav.changeLanguage")}>{otherLocale.toUpperCase()}</Link>
-          </span>
         </div>
       </header>
 
