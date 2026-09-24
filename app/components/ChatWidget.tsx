@@ -24,7 +24,7 @@ function MsgText({text}:{text:string}){
         // Match full URLs, orgro.ca/... bare domains, and /path style links
         const segs=part.split(/(https?:\/\/[^\s),]+|(?:orgro\.ca|oragrolglobal\.com)\/[^\s),]*|\/[a-z][a-z0-9-]*(?:\/[a-z0-9-]*)*)/g);
         return segs.map((seg,j)=>{
-          if(seg.startsWith("http"))return<a key={i+"-"+j} href={seg} target="_blank" rel="noopener noreferrer" style={{color:"#ef4d00",textDecoration:"underline",wordBreak:"break-all"}}>{seg}</a>;
+          if(seg.startsWith("http")){const isInternal=/orgro\.ca|oragrolglobal\.com/.test(seg);return<a key={i+"-"+j} href={seg} {...(isInternal?{}:{target:"_blank",rel:"noopener noreferrer"})} style={{color:"#ef4d00",textDecoration:"underline",wordBreak:"break-all"}}>{seg}</a>;}
           if(/^(?:orgro\.ca|oragrolglobal\.com)\//.test(seg))return<a key={i+"-"+j} href={"https://"+seg} style={{color:"#ef4d00",textDecoration:"underline"}}>{seg}</a>;
           if(seg.startsWith("/")&&seg.length>1)return<a key={i+"-"+j} href={seg} style={{color:"#ef4d00",textDecoration:"underline"}}>{seg}</a>;
           return<span key={i+"-"+j}>{seg}</span>;
