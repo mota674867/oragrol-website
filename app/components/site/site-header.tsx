@@ -193,8 +193,52 @@ export function SiteHeader() {
         */}
         <div className="relative z-10 border-b border-border/60">
           <div className="flex h-9 items-center justify-between px-6 md:px-12">
-            <div aria-hidden="true" />
+            {/* Left — Free Scan CTA */}
+            <Link
+              href="/scan"
+              className="font-body text-xs font-semibold transition-colors duration-150"
+              style={{ color: "#e86b1f" }}
+            >
+              {isFr ? "Scan gratuit →" : "Free Scan →"}
+            </Link>
+            {/* Right — Log in dropdown + EN/FR */}
             <div className="flex items-center gap-6">
+              {/* Log in dropdown */}
+              <div className="relative group">
+                <button className="font-body text-xs text-text-secondary flex items-center gap-1 hover:text-text-primary transition-colors duration-150">
+                  {isFr ? "Connexion" : "Log in"} <span style={{fontSize:"9px"}}>▾</span>
+                </button>
+                <div className="absolute right-0 top-full mt-1 w-64 bg-background border border-border shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-150 z-50">
+                  <div className="px-4 py-3 border-b border-border">
+                    <p className="text-xs font-semibold text-text-secondary uppercase tracking-widest">{isFr ? "Vos portails" : "Your portals"}</p>
+                  </div>
+                  <a
+                    href="https://app.oragrolglobal.com/or-one"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block px-4 py-3 hover:bg-surface-1 transition-colors border-b border-border/50"
+                  >
+                    <p className="text-xs font-semibold text-text-primary">OR ONE Dashboard</p>
+                    <p className="text-xs text-text-secondary mt-0.5">{isFr ? "Agents IA, approbations et rapports" : "AI agents, approvals and reports"}</p>
+                  </a>
+                  <a
+                    href="https://app.oragrolglobal.com/services"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block px-4 py-3 hover:bg-surface-1 transition-colors border-b border-border/50"
+                  >
+                    <p className="text-xs font-semibold text-text-primary">{isFr ? "Tableau de bord Services" : "Services Dashboard"}</p>
+                    <p className="text-xs text-text-secondary mt-0.5">{isFr ? "Statut de protection et rapports" : "Protection status and reports"}</p>
+                  </a>
+                  <Link
+                    href="/contact"
+                    className="block px-4 py-3 hover:bg-surface-1 transition-colors"
+                  >
+                    <p className="text-xs text-accent">{isFr ? "Nouveau client ? Commencez ici →" : "New client? Start here →"}</p>
+                  </Link>
+                </div>
+              </div>
+              {/* EN / FR toggle */}
               <div className="font-body text-xs">
                 <span className="font-semibold text-accent">{locale.toUpperCase()}</span>
                 <span className="text-text-secondary">&nbsp;|&nbsp;</span>
