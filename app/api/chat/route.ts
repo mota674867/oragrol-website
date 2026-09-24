@@ -51,6 +51,19 @@ export async function POST(request: Request) {
   return handleReply(parsed.data);
 }
 
+function getBusinessHoursContext(): string {
+  const now = new Date();
+  const etHour = (now.getUTCHours() - 5 + 24) % 24;
+  const etDay = now.toLocaleDateString("en-CA", { weekday: "long", timeZone: "America/Toronto" });
+  const etTime = now.toLocaleTimeString("en-CA", { hour: "2-digit", minute: "2-digit", hour12: true, timeZone: "America/Toronto" });
+  const utcDay = now.getUTCDay();
+  const isWeekday = utcDay >= 1 && utcDay <= 5;
+  const isBusinessHours = isWeekday && etHour >= 9 && etHour < 18;
+  return isBusinessHours
+    ? `\n\nCURRENT TIME CONTEXT: It is currently ${etDay} ${etTime} ET — business hours. A real person is available right now if needed.`
+    : `\n\nCURRENT TIME CONTEXT: It is currently ${etDay} ${etTime} ET — outside business hours (Mon–Fri 9am–6pm ET). No one is available to respond live right now. If a visitor needs a person, tell them to email info@orgro.ca or that the team will follow up next business day.`;
+}
+
 async function handleReply(data: { messages: { role: "visitor" | "oragrol"; text: string }[] }) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -71,7 +84,7 @@ async function handleReply(data: { messages: { role: "visitor" | "oragrol"; text
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: 400,
-      system: SYSTEM_PROMPT,
+      system: SYSTEM_PROMPT + getBusinessHoursContext(),
       messages,
     });
 

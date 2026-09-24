@@ -16,19 +16,40 @@ const ALLOWED_TYPES=["image/jpeg","image/jpg","image/png","image/webp"];
 const MAX_FILE_SIZE=5*1024*1024;
 
 function MsgText({text}:{text:string}){
-  const parts=text.split(/\*\*(.+?)\*\*/g);
+  // Pre-process: convert markdown [label](url) to a placeholder, then split
+  // This prevents [/contact](/contact) from rendering twice
+  const mdLinkRe=/\[([^\]]+)\]\(([^)]+)\)/g;
+  const mdLinks:{label:string;href:string}[]=[];
+  const preprocessed=text.replace(mdLinkRe,(_, label, href)=>{
+    const idx=mdLinks.length;
+    mdLinks.push({label,href});
+    return `\x00MDLINK${idx}\x00`;
+  });
+
+  const parts=preprocessed.split(/(\*\*.+?\*\*|\x00MDLINK\d+\x00|https?:\/\/[^\s),]+|\/[a-z][a-z0-9-]*(?:\/[a-z0-9-]*)*)/g);
+
   return(
     <p style={{fontSize:"13px",lineHeight:1.6,margin:"4px 0 0",overflowWrap:"break-word",wordBreak:"break-word",whiteSpace:"pre-wrap",minWidth:0,padding:0}}>
-      {parts.map((part,i)=>{
-        if(i%2===1)return<strong key={i}>{part}</strong>;
-        // Match full URLs, orgro.ca/... bare domains, and /path style links
-        const segs=part.split(/(https?:\/\/[^\s),]+|(?:orgro\.ca|oragrolglobal\.com)\/[^\s),]*|\/[a-z][a-z0-9-]*(?:\/[a-z0-9-]*)*)/g);
-        return segs.map((seg,j)=>{
-          if(seg.startsWith("http")){const isInternal=/orgro\.ca|oragrolglobal\.com/.test(seg);return<a key={i+"-"+j} href={seg} {...(isInternal?{}:{target:"_blank",rel:"noopener noreferrer"})} style={{color:"#ef4d00",textDecoration:"underline",wordBreak:"break-all"}}>{seg}</a>;}
-          if(/^(?:orgro\.ca|oragrolglobal\.com)\//.test(seg))return<a key={i+"-"+j} href={"https://"+seg} style={{color:"#ef4d00",textDecoration:"underline"}}>{seg}</a>;
-          if(seg.startsWith("/")&&seg.length>1)return<a key={i+"-"+j} href={seg} style={{color:"#ef4d00",textDecoration:"underline"}}>{seg}</a>;
-          return<span key={i+"-"+j}>{seg}</span>;
-        });
+      {parts.map((seg,i)=>{
+        if(!seg)return null;
+        // Bold
+        if(seg.startsWith("**")&&seg.endsWith("**"))return<strong key={i}>{seg.slice(2,-2)}</strong>;
+        // Markdown link placeholder
+        const mdMatch=seg.match(/^\x00MDLINK(\d+)\x00$/);
+        if(mdMatch){
+          const{label,href}=mdLinks[Number(mdMatch[1])];
+          const isExternal=/^https?:\/\//.test(href)&&!/orgro\.ca|oragrolglobal\.com/.test(href);
+          return<a key={i} href={href} {...(isExternal?{target:"_blank",rel:"noopener noreferrer"}:{})} style={{color:"#ef4d00",textDecoration:"underline"}}>{label}</a>;
+        }
+        // Full https:// URL
+        if(seg.startsWith("http")){
+          const isInternal=/orgro\.ca|oragrolglobal\.com/.test(seg);
+          return<a key={i} href={seg} {...(isInternal?{}:{target:"_blank",rel:"noopener noreferrer"})} style={{color:"#ef4d00",textDecoration:"underline",wordBreak:"break-all"}}>{seg}</a>;
+        }
+        // Relative /path
+        if(seg.startsWith("/")&&seg.length>1)return<a key={i} href={seg} style={{color:"#ef4d00",textDecoration:"underline"}}>{seg}</a>;
+        // Plain text
+        return<span key={i}>{seg}</span>;
       })}
     </p>
   );
