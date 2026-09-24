@@ -46,7 +46,7 @@ export default function UtilityBar() {
         <div style={{ position: "relative" }}>
           <button
             onClick={() => setLoginOpen(!loginOpen)}
-            onBlur={() => setTimeout(() => setLoginOpen(false), 150)}
+            onBlur={() => setTimeout(() => setLoginOpen(false), 300)}
             style={{
               background: "none",
               border: "none",
@@ -65,6 +65,7 @@ export default function UtilityBar() {
 
           {loginOpen && (
             <div
+              onMouseDown={e => e.preventDefault()}
               style={{
                 position: "absolute",
                 right: 0,
