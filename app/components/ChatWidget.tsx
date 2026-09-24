@@ -25,7 +25,7 @@ function MsgText({text}:{text:string}){
         const segs=part.split(/(https?:\/\/[^\s),]+|(?:orgro\.ca|oragrolglobal\.com)\/[^\s),]*|\/[a-z][a-z0-9-]*(?:\/[a-z0-9-]*)*)/g);
         return segs.map((seg,j)=>{
           if(seg.startsWith("http"))return<a key={i+"-"+j} href={seg} target="_blank" rel="noopener noreferrer" style={{color:"#ef4d00",textDecoration:"underline",wordBreak:"break-all"}}>{seg}</a>;
-          if(/^(?:orgro\.ca|oragrolglobal\.com)\//.test(seg))return<a key={i+"-"+j} href={"https://"+seg} target="_blank" rel="noopener noreferrer" style={{color:"#ef4d00",textDecoration:"underline"}}>{seg}</a>;
+          if(/^(?:orgro\.ca|oragrolglobal\.com)\//.test(seg))return<a key={i+"-"+j} href={"https://"+seg} style={{color:"#ef4d00",textDecoration:"underline"}}>{seg}</a>;
           if(seg.startsWith("/")&&seg.length>1)return<a key={i+"-"+j} href={seg} style={{color:"#ef4d00",textDecoration:"underline"}}>{seg}</a>;
           return<span key={i+"-"+j}>{seg}</span>;
         });
@@ -312,10 +312,10 @@ export default function ChatWidget(){
                 <button type="button" onClick={()=>fileInputRef.current?.click()}
                   style={{border:"1px solid #aaa7a0",background:"#f4f1ea",padding:"0 10px",cursor:"pointer",fontSize:"16px",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",minHeight:"40px"}}
                   title="Attach image — JPG, PNG or WEBP, max 5MB">📎</button>
-                <textarea rows={2} value={value} onChange={e=>setValue(e.target.value)}
+                <textarea value={value} onChange={e=>setValue(e.target.value)}
                   onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit(e as unknown as FormEvent);}}}
                   placeholder="Write your question..."
-                  style={{flex:1,resize:"none",border:"1px solid #aaa7a0",padding:"8px 10px",fontSize:"13px",fontFamily:"inherit",background:"#fff",outline:"none",minHeight:"40px",maxHeight:"100px"}}/>
+                  style={{flex:1,resize:"none",border:"1px solid #aaa7a0",padding:"8px 10px",fontSize:"13px",fontFamily:"inherit",background:"#fff",outline:"none",minHeight:"40px",maxHeight:"100px",height:"40px"}}/>
                 <button type="submit" disabled={sending||(!value.trim()&&!pendingFile)}
                   style={{border:0,background:"#111315",color:"#fff",padding:"0 14px",cursor:"pointer",fontSize:"13px",fontWeight:600,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",minHeight:"40px",opacity:(sending||(!value.trim()&&!pendingFile))?0.5:1}}>
                   Send
