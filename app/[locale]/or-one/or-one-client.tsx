@@ -17,6 +17,7 @@ import {
   RevisedManagement,
 } from "./review-sections";
 import "@/app/gpt-pages.css";
+import OdoDiscoveryPopup from "@/app/components/site/odo-popup";
 type Risk = "Standard" | "Controlled" | "Critical";
 type Item = { name: string; points: number; risk: Risk };
 type Group = { name: string; benefit: string; items: Item[] };
@@ -523,7 +524,8 @@ function OrOneClient() {
       <RevisedResponsibility />
       <RevisedManagement />
       <PreFooterCta page="or-one" />
-      <SiteFooter/>
+      <OdoDiscoveryPopup />
+  <SiteFooter/>
       <ScopeTray
         items={scope.items}
         remove={scope.remove}

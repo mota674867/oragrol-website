@@ -11,6 +11,7 @@ import UtilityBar from "@/app/components/site/utility-bar";
 import { OragrolLogo } from "@/app/components/brand/oragrol-logo";
 import {NAV_ITEMS} from "@/app/components/site/nav-items";
 import "./homepage-v3.css";
+import OdoDiscoveryPopup from "@/app/components/site/odo-popup";
 
 // Language-neutral metadata only (code/key/href/number) — the actual
 // display strings are resolved inside the component via useTranslations,
@@ -72,6 +73,7 @@ function HomeClient({cybersecuritySection}:{cybersecuritySection:ReactNode}){
   <section className="cyber-health-home"><div className="health-copy"><p className="section-label">{t("cyberHealthCta.label")}</p><h2>{t("cyberHealthCta.headline1")}<br/><span>{t("cyberHealthCta.headline2")}</span></h2><p>{t("cyberHealthCta.sub")}</p><Link href="/cyber-health">{t("cyberHealthCta.link")} <Arrow/></Link></div><div className="health-score"><span>{t("cyberHealthCta.illustrativeLabel")}</span><strong>78</strong><small>/100</small><div><i style={{width:"78%"}}/><p><span>{t("cyberHealthCta.currentPosition")}</span><b>{t("cyberHealthCta.clearerPriorities")}</b></p></div></div></section>
   <section className="industries-wrap"><CanadaCoverageStudy/></section>
   <PreFooterCta page="home"/>
+  <OdoDiscoveryPopup />
   <SiteFooter/>
  </main></>
 }

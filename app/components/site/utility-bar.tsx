@@ -29,6 +29,7 @@ export default function UtilityBar() {
       {/* Left — Free Scan */}
       <Link
         href="/scan"
+        data-odo-free-scan="true"
         style={{
           color: "#e86b1f",
           fontWeight: 600,

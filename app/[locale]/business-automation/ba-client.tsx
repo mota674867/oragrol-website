@@ -10,6 +10,7 @@ import UtilityBar from "@/app/components/site/utility-bar";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
 import { DetailsDialog, type DetailsDialogLabels } from "@/app/components/DetailsDialog";
 import "@/app/gpt-pages.css";
+import OdoDiscoveryPopup from "@/app/components/site/odo-popup";
 
 /**
  * Bilingual (D-086, Task #21): rewired to consume the `BusinessAutomation`
@@ -401,7 +402,8 @@ function BusinessAutomationClient() {
         </div>
       </section>
       <PreFooterCta page="business-automation" />
-      <SiteFooter />
+      <OdoDiscoveryPopup />
+  <SiteFooter />
       <ScopeTray
         items={scope.items}
         remove={scope.remove}

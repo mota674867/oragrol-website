@@ -13,6 +13,7 @@ import ServicesPage, {
   type ServicesSelection,
 } from "./services-body";
 import "@/app/gpt-pages.css";
+import OdoDiscoveryPopup from "@/app/components/site/odo-popup";
 
 /**
  * Client body for /services (2026-09-08 rebuild). The header, ScopeTray,
@@ -172,7 +173,8 @@ function ServicesClient() {
       />
 
       <PreFooterCta page="services" />
-      <SiteFooter />
+      <OdoDiscoveryPopup />
+  <SiteFooter />
       <ScopeTray
         items={scope.items}
         remove={scope.remove}
