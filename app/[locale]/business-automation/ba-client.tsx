@@ -6,6 +6,7 @@ import { ScopeTray, useScope } from "@/app/components/ScopeTray";
 import PreFooterCta from "@/app/components/site/pre-footer-cta";
 import SiteFooter from "@/app/components/site/footer";
 import OragrolMegaNav from "@/app/components/site/oragrol-mega-nav";
+import UtilityBar from "@/app/components/site/utility-bar";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
 import { DetailsDialog, type DetailsDialogLabels } from "@/app/components/DetailsDialog";
 import "@/app/gpt-pages.css";
@@ -150,6 +151,8 @@ function BusinessAutomationClient() {
   };
 
   return (
+    <>
+    <UtilityBar />
     <main className="ba-full-page ba-jobs-page">
       <header className="ba-header">
         <Link className="wordmark" href="/">
@@ -411,6 +414,7 @@ function BusinessAutomationClient() {
         activeArea="Automation"
       />
     </main>
+    </>
   );
 }
 

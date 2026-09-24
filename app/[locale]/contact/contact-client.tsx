@@ -6,6 +6,7 @@ import { FormEvent, useEffect, useState } from "react";
 import PreFooterCta from "@/app/components/site/pre-footer-cta";
 import SiteFooter from "@/app/components/site/footer";
 import OragrolMegaNav from "@/app/components/site/oragrol-mega-nav";
+import UtilityBar from "@/app/components/site/utility-bar";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
 import "@/app/gpt-pages.css";
 
@@ -112,6 +113,8 @@ function ContactPageClient() {
     }
   };
   return (
+    <>
+    <UtilityBar />
     <main className="contact-page">
       <header className="industry-header contact-header">
         <Link className="wordmark" href="/">
@@ -374,6 +377,7 @@ function ContactPageClient() {
 
       <SiteFooter/>
     </main>
+    </>
   );
 }
 

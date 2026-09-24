@@ -6,6 +6,7 @@ import { ScopeTray, useScope } from "@/app/components/ScopeTray";
 import PreFooterCta from "@/app/components/site/pre-footer-cta";
 import SiteFooter from "@/app/components/site/footer";
 import OragrolMegaNav from "@/app/components/site/oragrol-mega-nav";
+import UtilityBar from "@/app/components/site/utility-bar";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
 import { OR_ONE_CAPABILITY_BY_NAME } from "@/app/lib/or-one-capability-registry";
 import {
@@ -345,6 +346,8 @@ function OrOneClient() {
     t,
   ]);
   return (
+    <>
+    <UtilityBar />
     <main className="orone-full">
       <header className="one-header">
         <Link className="one-wordmark" href="/">
@@ -533,6 +536,7 @@ function OrOneClient() {
         activeArea="OR ONE"
       />
     </main>
+    </>
   );
 }
 

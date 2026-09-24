@@ -4,6 +4,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import PreFooterCta from "@/app/components/site/pre-footer-cta";
 import SiteFooter from "@/app/components/site/footer";
 import OragrolMegaNav from "@/app/components/site/oragrol-mega-nav";
+import UtilityBar from "@/app/components/site/utility-bar";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
 import "@/app/gpt-pages.css";
 
@@ -226,6 +227,8 @@ function ResourcesPageClient() {
     newResources = localized.slice(6);
 
   return (
+    <>
+    <UtilityBar />
     <main className="res-page">
       <header className="industry-header res-header">
         <Link className="wordmark" href="/">
@@ -336,6 +339,7 @@ function ResourcesPageClient() {
 
       <SiteFooter/>
     </main>
+    </>
   );
 }
 

@@ -6,6 +6,7 @@ import { ScopeTray, useScope, type ScopeItem } from "@/app/components/ScopeTray"
 import PreFooterCta from "@/app/components/site/pre-footer-cta";
 import SiteFooter from "@/app/components/site/footer";
 import OragrolMegaNav from "@/app/components/site/oragrol-mega-nav";
+import UtilityBar from "@/app/components/site/utility-bar";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
 import ServicesPage, {
   INDIVIDUAL_SERVICES,
@@ -139,6 +140,8 @@ function ServicesClient() {
   };
 
   return (
+    <>
+    <UtilityBar />
     <main className="services-page">
       <header className="site-header">
         <Link className="wordmark" href="/">
@@ -182,6 +185,7 @@ function ServicesClient() {
         activeArea="Cybersecurity"
       />
     </main>
+    </>
   );
 }
 

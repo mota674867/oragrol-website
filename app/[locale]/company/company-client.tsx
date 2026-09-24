@@ -4,6 +4,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import PreFooterCta from "@/app/components/site/pre-footer-cta";
 import SiteFooter from "@/app/components/site/footer";
 import OragrolMegaNav from "@/app/components/site/oragrol-mega-nav";
+import UtilityBar from "@/app/components/site/utility-bar";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
 import "@/app/gpt-pages.css";
 
@@ -42,6 +43,8 @@ function CompanyPageClient() {
   const points = t.raw("operating.points") as string[];
 
   return (
+    <>
+    <UtilityBar />
     <main className="company-page">
       <header className="industry-header company-header">
         <Link className="wordmark" href="/">
@@ -171,6 +174,7 @@ function CompanyPageClient() {
 
       <SiteFooter/>
     </main>
+    </>
   );
 }
 
