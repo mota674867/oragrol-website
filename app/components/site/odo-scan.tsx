@@ -159,20 +159,20 @@ function makeIdempotencyKey() {
   return `odo-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-function normalizeWebsite(value: string): string | null {
+function normalizeWebsite(value: string): string {
   const trimmed = value.trim();
-  if (!trimmed) return null;
+  if (!trimmed) return "";
   return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
 }
 
 function validateForm(form: typeof INITIAL_FORM): Record<string, string> {
-  const errors = {};
+  const errors: Record<string, string> = {};
   if (!form.name.trim()) errors.name = "Enter your name.";
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
     errors.email = "Enter a valid work email.";
   }
   if (!form.company.trim()) errors.company = "Enter your company name.";
-  if (form.website.trim() && !/^https?:\/\/[^\s]+$/i.test(normalizeWebsite(form.website))) {
+  if (form.website.trim() && !/^https?:\/\/[^\s]+$/i.test(normalizeWebsite(form.website) || "")) {
     errors.website = "Enter a valid website URL, or choose No website.";
   }
   return errors;
@@ -265,11 +265,11 @@ export default function OdoScanPage({ locale = "en", onEvent = (_e: Record<strin
   const [phase, setPhase] = useState("idle");
   const [step, setStep] = useState("website");
   const [sessionId, setSessionId] = useState("");
-  const [question, setQuestion] = useState<Record<string, unknown> | null>(null);
+  const [question, setQuestion] = useState<{id: string; text: string; options?: Array<string | {value: string; label?: string}>} | null>(null);
   const [answer, setAnswer] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollRef = useRef<ReturnType<typeof window.setInterval> | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
 
   const emit = useCallback((type: string, extra: Record<string, unknown> = {}) => onEvent({ type, ...extra }), [onEvent]);
@@ -286,9 +286,9 @@ export default function OdoScanPage({ locale = "en", onEvent = (_e: Record<strin
   const applyStatus = useCallback((payload: Record<string, unknown>) => {
     const next = payload?.status as string | undefined;
     if (!next) return;
-    if (payload.phase) setPhase(payload.phase as string);
-    if (payload.step) setStep(payload.step as string);
-    if (payload.question) setQuestion(payload.question as Record<string, unknown>);
+    if (payload.phase) setPhase(String(payload.phase));
+    if (payload.step) setStep(String(payload.step));
+    if (payload.question) setQuestion(payload.question as {id: string; text: string; options?: Array<string | {value: string; label?: string}>});
     if (next === "report_pending") {
       stopUpdates();
       setPhase("summary");
@@ -311,7 +311,7 @@ export default function OdoScanPage({ locale = "en", onEvent = (_e: Record<strin
       setPhase("questions");
       setBusy(false);
     } else {
-      setPhase(payload.phase || "researching");
+      setPhase(String(payload.phase || "researching"));
       setBusy(true);
     }
   }, [emit, stopUpdates]);
@@ -380,7 +380,7 @@ export default function OdoScanPage({ locale = "en", onEvent = (_e: Record<strin
             name: form.name.trim(),
             email: form.email.trim().toLowerCase(),
             company: form.company.trim(),
-            website: normalizeWebsite(form.website),
+            website: normalizeWebsite(form.website) || null,
           },
           consent: {
             accepted: true,
@@ -397,10 +397,10 @@ export default function OdoScanPage({ locale = "en", onEvent = (_e: Record<strin
         emit("scan-start-rejected", { code: payload?.code });
         return;
       }
-      setSessionId(payload.session_id);
-      if (typeof window !== "undefined") window.sessionStorage.setItem("oragrol_odo_session_id", payload.session_id);
+      setSessionId(String(payload.session_id));
+      if (typeof window !== "undefined") window.sessionStorage.setItem("oragrol_odo_session_id", String(payload.session_id));
       emit("scan-started");
-      startUpdates(payload.session_id, payload.events_url || `${ODO_ROUTES.events}?session_id=${encodeURIComponent(payload.session_id)}`, payload.status_url || ODO_ROUTES.status);
+      startUpdates(String(payload.session_id), String(payload.events_url || `${ODO_ROUTES.events}?session_id=${encodeURIComponent(String(payload.session_id))}`), String(payload.status_url || ODO_ROUTES.status));
     } catch {
       setBusy(false);
       setPhase("idle");
@@ -409,7 +409,7 @@ export default function OdoScanPage({ locale = "en", onEvent = (_e: Record<strin
     }
   };
 
-  const submitAnswer = async (event: React.FormEvent | null, selectedAnswer: string = answer.trim()) => {
+  const submitAnswer = async (event: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement> | null, selectedAnswer: string = answer.trim()) => {
     event?.preventDefault();
     if (!selectedAnswer || !sessionId || busy || !question?.id) return;
     setBusy(true);
@@ -420,7 +420,7 @@ export default function OdoScanPage({ locale = "en", onEvent = (_e: Record<strin
         body: JSON.stringify({
           session_id: sessionId,
           idempotency_key: makeIdempotencyKey(),
-          question_id: (question as Record<string, unknown>).id,
+          question_id: question.id,
           answer: selectedAnswer,
         }),
       });
@@ -433,7 +433,7 @@ export default function OdoScanPage({ locale = "en", onEvent = (_e: Record<strin
       setQuestion(null);
       setAnswer("");
       applyStatus(payload);
-      startUpdates(sessionId, payload.events_url || `${ODO_ROUTES.events}?session_id=${encodeURIComponent(sessionId)}`, payload.status_url || ODO_ROUTES.status);
+      startUpdates(sessionId, String(payload.events_url || `${ODO_ROUTES.events}?session_id=${encodeURIComponent(sessionId)}`), String(payload.status_url || ODO_ROUTES.status));
     } catch {
       setBusy(false);
       setMessage("We could not save that answer. Please try again.");
@@ -532,14 +532,14 @@ export default function OdoScanPage({ locale = "en", onEvent = (_e: Record<strin
               <PhaseTrack phase="questions" />
               <div className="odo-scan__question-panel">
                 <p className="odo-scan__section-kicker">ONE QUESTION AT A TIME</p>
-                <h2>{question.text as string}</h2>
+                <h2>{question.text}</h2>
                 <form onSubmit={submitAnswer}>
-                  {Array.isArray((question as Record<string, unknown>).options) && (question as Record<string, unknown[]>).options.length ? (
+                  {Array.isArray(question.options) && question.options && question.options.length ? (
                     <div className="odo-scan__options" role="group" aria-label="Choose an answer">
-                      {((question as Record<string, unknown[]>).options as (string | {value: string; label?: string})[]).map((option) => {
+                      {(question.options || []).map((option) => {
                         const value = typeof option === "string" ? option : option.value;
                         const label = typeof option === "string" ? option : option.label || value;
-                        return <button key={value} type="button" className="odo-scan__option" disabled={busy} onClick={(event) => submitAnswer(event, value)}>{label}</button>;
+                        return <button key={value} type="button" className="odo-scan__option" disabled={busy} onClick={(event: React.MouseEvent<HTMLButtonElement>) => submitAnswer(event, value)}>{label}</button>;
                       })}
                     </div>
                   ) : (
