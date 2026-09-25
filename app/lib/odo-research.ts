@@ -363,28 +363,29 @@ export async function runParallelResearch(
     ]),
   ]);
 
-  const getValue = <T>(result: PromiseSettledResult<T | null>): T | null =>
-    result.status === "fulfilled" ? result.value : null;
+  function getVal<T>(result: PromiseSettledResult<unknown>): T | null {
+    return result.status === "fulfilled" ? (result.value as T | null) : null;
+  }
 
-  const generalResearchData = getValue(generalResearch);
-  const staffData = getValue(staffAndContacts);
+  const generalResearchData = getVal<GeneralResearchFindings>(generalResearch);
+  const staffData = getVal<StaffFindings>(staffAndContacts);
   const { industry, businessSize } = await detectIndustryAndSize(generalResearchData, staffData);
 
   return {
-    website: getValue(pageSpeed),
-    seo: null, // DataForSEO — wired separately
-    technologies: getValue(technologies),
-    ssl: getValue(ssl),
-    emailSecurity: getValue(emailSecurity),
-    securityHeaders: getValue(securityHeaders),
-    mozillaObservatory: null, // Mozilla Observatory — wired separately
-    breachHistory: getValue(breachHistory),
-    shodan: getValue(shodan),
-    virusTotal: getValue(virusTotal),
-    certificates: getValue(certificates),
-    googleBusiness: getValue(googleBusiness),
+    website: getVal<WebsiteFindings>(pageSpeed),
+    seo: null,
+    technologies: getVal<TechFindings>(technologies),
+    ssl: getVal<SslFindings>(ssl),
+    emailSecurity: getVal<EmailSecurityFindings>(emailSecurity),
+    securityHeaders: getVal<SecurityHeadersFindings>(securityHeaders),
+    mozillaObservatory: null,
+    breachHistory: getVal<BreachFindings>(breachHistory),
+    shodan: getVal<ShodanFindings>(shodan),
+    virusTotal: getVal<VirusTotalFindings>(virusTotal),
+    certificates: getVal<CertFindings>(certificates),
+    googleBusiness: getVal<GoogleBusinessFindings>(googleBusiness),
     staffAndContacts: staffData,
-    crunchbase: null, // Crunchbase — wired separately
+    crunchbase: null,
     webPresence: null,
     socialMedia: null,
     paidAds: null,
@@ -392,7 +393,7 @@ export async function runParallelResearch(
     trademarks: null,
     businessRegistry: null,
     generalResearch: generalResearchData,
-    competitors: getValue(competitors),
+    competitors: getVal<CompetitorFindings>(competitors),
     industry,
     businessSize,
     errors,
