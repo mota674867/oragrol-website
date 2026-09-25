@@ -165,7 +165,7 @@ function normalizeWebsite(value: string): string {
   return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
 }
 
-function validateForm(form: typeof INITIAL_FORM): Record<string, string> {
+function validateForm(form: {name: string; email: string; company: string; website: string}): Record<string, string> {
   const errors: Record<string, string> = {};
   if (!form.name.trim()) errors.name = "Enter your name.";
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
