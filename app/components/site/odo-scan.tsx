@@ -259,8 +259,8 @@ function ResearchPreview({ phase, step }: { phase: string; step: string }) {
 }
 
 export default function OdoScanPage({ locale = "en", onEvent = (_e: Record<string, unknown>) => {} }: { locale?: string; onEvent?: (e: Record<string, unknown>) => void }) {
-  const [form, setForm] = useState(INITIAL_FORM);
-  const [errors, setErrors] = useState({});
+  const [form, setForm] = useState<{name: string; email: string; company: string; website: string}>({...INITIAL_FORM});
+  const [errors, setErrors] = useState<Record<string, string | undefined>>({});
   const [consent, setConsent] = useState(false);
   const [phase, setPhase] = useState("idle");
   const [step, setStep] = useState("website");
@@ -269,13 +269,13 @@ export default function OdoScanPage({ locale = "en", onEvent = (_e: Record<strin
   const [answer, setAnswer] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
-  const pollRef = useRef<ReturnType<typeof window.setInterval> | null>(null);
+  const pollRef = useRef<number | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
 
   const emit = useCallback((type: string, extra: Record<string, unknown> = {}) => onEvent({ type, ...extra }), [onEvent]);
 
   const stopUpdates = useCallback(() => {
-    if (pollRef.current) window.clearInterval(pollRef.current);
+    if (pollRef.current) window.clearInterval(pollRef.current as unknown as ReturnType<typeof setInterval>);
     pollRef.current = null;
     eventSourceRef.current?.close?.();
     eventSourceRef.current = null;
@@ -340,7 +340,7 @@ export default function OdoScanPage({ locale = "en", onEvent = (_e: Record<strin
       source.onerror = () => source.close();
     }
     pollStatus(id, statusUrl);
-    pollRef.current = window.setInterval(() => pollStatus(id, statusUrl), 2500);
+    pollRef.current = window.setInterval(() => pollStatus(id, statusUrl), 2500) as unknown as number;
   }, [applyStatus, pollStatus, stopUpdates]);
 
   useEffect(() => {
@@ -358,10 +358,10 @@ export default function OdoScanPage({ locale = "en", onEvent = (_e: Record<strin
     setErrors((current) => ({ ...current, [name]: undefined }));
   };
 
-  const submitStart = async (event) => {
+  const submitStart = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nextErrors = validateForm(form);
-    if (!consent) nextErrors.consent = "Accept the consent notice before starting.";
+    if (!consent) nextErrors["consent"] = "Accept the consent notice before starting.";
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) return;
 
