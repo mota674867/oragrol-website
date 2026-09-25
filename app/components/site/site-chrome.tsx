@@ -29,13 +29,18 @@ import ChatWidget from "../ChatWidget";
  * they can't be listed here individually — they're matched by prefix below
  * instead, alongside the exact-match set.
  */
-const REDESIGNED_ROUTES = new Set<string>(["/", "/services", "/business-automation", "/or-one", "/industries", "/resources", "/company", "/contact", "/cyber-health", "/faq", "/privacy-policy", "/terms-of-use", "/accessibility", "/careers", "/talent", "/partnerships"]);
+const REDESIGNED_ROUTES = new Set<string>(["/", "/services", "/business-automation", "/or-one", "/industries", "/resources", "/company", "/contact", "/cyber-health", "/faq", "/privacy-policy", "/terms-of-use", "/accessibility", "/careers", "/talent", "/partnerships", "/scan"]);
 
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isRedesigned =
     pathname !== null &&
     (REDESIGNED_ROUTES.has(pathname) || pathname.startsWith("/resources/"));
+
+  // /scan is a standalone focused page — no nav, no footer, no ChatWidget
+  if (pathname === "/scan") {
+    return <>{children}</>;
+  }
 
   if (isRedesigned) {
     return (
