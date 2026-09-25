@@ -89,18 +89,19 @@ export function SiteFooter() {
       <Container size="xl" className="py-16">
         <Grid cols={{ base: 1, md: 5 }} gap="lg">
           <div className="flex flex-col gap-4 md:col-span-2">
-            <Link
-              href="/"
-              className="inline-flex w-fit rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-              onClick={(e) => {
-                if (pathname === "/" || pathname === "") {
-                  e.preventDefault();
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }
-              }}
-            >
-              <OragrolLogo height={36} />
-            </Link>
+            {(pathname === "/" || pathname === "") ? (
+              <a
+                href="#top"
+                className="inline-flex w-fit rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+              >
+                <OragrolLogo height={36} />
+              </a>
+            ) : (
+              <Link href="/" className="inline-flex w-fit rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
+                <OragrolLogo height={36} />
+              </Link>
+            )}
             <Text size="sm" tone="secondary" className="max-w-sm">
               {isFr
                 ? "Une clarté en cybersécurité pour les entreprises modernes."
