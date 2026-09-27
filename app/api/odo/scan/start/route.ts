@@ -283,8 +283,9 @@ function generateFirstQuestion(
       options: ["Healthcare", "Legal", "Finance & Accounting", "Technology", "Retail", "Construction", "Food & Beverage", "Education", "Marketing & Advertising", "Consulting", "Manufacturing", "Other"],
     };
   }
-  // If DMARC is on "none" — ask about email security awareness
-  if (findings.emailSecurity?.dmarcPolicy === "none") {
+  // If DMARC is published but enforcing nothing — ask about email security awareness.
+  // Note: monitor-only is the finding, not the absence of DMARC.
+  if (findings.dns?.dmarc.state === "observed" && findings.dns.dmarc.value.isMonitorOnly) {
     return {
       id: "q_email_security_awareness",
       text: "Has your team experienced any phishing attempts or suspicious emails targeting your business in the last 12 months?",
@@ -308,15 +309,58 @@ function generateFirstQuestion(
 }
 
 function calculateSecurityScore(findings: import("@/app/lib/odo-research").ResearchFindings): number {
-  let score = 100;
-  if (!findings.ssl || findings.ssl.grade === "F") score -= 25;
-  else if (findings.ssl.grade === "C" || findings.ssl.grade === "D") score -= 10;
-  if (!findings.emailSecurity?.spf) score -= 10;
-  if (!findings.emailSecurity?.dmarc) score -= 10;
-  if (findings.emailSecurity?.dmarcPolicy === "none") score -= 5;
-  if (findings.breachHistory?.breached) score -= 20;
-  if (findings.shodan?.openPorts && findings.shodan.openPorts.length > 5) score -= 15;
-  if (!findings.virusTotal?.clean) score -= 15;
-  if (findings.securityHeaders?.grade === "F") score -= 10;
-  return Math.max(0, score);
+  // SCORING RULE — only a confirmed absence costs points.
+  //
+  // A check that could not be determined (timeout, no key, blocked origin)
+  // must never reduce the score. The previous version deducted for every
+  // source that returned null, so a prospect with perfect email security
+  // scored the same as one with none whenever a key was missing — roughly a
+  // 40-point systematic penalty applied to every scan.
+  //
+  // Scores are therefore computed over what was actually established, and
+  // normalised, so a partial scan reports a fair score rather than a low one.
+  let earned = 0;
+  let possible = 0;
+
+  const award = (weight: number, ok: boolean) => {
+    possible += weight;
+    if (ok) earned += weight;
+  };
+
+  if (findings.ssl?.grade) {
+    award(25, !["C", "D", "E", "F", "T"].includes(findings.ssl.grade));
+  }
+
+  const dns = findings.dns;
+  if (dns) {
+    if (dns.spf.state !== "not_determined") {
+      award(10, dns.spf.state === "observed");
+      // A published SPF that ends in +all or ?all enforces nothing.
+      if (dns.spf.state === "observed") {
+        award(5, dns.spf.value.qualifier === "-all" || dns.spf.value.qualifier === "~all");
+      }
+    }
+    if (dns.dkim.state !== "not_determined") award(10, dns.dkim.state === "observed");
+    if (dns.dmarc.state !== "not_determined") {
+      award(10, dns.dmarc.state === "observed");
+      if (dns.dmarc.state === "observed") {
+        // p=none is monitoring only — published but enforcing nothing.
+        award(10, !dns.dmarc.value.isMonitorOnly);
+        award(5, dns.dmarc.value.hasAggregateReporting);
+      }
+    }
+    if (dns.hygiene.mtaSts.state !== "not_determined") award(5, dns.hygiene.mtaSts.state === "observed");
+    if (dns.hygiene.caa.state !== "not_determined") award(5, dns.hygiene.caa.state === "observed");
+  }
+
+  const wk = findings.page?.wellKnown;
+  if (wk) {
+    if (wk.securityTxt.state !== "not_determined") award(3, wk.securityTxt.state === "observed");
+    if (wk.privacyPolicy.state !== "not_determined") award(7, wk.privacyPolicy.state === "observed");
+  }
+
+  // Nothing could be established at all — report no score rather than a bad one.
+  if (possible === 0) return -1;
+
+  return Math.round((earned / possible) * 100);
 }

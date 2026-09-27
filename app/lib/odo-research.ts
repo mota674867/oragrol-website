@@ -1,7 +1,35 @@
 // ORAGROL ODO — Parallel research engine
-// Calls all 22 APIs simultaneously and returns structured findings.
-// Each API call is wrapped in a safe fetcher — a single API failure
-// never blocks the others or crashes the scan.
+//
+// Every source runs in parallel; one failure never blocks the others or
+// crashes the scan (Promise.allSettled, never Promise.all).
+//
+// EVIDENCE RULE — read before adding a source.
+// A source that cannot answer must return `not_determined`, never a value
+// that reads as a finding. The removed MXToolbox path returned
+// `{ spf: false, dkim: false, dmarc: false }` whenever its key was absent,
+// which reported every prospect as having no email authentication at all.
+// See odo-evidence.ts. Absent and not-determined are different states and
+// only `absent` may be scored as a gap.
+//
+// REMOVED 2026-09-27 — do not reinstate without re-checking terms:
+//   VirusTotal     — Public API forbids use "in commercial products or
+//                    services"; ODO is one. Premium is ~$1,500-4,000/mo.
+//   HaveIBeenPwned — the breacheddomain endpoint only answers for domains
+//                    you have verified ownership of, so it can never scan a
+//                    prospect. (A consented check of the single email the
+//                    prospect supplies at intake is a separate, valid idea.)
+//   Shodan         — free accounts have no host-lookup API access.
+//   BuiltWith      — $295/month; replaced by native fingerprinting in
+//                    odo-page.ts.
+//   Hunter.io      — free tier is 25 searches/month and inbound ODO has no
+//                    contact to discover; deferred to Outbound Mode.
+//   MXToolbox      — replaced by native DNS in odo-dns.ts, which is free,
+//                    unlimited, and actually returns DKIM.
+//   SecurityHeaders.io — replaced by reading response headers directly.
+
+import { runDnsResearch, type DnsResearch } from "./odo-dns";
+import { runPageResearch, type PageResearch } from "./odo-page";
+import { coverageReport } from "./odo-evidence";
 
 export type ResearchFindings = {
   // Website & SEO
@@ -10,13 +38,12 @@ export type ResearchFindings = {
   technologies: TechFindings | null;
   // Security
   ssl: SslFindings | null;
-  emailSecurity: EmailSecurityFindings | null;
-  securityHeaders: SecurityHeadersFindings | null;
   mozillaObservatory: MozillaFindings | null;
-  breachHistory: BreachFindings | null;
-  shodan: ShodanFindings | null;
-  virusTotal: VirusTotalFindings | null;
   certificates: CertFindings | null;
+  /** Native DNS: SPF/DKIM/DMARC with policy strength, mail platform, M365 tenant, NS delegation, DNS hygiene. */
+  dns: DnsResearch | null;
+  /** Native homepage analysis: tech stack, on-page SEO health, well-known files. */
+  page: PageResearch | null;
   // Business
   googleBusiness: GoogleBusinessFindings | null;
   staffAndContacts: StaffFindings | null;
@@ -36,6 +63,13 @@ export type ResearchFindings = {
   industry: string | null;
   businessSize: "micro" | "small" | "medium" | "large" | null;
   errors: string[];
+  /**
+   * Reviewer-facing coverage. Which checks answered, which found a genuine
+   * absence, and which could not be determined. A not-determined check is a
+   * gap in ODO's coverage, never a finding about the prospect — surface it
+   * here so it cannot silently become bad news in the report.
+   */
+  coverage: { observed: string[]; absent: string[]; notDetermined: Array<{ check: string; reason: string }> };
 };
 
 // --- Type stubs (Jev reads these) ---
@@ -109,26 +143,6 @@ async function fetchSslGrade(domain: string): Promise<SslFindings> {
   };
 }
 
-async function fetchEmailSecurity(domain: string): Promise<EmailSecurityFindings> {
-  const host = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
-  const token = process.env.MXTOOLBOX_API_KEY;
-  if (!token) return { spf: false, dkim: false, dmarc: false, dmarcPolicy: null };
-  const [spfRes, dmarcRes] = await Promise.allSettled([
-    fetch(`https://mxtoolbox.com/api/v1/lookup/spf/${host}`, { headers: { Authorization: token }, signal: AbortSignal.timeout(10000) }),
-    fetch(`https://mxtoolbox.com/api/v1/lookup/dmarc/${host}`, { headers: { Authorization: token }, signal: AbortSignal.timeout(10000) }),
-  ]);
-  const spfData = spfRes.status === "fulfilled" && spfRes.value.ok ? await spfRes.value.json() as Record<string, unknown> : null;
-  const dmarcData = dmarcRes.status === "fulfilled" && dmarcRes.value.ok ? await dmarcRes.value.json() as Record<string, unknown> : null;
-  const dmarcRecord = (dmarcData as Record<string, string> | null)?.Information || "";
-  const policyMatch = dmarcRecord.match(/p=(\w+)/i);
-  const policy = policyMatch?.[1]?.toLowerCase() as "none" | "quarantine" | "reject" | null ?? null;
-  return {
-    spf: !!(spfData && !(spfData as Record<string, unknown[]>).Failed?.length),
-    dkim: false,
-    dmarc: !!dmarcData,
-    dmarcPolicy: policy,
-  };
-}
 
 async function fetchTavily(query: string): Promise<Array<{ title: string; url: string; content: string }>> {
   const apiKey = process.env.TAVILY_API_KEY;
@@ -143,81 +157,9 @@ async function fetchTavily(query: string): Promise<Array<{ title: string; url: s
   return data.results || [];
 }
 
-async function fetchBuiltWith(domain: string): Promise<TechFindings> {
-  const apiKey = process.env.BUILTWITH_API_KEY;
-  if (!apiKey) return { cms: null, analytics: [], payments: [], marketing: [], framework: null, allTech: [] };
-  const host = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
-  const res = await fetch(`https://api.builtwith.com/v21/api.json?KEY=${apiKey}&LOOKUP=${host}`, { signal: AbortSignal.timeout(15000) });
-  const data = await res.json() as Record<string, unknown>;
-  const results = (data.Results as Array<Record<string, unknown>>)?.[0];
-  const paths = (results?.Result as Record<string, unknown>)?.Paths as Array<Record<string, unknown>> | undefined;
-  const allTech: string[] = [];
-  const cms: string[] = [];
-  const analytics: string[] = [];
-  const payments: string[] = [];
-  const marketing: string[] = [];
-  paths?.forEach(path => {
-    (path.Technologies as Array<Record<string, string>> | undefined)?.forEach(tech => {
-      allTech.push(tech.Name);
-      const cats = tech.Categories?.toLowerCase() || "";
-      if (cats.includes("cms") || cats.includes("blog")) cms.push(tech.Name);
-      if (cats.includes("analytic")) analytics.push(tech.Name);
-      if (cats.includes("payment")) payments.push(tech.Name);
-      if (cats.includes("marketing") || cats.includes("email")) marketing.push(tech.Name);
-    });
-  });
-  return { cms: cms[0] || null, analytics, payments, marketing, framework: null, allTech: [...new Set(allTech)].slice(0, 30) };
-}
 
-async function fetchHaveIBeenPwned(domain: string): Promise<BreachFindings> {
-  const apiKey = process.env.HIBP_API_KEY;
-  const host = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
-  const headers: Record<string, string> = { "User-Agent": "ORAGROL-ODO/1.0" };
-  if (apiKey) headers["hibp-api-key"] = apiKey;
-  const res = await fetch(`https://haveibeenpwned.com/api/v3/breacheddomain/${encodeURIComponent(host)}`, { headers, signal: AbortSignal.timeout(10000) });
-  if (res.status === 404) return { breached: false, breachCount: 0, breaches: [] };
-  if (!res.ok) throw new Error(`HIBP returned ${res.status}`);
-  const data = await res.json() as Record<string, string[]>;
-  const breaches = Object.entries(data).slice(0, 10).map(([account]) => ({ name: account, date: "unknown", dataTypes: [] }));
-  return { breached: true, breachCount: Object.keys(data).length, breaches };
-}
 
-async function fetchVirusTotal(domain: string): Promise<VirusTotalFindings> {
-  const apiKey = process.env.VIRUSTOTAL_API_KEY;
-  if (!apiKey) return { malicious: 0, suspicious: 0, clean: true };
-  const host = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
-  const res = await fetch(`https://www.virustotal.com/api/v3/domains/${encodeURIComponent(host)}`, {
-    headers: { "x-apikey": apiKey },
-    signal: AbortSignal.timeout(10000),
-  });
-  if (!res.ok) return { malicious: 0, suspicious: 0, clean: true };
-  const data = await res.json() as Record<string, unknown>;
-  const stats = ((data.data as Record<string, unknown>)?.attributes as Record<string, unknown>)?.last_analysis_stats as Record<string, number> | undefined;
-  return {
-    malicious: stats?.malicious || 0,
-    suspicious: stats?.suspicious || 0,
-    clean: !stats?.malicious && !stats?.suspicious,
-  };
-}
 
-async function fetchShodan(domain: string): Promise<ShodanFindings> {
-  const apiKey = process.env.SHODAN_API_KEY;
-  if (!apiKey) return { openPorts: [], exposedServices: [], vulnerabilities: [] };
-  const host = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
-  const res = await fetch(`https://api.shodan.io/dns/resolve?hostnames=${encodeURIComponent(host)}&key=${apiKey}`, { signal: AbortSignal.timeout(10000) });
-  if (!res.ok) return { openPorts: [], exposedServices: [], vulnerabilities: [] };
-  const ips = await res.json() as Record<string, string>;
-  const ip = Object.values(ips)[0];
-  if (!ip) return { openPorts: [], exposedServices: [], vulnerabilities: [] };
-  const hostRes = await fetch(`https://api.shodan.io/shodan/host/${ip}?key=${apiKey}`, { signal: AbortSignal.timeout(10000) });
-  if (!hostRes.ok) return { openPorts: [], exposedServices: [], vulnerabilities: [] };
-  const hostData = await hostRes.json() as Record<string, unknown>;
-  return {
-    openPorts: (hostData.ports as number[] | undefined) || [],
-    exposedServices: ((hostData.data as Array<Record<string, string>> | undefined) || []).map(s => s.transport || "").filter(Boolean).slice(0, 10),
-    vulnerabilities: Object.keys((hostData.vulns as Record<string, unknown> | undefined) || {}).slice(0, 10),
-  };
-}
 
 async function fetchCertificates(domain: string): Promise<CertFindings> {
   const host = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "").replace(/^www\./, "");
@@ -228,12 +170,6 @@ async function fetchCertificates(domain: string): Promise<CertFindings> {
   return { subdomains, totalCerts: data.length };
 }
 
-async function fetchSecurityHeaders(url: string): Promise<SecurityHeadersFindings> {
-  const res = await fetch(`https://securityheaders.com/?q=${encodeURIComponent(url)}&followRedirects=on`, { signal: AbortSignal.timeout(10000) });
-  const grade = res.headers.get("x-grade") || null;
-  const score = grade ? { "A+": 100, "A": 90, "B": 75, "C": 60, "D": 45, "E": 30, "F": 10 }[grade] || null : null;
-  return { grade, score: score || null, missingHeaders: [] };
-}
 
 async function fetchGoogleBusiness(businessName: string, website: string | null): Promise<GoogleBusinessFindings> {
   const apiKey = process.env.GOOGLE_PLACES_API_KEY;
@@ -251,20 +187,6 @@ async function fetchGoogleBusiness(businessName: string, website: string | null)
   };
 }
 
-async function fetchHunter(domain: string): Promise<StaffFindings> {
-  const apiKey = process.env.HUNTER_API_KEY;
-  if (!apiKey) return { estimatedCount: null, emailPattern: null, keyContacts: [] };
-  const host = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
-  const res = await fetch(`https://api.hunter.io/v2/domain-search?domain=${encodeURIComponent(host)}&api_key=${apiKey}&limit=5`, { signal: AbortSignal.timeout(10000) });
-  if (!res.ok) return { estimatedCount: null, emailPattern: null, keyContacts: [] };
-  const data = await res.json() as Record<string, unknown>;
-  const d = (data.data as Record<string, unknown> | undefined);
-  return {
-    estimatedCount: (d?.emails as unknown[])?.length || null,
-    emailPattern: (d?.pattern as string | undefined) || null,
-    keyContacts: ((d?.emails as Array<Record<string, string>> | undefined) || []).slice(0, 3).map(e => `${e.first_name || ""} ${e.last_name || ""}`.trim()).filter(Boolean),
-  };
-}
 
 async function detectIndustryAndSize(
   generalResearch: GeneralResearchFindings | null,
@@ -321,15 +243,10 @@ export async function runParallelResearch(
     competitors,
     pageSpeed,
     ssl,
-    emailSecurity,
-    securityHeaders,
-    breachHistory,
-    shodan,
-    virusTotal,
     certificates,
-    technologies,
-    staffAndContacts,
     googleBusiness,
+    dnsResult,
+    pageResult,
   ] = await Promise.allSettled([
     // General research via Tavily
     safeFetch("Tavily:general", () => fetchTavily(`${businessName} company overview services reviews`).then(results => ({
@@ -342,24 +259,17 @@ export async function runParallelResearch(
     safeFetch("Tavily:competitors", () => fetchTavily(`${businessName} competitors alternative companies`).then(results => ({
       competitors: results.map(r => ({ name: r.title || "", website: r.url || null, source: "tavily" })).slice(0, 5),
     })), errors),
-    // Website & performance
+    // Website-dependent sources
     ...(hasWebsite && domain ? [
       safeFetch("PageSpeed", () => fetchPageSpeed(domain), errors),
       safeFetch("SSL Labs", () => fetchSslGrade(domain), errors),
-      safeFetch("MXToolbox", () => fetchEmailSecurity(domain), errors),
-      safeFetch("SecurityHeaders", () => fetchSecurityHeaders(domain), errors),
-      safeFetch("HaveIBeenPwned", () => fetchHaveIBeenPwned(domain), errors),
-      safeFetch("Shodan", () => fetchShodan(domain), errors),
-      safeFetch("VirusTotal", () => fetchVirusTotal(domain), errors),
       safeFetch("crt.sh", () => fetchCertificates(domain), errors),
-      safeFetch("BuiltWith", () => fetchBuiltWith(domain), errors),
-      safeFetch("Hunter.io", () => fetchHunter(domain), errors),
       safeFetch("Google Places", () => fetchGoogleBusiness(businessName, domain), errors),
+      safeFetch("DNS", () => runDnsResearch(domain), errors),
+      safeFetch("Page", () => runPageResearch(domain), errors),
     ] : [
       Promise.resolve(null), Promise.resolve(null), Promise.resolve(null),
       Promise.resolve(null), Promise.resolve(null), Promise.resolve(null),
-      Promise.resolve(null), Promise.resolve(null), Promise.resolve(null),
-      Promise.resolve(null), Promise.resolve(null),
     ]),
   ]);
 
@@ -368,23 +278,48 @@ export async function runParallelResearch(
   }
 
   const generalResearchData = getVal<GeneralResearchFindings>(generalResearch);
-  const staffData = getVal<StaffFindings>(staffAndContacts);
-  const { industry, businessSize } = await detectIndustryAndSize(generalResearchData, staffData);
+  const dns = getVal<DnsResearch>(dnsResult);
+  const page = getVal<PageResearch>(pageResult);
+
+  // Business size: no free source gives verified headcount for a private
+  // Canadian SMB (Crunchbase and Hunter are both out). Whatever comes back
+  // here is Inferred tier unless the client states it directly.
+  const { industry, businessSize } = await detectIndustryAndSize(generalResearchData, null);
+
+  // Coverage — which checks actually answered. Anything not_determined is a
+  // gap in ODO, not a finding about the prospect.
+  const determinations: Record<string, import("./odo-evidence").Determination<unknown>> = {};
+  if (dns) {
+    determinations["email.spf"] = dns.spf;
+    determinations["email.dmarc"] = dns.dmarc;
+    determinations["email.dkim"] = dns.dkim;
+    determinations["mail.platform"] = dns.mail;
+    determinations["identity.microsoft365"] = dns.microsoft365;
+    determinations["dns.delegation"] = dns.delegation;
+    determinations["dns.caa"] = dns.hygiene.caa;
+    determinations["dns.mtaSts"] = dns.hygiene.mtaSts;
+    determinations["dns.tlsRpt"] = dns.hygiene.tlsRpt;
+    determinations["dns.bimi"] = dns.hygiene.bimi;
+  }
+  if (page) {
+    determinations["page.homepage"] = page.snapshot;
+    determinations["wellknown.robots"] = page.wellKnown.robotsTxt;
+    determinations["wellknown.sitemap"] = page.wellKnown.sitemapXml;
+    determinations["wellknown.securityTxt"] = page.wellKnown.securityTxt;
+    determinations["wellknown.privacyPolicy"] = page.wellKnown.privacyPolicy;
+  }
 
   return {
     website: getVal<WebsiteFindings>(pageSpeed),
     seo: null,
-    technologies: getVal<TechFindings>(technologies),
+    technologies: null,
     ssl: getVal<SslFindings>(ssl),
-    emailSecurity: getVal<EmailSecurityFindings>(emailSecurity),
-    securityHeaders: getVal<SecurityHeadersFindings>(securityHeaders),
     mozillaObservatory: null,
-    breachHistory: getVal<BreachFindings>(breachHistory),
-    shodan: getVal<ShodanFindings>(shodan),
-    virusTotal: getVal<VirusTotalFindings>(virusTotal),
     certificates: getVal<CertFindings>(certificates),
+    dns,
+    page,
     googleBusiness: getVal<GoogleBusinessFindings>(googleBusiness),
-    staffAndContacts: staffData,
+    staffAndContacts: null,
     crunchbase: null,
     webPresence: null,
     socialMedia: null,
@@ -397,5 +332,6 @@ export async function runParallelResearch(
     industry,
     businessSize,
     errors,
+    coverage: coverageReport(determinations),
   };
 }

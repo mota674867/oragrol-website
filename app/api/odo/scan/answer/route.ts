@@ -204,8 +204,23 @@ function buildServiceMatches(findings: Record<string, unknown>): Record<string, 
   const matches: Record<string, unknown>[] = [];
   const f = findings as import("@/app/lib/odo-research").ResearchFindings;
 
-  if (!f.emailSecurity?.spf || !f.emailSecurity?.dmarc || f.breachHistory?.breached) {
-    matches.push({ service: "Cybersecurity Services", priority: "high", reason: "Email security gaps and/or breach history detected" });
+  // Only a CONFIRMED absence triggers a service match. A check that could not
+  // be determined must never produce a recommendation — that would be selling
+  // against a gap ODO never established.
+  const emailGaps: string[] = [];
+  if (f.dns?.spf.state === "absent") emailGaps.push("no SPF record");
+  if (f.dns?.dkim.state === "absent") emailGaps.push("no DKIM record");
+  if (f.dns?.dmarc.state === "absent") emailGaps.push("no DMARC record");
+  else if (f.dns?.dmarc.state === "observed" && f.dns.dmarc.value.isMonitorOnly) {
+    emailGaps.push(`DMARC published but set to p=none, which enforces nothing`);
+  }
+  if (emailGaps.length > 0) {
+    matches.push({
+      service: "Cybersecurity Services",
+      priority: "high",
+      reason: `Email authentication: ${emailGaps.join("; ")}`,
+      evidence: emailGaps.map((g) => ({ fact: g, source: "DNS lookup", confidence: "observed" })),
+    });
   }
   if (f.ssl?.grade && ["C", "D", "F"].includes(f.ssl.grade)) {
     matches.push({ service: "Cybersecurity Services", priority: "high", reason: `SSL grade: ${f.ssl.grade}` });
@@ -250,10 +265,12 @@ async function notifyZM77(
       businessSize: findings._businessSizeDetected || null,
       securityFindings: {
         ssl: (findings as import("@/app/lib/odo-research").ResearchFindings).ssl,
-        emailSecurity: (findings as import("@/app/lib/odo-research").ResearchFindings).emailSecurity,
-        breachHistory: (findings as import("@/app/lib/odo-research").ResearchFindings).breachHistory,
-        shodan: (findings as import("@/app/lib/odo-research").ResearchFindings).shodan,
+        dns: (findings as import("@/app/lib/odo-research").ResearchFindings).dns,
+        wellKnown: (findings as import("@/app/lib/odo-research").ResearchFindings).page?.wellKnown ?? null,
       },
+      // Coverage goes to the reviewer so an incomplete scan is visible as an
+      // ODO problem rather than silently reading as bad news about the client.
+      coverage: (findings as import("@/app/lib/odo-research").ResearchFindings).coverage ?? null,
       researchErrors: findings._researchErrors || [],
     },
     answers,

@@ -110,11 +110,13 @@ function buildFindingsSummary(findings: Record<string, unknown>): Record<string,
   let opportunities = 0;
 
   if (f.ssl?.grade && ["C", "D", "F"].includes(f.ssl.grade)) securityIssues++;
-  if (!f.emailSecurity?.spf) securityIssues++;
-  if (!f.emailSecurity?.dmarc) securityIssues++;
-  if (f.breachHistory?.breached) securityIssues++;
-  if (f.shodan?.openPorts && f.shodan.openPorts.length > 3) securityIssues++;
-  if (!f.virusTotal?.clean) securityIssues++;
+  // Count only confirmed absences. A not-determined check is a coverage gap
+  // in ODO, never an issue attributed to the prospect.
+  if (f.dns?.spf.state === "absent") securityIssues++;
+  if (f.dns?.dkim.state === "absent") securityIssues++;
+  if (f.dns?.dmarc.state === "absent") securityIssues++;
+  else if (f.dns?.dmarc.state === "observed" && f.dns.dmarc.value.isMonitorOnly) securityIssues++;
+  if (f.page?.wellKnown.privacyPolicy.state === "absent") securityIssues++;
   if (!f.paidAds?.runningFacebookAds && !f.paidAds?.runningGoogleAds) marketingGaps++;
   if (f.website?.pageSpeedScore && f.website.pageSpeedScore < 50) marketingGaps++;
   if (f.seo?.domainAuthority && f.seo.domainAuthority < 20) marketingGaps++;
