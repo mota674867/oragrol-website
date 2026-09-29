@@ -20,6 +20,15 @@ export type PageSnapshot = {
   status: number;
   html: string;
   headers: Record<string, string>;
+  /**
+   * Raw Set-Cookie header values, one per cookie. A `Headers` object folds
+   * repeated header names into one comma-joined string via `.forEach`/
+   * `.get()`, which is lossless for most headers but corrupts Set-Cookie
+   * (commas appear inside Expires dates and attribute lists too), so this is
+   * populated via `Headers.getSetCookie()` — the undici/WHATWG method built
+   * for exactly this — instead of being folded into the `headers` record.
+   */
+  setCookieHeaders: string[];
 };
 
 export async function fetchHomepage(rawDomain: string): Promise<Determination<PageSnapshot>> {
@@ -29,7 +38,11 @@ export async function fetchHomepage(rawDomain: string): Promise<Determination<Pa
     if (res.state === "observed") {
       const headers: Record<string, string> = {};
       res.value.headers.forEach((v, k) => (headers[k.toLowerCase()] = v));
-      return observed({ finalUrl: candidate, status: res.value.status, html: res.value.body, headers }, "page:home");
+      const setCookieHeaders = res.value.headers.getSetCookie?.() ?? [];
+      return observed(
+        { finalUrl: candidate, status: res.value.status, html: res.value.body, headers, setCookieHeaders },
+        "page:home"
+      );
     }
     if (res.state === "not_determined" && /blocked by origin/.test(res.reason)) return res as Determination<PageSnapshot>;
   }
@@ -153,6 +166,139 @@ export function analyzeTechStack(page: PageSnapshot): TechStack {
     hasAnalytics: (byCategory.analytics?.length ?? 0) > 0,
     hasChatWidget: (byCategory.chat?.length ?? 0) > 0,
     hasPayments: (byCategory.payments?.length ?? 0) > 0,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Web security hardening — headers, cookies, CSP/SRI
+//
+// Section 33, Area 4. The master spec named "Mozilla Observatory" as the
+// source, assuming its npm package (`@mdn/mdn-http-observatory`) was a
+// lightweight importable scorer. It is not — `npm view` shows it depends on
+// @fastify/*, pg, postgrator-cli and @sentry/node: it IS the Observatory's
+// backend service, not a library, and installing it would drag a Postgres-
+// backed Fastify app into this Next.js serverless bundle for no reason.
+//
+// So this reads the same publicly-documented header/cookie/CSP rubric
+// natively, directly off the response ODO already fetched — no second
+// request, no new dependency — and reports it as ODO's own findings list
+// (present/absent per header, per cookie, per script tag). It is NOT
+// presented as "your Mozilla Observatory grade" anywhere downstream: that
+// would claim equivalence with a specific third-party grading algorithm
+// ODO is not actually running, which is exactly the kind of fabricated
+// tool-equivalence this project's evidence rules exist to prevent.
+// ---------------------------------------------------------------------------
+
+export type SecurityHeaderFinding = { header: string; present: boolean; value: string | null };
+
+export type SecurityHeaders = {
+  findings: SecurityHeaderFinding[];
+  hsts: boolean;
+  csp: boolean;
+  xFrameOptions: boolean;
+  xContentTypeOptions: boolean;
+  referrerPolicy: boolean;
+  permissionsPolicy: boolean;
+  /** Count of the six checked headers that are present. Not a percentile or a vendor grade. */
+  presentCount: number;
+  missingCount: number;
+};
+
+const SECURITY_HEADER_CHECKS: Array<{ key: string; label: string }> = [
+  { key: "strict-transport-security", label: "Strict-Transport-Security (HSTS)" },
+  { key: "content-security-policy", label: "Content-Security-Policy" },
+  { key: "x-frame-options", label: "X-Frame-Options" },
+  { key: "x-content-type-options", label: "X-Content-Type-Options" },
+  { key: "referrer-policy", label: "Referrer-Policy" },
+  { key: "permissions-policy", label: "Permissions-Policy" },
+];
+
+export function analyzeSecurityHeaders(page: PageSnapshot): SecurityHeaders {
+  const findings: SecurityHeaderFinding[] = SECURITY_HEADER_CHECKS.map(({ key, label }) => ({
+    header: label,
+    present: page.headers[key] !== undefined,
+    value: page.headers[key] ?? null,
+  }));
+  const missingCount = findings.filter((f) => !f.present).length;
+
+  return {
+    findings,
+    hsts: page.headers["strict-transport-security"] !== undefined,
+    csp: page.headers["content-security-policy"] !== undefined,
+    xFrameOptions: page.headers["x-frame-options"] !== undefined,
+    xContentTypeOptions: page.headers["x-content-type-options"] !== undefined,
+    referrerPolicy: page.headers["referrer-policy"] !== undefined,
+    permissionsPolicy: page.headers["permissions-policy"] !== undefined,
+    presentCount: findings.length - missingCount,
+    missingCount,
+  };
+}
+
+export type CookieFinding = { name: string; secure: boolean; httpOnly: boolean; sameSite: string | null };
+
+export type CookieSecurity = {
+  cookies: CookieFinding[];
+  totalCookies: number;
+  /** Missing Secure or HttpOnly — a session-hijack/XSS-exfiltration risk, not a style nitpick. */
+  insecureCookies: number;
+};
+
+function parseSetCookie(raw: string): CookieFinding {
+  const attrs = raw.split(";").map((p) => p.trim());
+  const nameValue = attrs[0] ?? raw;
+  const name = nameValue.split("=")[0]?.trim() || nameValue;
+  const rest = attrs.slice(1);
+  const secure = rest.some((a) => a.toLowerCase() === "secure");
+  const httpOnly = rest.some((a) => a.toLowerCase() === "httponly");
+  const sameSiteRaw = rest.find((a) => a.toLowerCase().startsWith("samesite="));
+  const sameSite = sameSiteRaw ? sameSiteRaw.split("=")[1]?.trim() ?? null : null;
+  return { name, secure, httpOnly, sameSite };
+}
+
+export function analyzeCookies(page: PageSnapshot): CookieSecurity {
+  const cookies = page.setCookieHeaders.map(parseSetCookie);
+  const insecureCookies = cookies.filter((c) => !c.secure || !c.httpOnly).length;
+  return { cookies, totalCookies: cookies.length, insecureCookies };
+}
+
+export type ContentSecurityAnalysis = {
+  hasCsp: boolean;
+  cspValue: string | null;
+  /** `unsafe-inline`/`unsafe-eval` in a CSP defeat most of what a CSP is for. */
+  cspAllowsUnsafeInline: boolean;
+  cspAllowsUnsafeEval: boolean;
+  /** Third-party <script src> tags with no `integrity` attribute — a compromised CDN silently changes what runs on the prospect's site. */
+  thirdPartyScriptsWithoutSri: string[];
+  totalThirdPartyScripts: number;
+};
+
+export function analyzeContentSecurity(page: PageSnapshot, thirdPartyScriptHosts: string[]): ContentSecurityAnalysis {
+  const cspValue = page.headers["content-security-policy"] ?? null;
+  const hasCsp = cspValue !== null;
+  const cspAllowsUnsafeInline = hasCsp && /unsafe-inline/i.test(cspValue);
+  const cspAllowsUnsafeEval = hasCsp && /unsafe-eval/i.test(cspValue);
+
+  const thirdPartyHosts = new Set(thirdPartyScriptHosts);
+  const withoutSri = new Set<string>();
+  for (const m of page.html.matchAll(/<script\b[^>]*\ssrc=["']([^"']+)["'][^>]*>/gi)) {
+    const tag = m[0];
+    const src = m[1];
+    let host = "";
+    try {
+      host = new URL(src, page.finalUrl).hostname.replace(/^www\./, "");
+    } catch {
+      continue;
+    }
+    if (thirdPartyHosts.has(host) && !/\sintegrity\s*=/i.test(tag)) withoutSri.add(src);
+  }
+
+  return {
+    hasCsp,
+    cspValue,
+    cspAllowsUnsafeInline,
+    cspAllowsUnsafeEval,
+    thirdPartyScriptsWithoutSri: [...withoutSri],
+    totalThirdPartyScripts: thirdPartyHosts.size,
   };
 }
 
@@ -291,15 +437,22 @@ export type PageResearch = {
   techStack: TechStack | null;
   seo: SeoHealth | null;
   wellKnown: WellKnown;
+  securityHeaders: SecurityHeaders | null;
+  cookies: CookieSecurity | null;
+  contentSecurity: ContentSecurityAnalysis | null;
 };
 
 export async function runPageResearch(rawDomain: string): Promise<PageResearch> {
   const [snapshot, wellKnown] = await Promise.all([fetchHomepage(rawDomain), checkWellKnown(rawDomain)]);
   const page = snapshot.state === "observed" ? snapshot.value : null;
+  const techStack = page ? analyzeTechStack(page) : null;
   return {
     snapshot,
-    techStack: page ? analyzeTechStack(page) : null,
+    techStack,
     seo: page ? analyzeSeo(page) : null,
     wellKnown,
+    securityHeaders: page ? analyzeSecurityHeaders(page) : null,
+    cookies: page ? analyzeCookies(page) : null,
+    contentSecurity: page && techStack ? analyzeContentSecurity(page, techStack.thirdPartyScriptHosts) : null,
   };
 }

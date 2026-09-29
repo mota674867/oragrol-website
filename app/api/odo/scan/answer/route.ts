@@ -233,11 +233,89 @@ function buildServiceMatches(findings: Record<string, unknown>): Record<string, 
   if (f.ssl?.grade && ["C", "D", "F"].includes(f.ssl.grade)) {
     matches.push({ service: "Cybersecurity Services", priority: "high", reason: `SSL grade: ${f.ssl.grade}` });
   }
+
+  // --- Real Section-18 service names for the 2026-09-29 research expansion.
+  // This is NOT the full 63-service trigger table (Pending Item #2 / Section
+  // 18 of the master reference) — that is a separate, larger build. These
+  // are only the two services today's new evidence (odo-infra.ts,
+  // odo-attack-surface.ts, odo-compliance.ts) maps to cleanly, using the
+  // real confirmed Simple Names from ORAGROL_ODO_Service_Trigger_Data.
+
+  const exposureGaps: Array<{ fact: string; source: string }> = [];
+  if (f.infra?.registration.state === "observed") {
+    const reg = f.infra.registration.value;
+    if (reg.expiringWithin90Days) {
+      exposureGaps.push({
+        fact: `Domain registration expires within 90 days${reg.expiresAt ? ` (${reg.expiresAt.slice(0, 10)})` : ""}`,
+        source: "RDAP",
+      });
+    }
+    if (!reg.transferLocked) exposureGaps.push({ fact: "Domain has no registrar transfer lock", source: "RDAP" });
+  }
+  if (f.infra?.dnssec.state === "absent") {
+    exposureGaps.push({ fact: "DNSSEC is not enabled", source: "DNS-over-HTTPS" });
+  }
+  if (f.attackSurface?.danglingCnames.state === "observed" && f.attackSurface.danglingCnames.value.length > 0) {
+    exposureGaps.push({
+      fact: `${f.attackSurface.danglingCnames.value.length} subdomain(s) with a dangling CNAME — live subdomain-takeover risk`,
+      source: "Certificate transparency + DNS",
+    });
+  }
+  if (f.attackSurface?.sensitiveSubdomains && f.attackSurface.sensitiveSubdomains.length > 0) {
+    exposureGaps.push({
+      fact: `Infrastructure-revealing subdomains found: ${f.attackSurface.sensitiveSubdomains.map((s) => s.label).join(", ")}`,
+      source: "Certificate transparency",
+    });
+  }
+  if (f.compliance?.jsLibraries.state === "observed" && f.compliance.jsLibraries.value.vulnerable.length > 0) {
+    const libs = f.compliance.jsLibraries.value.vulnerable.map((v) => `${v.name} ${v.version}`).join(", ");
+    exposureGaps.push({ fact: `Front-end JavaScript libraries with known CVEs: ${libs}`, source: "PageSpeed + retire.js vulnerability database" });
+  }
+  if (exposureGaps.length > 0) {
+    const hasTakeoverRisk = f.attackSurface?.danglingCnames.state === "observed" && f.attackSurface.danglingCnames.value.length > 0;
+    matches.push({
+      service: "Vuln Watch", // C02-S01, Vulnerability Assessment & Management
+      priority: hasTakeoverRisk ? "high" : "medium",
+      reason: `External exposure findings: ${exposureGaps.map((g) => g.fact).join("; ")}`,
+      evidence: exposureGaps.map((g) => ({ fact: g.fact, source: g.source, confidence: "observed" })),
+    });
+  }
+
+  const complianceGaps: Array<{ fact: string; source: string }> = [];
+  if (f.compliance?.accessibility && f.compliance.accessibility.score !== null && f.compliance.accessibility.score < 90) {
+    complianceGaps.push({
+      fact: `Accessibility (axe-core) score ${f.compliance.accessibility.score}/100 — a potential AODA/WCAG 2.0 AA gap for organizations with 50+ employees`,
+      source: "PageSpeed accessibility audit",
+    });
+  }
+  if (f.compliance?.preConsentTrackers && f.compliance.preConsentTrackers.trackers.length > 0) {
+    const names = f.compliance.preConsentTrackers.trackers.map((t) => t.label).join(", ");
+    complianceGaps.push({
+      fact: `Analytics/ad trackers load before any consent interaction (${names}) — a Quebec Law 25 exposure`,
+      source: "PageSpeed network log",
+    });
+  }
+  if (complianceGaps.length > 0) {
+    matches.push({
+      service: "Compliance Check", // C01-S02, Cyber Compliance Readiness
+      priority: "medium",
+      reason: `Compliance findings: ${complianceGaps.map((g) => g.fact).join("; ")}`,
+      evidence: complianceGaps.map((g) => ({ fact: g.fact, source: g.source, confidence: "observed" })),
+    });
+  }
+
   const answers = (findings._answers as Record<string, string> | undefined) || {};
   if (answers.q_biggest_challenge?.includes("efficiency") || answers.q_biggest_challenge?.includes("automation")) {
     matches.push({ service: "Business Automation", priority: "medium", reason: "Visitor identified efficiency as primary challenge" });
   }
-  if (answers.q_biggest_challenge?.includes("Growing") || !f.paidAds?.runningFacebookAds) {
+  // FIXED 2026-09-29 — this previously also fired on `!f.paidAds?.runningFacebookAds`,
+  // which is permanently true (paidAds is an unimplemented stub — see the
+  // "INVESTIGATED 2026-09-29" note in odo-research.ts; Facebook/Google Ads
+  // Transparency both turned out to need either a Meta developer app or have
+  // no API at all). That made this match fire on every single scan
+  // regardless of the visitor's actual answer — a fabricated finding, not a
+  // real one. Now gated on the stated answer only.
+  if (answers.q_biggest_challenge?.includes("Growing")) {
     matches.push({ service: "OR ONE", priority: "medium", reason: "Growth challenge identified — AI agent support recommended" });
   }
 
@@ -275,6 +353,24 @@ async function notifyZM77(
         ssl: (findings as import("@/app/lib/odo-research").ResearchFindings).ssl,
         dns: (findings as import("@/app/lib/odo-research").ResearchFindings).dns,
         wellKnown: (findings as import("@/app/lib/odo-research").ResearchFindings).page?.wellKnown ?? null,
+        securityHeaders: (findings as import("@/app/lib/odo-research").ResearchFindings).page?.securityHeaders ?? null,
+        cookies: (findings as import("@/app/lib/odo-research").ResearchFindings).page?.cookies ?? null,
+        contentSecurity: (findings as import("@/app/lib/odo-research").ResearchFindings).page?.contentSecurity ?? null,
+        // Added 2026-09-29 (Section 33 expansion) — domain/hosting/DNSSEC,
+        // dangling-CNAME/sensitive-subdomain exposure, and accessibility/
+        // pre-consent-tracker/JS-CVE compliance findings. See buildServiceMatches
+        // for which of these already drive a service match vs. are reviewer-
+        // only context for now.
+        infra: (findings as import("@/app/lib/odo-research").ResearchFindings).infra,
+        attackSurface: (findings as import("@/app/lib/odo-research").ResearchFindings).attackSurface,
+        compliance: (findings as import("@/app/lib/odo-research").ResearchFindings).compliance,
+      },
+      // Softer signals — not yet mapped to a specific service trigger (see
+      // buildServiceMatches's Section-18 note), but real, evidenced findings
+      // the reviewer should see rather than lose by leaving them unwired.
+      researchSignals: {
+        waybackHistory: (findings as import("@/app/lib/odo-research").ResearchFindings).history,
+        hiringSignal: (findings as import("@/app/lib/odo-research").ResearchFindings).hiring,
       },
       // Coverage goes to the reviewer so an incomplete scan is visible as an
       // ODO problem rather than silently reading as bad news about the client.
