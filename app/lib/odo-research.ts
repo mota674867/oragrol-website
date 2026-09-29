@@ -30,6 +30,7 @@
 import { runDnsResearch, type DnsResearch } from "./odo-dns";
 import { runPageResearch, type PageResearch } from "./odo-page";
 import { coverageReport } from "./odo-evidence";
+import { classifyCompetitors, detectCity, type CompetitorProfile } from "./odo-competitors";
 
 export type ResearchFindings = {
   // Website & SEO
@@ -58,6 +59,8 @@ export type ResearchFindings = {
   businessRegistry: RegistryFindings | null;
   // General research
   generalResearch: GeneralResearchFindings | null;
+  /** Classified competitor candidates — see odo-competitors.ts. Only confirmed_competitor and probable_competitor are report-safe. */
+  competitorProfiles: CompetitorProfile[] | null;
   competitors: CompetitorFindings | null;
   // Metadata
   industry: string | null;
@@ -171,48 +174,66 @@ async function fetchCertificates(domain: string): Promise<CertFindings> {
 }
 
 
+// Migrated 2026-09-29 from the deprecated findplacefromtext endpoint to
+// Places API (New) — the old endpoint is on Google's deprecation path and
+// the New API is what GOOGLE_PLACES_API_KEY is provisioned for.
 async function fetchGoogleBusiness(businessName: string, website: string | null): Promise<GoogleBusinessFindings> {
   const apiKey = process.env.GOOGLE_PLACES_API_KEY;
   if (!apiKey) return { rating: null, reviewCount: null, responseRate: null, lastUpdated: null, categories: [] };
-  const query = encodeURIComponent(businessName + (website ? ` site:${website}` : ""));
-  const res = await fetch(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${query}&inputtype=textquery&fields=rating,user_ratings_total,types&key=${apiKey}`, { signal: AbortSignal.timeout(10000) });
-  const data = await res.json() as Record<string, unknown>;
-  const place = (data.candidates as Array<Record<string, unknown>> | undefined)?.[0];
-  return {
-    rating: (place?.rating as number | undefined) || null,
-    reviewCount: (place?.user_ratings_total as number | undefined) || null,
-    responseRate: null,
-    lastUpdated: null,
-    categories: ((place?.types as string[] | undefined) || []).slice(0, 5),
-  };
+  try {
+    const res = await fetch("https://places.googleapis.com/v1/places:searchText", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": apiKey,
+        "X-Goog-FieldMask": "places.rating,places.userRatingCount,places.types",
+      },
+      body: JSON.stringify({ textQuery: website ? `${businessName} ${website}` : businessName }),
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) return { rating: null, reviewCount: null, responseRate: null, lastUpdated: null, categories: [] };
+    const data = await res.json() as { places?: Array<Record<string, unknown>> };
+    const place = data.places?.[0];
+    return {
+      rating: (place?.rating as number | undefined) ?? null,
+      reviewCount: (place?.userRatingCount as number | undefined) ?? null,
+      responseRate: null,
+      lastUpdated: null,
+      categories: ((place?.types as string[] | undefined) ?? []).slice(0, 5),
+    };
+  } catch {
+    return { rating: null, reviewCount: null, responseRate: null, lastUpdated: null, categories: [] };
+  }
 }
 
+
+const INDUSTRY_KEYWORDS = [
+  { keywords: ["health", "medical", "clinic", "hospital", "dental", "pharmacy"], label: "Healthcare" },
+  { keywords: ["law", "legal", "attorney", "lawyer", "firm"], label: "Legal" },
+  { keywords: ["restaurant", "food", "cafe", "catering", "bakery"], label: "Food & Beverage" },
+  { keywords: ["real estate", "property", "realty", "mortgage"], label: "Real Estate" },
+  { keywords: ["tech", "software", "saas", "app", "digital", "it services"], label: "Technology" },
+  { keywords: ["finance", "accounting", "tax", "bookkeeping", "cpa"], label: "Finance & Accounting" },
+  { keywords: ["construction", "contractor", "building", "renovation"], label: "Construction" },
+  { keywords: ["retail", "store", "shop", "ecommerce", "e-commerce"], label: "Retail" },
+  { keywords: ["marketing", "advertising", "agency", "creative", "pr"], label: "Marketing & Advertising" },
+  { keywords: ["education", "school", "training", "coaching", "tutoring"], label: "Education" },
+  { keywords: ["manufacturing", "factory", "production", "industrial"], label: "Manufacturing" },
+  { keywords: ["consulting", "advisory", "strategy", "management"], label: "Consulting" },
+];
 
 async function detectIndustryAndSize(
   generalResearch: GeneralResearchFindings | null,
   staffFindings: StaffFindings | null
-): Promise<{ industry: string | null; businessSize: "micro" | "small" | "medium" | "large" | null }> {
+): Promise<{ industry: string | null; industryKeywords: string[]; businessSize: "micro" | "small" | "medium" | "large" | null }> {
   let industry: string | null = null;
+  let industryKeywords: string[] = [];
   let businessSize: "micro" | "small" | "medium" | "large" | null = null;
 
   if (generalResearch?.keyFacts) {
     const facts = generalResearch.keyFacts.join(" ").toLowerCase();
-    const industries = [
-      { keywords: ["health", "medical", "clinic", "hospital", "dental", "pharmacy"], label: "Healthcare" },
-      { keywords: ["law", "legal", "attorney", "lawyer", "firm"], label: "Legal" },
-      { keywords: ["restaurant", "food", "cafe", "catering", "bakery"], label: "Food & Beverage" },
-      { keywords: ["real estate", "property", "realty", "mortgage"], label: "Real Estate" },
-      { keywords: ["tech", "software", "saas", "app", "digital", "it services"], label: "Technology" },
-      { keywords: ["finance", "accounting", "tax", "bookkeeping", "cpa"], label: "Finance & Accounting" },
-      { keywords: ["construction", "contractor", "building", "renovation"], label: "Construction" },
-      { keywords: ["retail", "store", "shop", "ecommerce", "e-commerce"], label: "Retail" },
-      { keywords: ["marketing", "advertising", "agency", "creative", "pr"], label: "Marketing & Advertising" },
-      { keywords: ["education", "school", "training", "coaching", "tutoring"], label: "Education" },
-      { keywords: ["manufacturing", "factory", "production", "industrial"], label: "Manufacturing" },
-      { keywords: ["consulting", "advisory", "strategy", "management"], label: "Consulting" },
-    ];
-    for (const ind of industries) {
-      if (ind.keywords.some(k => facts.includes(k))) { industry = ind.label; break; }
+    for (const ind of INDUSTRY_KEYWORDS) {
+      if (ind.keywords.some(k => facts.includes(k))) { industry = ind.label; industryKeywords = ind.keywords; break; }
     }
   }
 
@@ -224,7 +245,7 @@ async function detectIndustryAndSize(
     else businessSize = "large";
   }
 
-  return { industry, businessSize };
+  return { industry, industryKeywords, businessSize };
 }
 
 // --- Main research runner ---
@@ -284,11 +305,24 @@ export async function runParallelResearch(
   // Business size: no free source gives verified headcount for a private
   // Canadian SMB (Crunchbase and Hunter are both out). Whatever comes back
   // here is Inferred tier unless the client states it directly.
-  const { industry, businessSize } = await detectIndustryAndSize(generalResearchData, null);
+  const { industry, industryKeywords, businessSize } = await detectIndustryAndSize(generalResearchData, null);
+
+  // Competitor classification — raw Tavily candidates are never report-safe
+  // on their own (see odo-competitors.ts). Each one is verified via Places
+  // (New) and scored for service/geographic overlap before it can be called
+  // a competitor in the client report.
+  const competitorCandidates = getVal<CompetitorFindings>(competitors);
+  const prospectCity = detectCity(generalResearchData?.summary ?? null) ?? detectCity(businessName);
+  const competitorProfiles = competitorCandidates?.competitors?.length
+    ? await classifyCompetitors(competitorCandidates.competitors, { industryKeywords, prospectCity })
+    : null;
 
   // Coverage — which checks actually answered. Anything not_determined is a
   // gap in ODO, not a finding about the prospect.
   const determinations: Record<string, import("./odo-evidence").Determination<unknown>> = {};
+  competitorProfiles?.forEach((p, i) => {
+    determinations[`competitor.${i + 1}.identity`] = p.identity;
+  });
   if (dns) {
     determinations["email.spf"] = dns.spf;
     determinations["email.dmarc"] = dns.dmarc;
@@ -328,7 +362,8 @@ export async function runParallelResearch(
     trademarks: null,
     businessRegistry: null,
     generalResearch: generalResearchData,
-    competitors: getVal<CompetitorFindings>(competitors),
+    competitors: competitorCandidates,
+    competitorProfiles,
     industry,
     businessSize,
     errors,
