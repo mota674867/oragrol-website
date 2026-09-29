@@ -1,0 +1,1429 @@
+From c168680abde1c655faabf80068273ef61c36e38b Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Sun, 27 Sep 2026 19:08:36 +0800
+Subject: [PATCH] fix(odo): stop fabricating findings; replace paid sources
+ with native code
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+ODO was reporting security gaps it had never checked. Three separate bugs,
+all of which reached the client report:
+
+1. Email security ran through MXToolbox, and with no MXTOOLBOX_API_KEY set it
+   returned { spf: false, dkim: false, dmarc: false } — so every scan told the
+   prospect they had no email authentication at all. DKIM was additionally
+   hardcoded false even when the key was present, so it was never checked.
+2. calculateSecurityScore deducted for any source returning null, including
+   ones that had no key wired. A prospect with perfect email security scored
+   the same as one with none — a systematic penalty of roughly 40 points on
+   every scan.
+3. VirusTotal was live in the research path. Its Public API terms forbid use
+   "in commercial products or services", which ODO is. Removed, not disabled.
+
+The root cause is that a boolean cannot express "we did not manage to check".
+Introduces odo-evidence.ts with three states — observed / absent /
+not_determined — and the rule that only a confirmed absence may be scored as a
+gap or trigger a service match. DNS timeouts and WAF 403s now resolve to
+not_determined with a reason, and coverage is surfaced to the reviewer so an
+incomplete scan reads as an ODO problem rather than bad news about the client.
+
+Verified against live domains: microsoft.com and shopify.com both returned
+spf=NOT_DETERMINED(ETIMEOUT) under a degraded resolver. Both publish SPF. The
+old code would have reported them as having none.
+
+Sources removed (see odo-research.ts header for the terms on each):
+  VirusTotal     — commercial use prohibited by their API terms
+  HaveIBeenPwned — breacheddomain only answers for domains you own
+  Shodan         — free accounts have no host-lookup API access
+  BuiltWith      — $295/month, replaced by native fingerprinting
+  Hunter.io      — 25 searches/month; inbound ODO has no contact to discover
+  MXToolbox      — replaced by native DNS, which also returns real DKIM
+  SecurityHeaders.io — replaced by reading response headers directly
+
+New native modules, no vendor and no key:
+  odo-dns.ts  — SPF with qualifier strength, DMARC with policy grading
+                (p=none is the finding, not the absence of DMARC), DKIM across
+                8 platform selectors, mail platform with security-gateway
+                detection, definitive Microsoft 365 tenant detection via the
+                openid-configuration endpoint, NS delegation (identifies the
+                incumbent IT provider), CAA/MTA-STS/TLS-RPT/BIMI.
+  odo-page.ts — tech-stack fingerprinting across 45 signatures, on-page SEO
+                health, and well-known file checks, all from one page fetch.
+
+MX records alone are not sufficient for M365 detection: Mimecast, Proofpoint
+and Barracuda proxy the mail flow and mask the mailbox provider entirely.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01TncAA37Xzdqd4iM287MWze
+---
+ app/api/odo/scan/answer/route.ts |  27 +-
+ app/api/odo/scan/events/route.ts |  12 +-
+ app/api/odo/scan/start/route.ts  |  70 +++++-
+ app/lib/odo-dns.ts               | 410 +++++++++++++++++++++++++++++++
+ app/lib/odo-evidence.ts          | 138 +++++++++++
+ app/lib/odo-page.ts              | 305 +++++++++++++++++++++++
+ app/lib/odo-research.ts          | 228 +++++++----------
+ 7 files changed, 1021 insertions(+), 169 deletions(-)
+ create mode 100644 app/lib/odo-dns.ts
+ create mode 100644 app/lib/odo-evidence.ts
+ create mode 100644 app/lib/odo-page.ts
+
+diff --git a/app/api/odo/scan/answer/route.ts b/app/api/odo/scan/answer/route.ts
+index ce0b243..dab49fb 100644
+--- a/app/api/odo/scan/answer/route.ts
++++ b/app/api/odo/scan/answer/route.ts
+@@ -204,8 +204,23 @@ function buildServiceMatches(findings: Record<string, unknown>): Record<string,
+   const matches: Record<string, unknown>[] = [];
+   const f = findings as import("@/app/lib/odo-research").ResearchFindings;
+ 
+-  if (!f.emailSecurity?.spf || !f.emailSecurity?.dmarc || f.breachHistory?.breached) {
+-    matches.push({ service: "Cybersecurity Services", priority: "high", reason: "Email security gaps and/or breach history detected" });
++  // Only a CONFIRMED absence triggers a service match. A check that could not
++  // be determined must never produce a recommendation — that would be selling
++  // against a gap ODO never established.
++  const emailGaps: string[] = [];
++  if (f.dns?.spf.state === "absent") emailGaps.push("no SPF record");
++  if (f.dns?.dkim.state === "absent") emailGaps.push("no DKIM record");
++  if (f.dns?.dmarc.state === "absent") emailGaps.push("no DMARC record");
++  else if (f.dns?.dmarc.state === "observed" && f.dns.dmarc.value.isMonitorOnly) {
++    emailGaps.push(`DMARC published but set to p=none, which enforces nothing`);
++  }
++  if (emailGaps.length > 0) {
++    matches.push({
++      service: "Cybersecurity Services",
++      priority: "high",
++      reason: `Email authentication: ${emailGaps.join("; ")}`,
++      evidence: emailGaps.map((g) => ({ fact: g, source: "DNS lookup", confidence: "observed" })),
++    });
+   }
+   if (f.ssl?.grade && ["C", "D", "F"].includes(f.ssl.grade)) {
+     matches.push({ service: "Cybersecurity Services", priority: "high", reason: `SSL grade: ${f.ssl.grade}` });
+@@ -250,10 +265,12 @@ async function notifyZM77(
+       businessSize: findings._businessSizeDetected || null,
+       securityFindings: {
+         ssl: (findings as import("@/app/lib/odo-research").ResearchFindings).ssl,
+-        emailSecurity: (findings as import("@/app/lib/odo-research").ResearchFindings).emailSecurity,
+-        breachHistory: (findings as import("@/app/lib/odo-research").ResearchFindings).breachHistory,
+-        shodan: (findings as import("@/app/lib/odo-research").ResearchFindings).shodan,
++        dns: (findings as import("@/app/lib/odo-research").ResearchFindings).dns,
++        wellKnown: (findings as import("@/app/lib/odo-research").ResearchFindings).page?.wellKnown ?? null,
+       },
++      // Coverage goes to the reviewer so an incomplete scan is visible as an
++      // ODO problem rather than silently reading as bad news about the client.
++      coverage: (findings as import("@/app/lib/odo-research").ResearchFindings).coverage ?? null,
+       researchErrors: findings._researchErrors || [],
+     },
+     answers,
+diff --git a/app/api/odo/scan/events/route.ts b/app/api/odo/scan/events/route.ts
+index 8ed46b6..5a1bd1e 100644
+--- a/app/api/odo/scan/events/route.ts
++++ b/app/api/odo/scan/events/route.ts
+@@ -110,11 +110,13 @@ function buildFindingsSummary(findings: Record<string, unknown>): Record<string,
+   let opportunities = 0;
+ 
+   if (f.ssl?.grade && ["C", "D", "F"].includes(f.ssl.grade)) securityIssues++;
+-  if (!f.emailSecurity?.spf) securityIssues++;
+-  if (!f.emailSecurity?.dmarc) securityIssues++;
+-  if (f.breachHistory?.breached) securityIssues++;
+-  if (f.shodan?.openPorts && f.shodan.openPorts.length > 3) securityIssues++;
+-  if (!f.virusTotal?.clean) securityIssues++;
++  // Count only confirmed absences. A not-determined check is a coverage gap
++  // in ODO, never an issue attributed to the prospect.
++  if (f.dns?.spf.state === "absent") securityIssues++;
++  if (f.dns?.dkim.state === "absent") securityIssues++;
++  if (f.dns?.dmarc.state === "absent") securityIssues++;
++  else if (f.dns?.dmarc.state === "observed" && f.dns.dmarc.value.isMonitorOnly) securityIssues++;
++  if (f.page?.wellKnown.privacyPolicy.state === "absent") securityIssues++;
+   if (!f.paidAds?.runningFacebookAds && !f.paidAds?.runningGoogleAds) marketingGaps++;
+   if (f.website?.pageSpeedScore && f.website.pageSpeedScore < 50) marketingGaps++;
+   if (f.seo?.domainAuthority && f.seo.domainAuthority < 20) marketingGaps++;
+diff --git a/app/api/odo/scan/start/route.ts b/app/api/odo/scan/start/route.ts
+index 1ae281b..5e8ad2e 100644
+--- a/app/api/odo/scan/start/route.ts
++++ b/app/api/odo/scan/start/route.ts
+@@ -283,8 +283,9 @@ function generateFirstQuestion(
+       options: ["Healthcare", "Legal", "Finance & Accounting", "Technology", "Retail", "Construction", "Food & Beverage", "Education", "Marketing & Advertising", "Consulting", "Manufacturing", "Other"],
+     };
+   }
+-  // If DMARC is on "none" — ask about email security awareness
+-  if (findings.emailSecurity?.dmarcPolicy === "none") {
++  // If DMARC is published but enforcing nothing — ask about email security awareness.
++  // Note: monitor-only is the finding, not the absence of DMARC.
++  if (findings.dns?.dmarc.state === "observed" && findings.dns.dmarc.value.isMonitorOnly) {
+     return {
+       id: "q_email_security_awareness",
+       text: "Has your team experienced any phishing attempts or suspicious emails targeting your business in the last 12 months?",
+@@ -308,15 +309,58 @@ function generateFirstQuestion(
+ }
+ 
+ function calculateSecurityScore(findings: import("@/app/lib/odo-research").ResearchFindings): number {
+-  let score = 100;
+-  if (!findings.ssl || findings.ssl.grade === "F") score -= 25;
+-  else if (findings.ssl.grade === "C" || findings.ssl.grade === "D") score -= 10;
+-  if (!findings.emailSecurity?.spf) score -= 10;
+-  if (!findings.emailSecurity?.dmarc) score -= 10;
+-  if (findings.emailSecurity?.dmarcPolicy === "none") score -= 5;
+-  if (findings.breachHistory?.breached) score -= 20;
+-  if (findings.shodan?.openPorts && findings.shodan.openPorts.length > 5) score -= 15;
+-  if (!findings.virusTotal?.clean) score -= 15;
+-  if (findings.securityHeaders?.grade === "F") score -= 10;
+-  return Math.max(0, score);
++  // SCORING RULE — only a confirmed absence costs points.
++  //
++  // A check that could not be determined (timeout, no key, blocked origin)
++  // must never reduce the score. The previous version deducted for every
++  // source that returned null, so a prospect with perfect email security
++  // scored the same as one with none whenever a key was missing — roughly a
++  // 40-point systematic penalty applied to every scan.
++  //
++  // Scores are therefore computed over what was actually established, and
++  // normalised, so a partial scan reports a fair score rather than a low one.
++  let earned = 0;
++  let possible = 0;
++
++  const award = (weight: number, ok: boolean) => {
++    possible += weight;
++    if (ok) earned += weight;
++  };
++
++  if (findings.ssl?.grade) {
++    award(25, !["C", "D", "E", "F", "T"].includes(findings.ssl.grade));
++  }
++
++  const dns = findings.dns;
++  if (dns) {
++    if (dns.spf.state !== "not_determined") {
++      award(10, dns.spf.state === "observed");
++      // A published SPF that ends in +all or ?all enforces nothing.
++      if (dns.spf.state === "observed") {
++        award(5, dns.spf.value.qualifier === "-all" || dns.spf.value.qualifier === "~all");
++      }
++    }
++    if (dns.dkim.state !== "not_determined") award(10, dns.dkim.state === "observed");
++    if (dns.dmarc.state !== "not_determined") {
++      award(10, dns.dmarc.state === "observed");
++      if (dns.dmarc.state === "observed") {
++        // p=none is monitoring only — published but enforcing nothing.
++        award(10, !dns.dmarc.value.isMonitorOnly);
++        award(5, dns.dmarc.value.hasAggregateReporting);
++      }
++    }
++    if (dns.hygiene.mtaSts.state !== "not_determined") award(5, dns.hygiene.mtaSts.state === "observed");
++    if (dns.hygiene.caa.state !== "not_determined") award(5, dns.hygiene.caa.state === "observed");
++  }
++
++  const wk = findings.page?.wellKnown;
++  if (wk) {
++    if (wk.securityTxt.state !== "not_determined") award(3, wk.securityTxt.state === "observed");
++    if (wk.privacyPolicy.state !== "not_determined") award(7, wk.privacyPolicy.state === "observed");
++  }
++
++  // Nothing could be established at all — report no score rather than a bad one.
++  if (possible === 0) return -1;
++
++  return Math.round((earned / possible) * 100);
+ }
+diff --git a/app/lib/odo-dns.ts b/app/lib/odo-dns.ts
+new file mode 100644
+index 0000000..90175a3
+--- /dev/null
++++ b/app/lib/odo-dns.ts
+@@ -0,0 +1,410 @@
++// ORAGROL ODO — Native DNS & identity-platform research
++//
++// Replaces the MXToolbox dependency entirely. Node's resolver is free,
++// unlimited, faster than a third-party API, and actually returns DKIM —
++// which the MXToolbox path hardcoded to `false` even when it succeeded.
++//
++// Every result is a Determination (see odo-evidence.ts): observed / absent /
++// not_determined. A resolver timeout is never reported as a missing record.
++//
++// BOUNDARY: everything here is a DNS lookup or a request to a public
++// discovery endpoint that any mail client performs automatically. Nothing
++// probes the prospect's infrastructure.
++
++import { Resolver } from "node:dns/promises";
++import {
++  type Determination,
++  observed,
++  absent,
++  notDetermined,
++  resolveOrDetermine,
++  fetchOrDetermine,
++} from "./odo-evidence";
++
++// Dedicated resolver so ODO's burst of parallel lookups doesn't inherit
++// whatever the platform default is configured with.
++function makeResolver() {
++  // Tight per-attempt budget: odo-evidence adds its own retry layer on top,
++  // so a generous resolver timeout multiplies (4s x 2 tries x 3 retries = 24s
++  // for a single failing lookup, and several run in parallel).
++  const r = new Resolver({ timeout: 1500, tries: 1 });
++  r.setServers(["1.1.1.1", "8.8.8.8"]);
++  return r;
++}
++
++export function normalizeDomain(input: string): string {
++  return input
++    .replace(/^https?:\/\//i, "")
++    .replace(/\/.*$/, "")
++    .replace(/^www\./i, "")
++    .trim()
++    .toLowerCase();
++}
++
++// ---------------------------------------------------------------------------
++// Email authentication — presence AND strength
++// ---------------------------------------------------------------------------
++
++export type SpfRecord = {
++  raw: string;
++  /** "-all" hard fail, "~all" soft fail, "?all" neutral, null if no all-mechanism */
++  qualifier: "-all" | "~all" | "?all" | "+all" | null;
++  lookupCount: number;
++  /** SPF breaks silently above 10 DNS-resolving mechanisms. */
++  exceedsLookupLimit: boolean;
++};
++
++export async function checkSpf(domain: string): Promise<Determination<SpfRecord>> {
++  const r = makeResolver();
++  const txt = await resolveOrDetermine("dns:spf", () => r.resolveTxt(domain));
++  if (txt.state !== "observed") return txt as Determination<SpfRecord>;
++
++  const flat = txt.value.map((chunks) => chunks.join(""));
++  const spf = flat.find((t) => /^v=spf1\b/i.test(t));
++  if (!spf) return absent<SpfRecord>("dns:spf");
++
++  const qMatch = spf.match(/([-~?+])all\b/);
++  const qualifier = qMatch ? (`${qMatch[1]}all` as SpfRecord["qualifier"]) : null;
++  const lookupCount = (spf.match(/\b(include|a|mx|ptr|exists|redirect)[:=]/gi) || []).length;
++
++  return observed(
++    { raw: spf, qualifier, lookupCount, exceedsLookupLimit: lookupCount > 10 },
++    "dns:spf"
++  );
++}
++
++export type DmarcRecord = {
++  raw: string;
++  policy: "none" | "quarantine" | "reject";
++  subdomainPolicy: "none" | "quarantine" | "reject" | null;
++  percentage: number;
++  hasAggregateReporting: boolean;
++  hasForensicReporting: boolean;
++  /** p=none enforces nothing. This is the finding, not the absence of DMARC. */
++  isMonitorOnly: boolean;
++};
++
++export async function checkDmarc(domain: string): Promise<Determination<DmarcRecord>> {
++  const r = makeResolver();
++  const txt = await resolveOrDetermine("dns:dmarc", () => r.resolveTxt(`_dmarc.${domain}`));
++  if (txt.state !== "observed") return txt as Determination<DmarcRecord>;
++
++  const flat = txt.value.map((chunks) => chunks.join(""));
++  const rec = flat.find((t) => /^v=DMARC1\b/i.test(t));
++  if (!rec) return absent<DmarcRecord>("dns:dmarc");
++
++  const policy = (rec.match(/\bp=(none|quarantine|reject)\b/i)?.[1]?.toLowerCase() ??
++    "none") as DmarcRecord["policy"];
++  const sp = rec.match(/\bsp=(none|quarantine|reject)\b/i)?.[1]?.toLowerCase() as
++    | DmarcRecord["subdomainPolicy"]
++    | undefined;
++  const pct = Number(rec.match(/\bpct=(\d{1,3})\b/i)?.[1] ?? 100);
++
++  return observed(
++    {
++      raw: rec,
++      policy,
++      subdomainPolicy: sp ?? null,
++      percentage: Number.isFinite(pct) ? pct : 100,
++      hasAggregateReporting: /\brua=/i.test(rec),
++      hasForensicReporting: /\bruf=/i.test(rec),
++      isMonitorOnly: policy === "none",
++    },
++    "dns:dmarc"
++  );
++}
++
++// Common DKIM selectors by platform. DKIM has no discovery mechanism, so
++// checking known selectors is the only passive route.
++const DKIM_SELECTORS: Array<{ selector: string; platform: string }> = [
++  { selector: "selector1", platform: "Microsoft 365" },
++  { selector: "selector2", platform: "Microsoft 365" },
++  { selector: "google", platform: "Google Workspace" },
++  { selector: "default", platform: "generic" },
++  { selector: "k1", platform: "Mailchimp/Mandrill" },
++  { selector: "s1", platform: "generic" },
++  { selector: "dkim", platform: "generic" },
++  { selector: "mail", platform: "generic" },
++];
++
++export type DkimRecord = {
++  selectorsFound: Array<{ selector: string; platform: string; target: string }>;
++  /** M365 DKIM CNAMEs leak the tenant name, e.g. contoso365.onmicrosoft.com */
++  tenantHint: string | null;
++};
++
++export async function checkDkim(domain: string): Promise<Determination<DkimRecord>> {
++  const r = makeResolver();
++  const found: DkimRecord["selectorsFound"] = [];
++  let anyDetermined = false;
++
++  const results = await Promise.allSettled(
++    DKIM_SELECTORS.map(async ({ selector, platform }) => {
++      const host = `${selector}._domainkey.${domain}`;
++      const cname = await resolveOrDetermine(`dns:dkim:${selector}`, () => r.resolveCname(host), {
++        retries: 2,
++      });
++      if (cname.state === "observed" && cname.value[0]) {
++        return { selector, platform, target: cname.value[0], determined: true };
++      }
++      if (cname.state === "absent") {
++        const txt = await resolveOrDetermine(`dns:dkim:${selector}`, () => r.resolveTxt(host), {
++          retries: 2,
++        });
++        if (txt.state === "observed") {
++          return { selector, platform, target: txt.value.map((c) => c.join("")).join(""), determined: true };
++        }
++        return { determined: txt.state === "absent" };
++      }
++      return { determined: false };
++    })
++  );
++
++  for (const res of results) {
++    if (res.status !== "fulfilled") continue;
++    if (res.value.determined) anyDetermined = true;
++    if ("selector" in res.value && res.value.selector) {
++      found.push({ selector: res.value.selector, platform: res.value.platform!, target: res.value.target! });
++    }
++  }
++
++  if (found.length > 0) {
++    const tenant = found
++      .map((f) => f.target.match(/([a-z0-9-]+)\.onmicrosoft\.com/i)?.[1])
++      .find(Boolean);
++    return observed({ selectorsFound: found, tenantHint: tenant ?? null }, "dns:dkim");
++  }
++
++  // No selector matched. That is only a finding if the lookups actually
++  // answered — if every one timed out we know nothing.
++  return anyDetermined
++    ? absent<DkimRecord>("dns:dkim")
++    : notDetermined<DkimRecord>("all selector lookups failed to resolve", "dns:dkim");
++}
++
++// ---------------------------------------------------------------------------
++// Mail platform & incumbent vendor
++// ---------------------------------------------------------------------------
++
++export type MailPlatform = {
++  mxHosts: string[];
++  /** Mailbox provider, where determinable from MX alone. */
++  provider: string | null;
++  /** A security gateway in front of the mailbox — masks the provider. */
++  gateway: string | null;
++};
++
++const GATEWAY_PATTERNS: Array<[RegExp, string]> = [
++  [/mimecast/i, "Mimecast"],
++  [/pphosted|proofpoint/i, "Proofpoint"],
++  [/barracudanetworks|barracuda/i, "Barracuda"],
++  [/messagelabs|symanteccloud/i, "Broadcom/Symantec"],
++  [/mailcontrol/i, "Forcepoint"],
++  [/trendmicro|trendmicromail/i, "Trend Micro"],
++  [/sophos/i, "Sophos"],
++  [/hornetsecurity|antispameurope/i, "Hornetsecurity"],
++  [/fortimail|fortinet/i, "Fortinet"],
++  [/cisco|iphmx/i, "Cisco Secure Email"],
++];
++
++const PROVIDER_PATTERNS: Array<[RegExp, string]> = [
++  [/\.mail\.protection\.outlook\.com$/i, "Microsoft 365"],
++  [/aspmx.*\.google(mail)?\.com$/i, "Google Workspace"],
++  [/\.zoho\./i, "Zoho Mail"],
++  [/\.protonmail\./i, "Proton Mail"],
++  [/\.fastmail\./i, "Fastmail"],
++  [/\.mailgun\./i, "Mailgun"],
++  [/\.improvmx\./i, "ImprovMX"],
++];
++
++export async function checkMailPlatform(domain: string): Promise<Determination<MailPlatform>> {
++  const r = makeResolver();
++  const mx = await resolveOrDetermine("dns:mx", () => r.resolveMx(domain));
++  if (mx.state !== "observed") return mx as Determination<MailPlatform>;
++
++  const hosts = mx.value.sort((a, b) => a.priority - b.priority).map((m) => m.exchange.toLowerCase());
++  const joined = hosts.join(" ");
++
++  const gateway = GATEWAY_PATTERNS.find(([re]) => re.test(joined))?.[1] ?? null;
++  const provider = PROVIDER_PATTERNS.find(([re]) => hosts.some((h) => re.test(h)))?.[1] ?? null;
++
++  return observed({ mxHosts: hosts, provider, gateway }, "dns:mx");
++}
++
++/**
++ * Definitive Microsoft 365 detection.
++ *
++ * MX records are NOT reliable for this: a security gateway in front of the
++ * mailbox hides the provider completely. Verified against real domains,
++ * MX-only detection misidentified the majority of a Mimecast/Proofpoint/
++ * Barracuda-fronted sample. This endpoint is what every Office client queries
++ * during account setup and answers for any domain.
++ *
++ * Domain-only. Never pass a synthesised username — that would be user
++ * enumeration, which is out of bounds.
++ */
++export type M365Tenant = {
++  isMicrosoft365: boolean;
++  tenantId: string | null;
++  /** Exchange Online confirmed via the autodiscover CNAME. */
++  exchangeOnline: boolean;
++  /** Entra device registration active — puts Intune/Conditional Access in scope. */
++  deviceRegistration: boolean;
++};
++
++export async function checkMicrosoft365(domain: string): Promise<Determination<M365Tenant>> {
++  const r = makeResolver();
++
++  const [oidc, autodiscover, deviceReg] = await Promise.all([
++    fetchOrDetermine(
++      "m365:oidc",
++      `https://login.microsoftonline.com/${encodeURIComponent(domain)}/.well-known/openid-configuration`,
++      { timeoutMs: 8000 }
++    ),
++    resolveOrDetermine("dns:autodiscover", () => r.resolveCname(`autodiscover.${domain}`), { retries: 2 }),
++    resolveOrDetermine("dns:enterpriseregistration", () => r.resolveCname(`enterpriseregistration.${domain}`), { retries: 2 }),
++  ]);
++
++  let tenantId: string | null = null;
++  let isM365 = false;
++
++  if (oidc.state === "observed") {
++    try {
++      const doc = JSON.parse(oidc.value.body) as { issuer?: string; token_endpoint?: string };
++      const guid = (doc.issuer ?? doc.token_endpoint ?? "").match(
++        /([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i
++      )?.[1];
++      if (guid) {
++        tenantId = guid;
++        isM365 = true;
++      }
++    } catch {
++      // Malformed response — fall through to the DNS signals below.
++    }
++  }
++
++  const exchangeOnline =
++    autodiscover.state === "observed" &&
++    autodiscover.value.some((t) => /autodiscover\.outlook\.com/i.test(t));
++  if (exchangeOnline) isM365 = true;
++
++  const deviceRegistration =
++    deviceReg.state === "observed" &&
++    deviceReg.value.some((t) => /enterpriseregistration\.windows\.net/i.test(t));
++
++  // Only report "not Microsoft" when at least one probe actually answered.
++  const anyAnswered =
++    oidc.state !== "not_determined" ||
++    autodiscover.state !== "not_determined" ||
++    deviceReg.state !== "not_determined";
++
++  if (!isM365 && !anyAnswered) {
++    return notDetermined<M365Tenant>("no identity probe returned an answer", "m365");
++  }
++
++  return observed({ isMicrosoft365: isM365, tenantId, exchangeOnline, deviceRegistration }, "m365");
++}
++
++// ---------------------------------------------------------------------------
++// DNS hygiene & incumbent IT provider
++// ---------------------------------------------------------------------------
++
++const DNS_OPERATORS: Array<[RegExp, string, "hyperscale" | "registrar" | "regional"]> = [
++  [/cloudflare/i, "Cloudflare", "hyperscale"],
++  [/awsdns/i, "AWS Route 53", "hyperscale"],
++  [/azure-dns/i, "Azure DNS", "hyperscale"],
++  [/googledomains|google\.com$/i, "Google Cloud DNS", "hyperscale"],
++  [/godaddy|domaincontrol/i, "GoDaddy", "registrar"],
++  [/namecheap|registrar-servers/i, "Namecheap", "registrar"],
++  [/wixdns/i, "Wix", "registrar"],
++  [/squarespacedns/i, "Squarespace", "registrar"],
++  [/shopify/i, "Shopify", "registrar"],
++  [/rebel\.ca|webnames\.ca|namespro/i, "Canadian registrar", "registrar"],
++];
++
++export type DnsDelegation = {
++  nameservers: string[];
++  operator: string | null;
++  /**
++   * A small regional operator behind a mid-size company usually means a small
++   * local IT shop is the incumbent — the most displaceable situation there is.
++   */
++  operatorClass: "hyperscale" | "registrar" | "regional" | "unknown";
++};
++
++export async function checkDnsDelegation(domain: string): Promise<Determination<DnsDelegation>> {
++  const r = makeResolver();
++  const ns = await resolveOrDetermine("dns:ns", () => r.resolveNs(domain));
++  if (ns.state !== "observed") return ns as Determination<DnsDelegation>;
++
++  const nameservers = ns.value.map((n) => n.toLowerCase());
++  const joined = nameservers.join(" ");
++  const match = DNS_OPERATORS.find(([re]) => re.test(joined));
++
++  return observed(
++    {
++      nameservers,
++      operator: match?.[1] ?? null,
++      operatorClass: match?.[2] ?? "regional",
++    },
++    "dns:ns"
++  );
++}
++
++export type DnsHygiene = {
++  caa: Determination<string[]>;
++  mtaSts: Determination<boolean>;
++  tlsRpt: Determination<boolean>;
++  bimi: Determination<boolean>;
++};
++
++export async function checkDnsHygiene(domain: string): Promise<DnsHygiene> {
++  const r = makeResolver();
++  const [caa, mtaSts, tlsRpt, bimi] = await Promise.all([
++    resolveOrDetermine("dns:caa", async () =>
++      (await r.resolveCaa(domain)).map((c) => c.issue ?? c.issuewild ?? c.iodef ?? "").filter(Boolean)
++    ),
++    resolveOrDetermine("dns:mta-sts", () => r.resolveTxt(`_mta-sts.${domain}`)),
++    resolveOrDetermine("dns:tls-rpt", () => r.resolveTxt(`_smtp._tls.${domain}`)),
++    resolveOrDetermine("dns:bimi", () => r.resolveTxt(`default._bimi.${domain}`)),
++  ]);
++
++  const toBool = (d: Determination<string[][]>): Determination<boolean> =>
++    d.state === "observed" ? observed(true, d.source) : (d as Determination<boolean>);
++
++  return {
++    caa,
++    mtaSts: toBool(mtaSts),
++    tlsRpt: toBool(tlsRpt),
++    bimi: toBool(bimi),
++  };
++}
++
++// ---------------------------------------------------------------------------
++// Aggregate
++// ---------------------------------------------------------------------------
++
++export type DnsResearch = {
++  domain: string;
++  spf: Determination<SpfRecord>;
++  dmarc: Determination<DmarcRecord>;
++  dkim: Determination<DkimRecord>;
++  mail: Determination<MailPlatform>;
++  microsoft365: Determination<M365Tenant>;
++  delegation: Determination<DnsDelegation>;
++  hygiene: DnsHygiene;
++};
++
++export async function runDnsResearch(rawDomain: string): Promise<DnsResearch> {
++  const domain = normalizeDomain(rawDomain);
++  const [spf, dmarc, dkim, mail, microsoft365, delegation, hygiene] = await Promise.all([
++    checkSpf(domain),
++    checkDmarc(domain),
++    checkDkim(domain),
++    checkMailPlatform(domain),
++    checkMicrosoft365(domain),
++    checkDnsDelegation(domain),
++    checkDnsHygiene(domain),
++  ]);
++  return { domain, spf, dmarc, dkim, mail, microsoft365, delegation, hygiene };
++}
+diff --git a/app/lib/odo-evidence.ts b/app/lib/odo-evidence.ts
+new file mode 100644
+index 0000000..b300441
+--- /dev/null
++++ b/app/lib/odo-evidence.ts
+@@ -0,0 +1,138 @@
++// ORAGROL ODO — Evidence determination states
++//
++// WHY THIS EXISTS
++// ODO's core rule is that it must refuse to invent conclusions. A boolean
++// cannot express that rule: `spf: false` is indistinguishable from "we did
++// not manage to check". The previous email-security fetcher returned
++// `{ spf: false, dkim: false, dmarc: false }` whenever its API key was
++// missing, which meant every single scan reported the prospect as having no
++// email authentication at all — a fabricated security finding about the exact
++// thing ORAGROL sells.
++//
++// Three states, never two:
++//   observed       — we looked and the thing is there
++//   absent         — we looked and it is genuinely not there (a real finding)
++//   not_determined — we could not establish either way (NOT a finding)
++//
++// A `not_determined` result must never be scored as a gap, must never appear
++// in the client report as a finding, and must be visible to the reviewer so
++// coverage problems surface instead of hiding as bad news about the prospect.
++
++export type Determination<T> =
++  | { state: "observed"; value: T; source: string; collectedAt: string }
++  | { state: "absent"; source: string; collectedAt: string }
++  | { state: "not_determined"; reason: string; source: string; collectedAt: string };
++
++const now = () => new Date().toISOString();
++
++export function observed<T>(value: T, source: string): Determination<T> {
++  return { state: "observed", value, source, collectedAt: now() };
++}
++
++export function absent<T>(source: string): Determination<T> {
++  return { state: "absent", source, collectedAt: now() };
++}
++
++export function notDetermined<T>(reason: string, source: string): Determination<T> {
++  return { state: "not_determined", reason, source, collectedAt: now() };
++}
++
++/** True only when we positively established the thing is missing. */
++export function isRealGap<T>(d: Determination<T>): boolean {
++  return d.state === "absent";
++}
++
++/** Value if observed, otherwise null. Never conflate with `absent`. */
++export function valueOf<T>(d: Determination<T>): T | null {
++  return d.state === "observed" ? d.value : null;
++}
++
++/**
++ * DNS error classification.
++ *
++ * ENODATA / ENOTFOUND are authoritative answers: the record genuinely is not
++ * published. Everything else — timeouts, SERVFAIL, refused, network errors —
++ * means the resolver did not give us an answer, which is not the same thing.
++ */
++const AUTHORITATIVE_ABSENCE = new Set(["ENODATA", "ENOTFOUND", "NXDOMAIN"]);
++
++export function classifyDnsError(err: unknown): "absent" | "not_determined" {
++  const code = (err as { code?: string })?.code;
++  return code && AUTHORITATIVE_ABSENCE.has(code) ? "absent" : "not_determined";
++}
++
++/**
++ * Run a DNS lookup with retries, returning a Determination rather than
++ * throwing. Only the not_determined class is retried — an authoritative
++ * "no such record" is already a final answer and retrying it wastes time.
++ */
++export async function resolveOrDetermine<T>(
++  source: string,
++  lookup: () => Promise<T>,
++  opts: { retries?: number; baseDelayMs?: number } = {}
++): Promise<Determination<T>> {
++  const retries = opts.retries ?? 2;
++  const baseDelay = opts.baseDelayMs ?? 120;
++  let lastReason = "unknown";
++
++  for (let attempt = 0; attempt < retries; attempt++) {
++    try {
++      const value = await lookup();
++      // An empty array from a DNS resolver is an answer with no records.
++      if (Array.isArray(value) && value.length === 0) return absent<T>(source);
++      return observed(value, source);
++    } catch (err) {
++      const kind = classifyDnsError(err);
++      if (kind === "absent") return absent<T>(source);
++      lastReason = (err as { code?: string })?.code ?? (err instanceof Error ? err.message : String(err));
++      if (attempt < retries - 1) {
++        // Jittered backoff — a burst of parallel lookups against one resolver
++        // is exactly the condition that produced the false negatives.
++        const delay = baseDelay * Math.pow(2, attempt) + Math.random() * baseDelay;
++        await new Promise((r) => setTimeout(r, delay));
++      }
++    }
++  }
++  return notDetermined<T>(lastReason, source);
++}
++
++/**
++ * HTTP equivalent. A 403 from a WAF is "blocked", not "missing" — and
++ * aggressive bot protection is itself a positive maturity signal worth
++ * recording rather than discarding.
++ */
++export async function fetchOrDetermine(
++  source: string,
++  url: string,
++  opts: { timeoutMs?: number; headers?: Record<string, string> } = {}
++): Promise<Determination<{ status: number; body: string; headers: Headers }>> {
++  try {
++    const res = await fetch(url, {
++      headers: { "User-Agent": "ORAGROL-ODO/1.0 (+https://orgro.ca)", ...opts.headers },
++      signal: AbortSignal.timeout(opts.timeoutMs ?? 10000),
++      redirect: "follow",
++    });
++    if (res.status === 404 || res.status === 410) return absent(source);
++    if (res.status === 403 || res.status === 429) {
++      return notDetermined(`blocked by origin (HTTP ${res.status})`, source);
++    }
++    if (!res.ok) return notDetermined(`HTTP ${res.status}`, source);
++    return observed({ status: res.status, body: await res.text(), headers: res.headers }, source);
++  } catch (err) {
++    const reason = err instanceof Error ? err.name === "TimeoutError" ? "timeout" : err.message : String(err);
++    return notDetermined(reason, source);
++  }
++}
++
++/** Reviewer-facing coverage summary. Surfaces gaps in ODO, not in the prospect. */
++export function coverageReport(
++  checks: Record<string, Determination<unknown>>
++): { observed: string[]; absent: string[]; notDetermined: Array<{ check: string; reason: string }> } {
++  const out = { observed: [] as string[], absent: [] as string[], notDetermined: [] as Array<{ check: string; reason: string }> };
++  for (const [name, d] of Object.entries(checks)) {
++    if (d.state === "observed") out.observed.push(name);
++    else if (d.state === "absent") out.absent.push(name);
++    else out.notDetermined.push({ check: name, reason: d.reason });
++  }
++  return out;
++}
+diff --git a/app/lib/odo-page.ts b/app/lib/odo-page.ts
+new file mode 100644
+index 0000000..6236bc5
+--- /dev/null
++++ b/app/lib/odo-page.ts
+@@ -0,0 +1,305 @@
++// ORAGROL ODO — Homepage fetch + native tech-stack and on-page SEO analysis
++//
++// Replaces two paid vendors with code:
++//   BuiltWith   ($295/month) → tech-stack fingerprinting
++//   DataForSEO  (paid)       → on-page SEO health
++//
++// Both work by pattern-matching what the server already publishes to any
++// visitor — the same method Wappalyzer uses. The page is fetched ONCE and
++// both analysers read the same response, so this costs one HTTP request.
++//
++// On-page SEO health is more useful to ODO than keyword rankings anyway:
++// "eleven pages have no meta description" is remediable work ORAGROL can
++// quote for. "You rank 14th for X" is not a service.
++
++import { type Determination, observed, absent, notDetermined, fetchOrDetermine } from "./odo-evidence";
++import { normalizeDomain } from "./odo-dns";
++
++export type PageSnapshot = {
++  finalUrl: string;
++  status: number;
++  html: string;
++  headers: Record<string, string>;
++};
++
++export async function fetchHomepage(rawDomain: string): Promise<Determination<PageSnapshot>> {
++  const domain = normalizeDomain(rawDomain);
++  for (const candidate of [`https://${domain}`, `https://www.${domain}`]) {
++    const res = await fetchOrDetermine("page:home", candidate, { timeoutMs: 12000 });
++    if (res.state === "observed") {
++      const headers: Record<string, string> = {};
++      res.value.headers.forEach((v, k) => (headers[k.toLowerCase()] = v));
++      return observed({ finalUrl: candidate, status: res.value.status, html: res.value.body, headers }, "page:home");
++    }
++    if (res.state === "not_determined" && /blocked by origin/.test(res.reason)) return res as Determination<PageSnapshot>;
++  }
++  return notDetermined<PageSnapshot>("homepage unreachable on both apex and www", "page:home");
++}
++
++// ---------------------------------------------------------------------------
++// Tech stack fingerprint
++// ---------------------------------------------------------------------------
++
++type Signature = { name: string; category: TechCategory; html?: RegExp; script?: RegExp; header?: [string, RegExp]; cookie?: RegExp };
++export type TechCategory = "cms" | "ecommerce" | "analytics" | "marketing" | "payments" | "chat" | "framework" | "cdn" | "hosting";
++
++const SIGNATURES: Signature[] = [
++  // CMS / site builders
++  { name: "WordPress", category: "cms", html: /<meta[^>]+name=["']generator["'][^>]+WordPress/i, script: /\/wp-(content|includes)\// },
++  { name: "Drupal", category: "cms", html: /<meta[^>]+name=["']generator["'][^>]+Drupal/i },
++  { name: "Joomla", category: "cms", html: /<meta[^>]+name=["']generator["'][^>]+Joomla/i },
++  { name: "Wix", category: "cms", script: /static\.parastorage\.com|wix\.com/i },
++  { name: "Squarespace", category: "cms", script: /squarespace\.com|sqspcdn/i },
++  { name: "Webflow", category: "cms", html: /data-wf-(site|page)=/i },
++  { name: "HubSpot CMS", category: "cms", script: /hs-sites\.com|hubspot\.net/i },
++  { name: "Duda", category: "cms", script: /dudamobile|dudaone/i },
++  { name: "GoDaddy Website Builder", category: "cms", script: /img1\.wsimg\.com/i },
++  // Ecommerce
++  { name: "Shopify", category: "ecommerce", script: /cdn\.shopify\.com/i },
++  { name: "WooCommerce", category: "ecommerce", script: /\/plugins\/woocommerce\// },
++  { name: "BigCommerce", category: "ecommerce", script: /bigcommerce\.com/i },
++  // Frameworks
++  { name: "Next.js", category: "framework", html: /id=["']__NEXT_DATA__["']|\/_next\//, header: ["x-powered-by", /next\.js/i] },
++  { name: "React", category: "framework", html: /data-reactroot|__REACT_DEVTOOLS/ },
++  { name: "Vue.js", category: "framework", html: /data-v-[0-9a-f]{8}|__VUE__/ },
++  { name: "Angular", category: "framework", html: /ng-version=|_nghost-/ },
++  // Analytics
++  { name: "Google Analytics 4", category: "analytics", script: /googletagmanager\.com\/gtag\/js|gtag\(/i },
++  { name: "Google Tag Manager", category: "analytics", script: /googletagmanager\.com\/gtm\.js/i },
++  { name: "Meta Pixel", category: "analytics", script: /connect\.facebook\.net.*fbevents/i },
++  { name: "Hotjar", category: "analytics", script: /static\.hotjar\.com/i },
++  { name: "Microsoft Clarity", category: "analytics", script: /clarity\.ms/i },
++  { name: "Matomo", category: "analytics", script: /matomo\.(js|php)/i },
++  { name: "LinkedIn Insight", category: "analytics", script: /snap\.licdn\.com/i },
++  // Marketing / CRM
++  { name: "HubSpot", category: "marketing", script: /js\.hs-scripts\.com|hs-analytics/i },
++  { name: "Mailchimp", category: "marketing", script: /chimpstatic\.com|list-manage\.com/i },
++  { name: "Klaviyo", category: "marketing", script: /klaviyo\.com/i },
++  { name: "ActiveCampaign", category: "marketing", script: /activehosted\.com/i },
++  { name: "Salesforce/Pardot", category: "marketing", script: /pardot\.com|force\.com/i },
++  // Payments
++  { name: "Stripe", category: "payments", script: /js\.stripe\.com/i },
++  { name: "PayPal", category: "payments", script: /paypal(objects)?\.com/i },
++  { name: "Square", category: "payments", script: /squareup\.com|squarecdn/i },
++  // Chat / support
++  { name: "Intercom", category: "chat", script: /widget\.intercom\.io/i },
++  { name: "Tawk.to", category: "chat", script: /embed\.tawk\.to/i },
++  { name: "Zendesk", category: "chat", script: /zdassets\.com|zendesk\.com/i },
++  { name: "Drift", category: "chat", script: /js\.driftt\.com/i },
++  { name: "Crisp", category: "chat", script: /client\.crisp\.chat/i },
++  { name: "LiveChat", category: "chat", script: /cdn\.livechatinc\.com/i },
++  // CDN / hosting
++  { name: "Cloudflare", category: "cdn", header: ["server", /cloudflare/i] },
++  { name: "Vercel", category: "hosting", header: ["server", /vercel/i] },
++  { name: "Netlify", category: "hosting", header: ["server", /netlify/i] },
++  { name: "Microsoft IIS", category: "hosting", header: ["server", /microsoft-iis/i] },
++  { name: "Apache", category: "hosting", header: ["server", /apache/i] },
++  { name: "nginx", category: "hosting", header: ["server", /nginx/i] },
++];
++
++export type TechStack = {
++  detected: Array<{ name: string; category: TechCategory }>;
++  byCategory: Partial<Record<TechCategory, string[]>>;
++  generator: string | null;
++  poweredBy: string | null;
++  /** Third-party hosts loading script — supply-chain surface. */
++  thirdPartyScriptHosts: string[];
++  /** No analytics at all is itself a finding for a business buying automation. */
++  hasAnalytics: boolean;
++  hasChatWidget: boolean;
++  hasPayments: boolean;
++};
++
++export function analyzeTechStack(page: PageSnapshot): TechStack {
++  const { html, headers, finalUrl } = page;
++  const detected: TechStack["detected"] = [];
++
++  for (const sig of SIGNATURES) {
++    const hit =
++      (sig.html && sig.html.test(html)) ||
++      (sig.script && sig.script.test(html)) ||
++      (sig.cookie && sig.cookie.test(headers["set-cookie"] ?? "")) ||
++      (sig.header && sig.header[1].test(headers[sig.header[0]] ?? ""));
++    if (hit) detected.push({ name: sig.name, category: sig.category });
++  }
++
++  const byCategory: TechStack["byCategory"] = {};
++  for (const d of detected) (byCategory[d.category] ??= []).push(d.name);
++
++  let ownHost = "";
++  try {
++    ownHost = new URL(finalUrl).hostname.replace(/^www\./, "");
++  } catch {
++    /* finalUrl is always constructed by us, but stay defensive */
++  }
++
++  const scriptHosts = new Set<string>();
++  for (const m of html.matchAll(/<script[^>]+src=["']([^"']+)["']/gi)) {
++    try {
++      const u = new URL(m[1], finalUrl);
++      const h = u.hostname.replace(/^www\./, "");
++      if (h && h !== ownHost && !h.endsWith(`.${ownHost}`)) scriptHosts.add(h);
++    } catch {
++      /* skip malformed src */
++    }
++  }
++
++  return {
++    detected,
++    byCategory,
++    generator: html.match(/<meta[^>]+name=["']generator["'][^>]+content=["']([^"']+)["']/i)?.[1] ?? null,
++    poweredBy: headers["x-powered-by"] ?? null,
++    thirdPartyScriptHosts: [...scriptHosts].sort(),
++    hasAnalytics: (byCategory.analytics?.length ?? 0) > 0,
++    hasChatWidget: (byCategory.chat?.length ?? 0) > 0,
++    hasPayments: (byCategory.payments?.length ?? 0) > 0,
++  };
++}
++
++// ---------------------------------------------------------------------------
++// On-page SEO health
++// ---------------------------------------------------------------------------
++
++export type SeoHealth = {
++  title: string | null;
++  titleLength: number;
++  metaDescription: string | null;
++  metaDescriptionLength: number;
++  h1Count: number;
++  h1Text: string[];
++  hasCanonical: boolean;
++  hasOpenGraph: boolean;
++  hasStructuredData: boolean;
++  structuredDataTypes: string[];
++  imagesTotal: number;
++  imagesMissingAlt: number;
++  hasViewportMeta: boolean;
++  langAttribute: string | null;
++  issues: string[];
++};
++
++export function analyzeSeo(page: PageSnapshot): SeoHealth {
++  const { html } = page;
++  const title = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]?.trim() ?? null;
++  const metaDescription =
++    html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i)?.[1]?.trim() ?? null;
++  const h1Text = [...html.matchAll(/<h1[^>]*>([\s\S]*?)<\/h1>/gi)].map((m) =>
++    m[1].replace(/<[^>]+>/g, "").trim()
++  );
++
++  const imgTags = [...html.matchAll(/<img\b[^>]*>/gi)].map((m) => m[0]);
++  const imagesMissingAlt = imgTags.filter((t) => !/\balt\s*=\s*["'][^"']+["']/i.test(t)).length;
++
++  const ldTypes = new Set<string>();
++  for (const m of html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
++    try {
++      const parsed = JSON.parse(m[1].trim()) as unknown;
++      const walk = (n: unknown) => {
++        if (Array.isArray(n)) return n.forEach(walk);
++        if (n && typeof n === "object") {
++          const t = (n as Record<string, unknown>)["@type"];
++          if (typeof t === "string") ldTypes.add(t);
++          else if (Array.isArray(t)) t.forEach((x) => typeof x === "string" && ldTypes.add(x));
++        }
++      };
++      walk(parsed);
++    } catch {
++      /* invalid JSON-LD is itself common; don't fail the scan for it */
++    }
++  }
++
++  const issues: string[] = [];
++  if (!title) issues.push("No <title> tag");
++  else if (title.length < 30) issues.push(`Title is short (${title.length} characters)`);
++  else if (title.length > 60) issues.push(`Title may be truncated in search results (${title.length} characters)`);
++  if (!metaDescription) issues.push("No meta description");
++  else if (metaDescription.length > 160) issues.push(`Meta description may be truncated (${metaDescription.length} characters)`);
++  if (h1Text.length === 0) issues.push("No H1 heading");
++  else if (h1Text.length > 1) issues.push(`${h1Text.length} H1 headings (should be one)`);
++  if (imagesMissingAlt > 0) issues.push(`${imagesMissingAlt} of ${imgTags.length} images have no alt text`);
++  if (ldTypes.size === 0) issues.push("No structured data (schema.org) markup");
++  if (!/<link[^>]+rel=["']canonical["']/i.test(html)) issues.push("No canonical URL");
++  if (!/<meta[^>]+name=["']viewport["']/i.test(html)) issues.push("No viewport meta tag (mobile rendering)");
++
++  return {
++    title,
++    titleLength: title?.length ?? 0,
++    metaDescription,
++    metaDescriptionLength: metaDescription?.length ?? 0,
++    h1Count: h1Text.length,
++    h1Text: h1Text.slice(0, 5),
++    hasCanonical: /<link[^>]+rel=["']canonical["']/i.test(html),
++    hasOpenGraph: /<meta[^>]+property=["']og:/i.test(html),
++    hasStructuredData: ldTypes.size > 0,
++    structuredDataTypes: [...ldTypes],
++    imagesTotal: imgTags.length,
++    imagesMissingAlt,
++    hasViewportMeta: /<meta[^>]+name=["']viewport["']/i.test(html),
++    langAttribute: html.match(/<html[^>]+lang=["']([^"']+)["']/i)?.[1] ?? null,
++    issues,
++  };
++}
++
++// ---------------------------------------------------------------------------
++// Well-known files
++// ---------------------------------------------------------------------------
++
++export type WellKnown = {
++  robotsTxt: Determination<boolean>;
++  sitemapXml: Determination<boolean>;
++  securityTxt: Determination<boolean>;
++  privacyPolicy: Determination<string>;
++};
++
++const PRIVACY_PATHS = ["/privacy-policy", "/privacy", "/privacy-notice", "/legal/privacy"];
++
++export async function checkWellKnown(rawDomain: string): Promise<WellKnown> {
++  const domain = normalizeDomain(rawDomain);
++  const base = `https://${domain}`;
++  const toBool = (d: Determination<{ status: number; body: string; headers: Headers }>): Determination<boolean> =>
++    d.state === "observed" ? observed(true, d.source) : (d as unknown as Determination<boolean>);
++
++  const [robots, sitemap, security, ...privacy] = await Promise.all([
++    fetchOrDetermine("wellknown:robots", `${base}/robots.txt`, { timeoutMs: 6000 }),
++    fetchOrDetermine("wellknown:sitemap", `${base}/sitemap.xml`, { timeoutMs: 6000 }),
++    fetchOrDetermine("wellknown:security.txt", `${base}/.well-known/security.txt`, { timeoutMs: 6000 }),
++    ...PRIVACY_PATHS.map((p) => fetchOrDetermine("wellknown:privacy", `${base}${p}`, { timeoutMs: 6000 })),
++  ]);
++
++  const foundPrivacy = privacy.findIndex((p) => p.state === "observed");
++  const privacyDetermined = privacy.some((p) => p.state !== "not_determined");
++
++  return {
++    robotsTxt: toBool(robots),
++    sitemapXml: toBool(sitemap),
++    securityTxt: toBool(security),
++    privacyPolicy:
++      foundPrivacy >= 0
++        ? observed(PRIVACY_PATHS[foundPrivacy], "wellknown:privacy")
++        : privacyDetermined
++          ? absent<string>("wellknown:privacy")
++          : notDetermined<string>("all privacy-policy paths unreachable", "wellknown:privacy"),
++  };
++}
++
++// ---------------------------------------------------------------------------
++// Aggregate
++// ---------------------------------------------------------------------------
++
++export type PageResearch = {
++  snapshot: Determination<PageSnapshot>;
++  techStack: TechStack | null;
++  seo: SeoHealth | null;
++  wellKnown: WellKnown;
++};
++
++export async function runPageResearch(rawDomain: string): Promise<PageResearch> {
++  const [snapshot, wellKnown] = await Promise.all([fetchHomepage(rawDomain), checkWellKnown(rawDomain)]);
++  const page = snapshot.state === "observed" ? snapshot.value : null;
++  return {
++    snapshot,
++    techStack: page ? analyzeTechStack(page) : null,
++    seo: page ? analyzeSeo(page) : null,
++    wellKnown,
++  };
++}
+diff --git a/app/lib/odo-research.ts b/app/lib/odo-research.ts
+index 570a7f1..f4d4d61 100644
+--- a/app/lib/odo-research.ts
++++ b/app/lib/odo-research.ts
+@@ -1,7 +1,35 @@
+ // ORAGROL ODO — Parallel research engine
+-// Calls all 22 APIs simultaneously and returns structured findings.
+-// Each API call is wrapped in a safe fetcher — a single API failure
+-// never blocks the others or crashes the scan.
++//
++// Every source runs in parallel; one failure never blocks the others or
++// crashes the scan (Promise.allSettled, never Promise.all).
++//
++// EVIDENCE RULE — read before adding a source.
++// A source that cannot answer must return `not_determined`, never a value
++// that reads as a finding. The removed MXToolbox path returned
++// `{ spf: false, dkim: false, dmarc: false }` whenever its key was absent,
++// which reported every prospect as having no email authentication at all.
++// See odo-evidence.ts. Absent and not-determined are different states and
++// only `absent` may be scored as a gap.
++//
++// REMOVED 2026-09-27 — do not reinstate without re-checking terms:
++//   VirusTotal     — Public API forbids use "in commercial products or
++//                    services"; ODO is one. Premium is ~$1,500-4,000/mo.
++//   HaveIBeenPwned — the breacheddomain endpoint only answers for domains
++//                    you have verified ownership of, so it can never scan a
++//                    prospect. (A consented check of the single email the
++//                    prospect supplies at intake is a separate, valid idea.)
++//   Shodan         — free accounts have no host-lookup API access.
++//   BuiltWith      — $295/month; replaced by native fingerprinting in
++//                    odo-page.ts.
++//   Hunter.io      — free tier is 25 searches/month and inbound ODO has no
++//                    contact to discover; deferred to Outbound Mode.
++//   MXToolbox      — replaced by native DNS in odo-dns.ts, which is free,
++//                    unlimited, and actually returns DKIM.
++//   SecurityHeaders.io — replaced by reading response headers directly.
++
++import { runDnsResearch, type DnsResearch } from "./odo-dns";
++import { runPageResearch, type PageResearch } from "./odo-page";
++import { coverageReport } from "./odo-evidence";
+ 
+ export type ResearchFindings = {
+   // Website & SEO
+@@ -10,13 +38,12 @@ export type ResearchFindings = {
+   technologies: TechFindings | null;
+   // Security
+   ssl: SslFindings | null;
+-  emailSecurity: EmailSecurityFindings | null;
+-  securityHeaders: SecurityHeadersFindings | null;
+   mozillaObservatory: MozillaFindings | null;
+-  breachHistory: BreachFindings | null;
+-  shodan: ShodanFindings | null;
+-  virusTotal: VirusTotalFindings | null;
+   certificates: CertFindings | null;
++  /** Native DNS: SPF/DKIM/DMARC with policy strength, mail platform, M365 tenant, NS delegation, DNS hygiene. */
++  dns: DnsResearch | null;
++  /** Native homepage analysis: tech stack, on-page SEO health, well-known files. */
++  page: PageResearch | null;
+   // Business
+   googleBusiness: GoogleBusinessFindings | null;
+   staffAndContacts: StaffFindings | null;
+@@ -36,6 +63,13 @@ export type ResearchFindings = {
+   industry: string | null;
+   businessSize: "micro" | "small" | "medium" | "large" | null;
+   errors: string[];
++  /**
++   * Reviewer-facing coverage. Which checks answered, which found a genuine
++   * absence, and which could not be determined. A not-determined check is a
++   * gap in ODO's coverage, never a finding about the prospect — surface it
++   * here so it cannot silently become bad news in the report.
++   */
++  coverage: { observed: string[]; absent: string[]; notDetermined: Array<{ check: string; reason: string }> };
+ };
+ 
+ // --- Type stubs (Jev reads these) ---
+@@ -109,26 +143,6 @@ async function fetchSslGrade(domain: string): Promise<SslFindings> {
+   };
+ }
+ 
+-async function fetchEmailSecurity(domain: string): Promise<EmailSecurityFindings> {
+-  const host = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+-  const token = process.env.MXTOOLBOX_API_KEY;
+-  if (!token) return { spf: false, dkim: false, dmarc: false, dmarcPolicy: null };
+-  const [spfRes, dmarcRes] = await Promise.allSettled([
+-    fetch(`https://mxtoolbox.com/api/v1/lookup/spf/${host}`, { headers: { Authorization: token }, signal: AbortSignal.timeout(10000) }),
+-    fetch(`https://mxtoolbox.com/api/v1/lookup/dmarc/${host}`, { headers: { Authorization: token }, signal: AbortSignal.timeout(10000) }),
+-  ]);
+-  const spfData = spfRes.status === "fulfilled" && spfRes.value.ok ? await spfRes.value.json() as Record<string, unknown> : null;
+-  const dmarcData = dmarcRes.status === "fulfilled" && dmarcRes.value.ok ? await dmarcRes.value.json() as Record<string, unknown> : null;
+-  const dmarcRecord = (dmarcData as Record<string, string> | null)?.Information || "";
+-  const policyMatch = dmarcRecord.match(/p=(\w+)/i);
+-  const policy = policyMatch?.[1]?.toLowerCase() as "none" | "quarantine" | "reject" | null ?? null;
+-  return {
+-    spf: !!(spfData && !(spfData as Record<string, unknown[]>).Failed?.length),
+-    dkim: false,
+-    dmarc: !!dmarcData,
+-    dmarcPolicy: policy,
+-  };
+-}
+ 
+ async function fetchTavily(query: string): Promise<Array<{ title: string; url: string; content: string }>> {
+   const apiKey = process.env.TAVILY_API_KEY;
+@@ -143,81 +157,9 @@ async function fetchTavily(query: string): Promise<Array<{ title: string; url: s
+   return data.results || [];
+ }
+ 
+-async function fetchBuiltWith(domain: string): Promise<TechFindings> {
+-  const apiKey = process.env.BUILTWITH_API_KEY;
+-  if (!apiKey) return { cms: null, analytics: [], payments: [], marketing: [], framework: null, allTech: [] };
+-  const host = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+-  const res = await fetch(`https://api.builtwith.com/v21/api.json?KEY=${apiKey}&LOOKUP=${host}`, { signal: AbortSignal.timeout(15000) });
+-  const data = await res.json() as Record<string, unknown>;
+-  const results = (data.Results as Array<Record<string, unknown>>)?.[0];
+-  const paths = (results?.Result as Record<string, unknown>)?.Paths as Array<Record<string, unknown>> | undefined;
+-  const allTech: string[] = [];
+-  const cms: string[] = [];
+-  const analytics: string[] = [];
+-  const payments: string[] = [];
+-  const marketing: string[] = [];
+-  paths?.forEach(path => {
+-    (path.Technologies as Array<Record<string, string>> | undefined)?.forEach(tech => {
+-      allTech.push(tech.Name);
+-      const cats = tech.Categories?.toLowerCase() || "";
+-      if (cats.includes("cms") || cats.includes("blog")) cms.push(tech.Name);
+-      if (cats.includes("analytic")) analytics.push(tech.Name);
+-      if (cats.includes("payment")) payments.push(tech.Name);
+-      if (cats.includes("marketing") || cats.includes("email")) marketing.push(tech.Name);
+-    });
+-  });
+-  return { cms: cms[0] || null, analytics, payments, marketing, framework: null, allTech: [...new Set(allTech)].slice(0, 30) };
+-}
+ 
+-async function fetchHaveIBeenPwned(domain: string): Promise<BreachFindings> {
+-  const apiKey = process.env.HIBP_API_KEY;
+-  const host = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+-  const headers: Record<string, string> = { "User-Agent": "ORAGROL-ODO/1.0" };
+-  if (apiKey) headers["hibp-api-key"] = apiKey;
+-  const res = await fetch(`https://haveibeenpwned.com/api/v3/breacheddomain/${encodeURIComponent(host)}`, { headers, signal: AbortSignal.timeout(10000) });
+-  if (res.status === 404) return { breached: false, breachCount: 0, breaches: [] };
+-  if (!res.ok) throw new Error(`HIBP returned ${res.status}`);
+-  const data = await res.json() as Record<string, string[]>;
+-  const breaches = Object.entries(data).slice(0, 10).map(([account]) => ({ name: account, date: "unknown", dataTypes: [] }));
+-  return { breached: true, breachCount: Object.keys(data).length, breaches };
+-}
+ 
+-async function fetchVirusTotal(domain: string): Promise<VirusTotalFindings> {
+-  const apiKey = process.env.VIRUSTOTAL_API_KEY;
+-  if (!apiKey) return { malicious: 0, suspicious: 0, clean: true };
+-  const host = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+-  const res = await fetch(`https://www.virustotal.com/api/v3/domains/${encodeURIComponent(host)}`, {
+-    headers: { "x-apikey": apiKey },
+-    signal: AbortSignal.timeout(10000),
+-  });
+-  if (!res.ok) return { malicious: 0, suspicious: 0, clean: true };
+-  const data = await res.json() as Record<string, unknown>;
+-  const stats = ((data.data as Record<string, unknown>)?.attributes as Record<string, unknown>)?.last_analysis_stats as Record<string, number> | undefined;
+-  return {
+-    malicious: stats?.malicious || 0,
+-    suspicious: stats?.suspicious || 0,
+-    clean: !stats?.malicious && !stats?.suspicious,
+-  };
+-}
+ 
+-async function fetchShodan(domain: string): Promise<ShodanFindings> {
+-  const apiKey = process.env.SHODAN_API_KEY;
+-  if (!apiKey) return { openPorts: [], exposedServices: [], vulnerabilities: [] };
+-  const host = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+-  const res = await fetch(`https://api.shodan.io/dns/resolve?hostnames=${encodeURIComponent(host)}&key=${apiKey}`, { signal: AbortSignal.timeout(10000) });
+-  if (!res.ok) return { openPorts: [], exposedServices: [], vulnerabilities: [] };
+-  const ips = await res.json() as Record<string, string>;
+-  const ip = Object.values(ips)[0];
+-  if (!ip) return { openPorts: [], exposedServices: [], vulnerabilities: [] };
+-  const hostRes = await fetch(`https://api.shodan.io/shodan/host/${ip}?key=${apiKey}`, { signal: AbortSignal.timeout(10000) });
+-  if (!hostRes.ok) return { openPorts: [], exposedServices: [], vulnerabilities: [] };
+-  const hostData = await hostRes.json() as Record<string, unknown>;
+-  return {
+-    openPorts: (hostData.ports as number[] | undefined) || [],
+-    exposedServices: ((hostData.data as Array<Record<string, string>> | undefined) || []).map(s => s.transport || "").filter(Boolean).slice(0, 10),
+-    vulnerabilities: Object.keys((hostData.vulns as Record<string, unknown> | undefined) || {}).slice(0, 10),
+-  };
+-}
+ 
+ async function fetchCertificates(domain: string): Promise<CertFindings> {
+   const host = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "").replace(/^www\./, "");
+@@ -228,12 +170,6 @@ async function fetchCertificates(domain: string): Promise<CertFindings> {
+   return { subdomains, totalCerts: data.length };
+ }
+ 
+-async function fetchSecurityHeaders(url: string): Promise<SecurityHeadersFindings> {
+-  const res = await fetch(`https://securityheaders.com/?q=${encodeURIComponent(url)}&followRedirects=on`, { signal: AbortSignal.timeout(10000) });
+-  const grade = res.headers.get("x-grade") || null;
+-  const score = grade ? { "A+": 100, "A": 90, "B": 75, "C": 60, "D": 45, "E": 30, "F": 10 }[grade] || null : null;
+-  return { grade, score: score || null, missingHeaders: [] };
+-}
+ 
+ async function fetchGoogleBusiness(businessName: string, website: string | null): Promise<GoogleBusinessFindings> {
+   const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+@@ -251,20 +187,6 @@ async function fetchGoogleBusiness(businessName: string, website: string | null)
+   };
+ }
+ 
+-async function fetchHunter(domain: string): Promise<StaffFindings> {
+-  const apiKey = process.env.HUNTER_API_KEY;
+-  if (!apiKey) return { estimatedCount: null, emailPattern: null, keyContacts: [] };
+-  const host = domain.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+-  const res = await fetch(`https://api.hunter.io/v2/domain-search?domain=${encodeURIComponent(host)}&api_key=${apiKey}&limit=5`, { signal: AbortSignal.timeout(10000) });
+-  if (!res.ok) return { estimatedCount: null, emailPattern: null, keyContacts: [] };
+-  const data = await res.json() as Record<string, unknown>;
+-  const d = (data.data as Record<string, unknown> | undefined);
+-  return {
+-    estimatedCount: (d?.emails as unknown[])?.length || null,
+-    emailPattern: (d?.pattern as string | undefined) || null,
+-    keyContacts: ((d?.emails as Array<Record<string, string>> | undefined) || []).slice(0, 3).map(e => `${e.first_name || ""} ${e.last_name || ""}`.trim()).filter(Boolean),
+-  };
+-}
+ 
+ async function detectIndustryAndSize(
+   generalResearch: GeneralResearchFindings | null,
+@@ -321,15 +243,10 @@ export async function runParallelResearch(
+     competitors,
+     pageSpeed,
+     ssl,
+-    emailSecurity,
+-    securityHeaders,
+-    breachHistory,
+-    shodan,
+-    virusTotal,
+     certificates,
+-    technologies,
+-    staffAndContacts,
+     googleBusiness,
++    dnsResult,
++    pageResult,
+   ] = await Promise.allSettled([
+     // General research via Tavily
+     safeFetch("Tavily:general", () => fetchTavily(`${businessName} company overview services reviews`).then(results => ({
+@@ -342,24 +259,17 @@ export async function runParallelResearch(
+     safeFetch("Tavily:competitors", () => fetchTavily(`${businessName} competitors alternative companies`).then(results => ({
+       competitors: results.map(r => ({ name: r.title || "", website: r.url || null, source: "tavily" })).slice(0, 5),
+     })), errors),
+-    // Website & performance
++    // Website-dependent sources
+     ...(hasWebsite && domain ? [
+       safeFetch("PageSpeed", () => fetchPageSpeed(domain), errors),
+       safeFetch("SSL Labs", () => fetchSslGrade(domain), errors),
+-      safeFetch("MXToolbox", () => fetchEmailSecurity(domain), errors),
+-      safeFetch("SecurityHeaders", () => fetchSecurityHeaders(domain), errors),
+-      safeFetch("HaveIBeenPwned", () => fetchHaveIBeenPwned(domain), errors),
+-      safeFetch("Shodan", () => fetchShodan(domain), errors),
+-      safeFetch("VirusTotal", () => fetchVirusTotal(domain), errors),
+       safeFetch("crt.sh", () => fetchCertificates(domain), errors),
+-      safeFetch("BuiltWith", () => fetchBuiltWith(domain), errors),
+-      safeFetch("Hunter.io", () => fetchHunter(domain), errors),
+       safeFetch("Google Places", () => fetchGoogleBusiness(businessName, domain), errors),
++      safeFetch("DNS", () => runDnsResearch(domain), errors),
++      safeFetch("Page", () => runPageResearch(domain), errors),
+     ] : [
+       Promise.resolve(null), Promise.resolve(null), Promise.resolve(null),
+       Promise.resolve(null), Promise.resolve(null), Promise.resolve(null),
+-      Promise.resolve(null), Promise.resolve(null), Promise.resolve(null),
+-      Promise.resolve(null), Promise.resolve(null),
+     ]),
+   ]);
+ 
+@@ -368,23 +278,48 @@ export async function runParallelResearch(
+   }
+ 
+   const generalResearchData = getVal<GeneralResearchFindings>(generalResearch);
+-  const staffData = getVal<StaffFindings>(staffAndContacts);
+-  const { industry, businessSize } = await detectIndustryAndSize(generalResearchData, staffData);
++  const dns = getVal<DnsResearch>(dnsResult);
++  const page = getVal<PageResearch>(pageResult);
++
++  // Business size: no free source gives verified headcount for a private
++  // Canadian SMB (Crunchbase and Hunter are both out). Whatever comes back
++  // here is Inferred tier unless the client states it directly.
++  const { industry, businessSize } = await detectIndustryAndSize(generalResearchData, null);
++
++  // Coverage — which checks actually answered. Anything not_determined is a
++  // gap in ODO, not a finding about the prospect.
++  const determinations: Record<string, import("./odo-evidence").Determination<unknown>> = {};
++  if (dns) {
++    determinations["email.spf"] = dns.spf;
++    determinations["email.dmarc"] = dns.dmarc;
++    determinations["email.dkim"] = dns.dkim;
++    determinations["mail.platform"] = dns.mail;
++    determinations["identity.microsoft365"] = dns.microsoft365;
++    determinations["dns.delegation"] = dns.delegation;
++    determinations["dns.caa"] = dns.hygiene.caa;
++    determinations["dns.mtaSts"] = dns.hygiene.mtaSts;
++    determinations["dns.tlsRpt"] = dns.hygiene.tlsRpt;
++    determinations["dns.bimi"] = dns.hygiene.bimi;
++  }
++  if (page) {
++    determinations["page.homepage"] = page.snapshot;
++    determinations["wellknown.robots"] = page.wellKnown.robotsTxt;
++    determinations["wellknown.sitemap"] = page.wellKnown.sitemapXml;
++    determinations["wellknown.securityTxt"] = page.wellKnown.securityTxt;
++    determinations["wellknown.privacyPolicy"] = page.wellKnown.privacyPolicy;
++  }
+ 
+   return {
+     website: getVal<WebsiteFindings>(pageSpeed),
+     seo: null,
+-    technologies: getVal<TechFindings>(technologies),
++    technologies: null,
+     ssl: getVal<SslFindings>(ssl),
+-    emailSecurity: getVal<EmailSecurityFindings>(emailSecurity),
+-    securityHeaders: getVal<SecurityHeadersFindings>(securityHeaders),
+     mozillaObservatory: null,
+-    breachHistory: getVal<BreachFindings>(breachHistory),
+-    shodan: getVal<ShodanFindings>(shodan),
+-    virusTotal: getVal<VirusTotalFindings>(virusTotal),
+     certificates: getVal<CertFindings>(certificates),
++    dns,
++    page,
+     googleBusiness: getVal<GoogleBusinessFindings>(googleBusiness),
+-    staffAndContacts: staffData,
++    staffAndContacts: null,
+     crunchbase: null,
+     webPresence: null,
+     socialMedia: null,
+@@ -397,5 +332,6 @@ export async function runParallelResearch(
+     industry,
+     businessSize,
+     errors,
++    coverage: coverageReport(determinations),
+   };
+ }
+-- 
+2.43.0
+

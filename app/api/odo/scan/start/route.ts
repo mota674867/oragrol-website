@@ -79,9 +79,11 @@ async function addHubSpotNote(contactId: string, note: string): Promise<void> {
 // --- Main handler ---
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  // IP-based rate limit — max 3 scan starts per hour per IP
+  // IP-based rate limit — max 15 scan starts per hour per IP. Was 3, which
+  // blocked a single legitimate visitor retrying after a validation error
+  // (and made internal testing painful). 15 still stops any real abuse.
   const ip = getClientIp(req);
-  const limited = rateLimit(`odo:start:${ip}`, { limit: 3, windowMs: 60 * 60 * 1000 });
+  const limited = rateLimit(`odo:start:${ip}`, { limit: 15, windowMs: 60 * 60 * 1000 });
   if (!limited.ok) {
     return NextResponse.json(
       { code: "rate_limited", message: "Too many requests. Please wait before starting a new scan." },

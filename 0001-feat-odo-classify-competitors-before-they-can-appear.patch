@@ -1,0 +1,406 @@
+From 7182a18bdb084b7987969273706b32e04ee993f4 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Tue, 29 Sep 2026 10:20:14 +0800
+Subject: [PATCH] feat(odo): classify competitors before they can appear in a
+ report
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Adds odo-competitors.ts: every competitor candidate is now verified via
+Places API (New) and scored for service/geographic overlap before it can
+be labeled a competitor. Classification tiers (confirmed/probable/
+comparable/irrelevant/insufficient_evidence) sit on top of the existing
+3-state Determination model — no new confidence scale.
+
+Only confirmed_competitor and probable_competitor are report-safe
+(reportableCompetitors()); everything else stays internal.
+
+Also migrates fetchGoogleBusiness off the deprecated findplacefromtext
+endpoint to Places API (New), same endpoint family the new module uses.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01TncAA37Xzdqd4iM287MWze
+---
+ app/lib/odo-competitors.ts | 207 +++++++++++++++++++++++++++++++++++++
+ app/lib/odo-research.ts    |  97 +++++++++++------
+ 2 files changed, 273 insertions(+), 31 deletions(-)
+ create mode 100644 app/lib/odo-competitors.ts
+
+diff --git a/app/lib/odo-competitors.ts b/app/lib/odo-competitors.ts
+new file mode 100644
+index 0000000..c7a9ae3
+--- /dev/null
++++ b/app/lib/odo-competitors.ts
+@@ -0,0 +1,207 @@
++// ORAGROL ODO — Competitor classification
++//
++// WHY THIS EXISTS
++// The old competitor list was just Tavily search-result titles with the
++// word "competitor" in the query — no verification at all. Any business
++// whose name showed up in a search snippet could be printed in a client
++// report as "your competitor." For a security vendor, one wrong competitor
++// name in a report is a credibility-ending mistake.
++//
++// This module classifies each candidate against minimum evidence rules
++// before it is allowed to appear as a competitor finding. It does NOT
++// introduce a new confidence scale — classification sits on top of the
++// existing 3-state Determination (observed/absent/not_determined) from
++// odo-evidence.ts. Only "identity verified" (an observed Determination)
++// counts toward a classification; not_determined never upgrades a rank.
++//
++// Classification (from weakest to strongest evidence):
++//   insufficient_evidence — could not verify the business independently
++//   irrelevant_candidate  — verified, but nothing ties it to the prospect
++//   comparable_business   — verified, same general space, no real overlap
++//   probable_competitor   — verified + service overlap + one supporting signal
++//   confirmed_competitor  — verified + service overlap + same market +
++//                            at least two independent sources agree
++//
++// Only confirmed_competitor and probable_competitor may reach the report
++// (see reportableCompetitors). Everything else stays internal — visible to
++// a reviewer, never printed as a finding about the prospect's market.
++
++import { Determination, observed, absent, notDetermined } from "./odo-evidence";
++
++export type CompetitorClassification =
++  | "confirmed_competitor"
++  | "probable_competitor"
++  | "comparable_business"
++  | "irrelevant_candidate"
++  | "insufficient_evidence";
++
++export type PlacesEnrichment = {
++  rating: number | null;
++  reviewCount: number | null;
++  address: string | null;
++  businessStatus: string | null;
++  types: string[];
++};
++
++export type CompetitorProfile = {
++  name: string;
++  website: string | null;
++  discoverySources: string[];
++  identity: Determination<PlacesEnrichment>;
++  serviceOverlap: { matchedKeywords: string[]; score: number };
++  geographicOverlap: boolean | null; // null = not_determined, not "no"
++  classification: CompetitorClassification;
++  reasoning: string;
++};
++
++export type CandidateInput = { name: string; website: string | null; source: string; snippet?: string };
++
++const CANADIAN_CITIES = [
++  "Toronto", "Mississauga", "Vaughan", "Markham", "Brampton", "Richmond Hill",
++  "Scarborough", "Etobicoke", "North York", "Ottawa", "Hamilton", "London",
++  "Kitchener", "Waterloo", "Windsor", "Burlington", "Oakville", "Vancouver",
++  "Calgary", "Edmonton", "Montreal", "Winnipeg", "Surrey", "Ajax", "Whitby",
++  "Oshawa", "Barrie", "Guelph", "Kingston", "Niagara Falls",
++];
++
++export function detectCity(text: string | null): string | null {
++  if (!text) return null;
++  const lower = text.toLowerCase();
++  for (const city of CANADIAN_CITIES) {
++    if (lower.includes(city.toLowerCase())) return city;
++  }
++  return null;
++}
++
++function keywordScore(candidateText: string, industryKeywords: string[]): { matchedKeywords: string[]; score: number } {
++  const lower = candidateText.toLowerCase();
++  const matched = industryKeywords.filter((k) => lower.includes(k.toLowerCase()));
++  return { matchedKeywords: matched, score: matched.length };
++}
++
++function dedupeCandidates(candidates: CandidateInput[]): CandidateInput[] {
++  const seen = new Set<string>();
++  const out: CandidateInput[] = [];
++  for (const c of candidates) {
++    const key = (c.website || c.name).toLowerCase().trim();
++    if (key && !seen.has(key)) {
++      seen.add(key);
++      out.push(c);
++    }
++  }
++  return out;
++}
++
++/**
++ * Places API (New) text search — used both to verify a candidate business
++ * exists and to pull its rating/address for geographic-overlap checks.
++ * Absence of the API key is not_determined, never "no such business."
++ */
++async function enrichWithPlaces(name: string, cityHint: string | null): Promise<Determination<PlacesEnrichment>> {
++  const apiKey = process.env.GOOGLE_PLACES_API_KEY;
++  if (!apiKey) return notDetermined("no GOOGLE_PLACES_API_KEY configured", "google-places-new");
++
++  try {
++    const res = await fetch("https://places.googleapis.com/v1/places:searchText", {
++      method: "POST",
++      headers: {
++        "Content-Type": "application/json",
++        "X-Goog-Api-Key": apiKey,
++        "X-Goog-FieldMask":
++          "places.displayName,places.rating,places.userRatingCount,places.formattedAddress,places.businessStatus,places.types",
++      },
++      body: JSON.stringify({ textQuery: cityHint ? `${name} ${cityHint}` : name }),
++      signal: AbortSignal.timeout(8000),
++    });
++    if (res.status === 403 || res.status === 429) {
++      return notDetermined(`blocked by origin (HTTP ${res.status})`, "google-places-new");
++    }
++    if (!res.ok) return notDetermined(`HTTP ${res.status}`, "google-places-new");
++
++    const data = (await res.json()) as { places?: Array<Record<string, unknown>> };
++    const place = data.places?.[0];
++    if (!place) return absent("google-places-new");
++
++    return observed(
++      {
++        rating: (place.rating as number | undefined) ?? null,
++        reviewCount: (place.userRatingCount as number | undefined) ?? null,
++        address: (place.formattedAddress as string | undefined) ?? null,
++        businessStatus: (place.businessStatus as string | undefined) ?? null,
++        types: (place.types as string[] | undefined) ?? [],
++      },
++      "google-places-new"
++    );
++  } catch (err) {
++    const reason = err instanceof Error ? (err.name === "TimeoutError" ? "timeout" : err.message) : String(err);
++    return notDetermined(reason, "google-places-new");
++  }
++}
++
++/**
++ * Classify each candidate against minimum evidence rules. Caps at 5
++ * candidates — Places calls cost money and a report only ever names 2-3
++ * competitors anyway.
++ */
++export async function classifyCompetitors(
++  candidates: CandidateInput[],
++  context: { industryKeywords: string[]; prospectCity: string | null }
++): Promise<CompetitorProfile[]> {
++  const top = dedupeCandidates(candidates).slice(0, 5);
++
++  return Promise.all(
++    top.map(async (c) => {
++      const identity = await enrichWithPlaces(c.name, context.prospectCity);
++      const overlap = keywordScore(`${c.name} ${c.snippet ?? ""}`, context.industryKeywords);
++
++      const candidateCity = identity.state === "observed" ? detectCity(identity.value.address) : null;
++      const geographicOverlap =
++        context.prospectCity && candidateCity
++          ? candidateCity.toLowerCase() === context.prospectCity.toLowerCase()
++          : null;
++
++      const sources = new Set<string>([c.source]);
++      if (identity.state === "observed") sources.add("google_places");
++
++      const identityVerified = identity.state === "observed";
++      const hasOverlap = overlap.score > 0;
++      const multiSource = sources.size >= 2;
++
++      let classification: CompetitorClassification;
++      let reasoning: string;
++
++      if (identityVerified && hasOverlap && geographicOverlap === true && multiSource) {
++        classification = "confirmed_competitor";
++        reasoning = `Verified business, overlapping services (${overlap.matchedKeywords.join(", ")}), same market (${context.prospectCity}), confirmed by ${sources.size} independent sources.`;
++      } else if (identityVerified && hasOverlap && (geographicOverlap === true || multiSource)) {
++        classification = "probable_competitor";
++        reasoning = "Verified business with service overlap, but geography or source count falls short of full confirmation.";
++      } else if (identityVerified && !hasOverlap) {
++        classification = "comparable_business";
++        reasoning = "Verified, similar-type business, but no confirmed service overlap — market context only, not a direct competitor.";
++      } else if (identityVerified) {
++        classification = "irrelevant_candidate";
++        reasoning = "Verified business, but nothing ties it to the prospect's market or services.";
++      } else {
++        classification = "insufficient_evidence";
++        reasoning = "Could not independently verify this business — do not present it as a competitor.";
++      }
++
++      return {
++        name: c.name,
++        website: c.website,
++        discoverySources: [...sources],
++        identity,
++        serviceOverlap: overlap,
++        geographicOverlap,
++        classification,
++        reasoning,
++      };
++    })
++  );
++}
++
++/** Only these two classifications are safe to print as a competitor finding. */
++export function reportableCompetitors(profiles: CompetitorProfile[]): CompetitorProfile[] {
++  return profiles.filter((p) => p.classification === "confirmed_competitor" || p.classification === "probable_competitor");
++}
+diff --git a/app/lib/odo-research.ts b/app/lib/odo-research.ts
+index f4d4d61..7245d67 100644
+--- a/app/lib/odo-research.ts
++++ b/app/lib/odo-research.ts
+@@ -30,6 +30,7 @@
+ import { runDnsResearch, type DnsResearch } from "./odo-dns";
+ import { runPageResearch, type PageResearch } from "./odo-page";
+ import { coverageReport } from "./odo-evidence";
++import { classifyCompetitors, detectCity, type CompetitorProfile } from "./odo-competitors";
+ 
+ export type ResearchFindings = {
+   // Website & SEO
+@@ -58,6 +59,8 @@ export type ResearchFindings = {
+   businessRegistry: RegistryFindings | null;
+   // General research
+   generalResearch: GeneralResearchFindings | null;
++  /** Classified competitor candidates — see odo-competitors.ts. Only confirmed_competitor and probable_competitor are report-safe. */
++  competitorProfiles: CompetitorProfile[] | null;
+   competitors: CompetitorFindings | null;
+   // Metadata
+   industry: string | null;
+@@ -171,48 +174,66 @@ async function fetchCertificates(domain: string): Promise<CertFindings> {
+ }
+ 
+ 
++// Migrated 2026-09-29 from the deprecated findplacefromtext endpoint to
++// Places API (New) — the old endpoint is on Google's deprecation path and
++// the New API is what GOOGLE_PLACES_API_KEY is provisioned for.
+ async function fetchGoogleBusiness(businessName: string, website: string | null): Promise<GoogleBusinessFindings> {
+   const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+   if (!apiKey) return { rating: null, reviewCount: null, responseRate: null, lastUpdated: null, categories: [] };
+-  const query = encodeURIComponent(businessName + (website ? ` site:${website}` : ""));
+-  const res = await fetch(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${query}&inputtype=textquery&fields=rating,user_ratings_total,types&key=${apiKey}`, { signal: AbortSignal.timeout(10000) });
+-  const data = await res.json() as Record<string, unknown>;
+-  const place = (data.candidates as Array<Record<string, unknown>> | undefined)?.[0];
+-  return {
+-    rating: (place?.rating as number | undefined) || null,
+-    reviewCount: (place?.user_ratings_total as number | undefined) || null,
+-    responseRate: null,
+-    lastUpdated: null,
+-    categories: ((place?.types as string[] | undefined) || []).slice(0, 5),
+-  };
++  try {
++    const res = await fetch("https://places.googleapis.com/v1/places:searchText", {
++      method: "POST",
++      headers: {
++        "Content-Type": "application/json",
++        "X-Goog-Api-Key": apiKey,
++        "X-Goog-FieldMask": "places.rating,places.userRatingCount,places.types",
++      },
++      body: JSON.stringify({ textQuery: website ? `${businessName} ${website}` : businessName }),
++      signal: AbortSignal.timeout(10000),
++    });
++    if (!res.ok) return { rating: null, reviewCount: null, responseRate: null, lastUpdated: null, categories: [] };
++    const data = await res.json() as { places?: Array<Record<string, unknown>> };
++    const place = data.places?.[0];
++    return {
++      rating: (place?.rating as number | undefined) ?? null,
++      reviewCount: (place?.userRatingCount as number | undefined) ?? null,
++      responseRate: null,
++      lastUpdated: null,
++      categories: ((place?.types as string[] | undefined) ?? []).slice(0, 5),
++    };
++  } catch {
++    return { rating: null, reviewCount: null, responseRate: null, lastUpdated: null, categories: [] };
++  }
+ }
+ 
+ 
++const INDUSTRY_KEYWORDS = [
++  { keywords: ["health", "medical", "clinic", "hospital", "dental", "pharmacy"], label: "Healthcare" },
++  { keywords: ["law", "legal", "attorney", "lawyer", "firm"], label: "Legal" },
++  { keywords: ["restaurant", "food", "cafe", "catering", "bakery"], label: "Food & Beverage" },
++  { keywords: ["real estate", "property", "realty", "mortgage"], label: "Real Estate" },
++  { keywords: ["tech", "software", "saas", "app", "digital", "it services"], label: "Technology" },
++  { keywords: ["finance", "accounting", "tax", "bookkeeping", "cpa"], label: "Finance & Accounting" },
++  { keywords: ["construction", "contractor", "building", "renovation"], label: "Construction" },
++  { keywords: ["retail", "store", "shop", "ecommerce", "e-commerce"], label: "Retail" },
++  { keywords: ["marketing", "advertising", "agency", "creative", "pr"], label: "Marketing & Advertising" },
++  { keywords: ["education", "school", "training", "coaching", "tutoring"], label: "Education" },
++  { keywords: ["manufacturing", "factory", "production", "industrial"], label: "Manufacturing" },
++  { keywords: ["consulting", "advisory", "strategy", "management"], label: "Consulting" },
++];
++
+ async function detectIndustryAndSize(
+   generalResearch: GeneralResearchFindings | null,
+   staffFindings: StaffFindings | null
+-): Promise<{ industry: string | null; businessSize: "micro" | "small" | "medium" | "large" | null }> {
++): Promise<{ industry: string | null; industryKeywords: string[]; businessSize: "micro" | "small" | "medium" | "large" | null }> {
+   let industry: string | null = null;
++  let industryKeywords: string[] = [];
+   let businessSize: "micro" | "small" | "medium" | "large" | null = null;
+ 
+   if (generalResearch?.keyFacts) {
+     const facts = generalResearch.keyFacts.join(" ").toLowerCase();
+-    const industries = [
+-      { keywords: ["health", "medical", "clinic", "hospital", "dental", "pharmacy"], label: "Healthcare" },
+-      { keywords: ["law", "legal", "attorney", "lawyer", "firm"], label: "Legal" },
+-      { keywords: ["restaurant", "food", "cafe", "catering", "bakery"], label: "Food & Beverage" },
+-      { keywords: ["real estate", "property", "realty", "mortgage"], label: "Real Estate" },
+-      { keywords: ["tech", "software", "saas", "app", "digital", "it services"], label: "Technology" },
+-      { keywords: ["finance", "accounting", "tax", "bookkeeping", "cpa"], label: "Finance & Accounting" },
+-      { keywords: ["construction", "contractor", "building", "renovation"], label: "Construction" },
+-      { keywords: ["retail", "store", "shop", "ecommerce", "e-commerce"], label: "Retail" },
+-      { keywords: ["marketing", "advertising", "agency", "creative", "pr"], label: "Marketing & Advertising" },
+-      { keywords: ["education", "school", "training", "coaching", "tutoring"], label: "Education" },
+-      { keywords: ["manufacturing", "factory", "production", "industrial"], label: "Manufacturing" },
+-      { keywords: ["consulting", "advisory", "strategy", "management"], label: "Consulting" },
+-    ];
+-    for (const ind of industries) {
+-      if (ind.keywords.some(k => facts.includes(k))) { industry = ind.label; break; }
++    for (const ind of INDUSTRY_KEYWORDS) {
++      if (ind.keywords.some(k => facts.includes(k))) { industry = ind.label; industryKeywords = ind.keywords; break; }
+     }
+   }
+ 
+@@ -224,7 +245,7 @@ async function detectIndustryAndSize(
+     else businessSize = "large";
+   }
+ 
+-  return { industry, businessSize };
++  return { industry, industryKeywords, businessSize };
+ }
+ 
+ // --- Main research runner ---
+@@ -284,11 +305,24 @@ export async function runParallelResearch(
+   // Business size: no free source gives verified headcount for a private
+   // Canadian SMB (Crunchbase and Hunter are both out). Whatever comes back
+   // here is Inferred tier unless the client states it directly.
+-  const { industry, businessSize } = await detectIndustryAndSize(generalResearchData, null);
++  const { industry, industryKeywords, businessSize } = await detectIndustryAndSize(generalResearchData, null);
++
++  // Competitor classification — raw Tavily candidates are never report-safe
++  // on their own (see odo-competitors.ts). Each one is verified via Places
++  // (New) and scored for service/geographic overlap before it can be called
++  // a competitor in the client report.
++  const competitorCandidates = getVal<CompetitorFindings>(competitors);
++  const prospectCity = detectCity(generalResearchData?.summary ?? null) ?? detectCity(businessName);
++  const competitorProfiles = competitorCandidates?.competitors?.length
++    ? await classifyCompetitors(competitorCandidates.competitors, { industryKeywords, prospectCity })
++    : null;
+ 
+   // Coverage — which checks actually answered. Anything not_determined is a
+   // gap in ODO, not a finding about the prospect.
+   const determinations: Record<string, import("./odo-evidence").Determination<unknown>> = {};
++  competitorProfiles?.forEach((p, i) => {
++    determinations[`competitor.${i + 1}.identity`] = p.identity;
++  });
+   if (dns) {
+     determinations["email.spf"] = dns.spf;
+     determinations["email.dmarc"] = dns.dmarc;
+@@ -328,7 +362,8 @@ export async function runParallelResearch(
+     trademarks: null,
+     businessRegistry: null,
+     generalResearch: generalResearchData,
+-    competitors: getVal<CompetitorFindings>(competitors),
++    competitors: competitorCandidates,
++    competitorProfiles,
+     industry,
+     businessSize,
+     errors,
+-- 
+2.43.0
+
