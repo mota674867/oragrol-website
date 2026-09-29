@@ -3,7 +3,7 @@
 // creates HubSpot contact, initializes Redis session, kicks off research.
 // Returns session_id to the front-end immediately — research runs async.
 
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import { checkCooldowns, createSession, getIncompleteSession } from "@/app/lib/odo-redis";
 import { runParallelResearch } from "@/app/lib/odo-research";
 import { getClientIp, rateLimit } from "@/app/lib/rate-limit";
@@ -179,11 +179,27 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     ).catch(() => {});
   }
 
-  // Kick off research asynchronously — do not await
-  // The front-end polls /api/odo/scan/status for updates
-  runResearchAsync(session.sessionId, company, website, hasWebsite, hubspotContactId).catch(err => {
-    console.error("[ODO] Async research failed:", err);
-  });
+  // FIXED 2026-09-29 — this used to be a bare "fire and forget" call
+  // (runResearchAsync(...).catch(...) with no await and nothing telling
+  // the platform to keep running). On Vercel's serverless runtime, once
+  // this handler returns its NextResponse the function instance can be
+  // frozen or torn down — an un-awaited promise has no guarantee it
+  // keeps executing after the response is sent. That silently orphaned
+  // every scan's research: the session got created, the browser got its
+  // 200, and research just never continued. Confirmed via a live test
+  // scan that sat frozen on "Analyzing your website..." for 60+ seconds
+  // with zero progress, even though every individual API call in the
+  // pipeline has its own 10-20s timeout — so it wasn't running slowly,
+  // it had stopped running at all.
+  // next/server's after() is Next.js's supported mechanism for exactly
+  // this: it tells the platform to keep the function alive until this
+  // callback finishes, instead of relying on a dangling promise that
+  // may or may not survive past the response.
+  after(() =>
+    runResearchAsync(session.sessionId, company, website, hasWebsite, hubspotContactId).catch(err => {
+      console.error("[ODO] Async research failed:", err);
+    })
+  );
 
   return NextResponse.json({
     session_id: session.sessionId,

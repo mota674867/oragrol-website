@@ -2,7 +2,7 @@
 // Receives visitor's answer to ODO's targeted question.
 // Updates session, generates next question or moves to evaluation phase.
 
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import { getSession, updateSession } from "@/app/lib/odo-redis";
 
 const MAX_QUESTIONS = 20;
@@ -60,10 +60,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       step: "Building your opportunity map...",
     });
 
-    // Kick off evaluation async
-    runEvaluationAsync(sessionId, session.visitorCompany, findings, session.hubspotContactId).catch(err => {
-      console.error("[ODO] Evaluation async failed:", err);
-    });
+    // FIXED 2026-09-29 — same bug as /api/odo/scan/start: a bare
+    // fire-and-forget call has no guarantee it keeps running once this
+    // handler's response is sent on Vercel's serverless runtime. Without
+    // after(), a scan could answer its last question, get told
+    // "evaluating," and then sit there forever because the function
+    // generating the SWOT/completion was frozen mid-flight. after()
+    // keeps it alive until this actually finishes.
+    after(() =>
+      runEvaluationAsync(sessionId, session.visitorCompany, findings, session.hubspotContactId).catch(err => {
+        console.error("[ODO] Evaluation async failed:", err);
+      })
+    );
 
     return NextResponse.json({
       status: "evaluating",
