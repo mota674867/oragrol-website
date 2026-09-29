@@ -283,19 +283,26 @@ export default function OdoScanPage({ locale = "en", onEvent = (_e: Record<strin
 
   useEffect(() => () => stopUpdates(), [stopUpdates]);
 
+  // FIXED 2026-09-29 — this switch never matched the backend's real status
+  // vocabulary. The backend (odo/scan/start, /answer, /status routes) has
+  // always used "questioning" / "complete" / "insufficient_data" /
+  // "cancelled"; this code only recognized "questions" / "report_pending" /
+  // "inconclusive", none of which the backend ever sends. Every scan that
+  // reached the question or summary stage silently fell into the `else`
+  // branch below and stayed stuck showing the research screen forever —
+  // found via a live test scan, not a code review.
   const applyStatus = useCallback((payload: Record<string, unknown>) => {
     const next = payload?.status as string | undefined;
     if (!next) return;
-    if (payload.phase) setPhase(String(payload.phase));
     if (payload.step) setStep(String(payload.step));
     if (payload.question) setQuestion(payload.question as {id: string; text: string; options?: Array<string | {value: string; label?: string}>});
-    if (next === "report_pending") {
+    if (next === "complete") {
       stopUpdates();
       setPhase("summary");
       setBusy(false);
       setMessage(ODO_COPY.completedSubtext);
       emit("report-pending");
-    } else if (next === "inconclusive") {
+    } else if (next === "insufficient_data") {
       stopUpdates();
       setPhase("summary");
       setBusy(false);
@@ -307,11 +314,17 @@ export default function OdoScanPage({ locale = "en", onEvent = (_e: Record<strin
       setBusy(false);
       setMessage("We could not complete the scan. Please try again later or contact our team.");
       emit("failed");
-    } else if (next === "questions") {
+    } else if (next === "cancelled") {
+      stopUpdates();
+      setPhase("idle");
+      setBusy(false);
+    } else if (next === "questioning") {
       setPhase("questions");
       setBusy(false);
     } else {
-      setPhase(String(payload.phase || "researching"));
+      // "researching" (or any future/unknown value) — keep showing the
+      // live research screen rather than guessing a phase name.
+      setPhase("researching");
       setBusy(true);
     }
   }, [emit, stopUpdates]);
