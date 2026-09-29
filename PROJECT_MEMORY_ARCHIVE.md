@@ -1,0 +1,1958 @@
+# Project Memory Archive — Oragrol Website
+
+Older session entries rotated out of `PROJECT_MEMORY.md` per `CLAUDE.md` §10 (keep the rolling log to roughly the last 10 sessions). Nothing here is deleted — this is historical reference only. Durable architecture/design decisions referenced by ID (D-0xx) live in `DECISIONS.md`, not here.
+
+---
+
+## Archived 2026-09-29 (during the ODO render-loop/serverless-freeze/Redis-quota session)
+
+The block below was the entire middle of `PROJECT_MEMORY.md` at that point — everything older than the 10 most recent sessions at the time. Original internal ordering (newest-first at the top of this block, degrading in places to chronological-ascending further down — an inconsistency inherited from how the file was maintained across many earlier sessions) is preserved as-is, not re-sorted.
+
+---
+
+### 2026-09-22 (later same day) — Bilingual EN/FR build, Phase 2h: Cyber Health Assessment quiz fully wired (44 questions, both Q08 variants, all 4 result tiers)
+
+**Completed:**
+- Confirmed the Company patch applied and pushed by Mohammad (`5f2983f` on `origin/feat/fr-locale`, "done") — `git fetch` + `git reset --hard` to resync before starting, same discipline as every prior phase.
+- Built out Task #21's next page: `/cyber-health` and `/fr/cyber-health` (the on-screen quiz flow only — see scope note below), sourced from `ORAGROL_CyberHealth_FR_Translation.md`. New `CyberHealth` messages namespace covers all 5 stages (intro, company profile form, quick-questions qualifier, the 42/44-question assessment across 5 sections, and the result screen).
+- **Index-pairing safety constraint, same pattern as OR ONE/Contact/FAQ:** `assessment-data.ts`'s `questions`, `sections`, `qualification` and `categories` exports were never touched — their `id`/`section` string values are matched by exact identity throughout the component's scoring and platform-variant logic (`answers[q.id]`, `q.id.startsWith(...)`, the `Q08-*-GWS` regex swap between Google Workspace and everyone-else). Added a `QUESTION_INDEX` map (id → fixed array index) so translated question text always resolves by id rather than by render order, even though `visibleQuestions`/`sectionQuestions` filter and reorder at render time.
+- **`categories`' 20 internal category names deliberately left untranslated** — grepped and confirmed `categoryScores` (built from `categories`) only ever feeds the numeric score calculation; it's never rendered in this component's JSX. Those names only surface inside the PDF report generator, which the translation doc's own "Known gaps" section explicitly puts out of scope for this pass (the PDF's actual findings/recommendations text isn't visible anywhere in the on-screen quiz and needs its own separate translation pass once its content can be read).
+- **Caught a second doc/live-code mismatch, same class of catch as FAQ's Phase 2f fix:** the doc's "Microsoft 365 variant" of question Q08-1/Q08-2 doesn't exist in the live code — the doc's own author flagged uncertainty about it inline ("captured from memory... not re-verified"). Reading `assessment-data.ts` directly showed the real structure: a Google-Workspace-specific pair (`Q08-1-GWS`/`Q08-2-GWS`, which the doc's GWS variant matches word for word — used that) and a single generic pair (`Q08-1`/`Q08-2`, shown for Microsoft 365/Neither/Not Sure alike, about "whatever cloud email/file system you use") — no M365-specific text exists anywhere in the app. Freshly translated the generic pair against its actual live text instead of the doc's misremembered one. Verified both variants render correctly end-to-end with a scripted Playwright run through the whole quiz (Google Workspace path on the French run, Microsoft 365 path on the English run).
+- **Resolved one of the doc's own flagged gaps for free by reading the source instead of re-running the quiz:** the doc only confirmed the Low and Critical result-tier headlines live (it ran the quiz twice, all-Yes and all-No) and explicitly said it didn't have Medium/High. The live component source has all 4 in one ternary — read it directly and translated all four (Low "Strong foundation." → "Une base solide." and Critical "Start with the essentials." → "Commencez par l'essentiel." from the doc; Medium "A workable base with clear gaps." → "Une base fonctionnelle avec des lacunes claires." and High "Material improvement is needed." → "Des améliorations importantes sont nécessaires." are this session's own translation, flagged here since the doc didn't cover them). Also translated the risk-tier badge word itself (Low/Medium/High/Critical → Faible/Moyen/Élevé/Critique), which the doc didn't address at all since it only discussed the headline phrases.
+- Kept the doc's one deliberate acronym call: **LPRPDE** used instead of PIPEDA in the Q20-2 regulatory-compliance question (PIPEDA's official French name, per the federal government and every provincial privacy commissioner) — a genuine terminology decision the doc's author flagged for sign-off, not a "keep acronyms in English" default. PCI-DSS stays as-is (no French variant exists). MFA also stays as "MFA" per the doc's call.
+- **Scope explicitly limited to the on-screen quiz, matching the doc's own "Known gaps" section:** the PDF report body text, the confirmation/report-delivery email copy, and the `/api/cyber-health` server route's own error strings are NOT translated in this pass — none of those are visible from the on-screen quiz flow, and the doc flags the PDF/email content as needing its own pass once real content is available to translate against. Confirmed via a live test run that the server's dynamic error string ("Report delivery isn't configured yet...") still surfaces in English even on `/fr/cyber-health` when the sandbox's report-delivery isn't configured — expected, unchanged from the English page's behavior, and consistent with the doc's own note that this message is a sandbox/test-environment artifact rather than live-site copy.
+- **No language switcher added** — unlike every other page this session, this component's 5-stage header was already minimal by design (wordmark + a small stage label only, no nav, and critically no existing dead button of any kind to fix, unlike Contact/FAQ/Company). Left as-is rather than inventing new chrome the English version never had either.
+- Also fixed the `contactMethod`-style select bug pattern in the profile form before it could ship: the 4 `<select>` fields (industry/province/employees/platform) now use explicit `value={canonicalValue}` on each `<option>` with translated text as the child, so `profile.platform` etc. keep resolving to stable English values (`"Google Workspace"`, `"Microsoft 365"`, ...) that the rest of the component's logic depends on, regardless of which locale's option text is showing.
+- Converted `page.tsx` to `generateMetadata({params})` with French title/description/OG/hreflang, same pattern as every prior page.
+- Verified, not assumed: `npx tsc --noEmit` clean, `npm run lint` 0 errors (same 7 pre-existing warnings). Live dev-server check of both routes (200s), no `MISSING_MESSAGE`/`IntlError` markers. Full scripted Playwright run through all 5 stages on both locales (intro → profile form fill incl. all 4 selects → qualify's 4 questions → all 5 assessment sections' 42 questions → result screen), confirming: translated field labels/option text with values still resolving correctly, all 5 section names and both Q08 variants' question text, the risk-tier badge and all-4-tier headline logic (tested Low tier live on both locales via all-"Yes" answers), the interpolated report-status message, and the disclaimer/CTA copy. Screenshots taken at every stage on both locales.
+
+**Files changed:**
+- Content: `messages/en.json`, `messages/fr.json` (new `CyberHealth` namespace)
+- `app/[locale]/cyber-health/page.tsx` (static `metadata` → `generateMetadata`), `cyber-health-client.tsx`
+- `app/[locale]/cyber-health/assessment-data.ts` unchanged (superseded as the sole source of *display* text for this component, but still the canonical source of `id`/`section`/scoring data — same "leave the coupled data file alone" pattern as OR ONE's capability registry)
+- `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- Doc/live-code mismatch on Q08's generic (non-GWS) pair — doc's imagined "Microsoft 365 variant" text doesn't exist in the app; same class of issue as FAQ's Phase 2f catch, and the doc's own author had already flagged the exact uncertainty.
+- Doc had an incomplete gap it flagged honestly (Medium/High tier headlines not live-verified) that turned out to be trivially resolvable by reading the component source directly rather than re-running the quiz with partial answers.
+
+**Problems solved:**
+- The Cyber Health quiz — the site's primary lead-generation flow — is now fully bilingual end-to-end, with both cloud-platform question variants and all 4 score tiers correctly translated and verified via a real scripted run-through, not just static text checks.
+
+**Still open / needs verification:**
+- Not yet delivered to Mohammad as a patch — immediate next step.
+- Task #21 remaining: Resources (flagged in its own doc as the largest remaining item, likely its own multi-file delivery), Careers/Talent/Partnerships, How We Work, chat widget.
+- Explicitly out of scope, flagged for a future separate pass: the PDF report's own body text (findings/recommendations), the report-delivery confirmation email copy, and the `/api/cyber-health` route's own server-side error strings — none are visible from the on-screen quiz and the PDF/email content isn't available anywhere to translate against yet.
+- Services' own Details-accordion content (`app/lib/services-details-content.tsx`, ~370 lines) still untranslated.
+- `SharedCta` placeholders remaining: resources only.
+- Legal pages (Privacy/Terms/Accessibility) stay English-only per Mohammad's earlier explicit decision.
+- PR #13 should stay unmerged into `main` until the whole site is bilingual (Mohammad agreed to this earlier).
+
+---
+
+### 2026-09-22 (later same day) — Bilingual EN/FR build, Phase 2g: Company page fully wired; fixed the `SharedCta.company` English placeholder
+
+**Completed:**
+- Confirmed the Contact + FAQ patch applied and pushed by Mohammad (`00dacdd` on `origin/feat/fr-locale`, "ok done, next?") — `git fetch` + `git reset --hard` to resync before starting, same discipline as every prior phase.
+- Built out Task #21's next page: `/company` and `/fr/company`, sourced from `ORAGROL_Company_FR_Translation.md` (a short, single-pass page with no collapsed sections — the doc notes it was pulled directly from the live site, not a draft). New `Company` messages namespace covers the full page: hero, "Why ORAGROL exists," "The name," "Why orange," the 3 Protect/Automate/Unify path cards, Founder, "How we operate," and "Canadian foundation."
+- **Split the page into `page.tsx` + `company-client.tsx`**, same pattern as every other converted page — the pre-existing `page.tsx` was a static Server Component (no `"use client"`, static `metadata` export, dead `<button>EN / FR</button>`), unlike every other route which was already a client-component-plus-metadata-wrapper before this session touched it. Converted `metadata` to `generateMetadata({params})` and moved all JSX into the new client file wired to `useTranslations("Company")`.
+- **Two strings deliberately kept in English on both locales**, per the translation doc's own explicit call-out: "Orchestrated AI Governance, Risk, Operations and Learning" (the letter-by-letter expansion of the ORAGROL name — translating it would break the connection to the brand name's own letters, since a French version wouldn't spell "ORAGROL" anymore) and the 6 individual acronym words (Orchestrated/AI/Governance/Risk/Operations/Learning) in the "The name" section's term grid. Both stored as identical EN/FR values in messages rather than hardcoded outside the translation system, so they're still driven by the same `t()` calls as everything else on the page — just resolve to the same English text either way.
+- Path cards ("Protect"/"Automate"/"Unify") link to Services/Business Automation/OR ONE — translated per the doc: "Cybersecurity Services" → "Services de cybersécurité," but "Business Automation" and "OR ONE" stay as-is in French too (brand/product names, not translated in the source doc).
+- **Found and fixed a real gap while auditing `SharedCta` keys (same category of catch as Phase 2e's `SharedCta.industries` fix):** `SharedCta.company` in `fr.json` was still the English placeholder despite matching the doc's own "Closing" section content almost verbatim in English — fixed with the real French translation ("Un point de départ clair" / "Découvrez la réflexion, l'expérience et la raison d'être derrière ORAGROL Global." / "Démarrer une conversation"). `SharedCta` placeholders remaining after this: resources only (1, down from the original 6 — or-one, industries, contact, faq, company all fixed across this session).
+- Added a working language-switcher `Link` to Company's header, replacing the same dead `<button className="language">EN / FR</button>` pattern fixed on every other page this session.
+- Verified, not assumed: `npx tsc --noEmit` clean, `npm run lint` 0 errors (same 7 pre-existing warnings). Live dev-server check of both routes (200s). Grep-verified translated content on `/fr/company` including confirmation that the two deliberately-English strings (name-line, acronym terms) render correctly in English on the French page, and that the `SharedCta.company` fix actually landed (French closing-CTA text where English placeholder used to be). No `MISSING_MESSAGE`/`IntlError` markers. Playwright screenshots of hero/story/paths/founder/operating/closing-CTA sections on both locales confirmed clean rendering, correct layout, and the new working language switcher (href pattern `/en/company` from `/fr/company`, matching every other converted page's existing behavior — not a regression).
+
+**Files changed:**
+- Content: `messages/en.json`, `messages/fr.json` (new `Company` namespace; `SharedCta.company` real translation)
+- `app/[locale]/company/page.tsx` (static Server Component → `generateMetadata` wrapper), new `app/[locale]/company/company-client.tsx`
+- `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- `SharedCta.company` English placeholder in `fr.json` (see above) — same class of gap as Phase 2e's Industries catch, found the same way (auditing `SharedCta` keys against the page's own closing section while building it).
+- Company's `page.tsx` was the one remaining static Server Component among Task #21's pages (every other route had already been split into page+client before this session started touching it) — not a bug, just meant this page needed the file-split step the others didn't.
+
+**Problems solved:**
+- Company is now fully bilingual, including the deliberately-untranslated brand-acronym strings staying correct in both locales, and the closing CTA no longer silently shows English on `/fr/company`.
+
+**Still open / needs verification:**
+- Not yet delivered to Mohammad as a patch — immediate next step.
+- Task #21 remaining: Cyber Health quiz, Resources (flagged in its own doc as the largest remaining item, likely its own multi-file delivery), Careers/Talent/Partnerships, How We Work, chat widget.
+- Services' own Details-accordion content (`app/lib/services-details-content.tsx`, ~370 lines) still untranslated — unblocked via the `labels` prop already added to `DetailsDialog.tsx` in an earlier phase, but not yet done.
+- `SharedCta` placeholders remaining: resources only.
+- Legal pages (Privacy/Terms/Accessibility) stay English-only per Mohammad's earlier explicit decision.
+- PR #13 should stay unmerged into `main` until the whole site is bilingual (Mohammad agreed to this earlier).
+- The Company doc itself flags a live-site content gap, not a translation issue: the founder section still shows literal "Founder portrait / Final image pending" placeholder text (now translated into both locales, but the underlying image is still missing) — worth flagging to Mohammad separately from the bilingual work.
+
+---
+
+### 2026-09-22 (later same day) — Bilingual EN/FR build, Phase 2f: Contact + FAQ pages fully wired (36 Q&As custom-translated against live code, not the richer draft doc)
+
+**Completed:**
+- Confirmed the OR ONE patch applied and pushed by Mohammad (`569e0e2` on `origin/feat/fr-locale`, "done, move") — `git fetch` + `git reset --hard` to resync before starting, same discipline as every prior phase.
+- Built out Task #21's next two pages: `/contact` + `/fr/contact` and `/faq` + `/fr/faq`, sourced from `ORAGROL_Contact_FAQ_FR_Translation.md` (page 5 of the 5-page translation series). New `Contact` and `Faq` messages namespaces.
+- **Contact**: hero, the 4-option conversation selector, the full enquiry form (name/email/company/job title/company size/goal textarea/contact method/preferred time/consent/submit/error/success states), the "what happens next" 4-step section, and the 3 location cards (HQ/Toronto/Digital) all translated.
+- **Index-pairing safety constraint, same pattern as OR ONE's `groups` array:** Contact's `options` array (the 4 conversation `name` values — "Cybersecurity Services" / "Business Automation" / "OR ONE" / "Partnership or General Enquiry") was left completely untouched. Those values are submitted verbatim to `/api/contact` (`conversation: z.string()`) and land in Mohammad's internal English notification email, so they stay stable English identifiers on `/fr` too. Displayed label/summary come from `Contact.conversations.options[i]` instead, resolved by array index (`t(\`conversations.options.${i}.label\`)`), including in the "selected conversation" recap inside the form (`options.findIndex((o) => o.name === conversation)`).
+- Caught and fixed a self-introduced bug before it shipped: the `contactMethod` `<select>` had `defaultValue="Email"` but no explicit `value` attrs on its `<option>`s, so once the option text became French ("Courriel"/"Appel vidéo") the browser's implicit value-from-text-content would silently stop matching `"Email"` on `/fr`. Fixed by adding explicit `value="Email"`/`value="Video call"` to the options (translated text stays as children only) — submitted field and default selection now stay stable across locales.
+- Added a working language-switcher `Link` to Contact's header, replacing a dead `<button className="language">EN / FR</button>` that had no href and did nothing — same fix Phase 2e made on OR ONE.
+- **FAQ**: all 36 Q&A pairs across the 7 topic groups (Getting started, Purchasing, Payment & contracts, How the service works, What you receive, Technical support, Company & trust) translated, plus hero/search UI/no-results state.
+- **Found and fixed a real functional bug, not just a display gap:** the `groups` array (all 36 Q&As) used to be a hardcoded English module-level constant, and the search box filters over `(q + " " + a).toLowerCase().includes(query)` — so on `/fr/faq`, a French visitor typing a French search term was filtering against English source text and getting zero matches. Fixed architecturally by sourcing `groups` from `t.raw("groups")` inside the component instead (re-fetched per locale), which fixes the search-locale bug as a side effect of doing the translation correctly rather than as a separate patch.
+- **Deliberately did NOT use the FR translation doc's answer text verbatim.** `ORAGROL_Contact_FAQ_FR_Translation.md` states its own answers were sourced from `ORAGROL_Website_FAQ_Draft.md` — a draft with materially different, more detailed wording than what's actually live in `faq-client.tsx`'s `groups` array (e.g. the cancellation-fee and GST/HST answers are more detailed in the draft than the live English text). Per CLAUDE.md's Honesty Rule (client-facing copy carries real liability/accuracy risk for an MSSP, and the two language versions of the same answer must say the same thing), all 36 answers were custom-translated against the exact live EN text pulled from the component, using the doc's FR only as a terminology/style reference — not pasted in. Flagging this explicitly so a future session doesn't "helpfully" swap in the doc's richer wording thinking something was missed.
+- Added a working language-switcher `Link` to FAQ's header — this page previously had none at all (unlike every other converted page), so this is a new capability, not a fix to a broken one.
+- `SharedCta.contact` and `SharedCta.faq` placeholder English keys got real French translations. `SharedCta` placeholders remaining after this: resources, company (2, down from the original 6).
+- Verified, not assumed: `npx tsc --noEmit` clean, `npm run lint` 0 errors (same 7 pre-existing warnings). Live dev-server check of all 4 routes (200s). Grep-verified translated vs. untranslated content split correctly by locale on both pages. No `MISSING_MESSAGE`/`IntlError` markers in any rendered output. Playwright screenshots confirmed clean visual rendering on both locales for both pages, including the two new working language switchers not breaking existing header layout (`.faq-nav`'s `justify-content: space-between` with a new 4th child; `.language` class reuse on Contact).
+
+**Files changed:**
+- Content: `messages/en.json`, `messages/fr.json` (new `Contact` and `Faq` namespaces; `SharedCta.contact`/`SharedCta.faq` real translations)
+- `app/[locale]/contact/page.tsx` (static → `generateMetadata`), `contact-client.tsx`
+- `app/[locale]/faq/page.tsx` (static → `generateMetadata`), `faq-client.tsx`
+- `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- FAQ's client-side search was locale-blind (see above) — a real bug, not cosmetic, fixed as part of this phase's normal architecture rather than as a separate patch.
+- Translation-doc/live-code divergence on FAQ answer wording (see above) — handled per the Honesty Rule by translating the live text, not by silently "upgrading" the English side to match the doc.
+
+**Problems solved:**
+- Contact and FAQ are now fully bilingual — Contact's backend-facing `conversation` field kept safely English while its display translates; FAQ's search now actually works in French.
+
+**Still open / needs verification:**
+- Not yet delivered to Mohammad as a patch — immediate next step.
+- Task #21 remaining: Company (translation doc `ORAGROL_Company_FR_Translation.md` exists in project docs, not yet opened/verified), Cyber Health quiz, Resources (flagged in its own doc as likely needing its own multi-file delivery, largest remaining item), Careers/Talent/Partnerships, How We Work, chat widget.
+- Services' own Details-accordion content (`app/lib/services-details-content.tsx`, ~370 lines) still untranslated — unblocked via the `labels` prop already added to `DetailsDialog.tsx` in an earlier phase, but not yet done.
+- `SharedCta` placeholders remaining: resources, company.
+- Legal pages (Privacy/Terms/Accessibility) stay English-only per Mohammad's earlier explicit decision.
+- PR #13 should stay unmerged into `main` until the whole site is bilingual (Mohammad agreed to this earlier).
+
+---
+
+### 2026-09-22 (later same day) — Bilingual EN/FR build, Phase 2e: OR ONE page fully wired, incl. the 77-item builder and all 4 tier Details dialogs; `ScopeTray` (shared, site-wide) translated too — retroactively fixes Services/Business Automation/Contact
+
+**Completed:**
+- Confirmed the Industries patch applied and pushed by Mohammad (`785354e` on `origin/feat/fr-locale`) — `git fetch` + `git reset --hard` to resync before starting, same discipline as every prior phase.
+- Built out Task #21's next page: `/or-one` and `/fr/or-one`, sourced from `ORAGROL_OR_ONE_FR_Translation.md` (page 4 of the project's 5-page translation series — fully complete, no truncation: hero, "separate product line" intro, OR/ONE Signature, "From scope to operation" 4-step process, all 10 builder categories × 77 items with tier labels, all 4 pricing tier cards (STARTER/100/200/400) including their full Details-dialog panels, Responsibility/Authorized-action, Monthly management, and the closing CTA). New `OrOne` messages namespace covers all of it.
+- **Critical safety constraint honored:** the `groups` array in `or-one-client.tsx` (77 item names, 10 category names) was NEVER edited — it's the exact key `OR_ONE_CAPABILITY_BY_NAME` (the permanent capability registry, `app/lib/or-one-capability-registry.ts`), the `selected` Set, and the localStorage-persisted scope state all match against by string identity. Translated display strings live in `OrOne.builder.categories` instead, index-paired against `groups`/`groups[i].items` (never re-keyed by name), resolved purely by array position at render time. A short comment block in both `or-one-client.tsx` and the messages-build script documents why, so a future edit doesn't "clean up" the apparent duplication and break capability-code resolution.
+- Same treatment for the dynamically-built "My Scope" tray entry the builder pushes via `useEffect` (`orone:builder` scope item) — its `title`/`detail`/`commercial` strings were English template literals; now built from new `OrOne.scopeItem.*` keys with interpolation (`{count}`, `{categories}`, `{points}`, `{standard}`, `{controlled}`, `{critical}`), matching the pattern Business Automation already established for its own scope-tray push.
+- **`ScopeTray.tsx` (`app/components/ScopeTray.tsx`) fully translated** — this is a genuinely shared, site-wide component (used by Services, Business Automation, OR ONE, and Contact), so this fix is retroactive: the "My Scope" side panel's full form (name/email/phone/company/timeframe/context, the 4 timeframe `<select>` options, the legal disclosure paragraph, the consent checkbox, both submit buttons and their in-flight labels, the PDF-ready/review-received confirmation screens, the empty state, and the "Continue browsing" footer) is now bilingual everywhere it appears, not just on OR ONE — same class of opportunistic site-wide fix as Phase 2c's `PreFooterCta` catch. New `ScopeTray` namespace. The one module-level (non-component) function, `pollForPdf`, can't call `useTranslations()` itself, so its one user-facing string (the "taking longer than expected" timeout message) is now passed in as a parameter from the component instead of hardcoded.
+- `SharedCta.or-one`'s placeholder English keys got their real French translation from the doc's "Closing" section. While auditing all `SharedCta` keys for this, found Phase 2d's Industries page had actually left `SharedCta.industries` as an English placeholder despite the page itself being fully translated (the closing CTA block just wasn't checked against `SharedCta` specifically) — fixed that too, pulling the real text from `ORAGROL_Industries_FR_Translation.md`'s shared-chrome table ("Votre prochaine étape la plus claire" / "Trouvez votre secteur"). `SharedCta` placeholders remaining: resources, company, contact, faq (4).
+- `review-sections.tsx` (Signature/Process/Pricing/Responsibility/Management — the 5 section components OR ONE renders from a sibling file) converted to `useTranslations`/`useLocale`; no `"use client"` pragma needed there since it's only ever imported from the already-client `or-one-client.tsx`. Pricing's build/monthly fee amounts stay as plain numbers formatted through the same locale-aware `money()` helper Business Automation already uses (`toLocaleString("en-CA"|"fr-CA")`), not literal currency strings in messages — these are pricing facts, not copy.
+- Fixed a real, if minor, pre-existing gap while here: the header's language switcher on this page was a dead `<button>EN / FR</button>` (no href, did nothing) — every other converted page already has a working `Link`/`locale` switcher. Replaced with the same working pattern (`Link href={pathname} locale={otherLocale}`) used on Industries/Business Automation. Not a content change to the English side; the page still renders identical English content at its English URL — this only makes the toggle functional, matching the site-wide pattern every other bilingual page already has.
+- Verified, not assumed: `npx tsc --noEmit` clean, `npm run lint` 0 errors (same 7 pre-existing warnings, one new harmless `react-hooks/exhaustive-deps` warning on a pre-existing `scope` dependency unrelated to this change). Live dev-server diff of `/or-one` vs `/fr/or-one`: hero/builder/pricing copy correctly French, all 77 item names and 10 category names translated, tier risk labels (Standard/Controlled/Critical → Standard/Contrôlé/Critique), all 4 Details dialogs' full content, and — separately — spot-checked `/fr/services`, `/fr/business-automation`, `/fr/contact` to confirm the `ScopeTray` fix actually landed retroactively on all three ("MA PORTÉE"/"Continuer la navigation" present on each). No `MISSING_MESSAGE`/`IntlError` markers in any rendered output (one `$undefined` match on `/or-one` is normal Next.js RSC flight-data serialization, not a translation error — checked the actual context before ruling it out).
+
+**Files changed:**
+- Content: `messages/en.json`, `messages/fr.json` (new `OrOne` and `ScopeTray` namespaces; `SharedCta.or-one` real translation)
+- `app/[locale]/or-one/page.tsx` (static → `generateMetadata`), `or-one-client.tsx`, `review-sections.tsx`
+- `app/components/ScopeTray.tsx` (shared component — affects Services/Business Automation/OR ONE/Contact)
+- `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- None new. The `groups`-array/capability-registry coupling was a known sharp edge going in (flagged in the file's own existing comments) rather than something discovered mid-task; handled by index-pairing rather than by touching the array.
+
+**Problems solved:**
+- OR ONE — the flagship product page, with by far the most content of any page converted so far (77 items) — is now fully bilingual, and the fix incidentally completed 3 other pages' "My Scope" side panel for free.
+
+**Still open / needs verification:**
+- Not yet delivered to Mohammad as a patch — immediate next step.
+- Task #21 remaining: Company, Contact+FAQ, Cyber Health quiz, Resources, Careers/Talent/Partnerships, How We Work, chat widget.
+- Services' own Details-accordion content (`services-details-content.tsx`) and `SharedCta`'s 4 remaining placeholder-English keys (resources/company/contact/faq) are still open, unchanged this phase.
+- Confirmed while browsing the claude.ai Project this phase: `ORAGROL_Contact_FAQ_FR_Translation.md` (page 5 of the 5-page series) is already complete and waiting — Contact+FAQ should be a fast next pickup, same as OR ONE was. `ORAGROL_Company_FR_Translation.md` also exists in the project docs list (not yet opened/verified this session) for whenever Company's turn comes up.
+
+---
+
+### 2026-09-22 — Bilingual EN/FR build, Phase 2d: Industries page fully wired (incl. full detail-accordion translation)
+
+**Completed:**
+- Confirmed patch `0009` (Business Automation) applied and pushed by Mohammad — verified via `git fetch` against `origin/feat/fr-locale` directly, then `git reset --hard` to sync this sandbox to the real pushed tip before starting new work (same discipline as every prior phase).
+- Built out Task #21's next page: `/industries` and `/fr/industries`, sourced from `ORAGROL_Industries_FR_Translation.md` (largest translation doc used so far, fully complete with no truncation). New `Industries` messages namespace covers the shared hero/navigator/journey/evidence-drawer/full-profile chrome plus all 9 industries' full content.
+- **Fully translated the "Industry detail" accordion this time too** (Risk and Canadian context / Protect / Automate / FAQ, for all 9 industries) — previously sourced from `industry-details.ts`, an English-only data file. That file's content was transcribed into `messages.Industries.list.*.detail` and the component now reads from there instead; `industry-details.ts` itself is left in place, untouched, purely as the English reference it was transcribed from, no longer imported by the page.
+- Reused the same 9 camelCase industry keys already established for `Home.industries.list` (professionalServices/healthcare/financialServices/retail/manufacturing/technology/construction/education/otherSmbs) so the same industry is addressed identically everywhere on the site, and the same 5 canonical automation-job ids Business Automation uses (sales-flow/customer-support/operational-intelligence/managed-it/customer-growth) for the "Automate the right jobs" panel's job references — kept self-contained in `Industries.jobShortNames` rather than cross-referencing the `BusinessAutomation` namespace.
+- Confirmed via grep that `categories`, `path`, `cta`, `href` and `secondary` — five fields defined on every industry in the original data — were never actually read anywhere in the component (dead data from an earlier design). Dropped rather than carried forward/translated; nothing user-facing was lost.
+- Self-translated a handful of items the doc didn't need to cover because the live page never renders them: Professional Services' 4th/5th `risks` and 3rd–5th `priorities` entries (the component only ever displays `risks.slice(0,3)`/`priorities.slice(0,2)`; all 8 other industries' arrays are already exactly 3 items each, matching what's shown). Kept for data-shape consistency with the English source, not because they're currently visible.
+- Verified, not assumed: `npx tsc --noEmit` clean, `npm run lint` 0 errors (same 7 pre-existing warnings), live dev-server diff of `/industries` vs `/fr/industries` — title/meta, hero, all 9 industry names in the ring-key nav, the evidence drawer's 3 stats + source citations (RCMP → GRC, OPC guidance → Lignes directrices du CPVP, correctly localized not just literal-translated), the full detail accordion's context/protect/automate/FAQ content, and per-industry job short names (e.g. Professional Services → Ventes/Finances vs Sales/Finance). Re-confirmed header/footer counts match 1:1 between EN and FR (no chrome-duplication regression) and no missing-message errors.
+
+**Files changed:**
+- Content: `messages/en.json`, `messages/fr.json` (new `Industries` namespace)
+- `app/[locale]/industries/page.tsx`, `industries-client.tsx`
+- `industry-details.ts` unchanged (superseded as a data source for this component, left in place as English reference)
+- `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- None new this phase — no site-wide bugs surfaced this time (the two prior phases' fixes, `SiteChrome`'s locale-aware pathname and `PreFooterCta`'s translation, already cover everything this page touches).
+
+**Problems solved:**
+- Industries is now the third fully bilingual page, and — like Business Automation but unlike Services — its deep accordion content is translated in full, not deferred.
+
+**Still open / needs verification:**
+- Not yet delivered to Mohammad as a patch — immediate next step.
+- Task #21 otherwise fully pending: OR ONE, Company, Contact+FAQ, Cyber Health quiz, Resources, Careers/Talent/Partnerships, How We Work, chat widget.
+- Services' own Details-accordion content (`services-details-content.tsx`) and `SharedCta`'s 6 placeholder-English keys remain the two known, previously-flagged gaps — unchanged this phase.
+
+**Next recommended step:**
+1. Commit, generate patch `0010` against the current pushed branch tip, verify via fresh-clone `git am`, deliver to Mohammad.
+2. Once applied and pushed, continue with the next Task #21 page.
+
+---
+
+### 2026-09-22 — Bilingual EN/FR build, Phase 2c: Business Automation fully wired (incl. Details dialogs) + a second shared-chrome gap found and fixed (PreFooterCta)
+
+**Completed:**
+- Confirmed patch `0008` (Services) is now actually applied and pushed by Mohammad — verified via `git fetch` + checking `origin/feat/fr-locale`'s log directly, not just his say-so. Reset this sandbox's working branch to match (`git reset --hard origin/feat/fr-locale`) so all further work builds on the real pushed state, not a locally-diverged one.
+- Confirmed with Mohammad, via screenshot, that PR #13's "Merge conflicts" badge is gone and shows green "Ready to merge" — the Phase 2b branch-drift fix (see that entry below) is fully closed out. Advised holding off on the actual merge until the whole site is bilingual (a partial-French live site would read worse than no French at all); Mohammad agreed and is using the PR's Vercel preview link to review as we go instead.
+- Built out Task #21's next page: `/business-automation` and `/fr/business-automation`, following the established pattern (`messages.BusinessAutomation` namespace; `generateMetadata({params})`; `useTranslations`/`Link`/`usePathname` from `@/i18n/navigation`; real language switcher; locale-aware currency via the same `money()` helper pattern as Services). Sourced from `ORAGROL_BusinessAutomation_FR_Translation.md`.
+- **Went further than Homepage/Services and fully translated the DetailsDialog deep-accordion content this time** (the "What's included / You stay in control / Who it suits / Illustrative example" panel for all 6 jobs), rather than deferring it the way Services' equivalent content still is. This was possible because `app/lib/ba-details-content.tsx` holds the complete, un-truncated English source (the translation doc's own `[...]` gaps were an artifact of the scraping tool used to build it, not a real content gap) — completed the handful of partial sentences by translating the full English source directly, consistent with the doc's already-approved terminology for the untruncated 90%.
+- Extended `DetailsDialog.tsx` (the shared component also used — untranslated — by Services) with an optional `labels` prop carrying its 7 chrome strings (Details button, "View what's included", Close, "What's included" heading, etc.), defaulting to the exact original English literals. Zero risk to any other caller: only Business Automation's page passes translated labels; Services' still-English "Details" dialogs are byte-identical to before.
+- **Found and fixed a second real site-wide gap while building this page, same as the Phase 2 chrome bug**: `PreFooterCta` (the shared CTA block rendered immediately before the footer on every redesigned page — Homepage and Services included) had never been converted in any prior phase, so both of those "done" French pages were silently showing this exact English block right at the bottom the whole time. Fixed by adding a `SharedCta` messages namespace (all 9 `CTAKey`s, so every page — translated or not — resolves without a missing-message error) and converting the component to a small Client Component using `useTranslations` — deliberately NOT `getTranslations`/async, because most call sites (`home-client.tsx`, `services-client.tsx`, `ba-client.tsx`, and four more not yet translated) are Client Components, and an async Server Component can't be rendered via direct JSX import from a Client Component (the exact bug already hit once with `HomeCybersecurity` in Phase 2). Verified this retroactively fixed Homepage's and Services' French CTA text with no other change needed, and confirmed the six not-yet-translated pages' `/fr/*` routes still render cleanly (English placeholder copy in `SharedCta`, not a crash) since they need all 9 keys present even before their own turn in Task #21.
+- Verified, not assumed: `npx tsc --noEmit` clean; `npm run lint` 0 errors (same 7 pre-existing warnings); live dev-server diff of `/business-automation` vs `/fr/business-automation` — title/meta/hreflang, hero, job-selector nav (all 6 tabs), the active job's full DetailsDialog JSON payload (all 6 jobs' complete FR translations confirmed present in the page data, English page confirmed still byte-identical to pre-session source), job-facts/commercial fee display (`9 500 $` / `2 200 $/mois` correct fr-CA formatting), existing-tools/journey/fee-explainer sections, language-switcher href (`/fr/business-automation` → `/en/business-automation`, matching the documented forced-prefix behavior). Also re-diffed `/`, `/fr`, `/services`, `/fr/services` to confirm the PreFooterCta fix landed cleanly with no regressions, and hit all 6 not-yet-translated pages' `/fr/*` routes (industries, or-one, contact, resources, faq, company) to confirm no missing-message crash. Sitemap already covered `/business-automation` with a correct hreflang pair from Phase 2's sitemap work — no sitemap change needed.
+
+**Files changed:**
+- Content: `messages/en.json`, `messages/fr.json` (new `BusinessAutomation` namespace, new `SharedCta` namespace)
+- `app/[locale]/business-automation/page.tsx`, `ba-client.tsx`
+- `app/components/DetailsDialog.tsx` (optional translated `labels` prop, English-default, non-breaking)
+- `app/components/site/pre-footer-cta.tsx` (Server → Client Component, hardcoded `CTA_CONTENT` → `SharedCta` messages lookup)
+- `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- `PreFooterCta`'s untranslated state on Homepage and Services — same class of gap as the Phase 2 chrome bug (a shared component nobody thought to re-check once the "big" per-page work was done), caught only because this session's live-diff habit extended to the CTA block, not just hero/nav text.
+- A near-miss self-inflicted bug in `ba-client.tsx`'s cart-reconciliation `scopeItem()` helper — first draft had dead conditional code left over from an edit; caught and cleaned up before commit by reviewing the diff, not just relying on tsc (this specific pattern doesn't throw a type error, just always evaluates to the same branch).
+
+**Problems solved:**
+- Business Automation is now the second fully bilingual page, and — uniquely among the pages done so far — its deep accordion content is translated too, not deferred.
+- The `PreFooterCta` fix is a second foundational, shared-component-level fix (after Phase 2's chrome bug) that protects every future Task #21 page automatically, and retroactively completes Homepage and Services rather than leaving a known gap to circle back to.
+- `DetailsDialog`'s new optional `labels` prop means Services' translation debt (its own Details accordion) is now a pure content task, not a component-refactor task, whenever that gets picked up.
+
+**Still open / needs verification:**
+- Services' own DetailsDialog content (`app/lib/services-details-content.tsx`, ~370 lines) is still untranslated — now trivially unblockable via the same `labels` prop this session added, but not done yet.
+- `SharedCta`'s 6 not-yet-relevant keys (or-one, industries, resources, company, contact, faq) hold English placeholder text — fine for now since those pages aren't translated either, but needs real translations when each page's turn comes, not to be forgotten as "already handled."
+- Business Automation's `[code]` detail pages (`business-automation/[code]/page.tsx`, shares `ServiceDetail` with `/services/[code]`) remain untranslated — same deferral as Services' own `[code]` pages, consistent precedent, not an oversight.
+- Not yet delivered to Mohammad as a patch — that's the immediate next step before anything else.
+- Task #21 otherwise fully pending: OR ONE, Industries, Company, Contact+FAQ, Cyber Health quiz, Resources, Careers/Talent/Partnerships, How We Work, chat widget.
+
+**Next recommended step:**
+1. Commit this work, generate patch `0009` against the current pushed branch tip, verify via fresh-clone `git am`, deliver to Mohammad with the same literal-filename `git am` instructions.
+2. Once applied and pushed, proceed to the next Task #21 page — per Mohammad's standing "research and pick the best option autonomously" preference, no need to wait for sign-off on the pattern itself.
+
+---
+
+### 2026-09-22 — Bilingual EN/FR build, Phase 2b: Services page delivered + PR #13 branch-drift merge conflict diagnosed and resolved
+
+**Summary (condensed — this session's own local log entry for this phase was lost to a `git reset --hard` sync-up and is reconstructed here from memory of the work actually done and verified at the time):** Delivered patch `0008` (Services page, hero/packages/à-la-carte/specialists, fully bilingual) to Mohammad. Diagnosed two real Windows/git issues on his machine (a leftover branch from a prior session; `cmd.exe` not expanding `*` wildcards for external programs like `git.exe`, unlike bash) and walked him through fixes one command at a time. PR #13 then showed a genuine "Merge conflicts" badge — root-caused (not assumed) as real branch drift: Mohammad's pushed branch's merge-base with `origin/main` was stale, missing 3 real upstream commits. Verified via `git merge-tree` that there were zero actual content conflicts (an initial grep false-positived on the word "conflict" inside Terms-of-Service legal text, not a git marker), verified the fix end-to-end in a disposable clone, then gave Mohammad the exact fix: `git fetch origin main` → `git merge origin/main --no-edit` → `git push origin feat/fr-locale`. He ran it successfully. Both patch `0008` and the merge fix are confirmed live on `origin/feat/fr-locale` as of the start of Phase 2c above.
+
+---
+
+### 2026-09-22 — Bilingual EN/FR build, Phase 2: Homepage wired with real French content + a real site-wide chrome bug found and fixed
+**Completed:**
+- Continuation of the same session/branch as Phase 1 below (infra was already in place; this phase is the first real content + the first real bugs). Built `messages/en.json`/`messages/fr.json`'s full "Home" namespace (nav/hero/entryPoints/reality/capabilities/method/cybersecurity/cyberHealthCta/industries incl. the 9-item industries list), sourced verbatim from `ORAGROL_Homepage_FR_Translation.md` — nothing invented. Verified casing fidelity against the live JSX/CSS before finalizing (8 industries fields are literal ALL-CAPS in source with no backing `text-transform` CSS rule, unlike the rest of the file which is CSS-driven).
+- Rewired `home-client.tsx`, `home-section-04.tsx`, `canada-coverage-study/page.tsx` to actually consume those keys via `useTranslations`/`getTranslations` instead of hardcoded English strings — the Homepage's visible body now genuinely renders in the requested locale at both `/` and `/fr`, not just its `<head>` metadata (which Phase 1's later SEO work had already handled). Added a real working language switcher (next-intl `Link` with a `locale` prop) in the homepage header, replacing the static "EN / FR" button — completes Task #19 for the homepage's own header specifically.
+- **Found and fixed a real site-wide bug while verifying this live**, not something anticipated going in: `SiteChrome` (root-layout chrome picker, decides "redesigned route = no extra chrome" vs "old SiteHeader+SiteFooter+EmergencyCta") was reading the raw un-stripped pathname, so on `/fr` it never matched `REDESIGNED_ROUTES` and wrapped every French page in a duplicate header+footer on top of the page's own — confirmed via a live header/footer-tag diff of `/` vs `/fr` (3 `<footer>`/6 `<header>` tags on French vs. 2/5 on English). Same root cause hit essentially all shared navigation: `oragrol-mega-nav`, `footer`, `pre-footer-cta`, `nav-dropdown`, `emergency-cta`, the old `site-header`/`site-footer`, and the base `ui/link.tsx`/`button.tsx`/`card.tsx` primitives most page content is built from were all using plain `next/link`, so a French visitor clicking almost anything in the shared chrome silently fell back to English with no visible indication. Fixed by switching all of the above to next-intl's locale-aware `Link`/`usePathname` (`@/i18n/navigation`) — confirmed via a full href dump of the French homepage afterward: zero stray unprefixed internal links remain.
+- Also fixed, mid-fix: `home-section-04.tsx`'s server-only `getTranslations()` broke ("not supported in Client Components") because it was imported directly inside `home-client.tsx` (a Client Component) — importing a Server Component module directly from a Client Component forces it into the client bundle. Fixed by having `page.tsx` (the real Server Component) render `<HomeCybersecurity/>` and pass it into `HomeClient` as a `cybersecuritySection` prop instead — the documented Next.js pattern, preserves the section's original zero-client-JS design intent.
+- Verified, not assumed: `npx tsc --noEmit` clean both before and after the chrome fix; `npm run lint` clean (0 errors, same 7 pre-existing warnings throughout); live dev-server diffs of `/` vs `/fr` at every step (title/meta, hero/reality/capabilities/method/cybersecurity/cyberHealthCta/industries body text, header/footer tag counts, full internal href list); smoke-tested `/`, `/fr`, `/services`, `/fr/services`, `/industries`, `/fr/industries`, `/cyber-health`, `/fr/cyber-health` all return 200; confirmed the switcher's `/en` link 307-redirects to `/` with `NEXT_LOCALE=en` set (next-intl's own documented forced-prefix-then-redirect behavior for locale switches, not a bug). `npm run build` still blocked only by this sandbox's known Google Fonts network restriction (not a defect — Vercel's real build has unrestricted internet, same as every prior session's note on this).
+
+**Files changed:**
+- Content: `messages/en.json`, `messages/fr.json`
+- Homepage wiring: `app/[locale]/home-client.tsx`, `app/[locale]/home-section-04.tsx`, `app/[locale]/canada-coverage-study/page.tsx`, `app/[locale]/page.tsx`
+- Chrome/nav locale-awareness fix: `app/components/site/site-chrome.tsx`, `site-header.tsx`, `site-footer.tsx`, `footer.tsx`, `oragrol-mega-nav.tsx`, `pre-footer-cta.tsx`, `nav-dropdown.tsx`, `emergency-cta.tsx`, `app/components/ui/link.tsx`, `button.tsx`, `card.tsx`
+- `PROJECT_MEMORY.md` (this entry) — `DECISIONS.md` not touched this phase (no new durable architectural decision beyond what D-086 already covers; the chrome fix is a bug fix against that existing decision, not a new one)
+
+**Problems found:**
+- `getTranslations` (server-only) throwing in what was silently a Client Component due to direct import from `home-client.tsx` — caught immediately via the dev server's own error overlay/HTML output (`__next_error__`), not assumed working from a clean typecheck alone (tsc doesn't catch this class of RSC/client boundary violation).
+- `SiteChrome`'s locale-blind `REDESIGNED_ROUTES` match, and the entire shared-chrome `next/link` fleet — neither was something Task #18/#19's original scope anticipated; both surfaced only because this phase actually diffed live `/` vs `/fr` output at the HTML level instead of stopping at "typecheck + lint clean, page returns 200."
+
+**Problems solved:**
+- The Homepage is now genuinely bilingual end-to-end (content, metadata, internal navigation, language switcher), and the same underlying fix (locale-aware Link/usePathname in shared chrome) protects every other page's `/fr/*` variant from the same silent-fallback-to-English bug *before* Task #21 gets to them individually — this was a foundational fix, not homepage-scoped.
+
+**Still open / needs verification:**
+- Still on `feat/fr-locale`, not pushed — same sandbox git-proxy restriction as Phase 1 (push/API access denied, not a token problem). Two commits this phase (`dde668d` content, `3bd7723` chrome fix) sit on top of Phase 1's already-pushed-by-Mohammad commits; a fresh patch needs to go to him the same way as last time.
+- Three page-level (not shared-chrome) components still import plain `next/link`: `app/components/sections/resources/article-card.tsx`, `breadcrumb.tsx`, `app/components/sections/services/service-detail.tsx` — left for Task #21 since they're page content without French message data behind them yet, not shared chrome.
+- Task #21 (remaining pages: Services, Business Automation, OR ONE, Industries, Company, Contact+FAQ, Cyber Health quiz, Resources, Careers/Talent/Partnerships, How We Work, chat widget) not started — those routes currently render English content under both `/` and `/fr/*` (not broken, just not yet translated; confirmed via smoke test, e.g. `/fr/services` returns 200 with an English `<title>`).
+- Mohammad has not yet seen any of this on a deployed preview (branch not merged/pushed).
+
+**Next recommended step:**
+- Generate and hand Mohammad a fresh patch (or patch stack) for these two commits, same handoff flow as Phase 1 (`git format-patch` against `origin/main`, verified via a clean `git am` against a fresh clone). Once pushed and a preview exists, either get Mohammad's sign-off on the Homepage pattern before mechanically repeating it across Task #21's remaining pages, or proceed directly given his standing "research and pick the best option autonomously" preference — his call, flagged either way.
+
+---
+
+### 2026-09-22 — Bilingual EN/FR build, Phase 1: next-intl locale routing infra wired (no page content translated yet)
+**Completed:**
+- Session ran from a Cowork session (not local Claude Code), working against this repo via a GitHub token scoped read/write to just this repository. Full context: a separate claude.ai Project ("Ai Agent, Tier 2") already holds 13 completed EN/FR content-translation files covering every real page on the live site plus the site-wide chat widget — that's the content source of truth for the page-by-page conversion still to come. This session built the routing/infrastructure layer only.
+- Wired `next-intl` (installed but unused per Section 12) with `localePrefix: "as-needed"` — English keeps every existing unprefixed URL, only French is visibly prefixed at `/fr/*`. See D-086 for the full reasoning, including why `proxy.ts` was used instead of the now-deprecated `middleware.ts` (a live `next dev` deprecation notice caught this before it shipped — confirmed against `node_modules/next/dist/docs`, not assumed from general Next.js knowledge).
+- Moved every route folder under `app/[locale]/` (next-intl's App Router requirement for this prefix behavior to work) — pure `git mv`, git-tracked as renames, zero content changes. `app/layout.tsx` → `app/[locale]/layout.tsx`, now the real root layout (dynamic `<html lang>`, `NextIntlClientProvider`, `generateStaticParams` for both locales). Converted 23 distinct cross-boundary import specifiers (in both directions — routes importing shared code, and the few shared modules that lived inside `cyber-health/`/`services/` being imported from `app/api/`/`app/lib/`) to the existing `@/*` tsconfig alias rather than hand-counting new relative-path depths.
+- New: `i18n/routing.ts`, `i18n/navigation.ts`, `i18n/request.ts`, `proxy.ts`, `messages/en.json` + `messages/fr.json` (empty `{}` scaffolds — no page content converted yet). Edited: `next.config.ts` (wrapped with next-intl's plugin, existing CSP headers/redirect untouched).
+- Verified properly, not assumed: `npx tsc --noEmit` clean (0 errors — this also incidentally resolved a batch of `TS7006 implicit any` errors that turned out to be a cascading consequence of the import breakage mid-move, not pre-existing noise as first assumed; re-confirmed against `git diff` on the untouched files before concluding that). `npm run lint`: 0 errors, same 7 pre-existing a11y/hooks warnings as every prior session. `npm run dev` + curl: every route tested (`/`, `/services`, `/business-automation`, `/or-one`, `/contact`, `/cyber-health` and their `/fr/` mirrors) returns 200, correct dynamic `<html lang="en">`/`<html lang="fr">`, homepage hero copy intact and byte-identical at the English URL. `npm run build` blocked only by this sandbox's known Google-Fonts network restriction (documented in multiple prior entries, not a defect — Vercel's real build has unrestricted internet).
+
+**Files changed:**
+- New: `i18n/routing.ts`, `i18n/navigation.ts`, `i18n/request.ts`, `proxy.ts`, `messages/en.json`, `messages/fr.json`
+- Moved (git rename, no content change): every top-level route folder (`accessibility/`, `business-automation/`, `canada-coverage-study/`, `careers/`, `company/`, `contact/`, `cyber-health/`, `faq/`, `how-we-work/`, `industries/`, `or-one/`, `partnerships/`, `privacy-policy/`, `resources/`, `services/`, `solutions/`, `style-guide/`, `talent/`, `terms-of-use/`) plus `page.tsx`/`home-client.tsx`/`home-section-04.tsx`/`home-section-04.module.css`/`homepage-v3.css`/`layout.tsx` from `app/` into `app/[locale]/`
+- Edited: `next.config.ts` (next-intl plugin wrapper); 25 route files + 4 `app/lib`/`app/api` files (import specifier changes only, listed in D-086)
+- `DECISIONS.md` (D-086), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The Next.js 16 `middleware.ts` → `proxy.ts` rename, caught live via the dev server's own deprecation warning rather than shipping the deprecated convention. Fixed same session, confirmed clean restart with no warning.
+- A batch of `TS2307`/cascaded `TS7006` errors immediately after the route move (see Decision 4 in D-086) — all traced to real, specific broken import paths (not vague "something's off"), fixed one by one, re-verified with a second clean `tsc --noEmit` run.
+
+**Problems solved:**
+- The site now has real, working bilingual URL routing end to end, with English provably unchanged at every existing URL (same content, same path, no `/en/` prefix anywhere) — the actual structural risk Mohammad flagged before this build started.
+
+**Still open / needs verification:**
+- No page has real French content yet — `/fr/*` currently mirrors English content verbatim, by design at this stage (empty message files). SEO plumbing (hreflang, sitemap, canonical, per-locale metadata) not started. Header's "EN | FR" toggle is still static/non-functional. Mohammad's live review of this phase — not yet seen by him on a deployed preview.
+- **Could not push `feat/fr-locale` to GitHub from this session** — this sandbox's own outbound git proxy rejected the push ("repository not in this session's authorized repository set"), a session-level access gate unrelated to the GitHub token itself (which was correctly scoped and worked fine for `git clone`). Same `git format-patch` → verified-clean-`git am`-against-fresh-`origin/main` handoff pattern as D-084/D-085 used instead; patch delivered to Mohammad directly.
+
+**Next recommended step:**
+- Mohammad applies the patch (`git am` + `git push origin feat/fr-locale`) and opens the PR himself, or sorts out why this sandbox's git proxy doesn't have this repo authorized, if direct pushes from a Cowork/cloud session are wanted going forward.
+- Once the branch is live on GitHub (triggering a Vercel preview + the existing Playwright/security-checks CI on the PR), continue with: SEO metadata (hreflang/sitemap/canonical), Homepage's real French content wired via `next-intl` as the proof-of-pattern, the real language switcher, then the remaining pages mechanically once the pattern's proven. Legal pages (Privacy/Terms/Accessibility) render English-only under `/fr/` per Mohammad's explicit decision — no legal review has been done or requested.
+
+---
+
+## Current Status
+Home (Step 4), Services hub (Step 5), Solutions (Step 6), and Cyber Health (Step 7, `/cyber-health`) all built. A full visual/UX audit (2026-08-13, AUDIT ONLY) produced the **Oragrol Visual Redesign Blueprint** (private Claude artifact + `VISUAL_REDESIGN_BLUEPRINT.md` in the repo root) — **approved by Mohammad**. Rollout order confirmed (D-009): new visual system builds on `/services` ONLY first; no other page touched until Services is reviewed and approved. Two independent, non-gated defects the audit also found were fixed the same session (D-010): the mobile nav overlay now covers the full viewport (was bleeding page content through underneath itself), and two WCAG AA contrast failures are fixed via new scoped tokens (`--accent-strong` for the primary button fill, `.env-dark`'s `--text-muted` override) — verified clean build/typecheck/lint plus Playwright/computed-style checks. Cyber Health's CTAs link to the real, live, already-in-production Tally assessment (`https://tally.so/r/2EzROb`, confirmed by Mohammad) — out of scope for this codebase, not rebuilt. Hero: all 16 frames, scroll bug fixed (D-005), visual-quality gap frozen (D-006) — **superseded 2026-08-18: the 16-frame city-skyline sequence is gone, replaced by "The Perimeter Sweep" (D-057).** That was swapped same-day for a Spline-hosted 3D scene (D-059/D-060), which hit an unfixable-from-this-codebase grey-box issue and was **reverted back to `PerimeterRing` (D-061)** — Home hero is a fully code-generated visual again, `@splinetool/*` packages removed. Company/Industries flagged for a possible future photographic upgrade, deferred, not blocking. **Sitewide visual-system migration (D-068, 2026-08-22)** replaced the entire color palette (6-color system: Deep Ink/Deep Blue/Muted Violet-Gray/Steel Gray/Warm Off-White/Burnt Orange) and typography (Space Grotesk/Manrope/IBM Plex Sans), followed by **atmospheric section-transitions (D-069)** and a **pricing-clipping fix (D-070)** the same day. A one-category (C01) bespoke-visual pilot was built, then **explicitly rejected by Mohammad and cleanly reverted** (`7af7c6e`) — see D-071 for the design-direction correction ("no per-category bespoke visual systems"). Services Landing Page rebuilt with editorial Hero+Overview panels above the untouched category architecture (D-072, `611871d`), then a visual-correction pass (D-073, `5a44b40`) — dark-first color balance, no repeated rounded card — then logo/badge removal + a header-clearance fix (D-074, `72ce1d1`), then the hero visual swapped to the actual approved photographic asset (D-075, `b41f112`, rights confirmed by Mohammad first), then the background extended to a wide landscape canvas (D-076, `8a4556b`, produced externally by Mohammad after an in-session Adobe outpainting attempt hit a real infrastructure wall), then integrated as a true full-bleed cinematic background (D-077, `6755a47`). Latest: **D-078 (`ec1dd29`)** — face repositioned to the right at desktop widths (a `translateX`, not a resize) after it read as too centered/overlapping the headline; root-caused why `object-position` alone couldn't fix it (zero horizontal slack once the box is wider than the image). Live in production, awaiting Mohammad's review.
+
+**SERVICES SIGNED OFF, COMPLETE (D-034, 2026-08-14).** The full multi-round visual-redesign thread (D-011 through D-034) is closed — Mohammad reviewed the final `/services` full-page screenshot and confirmed approval. Per the page-by-page rollout rule (D-009), this unblocked the next page: **Step 8 — How We Work**.
+
+**STEP 8 CONTENT-COMPLETE, CONNECTOR BUG FIXED (D-035/D-036/D-037, 2026-08-14).** Hero visual researched and built (D-035). Full page copy supplied and built (D-036), byte-for-byte verified. Connector-line bug reported and fixed (D-037) — investigated the cited reference component first and found it has the identical bug (flagged, not silently copied or silently ignored); real fix uses CSS Grid to structurally guarantee the circle sits on the spine. `/how-we-work` is live, `noindex` removed. Awaiting Mohammad's review.
+
+**CYBER HEALTH LOADER RESOLVED, LIVE, AND MOHAMMAD-CONFIRMED (D-042, 2026-08-14).** Mohammad confirmed D-041's architecture finding and directed a repurpose: no fake 5-step backend narration, replaced with one generic honest transition message ("Preparing your assessment...") shown during the click-to-redirect to the real Tally form. `AssessmentCta` (new wrapper, native `<a target="_blank">` preserved, no popup-blocker risk) now live on both Cyber Health CTAs (hero + closing-cta). `/cyber-health/prototype-loader` removed. Verified by Claude via Playwright (real new-tab navigation, color remap, reduced-motion), then separately confirmed by Mohammad directly in-browser: "Confirmed working live — loader shows correctly, colors match, Tally opens in new tab as expected. Approved." Fully closed.
+
+**CYBER HEALTH HERO GAUGE REOPENED, AMBIENT LOADER PROTOTYPED, NOT WIRED IN (D-043, 2026-08-14).** Mohammad reopened D-008's `GaugeVisual` hero, requesting a persistent ambient visual built on D-042's `AiLoader` ring (extracted into shared `RotatingRing`/`FadeText`, not duplicated), cycling short brand words instead of action language, reduced-motion holding for the full page lifetime, and offscreen pausing for performance. Prototyped at `/cyber-health/prototype-hero`, all 5 required changes verified with direct evidence. `hero.tsx`/`GaugeVisual` untouched — awaiting Mohammad's review and his call on a wording flag (see Next Steps #1).
+
+**CYBER HEALTH AMBIENT HERO SHIPPED LIVE (D-043, 2026-08-15).** Mohammad approved and re-specified the exact wording ("Assess."/"Prioritize."/"Protect.") — resolves the wording flag by keeping his original words. `hero.tsx` now renders `HeroAmbientLoader` in place of `GaugeVisual`; prototype route/component removed. Re-verified live (not just re-assumed from the prototype): clean typecheck/lint/build, and Playwright-captured proof screenshots (the Chrome-extension tab in this environment runs with `document.hidden === true` regardless of focus, throttling/freezing the CSS fade — Playwright was used instead, per CLAUDE.md §7's documented method) of the mid-cycle "PRIORITIZE." state, the reduced-motion static state, and the IntersectionObserver pause/resume on scroll.
+
+**STEP 9 — INDUSTRIES BUILT (D-044, 2026-08-15).** Mohammad supplied the real, fact-checked content brief (`ORAGROL_INDUSTRIES_CONTENT_CANADA.md`) plus an explicit structure spec. Built `/industries`: desktop sticky sidebar / mobile horizontal scrollable tabs (real ARIA `tablist`/`tab`/`tabpanel`, keyboard-navigable), an instant-swap detail panel (Risk/Priorities/Approach/Next Step), all 9 industries, active/inactive styling reusing Services' locked weight-600/weight-400-muted convention. Content verified byte-for-byte against the source `.md` via a Node diff script (not a visual read-through). Awaiting Mohammad's review.
+
+**EMERGENCY CTA PLACEHOLDER NUMBER REMOVED (D-045, 2026-08-15).** The temporary Malaysian number in the site-wide floating "Under attack?" pill (D-017) is gone — the pill is now text-only ("Under attack? Contact us now"), links to `/contact` instead of `tel:`, same styling/icon/position. Single global component (`EmergencyCta`, rendered once from `RootLayout`), no separate footer instance existed. Confirmed via grep: the number no longer appears anywhere in source, only in this file and `DECISIONS.md`'s historical record.
+
+**STEP 12 — CONTACT BUILT (D-046, 2026-08-15).** Mohammad supplied `Oragrol_Contact_Page_Content.md` with a two-path structure superseding the original generic-form outline. Built `/contact`: Path 1 "New to Oragrol" → the real Cyber Health assessment; Path 2 "Existing client / urgent" → direct `tel:`/`mailto:` to the real Thunder Bay number/email plus "Under attack?" framing. Two location cards — Toronto primary/Operations (all fields `[pending]` in the source, rendered as "Coming soon" badges, not blank/invented), Thunder Bay secondary/Registered Office (real details). Same session: footer's Instagram `href="#"` placeholder replaced with the real URL (`https://www.instagram.com/oragrolglobal`) — confirmed via grep to be the only instance site-wide. Awaiting Mohammad's review.
+
+**GENERAL INQUIRY FORM ADDED, BLOCKING ON A REAL API KEY (D-047, 2026-08-15).** Third entry point added to `/contact` above Locations: Name/Email/Company(optional)/Message, real email send via Resend at `POST /api/contact` (`resend`/`@hookform/resolvers` added; `react-hook-form`/`zod` were already installed, unused until now — one shared schema validates both client and server). No fake success path — verified directly: with `RESEND_API_KEY` unset in this environment, a real test submission correctly surfaces "Email sending isn't configured yet..." as an error, logged server-side with the exact fix needed. **BLOCKING — needs from Mohammad:** a real Resend API key (free tier is enough — https://resend.com/api-keys, no domain verification required to send via Resend's own `onboarding@resend.dev` sandbox sender). Once supplied, set it as `RESEND_API_KEY` in `.env.local` (gitignored, never committed — `.env.local.example` in the repo root documents this and two optional overrides) and restart the dev server; then a real test send still needs to be run and proven (screenshot of the received email, or a server log showing success) before this is fully closed.
+
+**STEP 11 — COMPANY / ABOUT BUILT (D-048, 2026-08-17).** Built `/company` from Mohammad's real, final content brief (`ORAGROL_ABOUT_PAGE_CONTENT_FINAL.md`, 4 sections: Founder Bio/Mission-Story/Team/Values) plus his real founder photo (arrived mis-saved to the repo root with a mangled filename — moved to the correct `public/images/founder-mohammad.jpg` after verifying it was a real, valid 3024×4032 photo). Researched via `ui-ux-pro-max` + `21st.dev` first per instruction; no strong pre-built "premium founder bio" match surfaced, so all 4 sections were built natively with distinct treatments (Dark 2-col editorial photo+bio / Light-blue single-column manifesto / minimal white band / icon grid + dark closing panel) — flagged as native-build rather than falsely claimed as sourced. No separate hero was built (none was supplied — Founder Bio doubles as the opening). Deliberately opens Dark rather than the brief's "primarily light" framing, to avoid a real pre-existing SiteHeader defect (illegible white nav text over a light entry section before ~140px of scroll) — flagged, not silently worked around. Caught and fixed two real issues before shipping: a mobile horizontal-overflow bug (a `GlowEffect` halo's negative inset bled past the viewport) and a heading-hierarchy gap (Values' card titles were `H4` under an `H2`, skipping a level — fixed to `H3`, matching this project's own established convention). Correctly diagnosed a screenshot false alarm (Playwright's `fullPage` mode mis-composites `position: fixed` elements) rather than reporting it as a bug. Full details: D-048. `tsc`/lint/build all clean, `/company` static. Awaiting Mohammad's review.
+
+**FOUNDER BIO RESTRUCTURED (D-049, 2026-08-17).** Mohammad requested a layout-only restructure of Company's Founder Bio (D-048): small circular headshot (new file, `founder-mohammad-headshot.jpg` — arrived with the same mis-saved-filename pattern as the first photo, renamed to the correct path) + name + title at top, the same 3 bio paragraphs (byte-identical) reading through as a narrative middle column, then the original large photo reappearing as a widened (`max-w-2xl`) closing visual at the end. Text content unchanged, verified. A real (not a screenshot artifact this time — checked both ways) mobile-only issue found: the wider closing photo now visibly overlaps the sitewide `EmergencyCta` pill at real scroll positions, obscuring the founder's face — the same standing D-044 pill-overlap issue, now landing on the actual deliverable of this task rather than incidental text. Flagged with evidence, not fixed (pill is a single global `RootLayout` instance; desktop unaffected). Full details: D-049. `tsc`/lint/build clean.
+
+**FOUNDER BIO REAL DESIGN FIXES (D-050, 2026-08-17).** Mohammad reviewed D-049 and reported two real problems, not a quick tweak: the top circular headshot cropped awkwardly (face off-center), and the closing photo was still far too large. Root cause of the crop bug: `founder-mohammad-headshot.jpg` (from D-049) turned out to actually be a 3/4-body composition, not a tight face crop — confirmed by direct pixel inspection — plus it was genuinely PNG bytes wrongly named `.jpg` (renamed to `.png`, D-049's own mistake, fixed here). Fixed the crop by decoupling `object-position` (top-anchored) from an explicit `transform-origin` placed at the face's real position + `scale(2)` — tuned empirically against a standalone comparison harness, then re-verified at the real rendered pixel size. Researched per instruction (`ui-ux-pro-max`: 0 matches, flagged; `21st.dev`: found "Editorial Testimonial," id 9637 — small photo beside a bold pull-quote) and redesigned the closing beat around that pattern: photo shrunk from a 672px stacked block to 224px (exactly one-third), placed beside a pull-quote (a verbatim excerpt of the bio's own first sentence, not new copy). Genuine side-effect: the mobile `EmergencyCta`/photo overlap D-049 flagged (pill covering the face) is now much smaller — the pill barely brushes the photo's corner at one scroll position instead of covering the subject, though not fully eliminated (same standing global-component issue). Full details: D-050. `tsc`/lint/build clean, 0px overflow both widths.
+
+**TOP HEADSHOT REMOVED (D-051, 2026-08-17).** Mohammad instructed removing D-050's small circular headshot from the top of Founder Bio entirely — name + "Founder & CEO" only, no photo there. The founder's photo now appears exactly once on the page: the closing placement established by D-050 (`founder-mohammad.jpg`, ~224px, beside the pull-quote), unchanged. `founder-mohammad-headshot.png` is no longer referenced anywhere (grepped repo-wide) — left on disk unused, same convention as other superseded visual assets. Verified via DOM query: exactly one `<img>` in the Founder Bio section, resolving to the closing photo. `tsc`/lint/build clean, 0px overflow both widths.
+
+**STEP 10 — RESOURCES BUILT (D-052, 2026-08-17).** Built `/resources` from the real content brief (`ORAGROL_RESOURCES_ALL_ARTICLES_FINAL.md`, 6 full articles + a CTA-mapping table). Found and fixed a real route mismatch: nav's existing "Resources" link pointed to `/insights` (an unbuilt D-017 placeholder), but the brief's own slugs are all `/resources/<slug>` — re-pointed `SiteHeader`/`SiteFooter` to `/resources`; `home/insights.tsx`'s "coming soon" teaser deliberately left untouched (out of scope, flagged, now slightly stale). Researched per instruction (`ui-ux-pro-max`: 0 landing-domain matches, flagged; real `ux`-domain chip-reflow guidance applied; `21st.dev`: "Blog Posts" and "Link Breadcrumb" retrieved and used, "Filter Grid" hit the session's retrieval limit so its *pattern* — not code — was rebuilt natively, flagged as such). All 6 articles transcribed verbatim then verified byte-for-byte via 3 separate Node diff scripts (body text, metadata, heading levels) — the heading-level script caught a real transcription mistake (Article 1's headings typed as `h2` while 2-6 were `h3`) before shipping, resolved by making all 6 uniformly `h2` (the correct page-level hierarchy: H1 title → H2 subsections, no skip — not a literal mirror of the source file's own internal markdown levels). Built faceted filters (Content Type/Topic/Industry) that hide zero-match options dynamically — verified live, not just asserted. CTA text/hrefs verified live against the source's mapping table via Playwright. Caught and fixed 2 more instances of the project's own documented `cn()` size-override conflict (`ArticleCard`'s `H3`, `ArticleDetail`'s `H2`) before shipping. Reading time computed from real word count. `tsc`/lint/build all clean, zero console errors, zero horizontal overflow both widths, unknown slug confirmed 404. Full details: D-052.
+
+**INDUSTRIES DROPDOWN CLICK BUG INVESTIGATED, HARDENED, ROOT CAUSE NOT CONCLUSIVE (D-056, 2026-08-18).** Mohammad reported clicking an Industries dropdown item (e.g. "Healthcare") from a non-Industries page closed the dropdown without navigating. Extensive instrumented live reproduction was genuinely inconsistent — some clicks navigated, some left the URL unchanged with zero mouse events reaching the page despite the target being correctly positioned/hover-active — and a full synthetic replay of the real event sequence (exercising the actual React handlers) always succeeded, so the exact mechanism was NOT conclusively pinned; the failures look more consistent with the browser-automation tool's own click dispatch than a deterministic product bug, reported honestly rather than overclaimed. Fixed a real, narrow gap regardless: `cancelScheduledClose()` (the dropdown's hover-close debounce) is now also called on `onPointerDownCapture`, not just `onMouseEnter`, closing a window where a pending scheduled close could fire mid-click and swallow it. `tsc`/lint/build clean; post-fix, a full real-gesture replay from two pages to two industries both landed correctly with the right tab visibly selected. **Needs Mohammad to confirm live with a real mouse** — see Next Steps.
+
+**HOME HERO REDESIGNED: "THE PERIMETER SWEEP" (D-057, 2026-08-18).** Instructed to design a genuinely new, distinctive Home hero visual replacing the 16-frame city-skyline sequence (frozen under D-006) — grounded in the actual MSSP subject, not a reused pattern from another page, one concept proposed and approved before any code. Verified first (per instruction) that the old hero's ring was baked into the photo frames, not a separate layer. Proposed and got approval for "The Perimeter Sweep": the Oragrol brand ring (Home-reserved per D-008), mostly off-canvas behind the headline, with one motion — a short bright arc continuously tracing the ring's circumference on an ~11s loop, literalizing continuous boundary monitoring — plus removing the old 350vh scroll-pin entirely (nothing left to pin without the frame crossfade). Built it, then found and fixed 4 real bugs before showing anything final, each caught live via screenshot rather than assumed correct: (1) reusing `OragrolRing` verbatim at hero scale rendered as a solid grey disc, not a hairline — its logo-calibrated stroke is too thick relative to its radius at that size; rebuilt as a new, same-identity circle with a scale-appropriate hairline stroke; (2) a `blur-3xl`'d ambient-glow circle had the identical problem for the identical reason (blur softens edges, doesn't fade a filled shape) — replaced with a true `radial-gradient`; (3) the sweep's rotation, first built with framer-motion, never actually animated (`initial={false}` + a constant `animate` target skips the mount transition and, with it, the `repeat` loop — confirmed via `getComputedStyle`/`getAnimations()`) — switched to a plain CSS `@keyframes` (globals.css, matching the project's existing `ai-loader-letter-fade` pattern) instead of debugging framer-motion's SVG-rotation handling further; (4) the ring's desktop position bled into the text column at mobile widths (copy runs nearly full-bleed there) — given its own bottom-right-corner-anchored mobile position instead. Confirmed the sweep genuinely animates (not just configured to) via a Playwright script from the scratchpad (`NODE_PATH` pointed at this repo's `node_modules`, per CLAUDE.md §7) — the `claude-in-chrome` tab used for interactive checks reports `document.hidden === true` regardless of focus (same quirk as D-43), which silently freezes CSS animations during live checks. `tsc`/lint/build clean, same 20 routes, zero console errors, zero horizontal overflow at 360/390/834/1440px, reduced-motion correctly freezes the sweep with zero animation instances. Screenshots (desktop/tablet/mobile) sent to Mohammad. Full details: D-057.
+
+**GLOWEFFECT CONSOLE WARNING FIXED: "static" MODE NO LONGER ROUTED THROUGH FRAMER MOTION (D-058, 2026-08-18).** Mohammad reported a repeating dev-console warning about animating `background` to an unanimatable gradient. Found: `GlowEffect` (~16 call sites across nearly every page — all use its default `mode="static"`) was passing its one fixed gradient through `animate={{ background: ... }}`, despite the component's own comment already documenting `static` as "no animation loop." Verified the exact mechanism empirically (not guessed) via a throwaway diagnostic route, deleted right after use: a gradient built from `var(--color-accent...)` tokens fails Framer Motion's animatable-value check every time; the identical gradient with colors resolved to hex does not — confirming the user's own diagnosis. Also reproduced on the real, live `/services` page via `git stash` (temporarily restoring the bug): exactly 9 warnings fire on load (one per mounted `GlowEffect` instance), matching the reported "keeps repeating" symptom; 0 new warnings from hovering/scrolling afterward (fires at mount, not per-interaction). Checked what `static` mode was actually designed to do before picking a fix, per instruction: it was never meant to animate at all, and — since gradients aren't interpolable — it had always just silently snapped straight to the final value with zero real transition anyway, so animating anything (even a hex-resolved version, even just opacity) would add motion that was never part of the design. Real fix: `static` mode's gradient is now a plain CSS `style` value, not routed through `animate` at all — same colors, same instant appearance, nothing visually changes. The dormant `rotate`/`pulse`/`breathe`/`colorShift`/`flowHorizontal` modes have the identical latent bug but are unused anywhere in this codebase (confirmed via grep) — flagged in the component's own comment rather than "fixed" unverifiably. `tsc`/lint/build clean, same 20 routes. Post-fix: 0 warnings on `/services` load and after the same interaction sequence that reproduced the bug; `getComputedStyle` confirms the glow's background resolves to the exact same three accent-token colors as before, with its opacity className still applying correctly; screenshotted the hero glow and a capability-card glow directly — visually unchanged. Spot-checked `/company`, `/how-we-work`, and a `/resources/[slug]` article — 0 warnings on all three. Full details: D-058.
+
+**HOME HERO RING MOVED TO SPLINE, NOT YET SIGNED OFF — BRAND MISMATCH FOUND (D-059, 2026-08-18).** Instructed to replace `PerimeterRing` (D-057) with a Spline-hosted 3D scene. Pushed back first: the instructions described the current ring as canvas/Three.js/Blender-GLB-based, none of which is accurate (grep confirmed zero GLB assets anywhere; the real predecessor is D-057's SVG `PerimeterRing`), and an initial preview of the given scene URL (via the standalone `@splinetool/viewer`, an old pinned CDN version) rendered an unrelated 3D volume-knob widget, not a ring. Mohammad confirmed the URL was correct (verified via raw node names in the file) and attributed the mismatch to the preview method, not the scene — asked for the real integration test instead. Did that: installed the actual current packages (`@splinetool/react-spline`/`@splinetool/runtime`, not an old pinned viewer), rendered in the live dev server, and — via a temporary debug line reading the real loaded `Application.getAllObjects()`, removed before finalizing — confirmed the scene genuinely contains the named objects Mohammad cited (`GapCutter`, `InnerLipFlat`, `OuterRimFlat`, `GrooveLine`, `SweepHighlight`, `GlowSeg1`–`110`). This is unambiguously the correct scene; the standalone-viewer preview really was unreliable (a genuine version mismatch — the old viewer itself warned "file is more recent than the library"), so the correction was right to make. **However**, what the real, correctly-installed integration actually renders — confirmed live at desktop/tablet/mobile, not assumed — is still an opaque grey square panel with a rotary dial/knob and blue tick marks, not a ring, and doesn't blend with the site's navy background. New finding this pass: it also ships with an unremoved "Built with Spline" free-tier watermark (confirmed scoped to the ring's own small container, not breaking out page-wide, but still real third-party branding on the homepage). Logged D-008's supersession for this one component as instructed (narrow exception, not a policy reversal) — `PerimeterRing` left untouched/unreferenced for a one-line revert. Reduced motion wired correctly (`Application.stop()`/`.play()`, confirmed real methods from `runtime.d.ts`) but nothing was observed autoplaying in the scene to actually verify pausing against (two screenshots 3s apart, motion not reduced, were pixel-identical) — the scene may be purely interaction-driven, and the wrapper's `pointer-events-none` means visitors can't trigger it anyway. `tsc`/lint/build clean, same 20 routes, zero horizontal overflow, all required responsive classes preserved verbatim. **Not signed off** — screenshots sent; this is a real content/asset problem on the Spline project's side (or a scope mismatch), not something fixable from this codebase. Full details: D-059.
+
+**SPLINE RING: CAMERA/TRANSPARENCY FIXES CONFIRMED PARTIALLY, GREY BOX ROOT-CAUSED TO THE SCENE ITSELF (D-060, 2026-08-18).** Mohammad fixed two things directly in the Spline project (removed an oversized leftover object breaking camera framing; set the scene background to transparent) and reported the ring now shows correctly, but a grey box still renders behind it instead of true transparency — asked to check this codebase's wrapper/skeleton for any explicit `background-color`. Confirmed the fresh scene had actually propagated first (re-fetched the raw file — new `Last-Modified`/`ETag`/size vs. the last check). Then checked exhaustively, live, via `getComputedStyle` on every DOM node from the wrapper down to the `<canvas>` element itself (not just reading source and assuming): every layer is `rgba(0, 0, 0, 0)`, including the loading skeleton confirmed at `opacity: 0`. Went further since ruling out CSS didn't explain the visible box: confirmed the WebGL context has `alpha: true`, and tried `Application.setBackgroundColor("transparent")` live as a from-our-side safety net (a real runtime method) — no visible effect, kept in the code anyway since it's harmless. Conclusion, reported honestly rather than kept digging past what's inspectable from outside the Spline editor: with CSS and WebGL-context alpha both ruled out, the grey box is real content the scene itself is drawing — almost certainly a leftover opaque panel/backdrop object or a background setting that didn't take effect, not anything fixable from this codebase. Fresh desktop screenshot taken and sent as requested — ring geometry/camera framing confirmed correct now, box still present. `tsc`/lint clean. Full details: D-060.
+
+**SPLINE INTEGRATION REVERTED; HOME HERO BACK TO HAND-CODED `PerimeterRing` (D-061, 2026-08-18).** After D-060's unfixable-from-this-codebase grey box, Mohammad instructed a full revert — remove the Spline integration entirely, rebuild the ring hand-coded (dashed ring + rotating sweep, token colors, no external deps), same wrapper/positioning, reduced-motion respected — matching the approach already used for Services' hero and Cyber Health's `HeroAmbientLoader`. Checked first rather than immediately building something new: `PerimeterRing` (D-057) was still sitting on disk, completely untouched since before the Spline detour, and already satisfied every stated requirement item-for-item. Reverted to it rather than building a redundant near-duplicate — flagged this choice explicitly rather than silently assuming it's what was wanted, since the requirements happened to describe the existing component exactly. Deleted `hero-ring-spline.tsx`; confirmed via grep that `@splinetool/react-spline`/`@splinetool/runtime` were referenced nowhere else, then `npm uninstall`ed both (confirmed zero remaining references in `package.json`/`package-lock.json`). `hero.tsx` imports `PerimeterRing` again, with an updated header comment recording the full D-057→D-059→D-060→D-061 lineage. `tsc`/lint/build all clean, same 20 routes. Verified live via Playwright: zero console/page errors, the sweep's rotation genuinely advances (real animation, re-confirmed after the revert, not assumed still working), zero horizontal overflow on mobile. Fresh desktop screenshot sent — clean hairline ring, correct token colors, no grey box, no camera-framing artifacts. Full details: D-061.
+
+**INDUSTRIES DROPDOWN: MOHAMMAD'S OWN CONSOLE TRACE ANALYZED, DEEPER LOGGING SHIPPED — STILL CANNOT REPRODUCE A FAILURE (2026-08-21).** Mohammad supplied a real console trace from a live reproduction. Read it closely and found something he hadn't flagged: `[industries-debug] click captured` only ever logs while `IndustriesExplorer` is mounted (i.e., already on `/industries`) — so his trace was a same-page click (Education, while already viewing Healthcare), not a fresh cross-page navigation. His own trace showed `click resolved`/`applySelection` both correctly resolving `index: 7, name: "Education"` — confirming (again) the selection logic is right — but stopped short of the actual `scrollIntoView` calls, so extended the diagnostics: log which scroll targets are found (with their rect/position) before scrolling, and a "settle check" sampling `scrollY`/`h2`/selected-tab-id at 0/100/300/800ms after selection to catch any drift or stale render. Re-traced the exact same scenario live via the real Chrome browser twice: both times the full settle trace shows `scrollY` correctly animating toward and resting on Education's position, with `h2`/selected-tab-id flipping to correct within 100ms and staying correct through 800ms — the DOM does briefly show the outgoing industry for under 100ms (React commit lag, expected and harmless) but self-corrects immediately and the resting state is always right. Still could not reproduce an actual failure. Shipped the deeper logging (commit 9c2ecf1) and asked Mohammad to correlate his next captured trace with a screenshot taken at the same moment, and to hard-refresh first in case of a stale cached bundle.
+
+**INDUSTRIES DROPDOWN: RUNTIME-TRACED PER MOHAMMAD'S REQUEST — SELECTION LOGIC CONFIRMED CORRECT, REAL CLICK-DISPATCH FAILURE FOUND (LIKELY = D-056), DIAGNOSTIC LOGGING SHIPPED (2026-08-21).** Mohammad reported 7f7356b still broken, with new evidence: every click lands on "Other SMBs" (the LAST industry) regardless of which was clicked, and the sidebar shows "Professional Services" (unchanged/default) right after clicking Education — an internal contradiction pointing at a state-update failure, not scroll targeting. Explicitly asked for real runtime tracing, not static review or automated assertions. Did exactly that: added temporary `console.log` instrumentation to every relevant step in both `nav-dropdown.tsx` (open/close state, scheduleClose armed/fired, cancelScheduledClose with whether a close was actually pending, the outside-click listener's decision, the item Link's own click) and `industries-explorer.tsx` (parsed slug, click-capture's detected href, `applySelection`'s resolved index/name + which path triggered it), then traced multiple real clicks live via the actual Chrome browser (not Playwright).
+**Result: every time a click genuinely registered, the trace shows the selection logic resolving the exactly correct index/industry, every single time** (e.g. clicking Education → `applySelection({ index: 7, name: "Education" })`; clicking Financial Services → same, correctly). The state/scroll logic from the last two fixes (06c7cd2, 7f7356b) is conclusively confirmed correct — not the source of what's being seen.
+**But separately, and repeatedly:** observed real click attempts, at a coordinate confirmed to be correctly hovering the target (`:hover` CSS engaged — screenshotted proof, e.g. "Construction & Real Estate" shown in its hover-highlighted state), that produced **zero** click-related events in the trace — not even the capture-phase `onPointerDownCapture`, which should be nearly impossible for a real click to bypass. An immediate retry at the identical coordinates then succeeded. This is a real, observed click-dispatch failure on this exact dropdown component, matching D-056's own prior, never-fully-resolved investigation ("clicking an Industries item closes the dropdown but doesn't navigate") almost exactly — reinforcing it with cleaner evidence (confirmed-correct hover position, zero downstream events) rather than resolving it.
+**Honest limitation, stated plainly rather than papered over:** could not conclusively determine, from this environment, whether Mohammad's real-mouse failures share this exact root cause — my own reproduction tool (browser automation) has its own demonstrated click-dispatch reliability issues on this component, so I cannot fully separate "my tool's clicks are unreliable" from "a real product race condition also affects real mice." Rather than keep guessing blind, shipped the diagnostic logging live to production (commit 01bd337, clearly marked TEMPORARY) and asked Mohammad to reproduce with DevTools Console (F12) open and share the actual `[industries-debug]`/`[navdrop-debug]` output from a real failing attempt — the one thing this environment cannot substitute for.
+**Not closed.** Genuinely unresolved pending either his console output or a cleaner reproduction. Full trace data and reasoning above, not just "couldn't reproduce."
+
+**INDUSTRIES DESKTOP BUG ACTUALLY FOUND AND FIXED: Next.js's SAME-ROUTE HASH NAVIGATION NEVER FIRES `hashchange` (2026-08-21).** Mohammad pushed back again with sharper new evidence: every industry link lands at the *exact same spot* — the end of Professional Services' content — regardless of which industry is clicked, meaning the tab state itself wasn't updating, not a scroll-offset problem. That detail (always the SAME industry, not "no scroll") is what cracked it. Re-tested with the actual Chrome browser, instrumented with real `hashchange`/`popstate` listeners: a fresh cross-page click (Home → Education) worked correctly (matches every earlier test — this path was never broken). But then, **while staying on `/industries`**, clicking a *different* industry from the still-visible header dropdown (Education → Healthcare, same route, hash-only change) did nothing — `window.location.hash` genuinely changed to `#industry-healthcare`, but the panel kept showing Education, and the instrumented listeners logged **zero** `hashchange` and **zero** `popstate` events. Root cause: Next.js's `<Link>` updates the URL for a same-route, hash-only navigation via the History API directly (a `pushState`-style call), and `pushState` does not fire a native `hashchange` event — only a true hash-only navigation (typing a new hash, a plain non-JS anchor, or browser back/forward) does. The existing `hashchange` listener in `industries-explorer.tsx` was therefore silently dead for the exact scenario a real visitor hits most (clicking through several industries via the header nav without returning to another page first) — every such click missed it, leaving the display stuck on whichever industry was last reached by an actual full-page navigation. That's exactly why it looked "hardcoded to Professional Services": that's simply whichever industry a fresh navigation had last landed on.
+Fixed in `industries-explorer.tsx`: added a `click` listener on `document` in the capture phase (runs before the `<Link>`'s own handler, so it doesn't depend on or fight Next's routing) that reads the clicked anchor's `href` attribute directly — not `location.hash`, which hasn't updated yet at that point in the capture phase — extracts the target industry, and applies the same selection+scroll logic the hash-based path uses via a new shared `applySelection` helper (both paths now can't drift out of sync). The original `hashchange` listener stays, still needed for real hash-only navigations (typing a hash, back/forward). Verified: clean `tsc`/lint/build (same 85 routes); re-ran the exact failing sequence via the real Chrome browser (Home → Education fresh, then Healthcare from within `/industries`) and confirmed it now updates correctly; a Playwright regression script chained 5 same-page clicks (Professional Services → Education → Healthcare → Manufacturing → Other SMBs, all without leaving the page) and all 5 landed correctly, where before this fix every one after the first would have stuck; the full existing regression suite (all 9 industries fresh-nav on mobile/desktop, reduced-motion) still passes unchanged. 4 pre-existing nav-prefetch 404s observed during testing, confirmed unrelated (same known noise D-016 already documented, unrelated to any hash/click logic).
+
+**INDUSTRIES DESKTOP RE-INVESTIGATED PER MOHAMMAD'S "STILL BROKEN" REPORT — COULD NOT REPRODUCE, LIKELY A PERCEPTION MATCH NOT A BUG (2026-08-21).** Mohammad retested after the mobile scroll fix (06c7cd2, below) and reported desktop (1440px+) is *still* broken, landing "near the final CTA and footer" for every industry, and explicitly asked me not to trust my own prior automated pass. Took that seriously — re-tested using the actual Chrome browser on this machine via `claude-in-chrome` (real mouse hover + click, not synthetic Playwright), against the real live production URL (`https://oragrol-website.vercel.app`), at desktop width. Note: the browser's real `innerWidth` reported 1920px despite requesting a 1440×900 window (some local display-scaling factor) — still solidly desktop/`lg` layout either way, not the `<1024` mobile path my last fix touched.
+Clicked Education, then Financial Services, from a fresh Home-page load each time (the exact real click path: hover the header's Industries trigger, click the dropdown item). **Both landed correctly** — the right industry's Risk/Priorities/Approach/Next Step content displayed, the matching sidebar tab highlighted blue, confirmed via both screenshots and exact JS-computed values (`scrollY`, target/panel `offsetTop`, `h2` text). Also explicitly checked the failure modes Mohammad raised were the cause: retried after a forced no-cache refetch (`fetch(..., {cache:"no-store"})` — 200, ETag present, nothing stale) and re-checked Vercel's domain list — still zero custom domains, so `oragrol-website.vercel.app` is definitively the real production URL, not a different one going stale.
+One real, findable nuance for the **Education** case specifically (not Financial Services): the `/industries` page is short (~2045px total, ~2.4 viewport-heights) once a single tab's content is showing, and Education's content happens to sit low enough on the page that the `FinalCta` section ("Know where you stand...") becomes partially visible in the *same* viewport, directly below the correctly-shown Education content — confirmed via exact offsets this is not scroll overshoot past the content (the content itself is fully visible, unclipped, at the top of that same view). This is a plausible explanation for the "near the footer" perception without an actual bug: a human glancing at that screen sees the dark FinalCta band prominently below and could read that as "it went to the footer," even though the correct content is what's actually on screen above it.
+**Could not reproduce the reported symptom of the industry content genuinely not showing.** Reported this back to Mohammad with the evidence (screenshots + exact numbers) rather than re-asserting "already fixed," and asked for more specific repro details (exact browser/OS, whether a hard refresh was done, whether the "footer" landing happens for every industry identically or specifically ones like Education where FinalCta is nearby) rather than continuing to guess blind. Not marked resolved — genuinely unresolved pending his reply, same honesty standard as D-056's inconclusive root-cause investigation.
+
+**INDUSTRIES DEEP-LINK SCROLL FIXED: MOBILE NEVER SCROLLED TO THE PANEL (2026-08-21).** Mohammad reported clicking any Industries nav dropdown link lands "near the footer" instead of the target industry, suspecting missing ids, a hash-scroll timing bug, or a sticky-header offset issue. Checked all 3 directly rather than guessing: ids DO exist (all 9 tab buttons render unconditionally with real ids regardless of `activeIndex`, confirmed by reading `industries-explorer.tsx`); tested the actual click flow live via Playwright across cold loads, warm client-side `<Link>` transitions, dev mode, and a production build — **desktop worked correctly in every single one of those** (confirmed via distinct, correct scroll positions and headings per industry, not just "didn't crash"). The real, reproducible bug was mobile-only: the horizontal tab strip's own `scrollIntoView({ block: "nearest" })` is *correctly* a no-op whenever that strip is already inside the viewport — true on every mobile page load, since the strip sits near the top of the page. That left the actual detail panel (stacked below the tab strip on mobile, `grid-cols-1` until `lg:`) off-screen with nothing telling the visitor a selection happened; internally the right tab/panel WAS selected (`<h2>` always updated), just never scrolled to. Couldn't reproduce the literal "near the footer" framing verbatim, but this is the same underlying failure class (a link that promises specific content doesn't bring it into view) — flagged that distinction rather than silently claiming an exact match. Fixed in `industries-explorer.tsx`: below the `lg` breakpoint (1024px, the same cutoff this component's own layout already uses), the effect now also scrolls `[role="tabpanel"]` (a stable selector — there's only ever one, regardless of which industry is active) into view with `block: "start"`, deferred one `requestAnimationFrame` so the position measured is the post-switch panel, not the outgoing one. Desktop's already-working path is untouched (guarded by the same viewport check). Verified: clean `tsc`/lint/build (same 85 routes); a full regression script hit all 9 industries on a real narrow mobile viewport (375px) in a production build — all 9 now land on the correct heading with real scroll (previously stuck at `scrollY: 0` for every one); reduced-motion and desktop (3 spot-checked industries, each landing at a distinct correct scroll position) both still pass; zero console errors, zero horizontal overflow at 375px/1440px.
+
+**GROWTH CARD "RECOMMENDED" BADGE FIXED: TRANSLUCENT FILL, NOT A PAINT-ORDER BUG (2026-08-21).** Mohammad reported the featured Growth card's "RECOMMENDED" badge looked clipped/hidden behind the card's top border, suspecting `overflow`/z-index. Checked his suggested causes first rather than guessing: `overflow` was `visible` up the entire ancestor chain, and the badge was already the topmost element at its own DOM position by every computed-style/hit-test check. Tried the standard fix anyway (`isolate` on the card + explicit `z-10` on the badge) and it changed **nothing** visually — itself the evidence this wasn't a stacking-context bug. Root-caused properly via a cropped 3x screenshot (showed the ring's stroke crossing straight through the badge's own letters) plus an empirical test — forcing the badge's background fully opaque inline made the artifact disappear instantly. Real cause: the shared `Badge` component's "accent" tone is a **translucent** `bg-accent/10` fill (10% opacity, designed for inline labels next to body text) — reused here for a ribbon straddling the card's own border, the ring underneath was simply showing through the badge's own see-through background the whole time, never an actual paint-order problem. Fixed in `recurring-packages.tsx` by rendering that one badge as a plain opaque pill (`bg-accent-strong text-white`, the same accessible pairing `Button`'s `primary` variant already uses per D-010) instead of routing it through `Badge`'s translucent tone — not a new `Badge` prop, since inventing an opaque-tone variant for one call site isn't worth widening its API. Verified: clean `tsc`/lint/build (same 85 routes), before/after cropped screenshots confirm the ring no longer shows through the text, full regression pass unchanged (all package content, nav link, zero overflow). Committed (`e31557f`) and pushed to `main`, matching the same production URL confirmed live in the prior session (`https://oragrol-website.vercel.app/business-automation`).
+
+**"PACKAGES NOT SHOWING ON LIVE SITE" REPORT INVESTIGATED — NO CODE BUG FOUND, ALREADY LIVE (2026-08-21).** Mohammad reported D-065's new Business Automation packages section wasn't appearing on the live site and asked to investigate, fix, and push to production. Investigated each of his 3 suggested causes directly rather than assuming: (1) `git show --stat f87ee5e` confirms the commit added real component files (`project-offers.tsx` +104 lines, `recurring-packages.tsx` +187 lines, `page.tsx` +12 lines wiring them in) — not a data-only change; (2) `git diff HEAD` on the working tree came back empty — nothing was reverted locally since that commit; (3) a completely clean rebuild (`rm -rf .next && npm run build`) followed by grepping the raw generated static HTML (`.next/server/app/business-automation.html`) directly confirmed "Assessment," "Contact us," "Recommended," etc. are genuinely baked into the production build output, not just present in dev-mode. No code bug existed anywhere in the chain from source to build output.
+Then checked the actual deployment, since GitHub already showed `f87ee5e` on `origin/main` with a completed Vercel "Production" deployment (unexplained — no push happened in the prior session's own visible actions, and this project has no push-related git hooks; the commit was apparently already pushed by some process outside this conversation's own record). Linked the project via `vercel link` (this environment had no prior Vercel auth) and ran `vercel domains ls` / `vercel inspect`: **zero custom domains are registered on this Vercel project** — there is no `oragrolglobal.com`-style production domain, only Vercel's own `*.vercel.app` aliases. The latest deployment (matching `f87ee5e`) is correctly aliased to all 3 stable production URLs (`oragrol-website.vercel.app`, `oragrol-website-oragrol.vercel.app`, `oragrol-website-git-main-oragrol.vercel.app`). Fetched `https://oragrol-website.vercel.app/business-automation` directly (a fresh, uncached request) and confirmed live: Assessment → Implementation → Starter → Growth (Recommended) → Scale → Enterprise/Custom (Contact us), in the correct order, exactly as built.
+**Conclusion: nothing to fix — the packages section was already live at the real production URL at the time of the report.** Most likely explanation for what Mohammad saw: a stale browser/CDN cache from before the deployment finished, or checking a stale bookmarked URL rather than the current production alias — not something confirmable after the fact, reported as the likely cause rather than a proven one. **Real gap surfaced by this investigation, unrelated to the reported symptom:** this Vercel project has no custom domain configured at all — worth confirming with Mohammad whether that's intentional (pre-launch, still on the default `*.vercel.app` URL) or a real gap to close before public launch. `.gitignore` gained `.vercel`/`.env*` entries as a side effect of linking the project (prevents ever committing the local Vercel link file or `.env.local`, which may now carry a `VERCEL_OIDC_TOKEN`) — reviewed, safe, kept.
+
+**BUSINESS AUTOMATION PACKAGES ADDED: REAL TIER 2 PRICING (D-065, 2026-08-21).** Mohammad supplied `oragrol-tier2-packages-data.json` — 2 one-time/project offers (Assessment $5,400, Implementation $17,850) and 4 recurring packages (Starter/Growth-featured/Scale/Enterprise-Custom) with real service lists, monthly/annual/month-to-month pricing, and per-tier `scope_limits`. Asked upfront where this should live and decided (with reasoning, before building): new sections on the existing `/business-automation` page, not a separate route — matches the site's whole nav-anchor-into-one-page architecture (D-055) and Solutions' own precedent (D-064) of packing a comparably-sized packaging structure into one page. Built: `packages-data.ts` (new data layer, JSON moved into `app/data/`), `ProjectOffers` (Assessment/Implementation, dashed-border "satellite" cards distinct from the recurring tiers per instruction, "Step 1/Step 2" labeling matching the real funnel order), `RecurringPackages` (4-tier `TierCards`-style grid + a new per-tier `scope_limits` block Solutions' tiers don't have; Growth gets a "Recommended" badge + accent ring; Enterprise/Custom shows "Contact us" + a `/contact` CTA instead of its calculated price, driven by checking for the data's own `display_note` rather than a name match). Page flow: Hero → ProjectOffers → RecurringPackages → existing Categories (individual à la carte services, now carrying `individual_services_note` in its intro) → FinalCta. Mohammad also asked for a nav anchor — added "Packages" as the first item in the Business Automation nav dropdown, linking to `#packages`. Verified: clean `tsc`/lint/build (same 85 routes), live Playwright pass (all real content renders, zero leaked internal Enterprise pricing, nav link resolves desktop+mobile, zero console errors, zero horizontal overflow at 1440/390px). One correctly-diagnosed non-bug: an initial case-sensitive text check for "Recommended"/"Scope & limits" came back false — turned out to be Caption/Badge's own `uppercase` CSS transform changing the rendered text case, not missing content, confirmed by reading the actual raw text before concluding anything. Flagged, not fixed: the sitewide "Under attack?" pill lightly overlaps the Implementation/Enterprise cards at some scroll positions — same standing D-044-class global-component issue. Full details: D-065.
+
+**SOLUTIONS: REAL TIER NAMES/PRICING/SERVICES REPLACE "LEVEL 01/02/03" (D-064, 2026-08-20).** Mohammad supplied `oragrol-solutions-data.json` — real names (Essential/Growth/Enterprise), pricing, per-tier included-service lists, a 12-service `addon_menu`, `penetration_testing_addon`, and a `pricing_confidence_note`. Explicit instruction: keep the existing visual design, no new components. Built: `solutions-data.ts` data layer (JSON moved into `app/data/`), `tier-cards.tsx` rewritten with real names/pricing/wrapped-`Badge` service lists (same card shell/icons/accent bars unchanged), new `addon-menu.tsx` (12 real add-ons, reuses `PentestAddon`'s own "+" icon concept rather than picking 12 new icons), `pentest-addon.tsx` content updated with real pricing (position/styling unchanged per instruction) plus the pricing confidence note as small print. Deliberately excluded `gross_margin_note` (internal cost data, not customer-facing, not in any instruction) — flagged, excluded at the data-layer level. Caught and fixed one real bug before it shipped: an invented `as="span"` prop on `Text` (which doesn't support one) would have produced invalid nested-`<p>`-in-`<span>` HTML — fixed to a plain styled `<span>`. Fixed the same class of nav-dropdown staleness found on Services/Business Automation: `SOLUTIONS_DROPDOWN`'s hardcoded "Level 01/02/03" labels now source from `solutions-data.ts` directly. Verified: clean `tsc`/lint/build, live Playwright pass (real names/prices, zero stale "Level 01" text, zero gross-margin leakage, all 12 add-ons render, updated nav dropdown, zero overflow). One correctly-diagnosed test-methodology false alarm, not a real bug: an initial `fullPage` screenshot without prior scrolling showed the Add-ons/Pentest sections as empty gaps (frozen `whileInView` Reveals, same known quirk as D-014/D-057) — a rescreenshot with real incremental scroll confirmed everything renders. Full details: D-064.
+
+**BUSINESS AUTOMATION SPLIT INTO ITS OWN TOP-LEVEL PAGE/NAV ITEM (D-063, 2026-08-20).** Same day as D-062, Mohammad requested a structural change: Business Automation as its own top-level nav item, not a dropdown column + anchor-scrolled tier of `/services`. Built: new `/business-automation` page (own hero, mirroring `services/hero.tsx`'s visual system exactly) + `NAV_LINKS` entry; `/services` now shows only its 10 cybersecurity categories (real 1-10 numbering unchanged); the 25 Business Automation service detail pages moved from `/services/[code]` to a new `/business-automation/[code]` route (chosen via `AskUserQuestion` — full URL/breadcrumb consistency, cheap since D-062's pages were unreviewed/unindexed), with page-local 1-5 display numbering on its own hub page while the real source `code`s (C11-C15) stay unchanged. Extracted `CategoryRow`/`TierSection` out of `live-services.tsx` into a new shared `category-section.tsx` so both pages render from one implementation, not two copies that could drift. Breadcrumbs on `service-detail.tsx` are now tier-aware (derived from the real category code, not passed in separately). Nav dropdown split into two single-column configs (10 + 5 items) in place of D-062's one combined 2-column version. Flagged, not fixed: a 7th top-level nav item makes D-054's already-known 1024px cramping somewhat worse. Verified: clean `tsc`/lint/build (39 + 25 = 64 static service routes confirmed in build output), live Playwright pass (10 vs. 5 category counts, correct breadcrumbs on one service per tier, the old `/services/c11-s01` URL genuinely 404s, nav shows all 7 items with correctly-scoped dropdowns), screenshots reviewed directly. Full details: D-063.
+
+**SERVICES FULLY RESTRUCTURED: REAL 15-CATEGORY/64-SERVICE TAXONOMY, D-034 SIGN-OFF SUPERSEDED (D-062, 2026-08-20).** Mohammad supplied real content (`oragrol-services-data.json`/`oragrol-pricing-reference.csv`) and instructed a full replacement of the 8-capability structure D-034 had signed off as complete. Built: `services-data.ts` data layer (JSON moved into `app/data/`, imported directly — not hand-transcribed), `live-services.tsx` rewritten to render 15 category rows (10 Cybersecurity + 5 Business Automation) across two top-level sections reusing the existing white/light-blue environment pattern, new `ServiceCard` (compact per-service card reusing `CapabilitySpotlightMark`) and `ServiceDetail` (new `/services/[code]` dynamic route, 64 static pages, same pattern as `/resources/[slug]`) components. The existing hero-scale schematic shell (`CapabilitySpotlightVisual`/`HeroSchematicVisual`) now renders once per category, not per service — confirmed first that `HeroSchematicVisual` is hardcoded to exactly 3 nodes with no count parameter, so it stays exactly as-is as decoration rather than being made to (falsely) represent a literal service count. Two real consequences of the restructure were found and fixed, not left silently broken: the site-wide nav's Services dropdown (hardcoded to the old `#capability-0N` anchors) and the Services page's own hero copy ("Eight capabilities" + a giant ghost "8" — now "Fifteen categories"/"15"), both flagged to Mohammad before fixing. `additional-capabilities.tsx` removed from the render tree (left on disk, unreferenced). Verified: clean `tsc`/lint/build (64 static service routes confirmed in build output), live Playwright pass (15 category ids, 64 unique service links, zero overflow, markdown-bearing service renders correctly, unknown code 404s, nav dropdown resolves to the correct new links), screenshots reviewed directly. Full details: D-062. **This supersedes D-034's "Services signed off, complete" status** — the page has materially changed and needs a fresh review, not carried forward as still-approved.
+
+**CAPABILITY 3 "BUILD" REQUEST: ALREADY LIVE, NO CHANGE MADE (2026-08-19).** Asked to build the Services Capability 3 (Vulnerability Assessment & Management) card, sourcing copy from `oragrol_services_page_content.md` and generating its visual via 21st.dev Magic MCP. Checked memory first per project rules and found two mismatches with the request's premise, flagged before writing any code (not silently built over): (1) Capability 3 is already fully live in `live-services.tsx` with real Challenge/What Oragrol Does/What You Get/Outcome copy and its own dashboard-style visual (`CapabilityDashboardVisual`, shared with Capability 2 by deliberate design — D-033) — Services was already signed off complete (D-034); (2) `oragrol_services_page_content.md` does not exist anywhere on the machine (repo, home dir, Downloads all checked) — same null result as the prior D-054 check. Found an unrelated empty 14-category folder tree at `Downloads\ORAGROL_SERVICES\` (dated 2026-08-18), structurally different from and much larger than the current 8-capability structure, every subfolder empty — surfaced to Mohammad rather than assumed relevant. Mohammad asked for live verification rather than trusting the decision log/code read alone — did that via a Playwright script against the running dev server (`localhost:3000/services#capability-03`), captured both `innerText` and a screenshot, confirmed byte-for-byte match with the code and with D-033's description. Mohammad confirmed: correct as-is, no changes needed. Zero files changed this session.
+
+**INDUSTRIES DROPDOWN SCROLL BUG: ACTUALLY ROOT-CAUSED AND FIXED — Next.js's own `<Link>` scroll-restoration was overriding our already-correct scroll (2026-08-21).** Picked up Mohammad's exact evidence (console showing `h2:"Education"`/`scrollY:936` holding steady across 100/300/800ms settle checks, but the visible viewport showing only the tail of Approach's text into the footer, no h2/Risk/Priorities on screen) against the working tree, which already had an uncommitted fix from earlier the same day (scrolling `[role="tabpanel"]` itself with `block:"start"` instead of the sidebar tab button — the fix described in `industries-explorer.tsx`'s own "REAL ROOT CAUSE" comment). Verified that fix live via `claude-in-chrome` first and reproduced Mohammad's exact symptom anyway — so the tabpanel-target fix, while a real and correct improvement, was not the whole story. Switched to Playwright per CLAUDE.md §7 (the `claude-in-chrome` tab's `document.hidden===true` quirk, documented repeatedly elsewhere in this file, makes it unreliable for anything scroll/animation-timed) and built a Playwright rAF-based per-frame `scrollY` tracer, not just the 0/100/300/800ms settle-check snapshots the app's own diagnostics sample. That tracer was decisive: on every same-page dropdown click (already on `/industries`, clicking a different industry), `applySelection`'s own scroll lands **correctly** almost immediately (settle-check `delay:0` already shows the right `scrollY` with `h2VisibleInViewport:true`) — then, ~100-300ms later, the position silently jumps again to a wrong value and freezes there through every later check, which is exactly the "settled, but wrong" shape in Mohammad's evidence. Root cause of that second, later mover: Next.js's `<Link>` defaults `scroll={true}`, so its own router does a SECOND, independent post-navigation scroll-to-hash via `document.getElementById(hash)` — which resolves to the desktop sidebar TAB BUTTON (`id="industry-<slug>"`, the real deep-link anchor, intentionally kept there for standalone `#industry-x` links), not the panel — reintroducing the exact same "scrolls to the tab's position in an unrelated list" bug one layer up, from Next's router instead of our own code, on every single same-page click, not intermittently. Confirmed by disabling it: `scroll={!item.href.includes("#industry-")}` on the two `<Link>`s in `nav-dropdown.tsx` that render dropdown items (both the desktop two-column-grid branch and the shared mobile-accordion branch), leaving every other dropdown's hash links (Business Automation's `#packages`, Solutions' `#pentest-addon`) on Next's default since they have no competing custom scroll logic. Also hardened the panel-fix's own secondary call while investigating: `hTarget?.scrollIntoView(...)` (the mobile horizontal-strip position call) now only fires when `hTarget` actually has a rendered box (`getClientRects().length > 0`) — false on desktop where that element is `display:none` via an ancestor, so it's skipped there; unchanged on mobile. This alone did not fix the bug (confirmed by testing it in isolation before finding the real Next.js router cause) but is still a correctness improvement worth keeping.
+Verified with real browser automation, not just code review, per explicit instruction: a Playwright script chained all 9 industries via the header dropdown without leaving `/industries` (the exact reported scenario) — all 9 land with the correct `h2` visible in-viewport, `scrollY` stable at 507 (matches the panel's `scroll-mt-28` target) — where every one of them failed before the fix; fresh cross-page navigation re-tested for 4 industries across the full index range (Healthcare/Technology/Education/Other SMBs, shallow to deepest) — unaffected, still correct; mobile hamburger-menu path re-tested for 2 industries — correct. Then re-verified visually via `claude-in-chrome` (real mouse hover + click, not scripted) for 3 industries (Education, Financial Services, Manufacturing), each landing with the full h2/Risk/Priorities/Approach/Next-Step panel visible in the viewport immediately, screenshots inspected directly. `npx tsc --noEmit`, `npm run lint` (1 pre-existing, unrelated warning in `nav-dropdown.tsx` confirmed present on `HEAD` via `git stash`, not introduced here), and `npm run build` (same 85 routes) all clean.
+Kept the existing `[industries-debug]`/`[navdrop-debug]` console logging in place, per instruction — still useful, and this investigation is exactly the case where its "settle check" shape (correct-then-wrong) was the key clue.
+
+**HEADER REDESIGNED: TWO-TIER STRUCTURE (BELL BUSINESS REFERENCE), NAV COLLAPSE NOW MEASUREMENT-DRIVEN NOT GUESSED (D-066, 2026-08-21).** Requested: a thin utility bar (EN | FR, right-aligned, room left for a future Blog/Login link) above the main nav row; "Cyber Health" dropped as a standalone nav link (duplicated the CTA's own destination); desktop CTA shortened to "Get Score" (mobile keeps the full text). Explicit instruction to fix the ROOT CAUSE of the nav/logo overlap bug, not patch specific widths: `NavBar`'s old `breakpoint="lg"` was a single guessed Tailwind breakpoint, never verified against the nav's real rendered width — exactly what `SiteHeader`'s own comment had already flagged once a 7th item (Business Automation) made it worse, but never fixed.
+Rebuilt `NavBar` (`app/components/ui/nav.tsx`) to measure live instead of guessing: the desktop nav+CTA cluster is rendered a second time, invisibly (`visibility:hidden`, same exact React node both times — zero drift risk between what's measured and what's shown), and its real `scrollWidth` is compared via `ResizeObserver` against the row's actual available width; the cluster renders only when it genuinely fits, the hamburger trigger the instant it doesn't — at any width, not just tested ones. Removed the old "two places must independently agree on a breakpoint" fragility entirely: the mobile trigger's existence in the DOM is now the single source of truth the mobile panel gates on (no more separate `lg:hidden` on the panel itself).
+Real cross-cutting consequence caught before it could regress anything: the new utility bar changes the fixed header's total height (80px→116px), which every `scroll-mt-28`/`top-20`/`mt-24` value elsewhere had silently assumed. Added `--header-height: 116px` to `tokens.css` and repointed the mobile panel, the search dialog, and all 6 `scroll-mt-28` anchor-scroll usages (Industries' tabpanel, Business Automation's `#packages`, Solutions' `#pentest-addon`/`#tier-0N`, Services' category rows) to `scroll-mt-[calc(var(--header-height)+2rem)]` — so none of them can drift out of sync with the real header height again.
+Verified with real automated testing across the full requested range, not spot checks: a Playwright sweep at every 50px from 1024–1920px (19 widths) — zero overlap/clipping/page-overflow, exactly one of {nav, hamburger} visible at every width; a finer 5px sweep across the transition zone (1000-1090px) confirmed exactly one clean handoff with no dead zone; a 2560px spot check held too. Re-verified the 4 `--header-height`-dependent anchor targets (including today's own Industries fix) still land correctly. `tsc`/lint (1 pre-existing unrelated warning)/build all clean, same 85 routes. Real-browser (`claude-in-chrome`) and Playwright screenshots at 1024/1074/1440/1920px confirm clean spacing visually, matching the numeric checks. Full details: D-066.
+
+**HEADER FOLLOW-UP: HERO OVERLAP REGRESSION FIXED, WIDE-VIEWPORT GAP FIXED, CTA COPY FIXED (D-067, 2026-08-21).** Mohammad reported 2 real issues after D-066 plus a copy note: (1) REGRESSION — at 14-inch/narrower desktop widths, Home's Hero eyebrow/heading rendered UNDER the header (a direct side effect of the header growing 80px→116px); (2) SPEC GAP — at 24"+/1920px+ monitors, an unbounded, awkward empty gap opened between the edge-pinned logo and edge-pinned nav cluster; (3) "Get Score" (D-066) is ambiguous, doesn't say what's scored.
+**Honest accounting of the miss, not glossed over:** D-066's Playwright sweep varied WIDTH across 19 values but held HEIGHT constant at a generous 900px for every single one — Home's Hero is `h-[100svh]` with content flex-`justify-center`ed inside it, so its vertical position depends on viewport HEIGHT, which the sweep never tested. Real 14-inch laptops (1366×768, 1440×900, MacBook 14" 1512×982) are shorter, not just narrower, than 900px — short enough that centered content collided with the taller header. The nav-layout checks were genuinely thorough for what they measured (logo/nav/CTA/search/hamburger overlap); they just never checked whether PAGE CONTENT below the header could collide with it.
+Fixed: `home/hero.tsx`'s content `Container` gets `pt-[var(--header-height)]`, reserving the header's real height as the floor of the box `justify-center` centers within — content can't render above the header at any viewport height now, not just tested ones. Confirmed no other page hero uses this `100svh`+`justify-center` pattern (every other page hero is `py-24 md:py-32` in normal flow, already clear) — isolated to Home. Wide-gap fix: wrapped `NavBar`'s row (not the `<header>` itself, which stays genuinely full-bleed per D-001) in `mx-auto max-w-[1440px]` — reusing `Container`'s existing `xl` tier rather than inventing a number, so the nav row lines up with the same content column Home's Hero/footer already use. Gap now measured identical (328.8px) at 1440/1920/2560px, where before it grew unbounded. CTA: "Get Score" → "Get Cyber Score" (desktop only; mobile's full "Get Your Cyber Health Score" untouched).
+**Verified properly this time:** tested the exact gap that was missed — 7 realistic width×height combos including the named 1366×768/1440×900/1512×982 laptop resolutions, plus 1920×1080/2560×1440 and an adversarial narrow-tall combo — all pass, with real screenshots inspected directly at 1366×768 and 1440×900 (not just numeric asserts). Re-ran D-066's full 1024-1920px nav-overlap sweep — no regression from the new max-width wrapper. Confirmed the gap is bounded via a 2560px screenshot. `tsc`/lint (same pre-existing warning)/build all clean, same 85 routes. Full details: D-067.
+
+**ATMOSPHERIC TRANSITIONS SHIPPED (D-069, 2026-08-22); PRICING-CLIPPING FIX (D-070, same day); SERVICES C01 VISUAL PILOT BUILT THEN REJECTED AND CLEANLY REVERTED (2026-08-22).** Three back-to-back items, backfilled here since the compacted session that did them ran long enough that this file fell behind:
+- **D-069** — global `Section` component gained `transitionFrom`/`transitionTo`/`transitionDirection` props rendering a soft `oklab`-interpolated gradient overlay at section boundaries, replacing hard environment-color cuts sitewide. Full mechanism/decisions in DECISIONS.md.
+- **D-070** — Mohammad reported the new Services card grid's background fade "covering content" (pricing clipped). Framed as a z-index bug; root cause was actually a Tailwind arbitrary-value `calc(100%+3rem)` missing its required underscore-escaped spaces (`calc(100%_+_3rem)`), silently producing invalid CSS that got dropped — confirmed via `getComputedStyle` (287.25px measured vs. 335.25px intended), not by trusting the z-index framing. Fixed by removing the margin/calc workaround entirely (featured cards now get visual weight from content only). Also hardened `Section`'s overlay with explicit `-z-10` + `isolate` per Mohammad's request for an architectural guarantee, even though the stacking-order theory itself wasn't the actual bug.
+- **C01 pilot (`fb34519`) → reverted (`7af7c6e`).** Built one full category (C01, 4 services) as bespoke per-service visual scenes (node-topology diagram, checkpoint pathway, governance-tree, OR-ring vantage point) per an explicit pilot brief. **Mohammad rejected it outright as visually incorrect** and identified the root cause of the miss: an earlier brief had been interpreted too literally as "create custom visual compositions for each service," which is explicitly NOT the intended direction — no per-category bespoke visual systems, no oversized isolated visual blocks, no arbitrary asymmetric positioning. Cleanly `git revert --no-edit fb34519`'d (not reset); confirmed via diff that D-069/D-070's own files were byte-identical before/after; confirmed C02/C05/pricing/other pages unaffected via production screenshots. This correction is logged as DECISIONS.md D-071 so the "one bespoke visual per category" direction isn't attempted again.
+
+**SERVICES LANDING PAGE BUILT: EDITORIAL HERO + OVERVIEW PANELS (D-072, 2026-08-22, commit `611871d`).** A new reference image (an AI-marketing hero mockup, composition-only — branding/content/colors/typography stayed Oragrol's own, current D-068 palette not the retired hex values the brief itself quoted, flagged both times) drove a 2-level restructure of `/services`, dictated explicitly by Mohammad after he rejected my attempt to ask a scope-narrowing question:
+- **Level 1 (new, landing/introduction):** `hero.tsx` rewritten into one large rounded panel (logo/badge/H1/description left, `ServicesNetworkVisual` — the existing D-008/D-015 illustration, scaled up rather than replaced — plus a faint "10" numeral right, `GlowEffect` given a per-call-site warm-orange `colors` override against its Deep-Blue sitewide default). New `overview.tsx` — a second panel with mirrored asymmetry (real computed 10-categories/39-services big-number stat pair left, the exact eyebrow/heading/intro copy `live-services.tsx` used to render at its own top, relocated not rewritten, right).
+- **Level 2 (existing architecture, untouched beyond removing its own now-relocated intro block):** `live-services.tsx` keeps the identical `CategoryNav`/`ServiceCategoryRow`-per-category/`Container size="2xl"`/D-069-D-070 behavior it already had. `/business-automation` still renders through its own untouched `CategorySection`/`ServiceCard`/`CapabilitySpotlightMark` — confirmed untouched via `git diff --stat` listing only the 4 intended files.
+- No human/robot face (explicitly forbidden), no renamed categories/codes/services/pricing, no new marketing copy, no new visual system beyond scaling the existing network visual.
+- **Verified:** `tsc`/lint (1 pre-existing unrelated warning)/build all clean, same 85 routes. Local Playwright at 1440/834/390 — zero console errors, zero horizontal overflow. Caught and correctly diagnosed a screenshot-methodology false alarm: a raw non-scrolled full-page capture showed the new Overview panel's stat numbers/copy as empty — traced to `Reveal`'s scroll-triggered `IntersectionObserver` animation not having fired for off-screen content during a stitched full-page capture, not a real bug (confirmed by re-capturing after a simulated scroll-through, and by a direct DOM/computed-opacity check finding zero hidden elements). Spot-checked `c01-s01`/`c05-s03`/`c10-s01`/`/business-automation` all 200. Pushed to `main` (`7af7c6e..611871d`), Vercel deploy confirmed `"state":"success"` via GitHub's commit-status API, and production screenshots at all three breakpoints matched local pixel-for-pixel. One pre-existing, out-of-scope observation (not a regression, not fixed): the sitewide fixed "Under attack?" pill (`EmergencyCta`, D-017/D-044/D-045, rendered once from `RootLayout`) visually overlaps whatever content lands under it at a given mobile scroll stop — inherent to any fixed-position CTA over scrollable content on any page.
+
+**SERVICES LANDING PAGE VISUAL-CORRECTION PASS (D-073, 2026-08-22, commit `5a44b40`).** Mohammad accepted D-072's structure but rejected its visual direction: too much brown/orange (both new panels used a full-panel accent-family `GlowEffect` wash inside a `bg-surface/40` rounded card), the hero visual read as "a simple diagram in a card" rather than a dominant cinematic composition, and the two panels repeated the identical rounded-card treatment back to back. Fix scoped to exactly `hero.tsx`/`overview.tsx` (git-diff confirmed) — service architecture, data, pricing, nav, and C01/C02/C03 untouched. Both sections' rounded card + panel-wide glow wash removed entirely; they now sit flush on the page's own dark ground. Hero keeps only two small, restrained glows (shared Deep-Blue ambient default + one tightly-scoped accent rim, not a wash) and layers `HeroSchematicVisual` (dominant foreground) with `ServicesNetworkVisual` reused a second time at ~7% opacity as a faint depth layer behind it — no new illustration system. Composition uses a plain CSS grid (no absolute-positioning): text/visual `1fr`/`1.3fr` row, visual side's right padding zeroed at `lg`+ so it bleeds to the row's own edge instead of sitting inset in a card, `overflow-x-clip` guarding the glow's blur/scale from creating a horizontal scrollbar. Overview dropped its glow/card entirely, distinguished from the hero by a thin top rule and a tighter asymmetric grid instead of a second colored panel. Typography/content unchanged (the brief again asked for IBM Plex Sans on body text, contradicting the standing sitewide rule — flagged, not applied, third occurrence of this same flag). **Verified:** `tsc`/lint (same 1 pre-existing warning)/build clean, same 85 routes. Playwright at all 6 explicitly required breakpoints (1440/1280/1024/768/390/375) — zero console errors, zero horizontal overflow at every one. Confirmed visually: no clipping/overlap, pricing fully visible, nav functional, C01/C02/C03 and the rest of the category list pixel-identical to before this pass. Pushed to `main`, Vercel `"state":"success"` confirmed for `5a44b40`, production screenshots (desktop/mobile) matched local pixel-for-pixel.
+
+**HERO LOGO/BADGE REMOVED; HEADER-CLEARANCE REGRESSION CAUGHT AND FIXED (D-074, 2026-08-22, commit `72ce1d1`).** Mohammad's correction: the hero's logo (duplicating the main nav's own) and its "Services" badge don't belong — removed both, no replacement label/eyebrow/marker, hero now opens directly on the H1. Caught before shipping: that removed stack's own height had been the hero's only real top clearance beneath `SiteHeader` (`fixed`, off normal flow — every page independently reserves `--header-height`, 116px). Removing it without compensating put the H1 under the fixed header on mobile — confirmed via screenshot, not assumed. Fixed the same way D-067 fixed the identical bug class on Home: `pt-*` now derives from `calc(var(--header-height) + Nrem)` instead of a flat value that happened to work by accident. Verified: `tsc`/build clean, same 85 routes, Playwright at all 6 breakpoints zero errors/overflow, header clearance re-confirmed specifically at mobile. Pushed, Vercel `"state":"success"` confirmed for `72ce1d1`, production screenshots matched local.
+
+**HERO VISUAL REPLACED WITH THE APPROVED PHOTOGRAPHIC ASSET (D-075, 2026-08-22, commit `b41f112`).** Mohammad instructed bringing the "AI face" photo from `_reference/8878.png` into the hero as the dominant visual, replacing the illustrated network/schematic. **Before implementing, flagged a real problem**: that source file is a screenshot of a *different company's own marketing hero* — carrying that company's own logo and headline baked into the pixels — so using it as-is would be reproducing someone else's copyrighted/branded asset, and the person depicted appears to be a real model licensed to that other company, not to Oragrol (right-of-publicity exposure). Asked via `AskUserQuestion` rather than silently complying or silently reverting to the old rule; Mohammad selected "you confirm you own rights to this exact file," which is the explicit rights confirmation the option was written to capture. Proceeded on that basis, but as an additional safeguard cropped the source (1017x618) down to `public/images/services-hero-visual.jpg` (457x618, ~65KB, via `sharp`) — isolating only the face/visual portion (the right ~45% of the frame) and excluding the other company's own logo/headline text (left ~55%), which weren't part of the confirmed rights regardless of the face photo itself. No AI regeneration, no illustrated replacement — the real photograph, cropped only to isolate the subject. Hero: no card/border/panel, image sits at its native 457:618 aspect ratio (object-cover only crops if a height cap engages at the very widest viewports — never stretches/distorts), sized by height with width auto-derived, `lg:ml-auto` pushes it to the row's own right edge once two-column activates. Removed `HeroSchematicVisual`/`ServicesNetworkVisual`/`GlowEffect` from this hero entirely (no longer needed) — both components are still live elsewhere (`service-category-row.tsx`, `capability-spotlight.tsx`), untouched. Supporting copy shortened to the exact wording supplied with this brief. D-074's logo/badge removal and header-clearance fix untouched. **Verified:** `tsc`/lint (same 1 pre-existing warning)/build clean, same 85 routes. Playwright at all 6 breakpoints — zero console errors, zero horizontal overflow, image confirmed loaded (`naturalWidth`/`complete`) and rendered undistorted at every one, face fully visible with no awkward cropping. Pushed to `main`; Vercel `"state":"success"` confirmed for `b41f112`; production screenshots matched local.
+
+**HERO BACKGROUND EXTENDED, TRIED VIA ADOBE, BLOCKED, PRODUCED EXTERNALLY (D-076, 2026-08-22, commit `8a4556b`).** Mohammad asked to extend the face image's background outward to a wide landscape canvas (~1900x1000) — dark fade left, warm amber/orange fade right/bottom, one continuous photograph. Attempted Adobe's `image_generative_expand` (the one generative-AI tool actually available in this environment, confirmed via `adobe_mandatory_init`) with the exact expand-pixel math worked out (left 950/right 493/top 120/bottom 262 → 1900x1000). Blocked at every turn: the live production URL and a GitHub raw-content URL were both rejected as non-whitelisted domains by Adobe's own tool; the documented local-file fallback (`asset_add_file`, a picker) sat `pending` with nothing surfacing; the other documented fallback (programmatic chunk-upload via `curl PUT` straight to Adobe's storage endpoint) was denied outright by this environment's own safety classifier before it ever reached Adobe. Surfaced all of this plainly and asked Mohammad how to proceed via `AskUserQuestion` rather than trying to route around the block — **he chose to hold off entirely, produce the extended image himself outside this codebase, and hand it over as a finished file**, explicitly declining to grant any new Bash/network permission in the meantime. He supplied `public/images/services-hero.png` (1512x1145, landscape) in a later message — found it had landed as `services-hero.png.png` (double extension), renamed to the correct path before wiring it in. Swapped only the image + the container's aspect ratio (portrait `457:618` → landscape `1512:1145`, now `w-full` with `aspect-[1512/1145]`, no height cap needed — a landscape image in this landscape grid track doesn't risk the runaway height a portrait crop would have at ultra-wide, confirmed via a real 2560px screenshot, not assumed). Same layout/copy/nav/structure untouched. Old `services-hero-visual.jpg` left on disk unreferenced (standing convention). **Verified:** `tsc`/lint/build clean, same 85 routes. Playwright at all 6 breakpoints Mohammad specified this round (1440/1920/2560 desktop, 1024/768 tablet, 390 mobile) — zero console errors, zero horizontal overflow, zero layout shift into the Overview section even at 2560px, image confirmed loaded and undistorted at every one. Pushed to `main`; Vercel `"state":"success"` confirmed for `8a4556b`; production screenshots matched local pixel-for-pixel at every requested breakpoint including 2560px.
+
+**HERO INTEGRATED AS A FULL-BLEED CINEMATIC BACKGROUND (D-077, 2026-08-22, commit `6755a47`).** Mohammad's follow-up: stop treating `services-hero.png` as a boxed photo beside the text (D-075/D-076's two-column grid) and integrate it as one continuous, edge-to-edge background — no visible frame/border/card, continuing behind the fixed header, fading into the flat dark page background at the bottom. Same image file, no re-crop/regeneration. Rebuilt: image is now `absolute inset-0 -z-10` (D-070's own hardened pattern — explicit negative z-index + `Section`'s `isolate`, not DOM-order alone) with `object-cover` + `object-position: 62% 36%` anchored near the face's own position so crops (top/bottom on wide desktop, left/right on narrow mobile) never cut into it. Top edge needed zero header changes — `SiteHeader`'s own D-066/067 gradient background was already built to let whatever's beneath it show through; the image starting at the section's true top edge (page y=0) reads as "behind the nav" for free. Bottom edge: a gradient fade into `--background` (identical flat color the next section already uses, zero seam). **Caught a real legibility problem via screenshot, not assumed fine:** the raw photo's own dark left margin wasn't wide enough at typical desktop crop windows to keep the description text legible against the brighter facial/rim-light area — added a left-to-right scrim gradient reinforcing the dark ground behind the text, which is the literal "extend the dark background further left, behind the text" instruction implemented directly, not scope creep. Layout simplified from a 2-column grid to a single `max-w-xl` text block over the full-bleed background. **Verified:** `tsc`/lint/build clean, same 85 routes. Playwright at all 7 breakpoints (1440/1920/2560 desktop, 1024/768 tablet, 390/375 mobile) — zero console errors, zero horizontal overflow; confirmed visually at each: no visible frame/seam, face fully visible and undistorted at every breakpoint, text legible everywhere, category architecture below untouched. Pushed to `main`; Vercel `"state":"success"` confirmed for `6755a47`; production screenshots matched local pixel-for-pixel at every breakpoint including 2560px.
+
+**HERO FACE REPOSITIONED TO THE RIGHT, DESKTOP-ONLY (D-078, 2026-08-22, commit `ec1dd29`).** Mohammad reported the face reading as too centered/overlapping the headline. Root-caused (not guessed): at desktop widths the section's box is proportionally wider than the 1512:1145 image, so `object-cover` scales to match width exactly, leaving zero horizontal slack for `object-position`'s X value to act on — that's why the prior `object-[62%_36%]` never actually moved the face horizontally at desktop widths. A `transform:scale()` + shifted `transform-origin` first attempt was tried, screenshotted, and rejected (didn't land the face predictably) before landing on the actual fix: a plain desktop-only `translateX` (`md:10% / lg:16% / xl:20%`) on the already-fitted image — reveals flat `--background` on the newly-exposed left edge (the "clean dark left" ask, no new markup needed) while the image's own excess just clips further right, still fully covered. No zoom/resize, so the face's on-screen size is unchanged, only its position — matching the explicit "keep it large" instruction. Mobile/tablet untouched (no translate class below `md`), confirmed via screenshot. **Verified:** `tsc`/lint/build clean, same 85 routes. Screenshot-confirmed at 1440/1920/2560px — face lands in the right ~45% at every width, headline fully clear, zero overflow. Pushed to `main`; Vercel `"state":"success"` confirmed for `ec1dd29`; production screenshot at 1440px matched local (per the "verify desktop and stop" scope this round).
+
+## Next Steps
+0. **Get Mohammad's review of the Services Landing Page (D-072 through D-078)** — editorial Hero+Overview structure, dark-first color-balance correction, logo/badge removal + header-clearance fix, the hero visual using the approved photographic asset, the extended-background landscape version, the full-bleed cinematic-background integration, and now the desktop face repositioning. Verified per each entry above but not yet seen by him live. Per his explicit instruction: do not redesign further without his approval.
+0. **Get Mohammad's review of the two-tier header (D-066) + its follow-up fixes (D-067).** Utility bar (EN | FR) + main nav restructure, Cyber Health link removed, "Get Cyber Score" desktop CTA, measurement-driven adaptive nav collapse, Home hero no longer overlaps the header at 14-inch widths, wide-viewport logo↔nav gap now bounded. Verified thoroughly via automation (including realistic 14-inch laptop dimensions this round, not just width sweeps) but not yet seen by him live.
+0. **Confirm with Mohammad: is the missing custom domain (found 2026-08-21 investigating the "packages not showing" report) intentional or a gap?** This Vercel project currently has zero custom domains registered — the site is only reachable at `*.vercel.app` URLs (`oragrol-website.vercel.app` is the stable production alias). If a real domain (e.g. `oragrolglobal.com`) is meant to be live, it needs to be added in Vercel's domain settings — not something to do unilaterally without confirming DNS ownership/intent first.
+0. **Get Mohammad's review of Business Automation's new packages (D-065)** — ProjectOffers (Assessment/Implementation) + RecurringPackages (Starter/Growth/Scale/Enterprise), the new nav "Packages" anchor. Confirmed live and publicly reachable at `https://oragrol-website.vercel.app/business-automation` as of 2026-08-21 — his "not showing" report investigated, no code bug found (see Current Status). Still needs his own visual review/sign-off.
+0. **Get Mohammad's review of Solutions' real content (D-064)** — tier names/pricing/services, add-ons section, updated Pentest pricing. Not yet reviewed live.
+0. **Get Mohammad's review of the Services/Business Automation split (D-063) and the underlying restructure (D-062).** Two pages now: `/services` (10 categories) and `/business-automation` (5 categories, own top-level nav item), 64 total service detail pages across both. Not yet reviewed live.
+0. **Get Mohammad's review of the Home hero now that it's back to `PerimeterRing` (D-061).** Screenshot already sent. This closes out the Spline detour (D-059/D-060) — no outstanding Spline-side action needed anymore.
+0. **Get Mohammad's review of the new Home hero (D-057), if it stays.** Screenshots already sent for the SVG version; superseded for now by the Spline attempt above pending his call. The 16 old frame images (`public/hero/frame-*.png`) are left on disk, unreferenced, same convention as other superseded assets — fine to delete later once he's confirmed he doesn't want them back.
+0. **Get Mohammad to confirm the Industries dropdown scroll bug live (2026-08-21, same-day fix above).** This is a DIFFERENT bug than D-056 (D-056 was an inconclusive click-*dispatch* reliability question; this is the scroll-*target* bug his actual screenshots showed, now root-caused to Next.js `<Link>`'s own scroll-restoration and fixed in `nav-dropdown.tsx` — see the dated entry above for the full mechanism). Verified with real Playwright automation (9/9 chained same-page clicks, 4/4 fresh-nav across the full index range, mobile hamburger) and re-confirmed visually via `claude-in-chrome` for 3 industries — high confidence this time, not just "couldn't reproduce," but still needs Mohammad's own real-mouse confirmation before calling it fully closed, same as every prior "fixed" round on this bug.
+1. **BLOCKING: General Inquiry real email send (D-047).** Needs a real `RESEND_API_KEY` from Mohammad before the required real-send proof can be completed — see Current Status above for exactly what to supply and where it goes. Do not fabricate a "success" screenshot/log without an actual send.
+2. Awaiting Mohammad's review of Company (D-048/D-049/D-050/D-051) and Resources (D-052) — see Current Status. All page-build Steps (1-12) are now done; Steps 13-23 (cross-cutting QA/polish) are next once reviews clear, not a new page. Same standing flag: the sitewide `EmergencyCta` pill can still lightly overlap page content at some scroll positions (D-044-class, out of scope for a page-level task); SiteHeader's Dark-entry-section assumption remains open for whenever a genuinely light-first page is wanted; `home/insights.tsx`'s "coming soon" teaser is now stale next to a live `/resources` page (D-052, flagged, not fixed).
+2. ~~BLOCKING: Cyber Health ambient hero (D-043)~~ — **SHIPPED LIVE 2026-08-15**, see Current Status. No longer blocking.
+2. ~~ACTIVE: Step 9 — Industries~~ — **BUILT 2026-08-15 (D-044)**, see Current Status. Awaiting Mohammad's review. A pre-existing, out-of-scope issue was surfaced (not fixed) while building this: the sitewide floating "Under attack?" widget can visually overlap the panel's Next-Step CTA button at some scroll positions — flag for a future pass.
+3. Solutions' Kinetic Grid hero (D-039) approved and shipped live (D-040) — all 5 required modifications re-verified against the live page (canvas scoping, background pixel, reduced-motion staticness), not assumed to still hold from the prototype. `/solutions/prototype` removed. `StrataVisual`'s file kept unused, available for revert.
+4. Awaiting Mohammad's review of Step 8 (How We Work) — full page built, content-complete, connector-line bug fixed (D-037), and the same bug fixed on Home's own teaser too (D-038, confirmed). One thing still flagged, not silently resolved: the hero visual's own short stage one-liners sit directly above the Stage Sequence's full-paragraph versions of the same 4 stages — some content echo, left as-is per "build around the hero visual already built."
+5. ~~SERVICES SIGNED OFF (D-034, 2026-08-14)~~ — **SUPERSEDED 2026-08-20 (D-062):** the page was fully restructured (real 15-category/64-service taxonomy replacing the 8-capability one this sign-off covered) — no longer "complete as reviewed," see item 0 above. The D-015 "item 5" capability-regrouping question is moot now (that grouping no longer exists). Both flags carried forward from D-017 are still resolved: Instagram has a real URL (D-046); the emergency-CTA phone number is gone entirely (D-045).
+12. Awaiting Mohammad's review of Contact (D-046). Toronto's address/phone/email/hours are all still genuinely `[pending]` — do not fill any of them in without a real supplied value, even once the page is reviewed.
+6. `21st` MCP is authenticated (OAuth completed 2026-08-13) — its real search/generate/get_component tools are available for future rounds without re-authenticating. `ui-ux-pro-max` skill is installed (Python 3.12 dependency) and usable the same way.
+7. Known Tailwind v4 gotcha worth remembering: arbitrary-value utilities with `color-mix()` (or similar multi-comma CSS functions) nested inside bracket syntax can silently generate no CSS at all. Prefer Tailwind's built-in `{utility}-{registered-color}/{opacity}` mechanic over hand-rolled arbitrary values when a registered theme color is involved. Also: Tailwind v4 uses standalone `translate`/`scale`/`rotate` CSS properties, not the composed `transform` — don't debug hover/motion utilities by checking `getComputedStyle(el).transform`.
+8. Known follow-up, not urgent: `StrataVisual`/`GaugeVisual` use `var(--color-surface)`/`var(--color-border)`, which have the same latent per-environment token bug D-011 found and fixed in the Services visual components — harmless today since both are Dark-only, but swap to `var(--surface)`/`var(--border)` if either is ever reused in a non-Dark context.
+9. Hero (Home): current 16-frame sequence stays frozen per D-006; "Aperture O" is the named successor concept — Prototype 1 (isolated hero prototype) not started yet.
+10. ~~Pricing/package names/inclusions remain UNCONFIRMED site-wide~~ — **Solutions now has real, supplied pricing (D-064, 2026-08-20)**; Services/Business Automation also have real per-service pricing (D-062/D-063). Any OTHER page still referencing "currently being finalized" pricing language (e.g. Home's teaser, if any) is unaffected by this task's scope — check before assuming it's stale.
+11. Durable patterns from the Services thread, worth applying to future pages: (a) two visually-adjacent elements that must share exact width/position should share one physical wrapper with the constraint declared once, not matching classes independently on each (D-020); (b) any illustrative numeric figure needs its own explicit "not a real result" flag unless reusing an already-approved example (D-022); (c) a grid that stretches cards to match the tallest by CSS Grid default needs `items-start` once a mark's height varies (D-024/D-025); (d) a text label + variable-width badge sharing a row needs a wrap-friendly label, not a fixed single-line truncate (D-026); (e) a Waffle/Pictogram (grid of discrete units) beats a pie/donut for part-to-whole data, per `ui-ux-pro-max` (D-028); (f) never simulate a LIVE/in-progress operational state on marketing-page illustrative content, even labeled as an example (D-030).
+
+---
+
+## Session Log
+
+### 2026-08-18 — Industries dropdown click-doesn't-navigate bug: hardened, root cause not conclusively pinned (D-056)
+**Completed:**
+- Investigated a bug report: clicking an Industries nav dropdown item (e.g. "Healthcare") from a non-Industries page was said to close the dropdown without navigating. Reproduced via `claude-in-chrome`, heavily instrumented with real DOM event listeners and `elementFromPoint` checks, across two starting pages (`/`, `/services`).
+- Result was genuinely inconsistent, not a clean deterministic repro: some hover→click attempts navigated fine; others left the URL unchanged with the panel still open and literally zero mouse events (`pointerdown`/`mousedown`/`mouseup`/`click`) reaching `document`, despite the target link being confirmed correctly positioned, topmost, and `:hover`-active at that exact instant via `elementFromPoint`. A full synthetic replay of the real event sequence (mouseover → transition → mousedown/mouseup/click, dispatched to exercise the actual React handlers, not bypass them) navigated correctly every single time it was tried, from two different pages, to two different industries. One earlier apparent `.click()` "failure" turned out to be a testing-methodology mistake (checking `location.href` synchronously before Next's async route transition resolved) — caught and corrected, not reported as a real finding.
+- Conclusion, reported honestly rather than overclaimed: could not isolate a single deterministic product-code mechanism reproducing the bug. The zero-event failures look most consistent with the browser-automation tool's own click dispatch occasionally not firing (unrelated to page content — happened on both pages tested; identical-state retries sometimes succeeded).
+- Fixed a real, narrow gap in the dropdown's own logic anyway, on its own merits (not as a claimed root-cause fix): `cancelScheduledClose()` was only wired to `onMouseEnter`, so a close armed by an earlier brief mouseleave could still be pending at click time — if its 150ms timer fired between a real mousedown/mouseup, the panel would go `invisible` mid-click, swallowing it (exactly matching the reported symptom, even though this specific mechanism wasn't caught red-handed in the reproduction attempts). Added `onPointerDownCapture={cancelScheduledClose}` to the desktop container in `nav-dropdown.tsx` — safe no-op when nothing's scheduled, doesn't touch mobile (no hover debounce there).
+- Full details, including the exact investigation trail: D-056.
+
+**Files changed:**
+- `app/components/site/nav-dropdown.tsx` (added `onPointerDownCapture={cancelScheduledClose}` to the desktop dropdown container, with an explanatory comment)
+
+**Problems found:**
+- A real, narrow logic gap in the hover-close debounce (see above) — fixed, though not conclusively proven to be THE cause of the reported bug.
+- Own testing-methodology mistake (checking `location.href` synchronously before an async transition resolved) — caught before it was reported as a finding.
+
+**Still open / needs verification:**
+- **Root cause not conclusively proven.** Ask Mohammad to confirm live with a real mouse whether the original "closes without navigating" symptom still recurs post-fix. If it does, the next step should be testing on his actual OS/browser/input device rather than continuing to chase it via this automation tool, which showed its own click-dispatch unreliability during this investigation.
+- All previously-carried-forward open items (D-055's own review, Home `insights.tsx` stale teaser, sitewide `EmergencyCta` overlap-at-some-scroll-positions, D-054's 1024px nav-cramping) remain open, unrelated to this session.
+
+**Next recommended step:**
+- Get Mohammad to re-test the Industries dropdown live and confirm whether this closes the report.
+
+---
+
+### 2026-08-17 (continued 7) — Nav dropdowns extended to Solutions/Industries/Resources; Services generalized into shared NavItemDropdown (D-055)
+**Completed:**
+- **Investigated each nav item's real content before proposing anything** (Solutions, Cyber Health, Industries, Resources, Company), per the explicit instruction not to invent sub-sections. Read every page.tsx, section component, and data file directly rather than assuming:
+  - **Cyber Health / Company: NO dropdown** — both single narrative flows, zero `id`s anywhere in their section files. Matches Mohammad's own stated no-dropdown examples exactly.
+  - **Solutions: real content (3 tiers + 1 add-on), but zero anchor ids existed.** Flagged before building — needs small structural additions to `tier-cards.tsx`/`pentest-addon.tsx`.
+  - **Industries: real content (9 industries), but implemented as a client-state ARIA Tabs widget** (`IndustriesExplorer`), not scroll anchors — no working per-industry link existed at all. Flagged as the biggest-scope item.
+  - **Resources: real content (6 already-live article pages)** — nothing to add, genuine existing routes. Checked whether the 3 filter facets (contentType/topic/industry) grouped naturally — every article has a UNIQUE topic, the other two facets split 5:1 — no natural grouping exists, so a single-column list (not forced columns) was the right shape.
+- **Reported all 5 determinations + proposed structures before writing any code**, then used `AskUserQuestion` for the two genuinely open decisions (Industries: build real deep-linking vs. skip; Solutions: add new anchor ids vs. skip). Mohammad approved both: build Industries deep-linking with a flat 9-item list (no invented sector taxonomy — the source content doesn't group these 9 anywhere), and add the Solutions anchor ids.
+- **Solutions:** added real `id`/`scroll-mt-28` to the 3 existing `TierCards` (`tier-01`/`02`/`03`) and `PentestAddon` (`pentest-addon`) — purely structural, no visual/content change. Dropdown: single column, 4 items (Level 01/02/03, Penetration Testing).
+- **Industries:** added real deep-linking to `industries-explorer.tsx`. Extracted a shared `slugifyIndustryName()` into `industries-data.ts` (single source of truth for both the explorer's tab ids and the nav dropdown's hrefs — can't drift out of sync). Tabs now read `location.hash` on mount + `hashchange` to select + scroll to the right industry. **Caught and fixed a real pre-existing duplicate-id bug while doing this:** the mobile and desktop tablists render simultaneously (CSS only hides one visually) and previously shared the exact same tab id — `document.getElementById` always resolved to the first (mobile) instance, which silently broke the existing Arrow-key-focus-follow behavior on desktop keyboards (pre-existing, not introduced here, just newly consequential once these ids became real anchor targets). Fixed by giving the two orientations distinct ids (desktop keeps the real slug, mobile gets a `-mobile` suffix); only the desktop id is ever linked to externally.
+- **Services generalized:** `ServicesNavDropdown` (D-053/D-054) rewritten as a generic `NavItemDropdown` (`app/components/site/nav-dropdown.tsx`) driven by a `NavDropdownConfig` (columns, optional per-column heading, desktop width/layout classes) instead of hardcoded Services data. `SiteHeader` now looks up `NAV_DROPDOWNS[link.href]` per nav item instead of a single `label === "Services"` check. `services-nav-dropdown.tsx` deleted; `NAV_DROPDOWNS` covers `/services`, `/solutions`, `/industries`, `/resources`.
+- **Chevron added to every dropdown trigger** (desktop: inline inside the `NavLink`, rotates on open via Tailwind's `rotate-*`; mobile: on the existing separate toggle button, unchanged) — the "there's more here" signal Mohammad asked for. Cyber Health/Company render none, confirmed via `aria-haspopup`/svg-count checks.
+- **One real interaction bug caught and fixed during verification, not just the earlier-session Escape bug:** closing a sibling dropdown on `pointerdown` (used so an outside click registers before a full click completes) meant that once a SECOND dropdown existed on the page, clicking a lower trigger while an upper one was still open would correctly close the upper one but then MISS the click on the lower trigger entirely — reproduced live (mobile: Services open, click Solutions' chevron → Services closes, Solutions never opens), root-caused via a mid-transition screenshot (Chromium resolves a click's target via `elementFromPoint` at mouseup, and the upper dropdown's `pointerdown`-triggered close/reflow had already shifted the layout by the time mouseup fired, so the click landed on whatever reflowed into that same screen position instead). Fixed by switching the outside-click listener from `pointerdown` to `click` — React's own delegated click on the actual target element fires first (its listener sits lower in the bubble path), so a lower trigger's own toggle always lands before this outside-close logic runs, regardless of any reflow it goes on to cause. This wasn't reachable as a bug in D-053/D-054 (only one dropdown existed then) — only surfaced once a second one did.
+- **Verified:** `npx tsc --noEmit` / `npm run lint` / `npm run build` all clean (same 20 routes, no new ones). Full Playwright pass: all 4 dropdowns' `aria-haspopup`/chevron/link-count/hrefs/panel-bg/chevron-rotate; Cyber Health/Company confirmed to have neither; zero horizontal overflow at 1024/1280/1440 with each dropdown open; Industries deep-link both via direct URL load (`/industries#industry-healthcare` → panel shows "Healthcare") and via clicking the dropdown item while already on another page; Solutions' 4 new ids all resolve; a Resources guide-article URL returns 200; mobile: all 4 chevrons present and none on Cyber Health/Company, sequential-click accordion behavior re-verified correct after the outside-click fix (each new dropdown opens, previous one correctly auto-closes, zero overflow). Screenshots reviewed directly (all 4 desktop dropdowns open, mobile fully expanded) before reporting anything as done.
+- **One test-tooling correction, not a product bug:** an early check read `getComputedStyle(el).transform` to confirm the chevron rotates, saw `"none"`, and initially looked like a bug — Tailwind v4 compiles `rotate-*` to the standalone CSS `rotate` property (not the legacy `transform: rotate()`), so that was the wrong property to check. Confirmed via `getComputedStyle(el).rotate` (`none` → `180deg`) and a direct stylesheet-rule check before concluding anything.
+
+**Files changed:**
+- New: `app/components/site/nav-dropdown.tsx` (replaces `services-nav-dropdown.tsx`, deleted)
+- `app/components/site/site-header.tsx` (config-lookup instead of single-item conditional)
+- `app/components/sections/solutions/tier-cards.tsx`, `pentest-addon.tsx` (new anchor ids, structural only)
+- `app/components/sections/industries/industries-data.ts` (new `slugifyIndustryName` export)
+- `app/components/sections/industries/industries-explorer.tsx` (deep-linking + duplicate-id fix)
+
+**Problems found:**
+- Pre-existing duplicate tab-id bug in `IndustriesExplorer` (see above) — fixed as part of this work, not a new regression.
+- The outside-click `pointerdown`-vs-`click` interaction bug (see above) — a real bug, only reachable once multiple dropdowns coexisted; fixed.
+- One test-script false alarm (Tailwind v4's `rotate` property, see above) — correctly diagnosed as tooling, not product, before being dismissed.
+
+**Still open / needs verification:**
+- Mohammad's in-browser review of all 4 dropdowns — not yet done.
+- The 4 Services category names (Advisory/Assessment & Testing/Protection & Monitoring/Response & Training, D-054) still carry their existing "needs separate sign-off if reused beyond nav" flag.
+- Pre-existing carried-forward items unrelated to this work: Home `insights.tsx` stale teaser, sitewide `EmergencyCta` overlap-at-some-scroll-positions, the 1024px nav-row cramping noted in D-054.
+
+**Next recommended step:**
+- Get all 4 dropdowns reviewed live.
+
+---
+
+### 2026-08-17 (continued 6) — Services dropdown: bg-token fix + restructured into grouped columns (D-054)
+**Completed:**
+- **Bg-token fix (reported by Mohammad live in-browser):** the dropdown panel looked semi-transparent, hero text bleeding through. Checked computed style directly via Playwright at scroll 0 and scrolled past the header's own fade — `backgroundColor` was already opaque (`rgb(20,20,20)`, `opacity:1`, no `backdrop-filter`) in both states; couldn't reproduce real alpha transparency. Made the fix anyway, per the explicit instruction to match the nav bar's own token rather than guess a new value: the panel was using `--surface` (#141414, the `HeaderSearch`-style "floating card" token) instead of the nav bar's own real background token, `--background` (#0a0a0a — confirmed by reading `SiteHeader`'s own gradient layers, which are built from `from-background/90...`, not `--surface`). Swapped `bg-surface` → `bg-background`; re-verified computed style now `rgb(10,10,10)`.
+- **Restructured from a flat 8-item list into Bell.ca-style grouped columns** (structure only — explicitly NOT Bell's promo-card/image treatment; kept the plain dark panel, no photography). Re-confirmed `oragrol_services_page_content.md` still doesn't exist anywhere in the repo (second check, same method as the first). Read the real per-capability copy already on `/services` (problem/what-we-do/what-you-get/outcome text) and built 3 candidate groupings from it, shown to Mohammad via `AskUserQuestion` before building anything — he picked **4 columns, paired by stage**:
+  - Advisory — Virtual CISO, Risk Assessment & Compliance
+  - Assessment & Testing — Vulnerability Assessment & Management, Penetration Testing
+  - Protection & Monitoring — Managed Security Services / 24/7 MDR, Endpoint Protection / EDR
+  - Response & Training — Incident Response, Security Awareness Training
+- **These 4 category names are new** — Claude's synthesis of the real per-capability copy into a theme label, not text present verbatim anywhere in existing content, and not independently confirmed as customer-facing marketing copy. Approved by Mohammad for this nav menu specifically; flagged in the component's own header comment as needing separate sign-off if used as marketing copy elsewhere.
+- No category-level anchor exists on `/services` itself (only the 8 `capability-0N` ids) — each category title links to the first capability listed under it in this component's own display order, not a fabricated section anchor.
+- Desktop: `grid-cols-4` panel, widened `w-72` → `w-[820px]`, still `left-0`-anchored (not centered — centering was considered and rejected: the trigger sits near the nav's left edge, right after the logo, so centering an 820px panel on it would push the panel's left edge off-screen). Verified via Playwright at 1024/1280/1440/1920px: zero horizontal page overflow at any width, panel's own right edge stays well inside the viewport at all four (max 1345px at 1920px viewport). Mobile: the single chevron-toggle disclosure now expands into 4 stacked category groups (each with its own heading + indented items) instead of one flat list — still one control, still inside the existing full-viewport mobile panel.
+- ArrowUp/ArrowDown roving focus now moves across all 8 capability links in column-then-row display order (category titles aren't part of the roving set, same as v1 — only reachable via Tab); re-verified the full 9-press wrap-around sequence lands back on item 1.
+- **Verified:** `npx tsc --noEmit` / `npm run lint` / `npm run build` all clean. Fresh Playwright pass: category titles + hrefs, all 8 item labels + hrefs, ArrowDown roving order (9 presses, correct wrap), Escape closes (`aria-expanded` → `false`), category-title font-family `"Space Grotesk"`, item font-family `Inter`, category-title hover color confirmed exactly `rgb(1, 138, 190)` (#018ABE) via a real `:hover`-pseudo-class match (isolated, single-purpose script — the first combined script's own hover read was a flake from a rapid keyboard→mouse sequence on one page instance, diagnosed and confirmed not a product bug before being dismissed), mobile expand shows all 4 category headings + 8 items in the right grouping, zero horizontal overflow on mobile. Screenshots reviewed directly at 1024/1440 desktop and 390 mobile before reporting anything as done.
+- **Noted, not fixed (pre-existing, unrelated to this task):** at exactly the 1024px `lg` breakpoint where the desktop nav switches on, the nav row itself is already cramped pre-existing this change — "Cyber Health" wraps to two lines, the primary CTA button wraps, "EN | FR" wraps. Visible in the 1024px screenshot taken for this verification; not introduced by the Services dropdown (confirmed by reading `NavBar`/`SiteHeader` — none of `NAV_LINKS`' other items were touched) and out of scope for this task. Flagging for a future pass.
+
+**Files changed:**
+- `app/components/site/services-nav-dropdown.tsx` (bg-token swap, then full restructure into `SERVICES_CATEGORIES`/grouped rendering — same file from D-053, no new files)
+
+**Problems found:**
+- None that were real product bugs. The reported bg-transparency issue couldn't be reproduced in automated testing at any state tested, before or after the fix — reported honestly rather than claiming to have found+fixed a bug that wasn't observed. The fix (matching the literal nav-bar token) was made regardless, per the explicit instruction, and is a real correctness improvement independent of whether the original bug reproduced.
+- One test-script flake (hover-color read returned the muted/default color once, in a script hammering keyboard+mouse interactions back-to-back on one page instance) — isolated and confirmed to be a script artifact, not a product bug, via a clean single-purpose repro.
+
+**Still open / needs verification:**
+- Mohammad's in-browser review of the grouped dropdown — not yet done (this entry covers Claude's own verification only).
+- The 4 new category names (Advisory / Assessment & Testing / Protection & Monitoring / Response & Training) may need separate sign-off if reused as customer-facing copy beyond this nav menu.
+- The pre-existing 1024px nav-cramping issue (noted above) — not addressed, flagged for a future pass.
+- All previously-carried-forward open items (Home `insights.tsx` stale teaser, sitewide `EmergencyCta` overlap-at-some-scroll-positions, D-053's own review) remain open.
+
+**Next recommended step:**
+- Get the grouped Services dropdown reviewed live; decide whether the 1024px nav-cramping issue gets its own pass.
+
+---
+
+### 2026-08-17 (continued 5) — Services nav mega-menu added (D-053)
+**Completed:**
+- Built `app/components/site/services-nav-dropdown.tsx` (`ServicesNavDropdown`) and wired it into `SiteHeader` — the "Services" item only (desktop nav row + mobile nav panel); the other 6 nav items (Home logo aside — Solutions/Cyber Health/Industries/Resources/Company/Contact-via-CTA) are byte-for-byte untouched, confirmed via Playwright (`aria-haspopup` absent on Cyber Health's link, no chevron sibling on Company's mobile row).
+- **Content-source gap found and reported, not silently substituted:** the instruction named `oragrol_services_page_content.md` as the section-header source; a full repo search (glob + `git log --all --full-history`) found no such file, ever, in this repo. Used the actual confirmed, already-shipped source instead — `/services`' own locked capability data (`LiveServices.LIVE_SERVICES` 01-04 + `AdditionalCapabilities.FINALIZING_SERVICES` 05-08, and their real `capability-0N` DOM ids that `CategoryNav` already jump-scrolls to) — rather than inventing names to match a file that doesn't exist. Flagged to Mohammad in the same-turn report.
+- The 8 links: Virtual CISO, Risk Assessment & Compliance, Vulnerability Assessment & Management, Security Awareness Training, Managed Security Services / 24/7 MDR, Penetration Testing, Endpoint Protection / EDR, Incident Response — each `/services#capability-0N`. The instruction's own example anchor format (`#capability-name`, i.e. a slugified name) doesn't match the real anchors already live on the page (`#capability-01`...`#capability-08`, numbered) — used the real ones (a slug anchor would silently 404-scroll, matching nothing), flagged as a mismatch rather than silently deviating from the instruction's example unremarked.
+- Two variants, one component (`variant: "desktop" | "mobile"`): desktop is a hover/focus-opened absolute panel below the existing `NavLink` trigger (same component every other item uses, so it's pixel-identical at rest); mobile is an inline disclosure inside the existing full-viewport mobile panel — a chevron button toggles an indented sub-list, the "Services" label itself stays a plain link to `/services`.
+- Styling: reused tokens only — `bg-surface`/`border-border`/`shadow-xl` (same recipe as `HeaderSearch`'s existing floating panel), `font-heading` (Space Grotesk) on the small "Capabilities" panel label, `font-body` (Inter) on every link, `text-accent` (#018ABE, verified via computed style: `rgb(1, 138, 190)`) on hover/focus. No new colors, no promo cards/images — a plain link list, per the explicit "not Bell-style" instruction.
+- Behavior, each verified live via Playwright (not just asserted): Tab onto the trigger opens the panel (`onFocus`) and Tab continues naturally into its links (real DOM order); ArrowDown/ArrowUp move focus between the 8 items; Escape closes AND returns focus to the trigger; outside click closes it; closes on route change (`usePathname`, render-time reset — same pattern `SiteHeader` already uses for `mobileOpen`, not an effect, so it doesn't trip the "no setState in an effect" lint rule) and explicitly on every item click (covers same-page anchor navigation, where pathname alone doesn't change); `prefers-reduced-motion` swaps the open/close transition for an instant `hidden`/`block` toggle (verified under `reducedMotion: "reduce"` emulation).
+- **One real bug caught by the verification script and fixed before shipping:** Escape's `.focus()` call on the trigger re-triggered the same `onFocus` handler that opens the panel on a real Tab-in, silently reopening it on the same keypress — `aria-expanded` stayed `"true"` after Escape instead of flipping to `"false"`. Fixed with a one-shot `suppressNextFocusOpenRef` flag set right before the programmatic refocus and consumed by the very next `onFocus`. Re-verified clean after the fix.
+- Desktop hover-close is debounced ~150ms (`setTimeout`, cleared on re-entry): the panel is a DOM descendant of the hover container but the visual gap between trigger and panel isn't covered by either element, so an undebounced `mouseleave` fired mid-transit on a diagonal mouse move — caught by reasoning through the geometry before shipping, not discovered as a live bug.
+- **Verified:** `npx tsc --noEmit` / `npm run lint` / `npm run build` all clean (no new routes, same 20 pages). Full Playwright pass against the running dev server (not just component-level assumptions): desktop hover open/close, full keyboard flow (Tab → ArrowDown/ArrowUp → Escape), outside-click close, reduced-motion instant toggle, mobile chevron expand/collapse, click-through navigation to `/services#capability-01` (URL and panel-closed state both confirmed), hover-state accent color computed exactly `#018ABE`, panel heading computed font-family `"Space Grotesk"`, link computed font-family `Inter`. Screenshots reviewed directly (desktop panel open, mobile panel expanded) before reporting anything as done.
+
+**Files changed:**
+- New: `app/components/site/services-nav-dropdown.tsx`
+- `app/components/site/site-header.tsx` (conditional render: "Services" → `ServicesNavDropdown`, all 5 other links untouched)
+
+**Problems found:**
+- The named content file doesn't exist (see above) — reported, not guessed around.
+- The Escape/re-focus/re-open loop bug (see above) — caught by the verification script itself, fixed same session.
+
+**Still open / needs verification:**
+- Mohammad's in-browser review of the new dropdown — not yet done.
+- All previously-carried-forward open items (Home `insights.tsx` stale teaser, sitewide `EmergencyCta` overlap-at-some-scroll-positions) are unrelated to this session and remain open.
+
+**Next recommended step:**
+- Get the Services dropdown reviewed live; otherwise continue with whatever page/step Mohammad prioritizes next.
+
+---
+
+### 2026-08-17 (continued 4) — Resources page built (Step 10, D-052)
+**Completed:**
+- User instructed building `/resources` with a mandatory research step first, content read verbatim from `ORAGROL_RESOURCES_ALL_ARTICLES_FINAL.md` (6 articles, Article 1 featured), a content grid with faceted filters (Industry/Topic/Content Type, hiding zero-match options), and an article detail template with an exact per-article CTA from the source's mapping table.
+- Found the nav's existing "Resources" link pointed to `/insights` (D-017's unbuilt placeholder), inconsistent with the brief's own `/resources/<slug>` slugs. Re-pointed `SiteHeader`/`SiteFooter` to `/resources` rather than building at the stale target. `home/insights.tsx`'s Home-page "coming soon" teaser was left untouched — out of scope for this instruction, flagged as now slightly stale rather than silently updated.
+- Research: `ui-ux-pro-max` (`--domain landing` — 0 matches, flagged; `--domain ux` — real chip-reflow/lazy-load findings, applied). `21st.dev search` surfaced 3 real matches; successfully retrieved and used "Blog Posts" (asymmetric featured-card grid) and "Link Breadcrumb"; "Filter Grid" (segmented chips with live counts) hit this session's daily retrieval-limit mid-task — its pattern was rebuilt natively instead of literal code, flagged as such in the component's own comment rather than presented as sourced.
+- Transcribed all 6 articles' full bodies + every metadata field into `articles-data.ts` by hand, then verified byte-for-byte via 3 separate Node scripts (body text, metadata fields, heading levels) run against the actual source file — not re-read by eye a second time. The heading-level script caught a real mistake: Article 1's subheadings had been typed `h2` while Articles 2-6 were `h3` (the source itself is uniform `###` throughout — this was my own inconsistent transcription, not a source variation). Fixed by making all 6 articles' subheadings `h2` uniformly, the correct choice for the rendered page's own hierarchy (H1 title → H2 subsections, no skip) rather than a literal mirror of the source file's internal markdown structure. All 3 scripts passed clean after the fix.
+- Built genuinely faceted filtering (not independent per-dimension filters): each filter group computes its visible options from the OTHER two active filters, so a combination with zero matches is never rendered as a choice — verified live (selecting Industry: Professional Services immediately hid "Article" from Content Type and every topic but one, since the sole Professional-Services piece is the one Guide), not just asserted from the code.
+- Verified CTA text/href live via Playwright against the source's own mapping table (not just copied into the data file and assumed correct) — confirmed exact text and correct `/contact` vs `/cyber-health` destination.
+- Caught and fixed 2 more instances of this project's own documented `cn()` conflict (component base classes + a conflicting `className` size override) before shipping: `ArticleCard`'s title against `H3`, `ArticleDetail`'s body headings against `H2` — same fix D-018/D-048 already established for the identical mistake.
+- Reading time computed from real word count (`app/lib/reading-time.ts`, 200 wpm, minimum 1 min), not hardcoded per article.
+- No `FinalCta` added to either page — each article already has its own specific mapped CTA, and the grid's whole purpose is surfacing a next step; stacking a generic CTA on top would compete with the specific one (same reasoning Contact used, D-046).
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean (`/resources` static, all 6 `/resources/<slug>` pages statically generated, unknown slug confirmed 404). Server HTML fetched via `curl` confirms all 6 titles present verbatim. Playwright: 0px horizontal overflow at 1440/390px; 0 console errors on both the grid and an article page; correct heading order (H1 then H2s, no skips); reduced-motion renders content at final `opacity: 1`. Full-page and filtered-state screenshots at both widths reviewed directly.
+
+**Files changed:**
+- New: `app/resources/page.tsx`, `app/resources/[slug]/page.tsx`, `app/lib/reading-time.ts`, `app/components/sections/resources/{hero,article-card,resources-explorer,breadcrumb,article-detail,articles-data,inline-markdown}.tsx/.ts`
+- `app/components/site/site-header.tsx`, `app/components/site/site-footer.tsx` (Resources nav link `/insights` → `/resources`)
+- `DECISIONS.md` (D-052), `PROJECT_MASTER.md` (Step 10 → IMPLEMENTED, Current Position), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The stale `/insights` nav target (caught and fixed before shipping).
+- The heading-level transcription mistake (caught via the verification script, fixed before shipping).
+- Two `cn()` size-override conflicts (caught before shipping, same known project gotcha).
+- `21st.dev`'s daily retrieval limit hit mid-research (worked around by rebuilding the pattern natively, flagged honestly rather than claimed as sourced).
+
+**Problems solved:**
+- All 6 articles built from a real, final content brief, verified byte-for-byte accurate — matching this project's content-accuracy discipline (CLAUDE.md §8) for client-facing MSSP copy, at real scale (6 full long-form articles, not a handful of short fields like prior pages).
+- A genuinely faceted (not merely independent) filter system, verified interactively.
+
+**Still open / needs verification:**
+- Mohammad's review of `/resources` (D-052).
+- `home/insights.tsx`'s now-stale "coming soon" teaser (flagged, not fixed — out of scope for this instruction).
+- Same standing flags carried forward: `EmergencyCta` overlap (D-044-class), SiteHeader Dark-entry assumption, the blocking `RESEND_API_KEY` (D-047).
+
+**Next recommended step:**
+- Get Resources reviewed alongside the rest of the recently-built pages. All page-build Steps (1-12) are now done — next real work is Steps 13-23 (cross-cutting QA/polish), not a new page.
+
+---
+
+### 2026-08-17 (continued 3) — Top headshot removed from Founder Bio (D-051)
+**Completed:**
+- Mohammad instructed removing D-050's small circular headshot from the top of Founder Bio entirely — name + "Founder & CEO" only there. Removed the photo `<div>` (circle frame, `Image`, crop styling) from `founder-bio.tsx` outright, not hidden/commented out; the top block is now just centered `H1` name + `Caption` title.
+- Confirmed via repo-wide grep that `founder-mohammad-headshot.png` (D-050's corrected asset) is no longer referenced anywhere — left in place on disk, unused, same "kept for a possible revert" convention already used for other superseded visual assets (`StrataVisual`, `SchematicVisual`).
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean; 0px horizontal overflow at 1440/390px; DOM query confirms exactly one `<img>` inside the Founder Bio `<section>`, resolving to `founder-mohammad.jpg` (the closing photo, unchanged from D-050) — not the removed headshot. Screenshots at both widths reviewed directly.
+
+**Files changed:**
+- `app/components/sections/company/founder-bio.tsx` (top photo removed, doc comment updated)
+- `DECISIONS.md` (D-051, D-050 status marked superseded), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- None — straightforward removal, no surprises.
+
+**Still open / needs verification:**
+- Mohammad's review of the full Company page (D-048 through D-051).
+- Same standing flags carried forward unchanged (Resend API key, `EmergencyCta` overlap, SiteHeader Dark-entry assumption).
+
+**Next recommended step:**
+- Get this reviewed alongside the rest of Company.
+
+---
+
+### 2026-08-17 (continued 2) — Founder Bio real design fixes: headshot crop + closing photo redesign (D-050)
+**Completed:**
+- Mohammad reported D-049's restructure had two real design problems (not a quick tweak): the top circular headshot's crop was awkward/off-center, and the closing photo was still far too large — plus an explicit instruction to research (`ui-ux-pro-max` + `21st.dev`) a real redesign of the closing beat, e.g. a smaller photo beside a pull-quote instead of a stacked block.
+- Investigated the crop bug before touching CSS: pixel-inspected `founder-mohammad-headshot.jpg` and found it's actually a 3/4-body composition (same "arms crossed" framing as the main photo), not a tight face crop, despite its name — confirmed via `xxd` that its real bytes are also PNG (magic number `89 50 4E 47`), mis-extensioned `.jpg` during D-049. Renamed to the correct `.png`.
+- Tuned the crop empirically: built a standalone 4-way comparison HTML harness (scratchpad only) to test `object-position`/`transform-origin`/`scale` combinations against the real source file, screenshotted via Playwright. First attempt (position bias + scale from default center) was visibly wrong — worked out why mathematically (a `scale()` from the box's own center can never land on the face when the cover-fit window's center, computed from the real image proportions, falls below the face no matter what position is chosen) — then fixed by explicitly decoupling `object-position` (top-anchored) from `transform-origin` (placed at the face's real position) before scaling. Verified against the real rendered 96px/80px circle on the live page, not just the larger test harness.
+- Researched the closing-photo redesign per instruction: `ui-ux-pro-max` returned 0 matches for the specific pattern (flagged, not silently defaulted); `21st.dev search` found "Editorial Testimonial" (id 9637) — small ringed photo beside a bold pull-quote, oversized faint numeral, generous whitespace. Adapted its core pairing (not its carousel machinery, which doesn't apply to one founder) into a static closing beat: photo shrunk from a 672px stacked block to 224px (exactly one-third on desktop), placed beside a pull-quote — the bio's own first sentence, quoted verbatim (a pull-quote by definition re-displays existing text; not new copy).
+- Added a `border-t` divider above the closing beat for clearer section rhythm — part of the "framing/text placement looks unpolished" complaint, not just the two explicit sizing/crop items.
+- Re-verified the D-049-flagged mobile `EmergencyCta`/photo overlap at the same real scroll positions with the new, smaller photo: no longer covers the subject's face (the severity D-049 flagged) — the pill now only lightly brushes the photo frame's corner at one scroll position, the same lower-severity, still-standing D-044-class sitewide issue as everywhere else. Verified this honestly rather than either claiming it's fully fixed or leaving the D-049 severity claim uncorrected.
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean; 0px horizontal overflow at 1440/390px; both images confirmed correctly wired via DOM query; full-section screenshots (element-scoped, not `fullPage`) reviewed directly at both widths.
+
+**Files changed:**
+- `app/components/sections/company/founder-bio.tsx` (crop fix + closing-beat redesign)
+- Renamed: `public/images/founder-mohammad-headshot.jpg` → `founder-mohammad-headshot.png` (asset-hygiene fix, corrects D-049's mistake)
+- `DECISIONS.md` (D-050), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The headshot's actual composition (3/4-body, not a tight face crop) and its PNG-named-.jpg mismatch — both from D-049, both caught and fixed here.
+- The math error in the first crop attempt — caught via the comparison harness before shipping, not left for a second round of feedback.
+
+**Problems solved:**
+- A real, empirically-tuned crop fix instead of a single guessed value.
+- A genuine redesign (not a resize alone) of the closing beat, grounded in real research per instruction, with a byproduct fix to the D-049-flagged pill/photo overlap.
+
+**Still open / needs verification:**
+- Mohammad's review of this round.
+- The lighter-severity `EmergencyCta` corner-brush overlap noted above (D-044-class, out of scope).
+
+**Next recommended step:**
+- Get this reviewed. Every other outstanding item (Resend API key, other pages' reviews) is unchanged from before this round.
+
+---
+
+### 2026-08-17 (continued) — Founder Bio restructured: small top identifier → narrative bio → large closing photo (D-049)
+**Completed:**
+- Restructured `FounderBio` (`app/components/sections/company/founder-bio.tsx`) per instruction: small circular headshot + name + "Founder & CEO" at top, the same 3 bio paragraphs (verified byte-identical, not touched) reading through as a narrative middle column, then the large-format photo reappearing as a widened closing visual at the end. Text-only-unchanged confirmed by direct comparison against the pre-edit file.
+- New headshot (`public/images/founder-mohammad-headshot.jpg`) arrived saved as `founder-mohammad-headshot.jpg.png` — same mis-saved-filename pattern as the original founder photo — verified it was a real, valid headshot before renaming to the correct path.
+- Moved `priority` from the large closing photo to the small top headshot (now the actual above-the-fold/LCP image) — a correctness fix that falls naturally out of the restructure, not a separate ask.
+- Found and verified a real (not a screenshot-stitching artifact — checked both ways, learned from the prior round's false alarm) mobile-only issue: the widened closing photo now visibly overlaps the sitewide `EmergencyCta` pill at real scroll positions, landing on the founder's face — the same standing D-044 pill-overlap issue, now hitting the actual deliverable this task asked for rather than incidental text. Flagged with evidence (real per-frame screenshots at fixed scroll offsets on both widths), not fixed — `EmergencyCta` is one global `RootLayout` instance; desktop confirmed unaffected at the same scroll positions.
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean; 0px horizontal overflow at 1440/390px; both images confirmed correctly wired via DOM query (correct `src`, correct alt-text split between decorative top photo and descriptive closing photo).
+
+**Files changed:**
+- `app/components/sections/company/founder-bio.tsx` (restructured)
+- New: `public/images/founder-mohammad-headshot.jpg` (moved/renamed from a mis-saved upload)
+- `DECISIONS.md` (D-049), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The mis-saved headshot filename (caught before use).
+- The real mobile pill/photo overlap — a genuine, new-severity instance of the already-standing D-044 issue, correctly distinguished from a screenshot artifact this time via real per-frame captures.
+
+**Still open / needs verification:**
+- Mohammad's review of the restructure, specifically his call on the mobile pill/photo overlap (a global-component question, not scoped to this page).
+- Every other still-open item carried forward unchanged (see Next Steps).
+
+**Next recommended step:**
+- Get this restructure reviewed alongside the rest of Company. If Mohammad wants the `EmergencyCta` overlap addressed, that's a separate, sitewide-scoped task (touches `RootLayout`/`emergency-cta.tsx`, not just this page).
+
+---
+
+### 2026-08-17 — Company / About page built (Step 11, D-048)
+**Completed:**
+- User instructed building `/company` (matching the site's existing route pattern — confirmed via grep of `site-header.tsx`/`site-footer.tsx`, both already link "Company" → `/company`), with a mandatory research step (`ui-ux-pro-max` + `21st.dev`) before designing, content read verbatim from `ORAGROL_ABOUT_PAGE_CONTENT_FINAL.md` (4 sections: Founder Bio, Company Mission/Story, Team, Values/Differentiators), and the founder photo used at large editorial scale, not a small avatar.
+- Investigated project memory first, per CLAUDE.md §2: read the last several `PROJECT_MEMORY.md`/`DECISIONS.md` entries, confirmed D-008's original Company motif ("architectural/material-study abstractions... no fabricated people/office photography, since none exists") is now superseded for Founder Bio specifically — a real photo now exists — and confirmed PROJECT_MASTER.md's Step 11 outline (Hero/Who Oragrol Is/Company Story/Philosophy/Experience & Expertise/Partners & Ecosystem/Approach/CTA, "primarily light") is superseded by the real content brief, the same pattern D-046 set for Contact.
+- Found the founder photo saved to the repo root as `publicimagesfounder-mohammad.jpg.jpeg` (path separators and correct extension lost) instead of the stated `public/images/founder-mohammad.jpg`. Read/viewed it directly first to confirm it's a real, valid, high-resolution (3024×4032, exact 3:4 portrait) photo — not a broken/placeholder file — before moving it to the correct path and deleting the stray original.
+- Research: `ui-ux-pro-max` (`--domain landing`, `--domain ux`) and `21st.dev` (`search` for founder/about/team patterns) — neither surfaced a strong match for a premium editorial founder-bio pattern; results were generic SaaS "About Page" templates. Built natively instead, flagged as such rather than falsely presented as sourced — consistent with this project's repeated precedent (D-035/D-041/D-043) for the same situation.
+- Built 4 components, each with a distinct treatment (not four stacked identical blocks): `FounderBio` (Dark, 2-col, real photo at hero scale with a `GlowEffect` halo reusing Services' D-013 "light-based depth" material, lede-sized origin paragraph), `MissionStory` (Light-blue, single-column manifesto — the two-sentence opening set at display scale via a plain `<h2>` to avoid the H2-size/`cn()` conflict D-018 already documented), `TeamSection` (White, deliberately minimal bordered band), `ValuesSection` (White, 3-item icon-led grid reusing `CapabilitySpotlight`'s exact icon-badge gradient, closing one-line summary in its own nested `env-dark` panel). Composed in `app/company/page.tsx` with the existing `FinalCta` reused at the bottom (flagged as a structural choice, same as Industries' identical reuse).
+- **Deliberately opened Founder Bio Dark, not the brief's "primarily light" framing — flagged, not silent:** `SiteHeader` is hardcoded `env-dark`, illegible-by-design against a light entry section before ~140px of scroll (its own comment already flags this as a known, not-yet-fixed gap). Every page built so far opens Dark for the identical reason (confirmed via `services/hero.tsx`'s own comment). Rather than touch the shared `SiteHeader` (out of scope, risks every already-approved page) or ship a page illegible at load, kept Founder Bio Dark and the remaining 3 sections White/Light-blue.
+- Caught and fixed two real issues before calling this done, not after: (1) a mobile-only 8px horizontal overflow — Founder Bio's photo-halo `GlowEffect` wrapper used a `-inset-8` negative inset with no `overflow-hidden` ancestor; fixed by adding `overflow-hidden` to the section, the same pattern `FinalCta`'s own decorative bleed already uses. (2) A heading-hierarchy gap — Values' 3 card titles were built as `H4` under an `H2`, skipping a level and breaking this project's own established convention (grepped the whole codebase: every other card/item title site-wide — Contact, How We Work, Services — uses `H3`, never `H4`); fixed to `H3`.
+- Correctly diagnosed a screenshot false alarm rather than reporting it as a bug: a `fullPage: true` Playwright mobile capture appeared to show the founder photo entirely missing and the sitewide `EmergencyCta` pill overlapping the H1 name. Checked via direct DOM/computed-style query before concluding anything (same discipline as D-036/D-041/D-043's own prior false-alarm catches) — the photo was fully loaded/visible/correctly positioned, and the pill's actual parent element is genuinely `position: fixed` (confirmed in source); both artifacts were Playwright's own known limitation of compositing fixed-position elements once into a tall stitched image, not a live defect. Re-captured with per-viewport (non-stitched) screenshots, which show both rendering correctly. Separately confirmed the pill's real, live overlap with Values' third card at one specific mobile scroll depth is the same already-flagged, out-of-scope D-044 issue from Industries — not new, not silently fixed, not silently ignored either.
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean (`/company` static, 11 routes). Server HTML fetched directly via `curl` (not just browser-rendered) confirmed all 4 section headings present verbatim. Playwright: 0px horizontal overflow at 1440px/390px; reduced-motion context confirms every `Reveal`-wrapped heading renders at `opacity: 1` (final state); alt text confirmed present and meaningful; heading order confirmed correct (one H1, then H2s, then H3s, no skips) after the fix. Full-page and per-section screenshots at both widths reviewed directly before reporting anything as done.
+
+**Files changed:**
+- New: `app/company/page.tsx`, `app/components/sections/company/{founder-bio,mission-story,team,values,values-data}.tsx/.ts`
+- Moved: founder photo from a mis-saved repo-root file to `public/images/founder-mohammad.jpg`
+- `DECISIONS.md` (D-048), `PROJECT_MASTER.md` (Step 11 → IMPLEMENTED, Current Position), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The mis-saved founder-photo filename (caught before use, not a code defect).
+- The mobile overflow bug and the H4/H3 heading-hierarchy gap — both caught and fixed within this same round, not left for Mohammad to discover.
+- The Playwright `fullPage`+`position:fixed` compositing artifact — a real tooling quirk, correctly diagnosed via direct DOM inspection before being (not) reported as a product bug.
+
+**Problems solved:**
+- Step 11 built from a real, final content brief with a genuinely different (specific, compliance-reviewed) structure than the original placeholder outline, verbatim copy preserved, nothing invented — matching this project's content-accuracy discipline (CLAUDE.md §8) for client-facing MSSP copy. A real photo now exists, superseding D-008's "no fabricated photography" note for this one section.
+
+**Still open / needs verification:**
+- Mohammad's review of `/company` (D-048).
+- Same standing flags as every recent page: the sitewide `EmergencyCta` pill overlap-at-some-scroll-positions issue (D-044, out of scope); SiteHeader's Dark-entry-section assumption (reaffirmed here, not fixed).
+- **BLOCKING, unrelated to this session:** a real `RESEND_API_KEY` from Mohammad for D-047 — still outstanding.
+
+**Next recommended step:**
+- Get Company reviewed. Step 10 (Resources/Insights) is the next unbuilt step once outstanding reviews clear (How We Work, Cyber Health ambient hero, Industries, Contact, Company).
+
+---
+
+### 2026-08-15 (continued 4) — General Inquiry form added to Contact (D-047), blocking on a real API key
+**Completed:**
+- User instructed a third Contact-page entry point, above Locations: "General Inquiry" (headline/subtext + Name/Email/Company-optional/Message form, "Send Message" button), with an explicit real-email requirement — no n8n/HubSpot, must actually send via Resend or SendGrid (whichever's simpler), a real success/error state (no faked success), and an explicit instruction to say exactly what API key setup is needed rather than hardcoding anything.
+- Chose Resend over SendGrid: one API key, one `emails.send()` call, and its own `onboarding@resend.dev` sandbox sender can send a real test email immediately with just the key — no mandatory sender-verification step first, unlike SendGrid. Installed `resend` + `@hookform/resolvers`; `react-hook-form`/`zod` were already project dependencies, unused anywhere until now — reused rather than hand-rolling form state or a different library.
+- Built one shared `zod` schema (`app/lib/contact-schema.ts`), validating both client (`GeneralInquiry`, via `zodResolver`) and server (`/api/contact`'s authoritative re-check). Hit and fixed a real zod+RHF typing pitfall before shipping: an initial `.transform()` on the optional `company` field made zod's input/output types diverge, which broke `useForm`'s single generic — removed the transform, handled blank-vs-provided at render time instead (`company || "—"` in the email body).
+- Built `POST /api/contact` — the only place the real send happens (client never touches Resend directly, no key in the browser bundle). `RESEND_API_KEY` read via `process.env` only; a missing key is a real, logged, reportable failure (never a faked success) — returns a real error pointing the visitor to the direct email address. Added `.env.local.example` (had to also fix `.gitignore`: the existing blanket `.env*` rule was silently swallowing example files too — added `!.env*.example`) documenting `RESEND_API_KEY` (required) plus `CONTACT_TO_EMAIL`/`CONTACT_FROM_EMAIL` (optional overrides).
+- Verified the "no fake success" behavior directly rather than just claiming it: submitted the live form with no `RESEND_API_KEY` set (this environment has none) — Playwright and the dev-server log both confirm it surfaces the real "Email sending isn't configured yet..." error, with the exact diagnostic logged server-side.
+- Visual consistency: the form sits in the same `Card` treatment as `TwoPath`'s two path-cards (bordered, same Caption/H2 pattern) — reads as a third option in the same family, not a bolted-on generic form. Error text reuses the site's existing `text-risk-critical` form-error convention (already used by `FieldChrome`), not a new color.
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean (`/api/contact` now a dynamic route, `/contact` still static — 13 routes total). Screenshots sent showing the idle form (styled consistent with the two path-cards) and the real error state after a live test submission.
+- **Still blocking, surfaced explicitly rather than worked around:** a real `RESEND_API_KEY` is needed from Mohammad before the required real-send proof (screenshot of a received email, or a server log showing success) can be completed. Did not fabricate either.
+
+**Files changed:**
+- New: `app/api/contact/route.ts`, `app/lib/contact-schema.ts`, `app/components/sections/contact/general-inquiry.tsx`, `.env.local.example`
+- `app/contact/page.tsx` (wired in above LocationsSection), `.gitignore` (`!.env*.example` exception), `package.json`/`package-lock.json` (`resend`, `@hookform/resolvers`)
+- `DECISIONS.md` (D-047), `PROJECT_MASTER.md` (Step 12 update, Current Position), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The zod `.transform()`/RHF generic-type mismatch above — caught by `tsc`, fixed before shipping, not a runtime bug.
+
+**Problems solved:**
+- A real, working (pending only a real API key) email-send integration built from already-installed dependencies, with the "don't fake success" requirement verified by actually triggering the failure path live, not just written into the code and assumed correct.
+
+**Still open / needs verification:**
+- **BLOCKING:** a real `RESEND_API_KEY` from Mohammad (see Current Status/Next Steps #1 for exactly what to supply and where it goes) — required before the real-send proof this task explicitly asked for can be completed.
+- Mohammad's review of `/contact` (D-046/D-047), `/industries` (D-044), the Cyber Health ambient hero (D-043), and How We Work (D-036/D-037/D-038) — all pending.
+- Nav contrast (visual check only, carried over) — still the only long-standing open item.
+
+**Next recommended step:**
+- Get the real `RESEND_API_KEY` from Mohammad, wire it into `.env.local`, run and prove a real test send. Otherwise: awaiting review of the several items above; Step 10 (Resources/Insights) once those clear.
+
+---
+
+### 2026-08-15 (continued 3) — Contact page built (Step 12, D-046) + Instagram link fixed
+**Completed:**
+- User supplied `Oragrol_Contact_Page_Content.md` with an explicit two-path structure superseding Step 12's original generic-form outline: Path 1 "New to Oragrol" → the Cyber Health assessment; Path 2 "Existing client / urgent" → direct phone/email + "Under attack?" — kept visually/functionally separate, not merged into one form. Reused the hero headline ("Let's make security clearer.") from the original outline since it's still the same locked line; dropped "Book a consultation" since no real booking destination exists anywhere in the project (flagged, not invented).
+- Built `locations-data.ts` — a typed `Location[]` array. Thunder Bay's fields copied verbatim (real address/phone/email/hours). Every Toronto field is the literal `[pending]` marker from the source, rendered per-field as a "Coming soon" `Badge` — not blank, not backfilled with Thunder Bay's values. Toronto renders as the visually primary card (larger, accent border/tint, "Operations" label); Thunder Bay renders smaller/secondary, explicitly "Registered Office."
+- Caught and avoided a real pitfall before it shipped: the location cards needed a heading size between `H3`'s two existing tiers. Overriding `H3`'s size via `className` would have emitted two conflicting `text-*` utilities for the same element — the exact plain-`cn()`-concatenation gotcha `cn.ts`/`typography.tsx` already document. Used a plain `<h3>` with one complete class string instead of fighting the shared component's own size table.
+- Path 2's "Under attack?" CTA is a real `tel:` link to Thunder Bay's confirmed number, not a link back to `/contact` — that would be circular now that this page IS `/contact` and the sitewide pill (D-045) already points here. Path 1 reuses the exact same `AssessmentCta`/Tally destination used everywhere else. Deliberately no closing `FinalCta` on this page (every other page has one) — `FinalCta` itself points at `/contact`, so it would point the page at itself.
+- Instagram fix (separate item, same session): grepped the whole repo for `instagram` first — confirmed exactly one live `href` existed (`SiteFooter`'s `href="#"` placeholder, D-017); no separate hardcoded instance anywhere else, including the new Contact page (which doesn't render social icons). Updated to `https://www.instagram.com/oragrolglobal`, added `target="_blank"`/`rel="noopener noreferrer"` to match the LinkedIn icon's existing pattern, removed the now-inaccurate "(coming soon)" `aria-label`.
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean (`/contact` now static, 12 total routes). Playwright confirmed — scoped to `<main>`, since the header nav has its own same-text CTA that a naive query would wrongly match — Path 1's CTA resolves to the real Tally URL; Path 2's CTA resolves to `tel:+16133150328`; the email link resolves to `mailto:info@oragrolglobal.com`; exactly 4 "Coming soon" badges render; both "Registered Office"/"Operations" labels are present. Post-edit grep: zero remaining `href="#"` in any `.tsx` file; exactly one hit for the real Instagram URL. Screenshots sent to the user showing both location cards (pending-state styling included) and the footer.
+
+**Files changed:**
+- New: `app/contact/page.tsx`, `app/components/sections/contact/{hero,two-path,locations,locations-data}.tsx/.ts`
+- `app/components/site/site-footer.tsx` (Instagram href + comment)
+- `DECISIONS.md` (D-046), `PROJECT_MASTER.md` (Step 12 → IMPLEMENTED, Current Position), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The `H3` size-conflict pitfall above — caught and avoided before it shipped, not a real bug in the final code.
+
+**Problems solved:**
+- Step 12 built from a real content brief with a genuinely different (better-specified) structure than the original placeholder outline, without silently dropping the "Book a consultation" CTA's absence — flagged instead.
+- Instagram's last remaining dead link on the site replaced with the real URL.
+
+**Still open / needs verification:**
+- Mohammad's review of `/contact`, `/industries` (D-044), the Cyber Health ambient hero (D-043), and How We Work (D-036/D-037/D-038) — all pending.
+- Toronto's address/phone/email/hours remain genuinely unconfirmed — do not fill in without a real supplied value.
+- Nav contrast (visual check only, carried over) — still the only long-standing open item.
+
+**Next recommended step:**
+- Awaiting Mohammad's review of the several items above; Step 10 (Resources/Insights) once those clear.
+
+---
+
+### 2026-08-15 (continued 2) — Emergency CTA placeholder number removed (D-045)
+**Completed:**
+- User instructed removing D-017's temporary Malaysian emergency number from the "Under attack?" floating pill site-wide, replacing it with a text-only CTA linking to `/contact` — "Under attack? Contact us now," same pill styling/icon/position.
+- Grepped the whole repo for the number and its `tel:` variant first, per this project's "investigate before editing" discipline: found exactly one component, `EmergencyCta`, rendered once from `RootLayout` (already site-wide, including behind the footer) — no separate hardcoded footer instance existed to find.
+- Edited `EmergencyCta`: `<a href="tel:...">` → `next/link` `<Link href="/contact">`; deleted the phone-number constants entirely (not just hidden/commented out); kept `PhoneCall` icon, pill classes, and fixed bottom-right position untouched, per explicit instruction. Also stripped the literal digits out of the component's own code comment — the requirement was "no longer appears anywhere," which a comment would have violated even though it doesn't render.
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean. Post-edit grep for the exact digit sequence across the repo: zero hits outside `DECISIONS.md`/`PROJECT_MEMORY.md` (the permanent historical record, correctly left alone). Playwright-confirmed on 3 different pages (`/`, `/cyber-health`, `/industries`) that the pill's text and `href` are both correct — not assumed from editing one call site, since the component is global.
+
+**Files changed:**
+- `app/components/site/emergency-cta.tsx`
+- `DECISIONS.md` (D-045, D-017 cross-reference update), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- None — straightforward single-component change, no surprises.
+
+**Problems solved:**
+- D-017's "temporary placeholder, replace before launch" flag is now moot for the phone number specifically (no number shown at all). Instagram's separate placeholder from the same D-017 round is untouched, still open.
+
+**Still open / needs verification:**
+- Instagram `href="#"` placeholder (D-017, unrelated to this change).
+- Mohammad's review of `/industries` (D-044), the Cyber Health ambient hero (D-043), and How We Work (D-036/D-037/D-038) — all still pending from prior sessions.
+
+**Next recommended step:**
+- Awaiting Mohammad's review of the several items above; Step 10 (Resources/Insights) once those clear.
+
+---
+
+### 2026-08-15 (continued) — Industries page built (Step 9, D-044)
+**Completed:**
+- User supplied `ORAGROL_INDUSTRIES_CONTENT_CANADA.md` (Mohammad's real, fact-checked-against-Canadian-Centre-for-Cyber-Security/OSFI content brief) plus an explicit structure spec: desktop left sidebar / mobile horizontal scrollable tabs, a right detail panel with 4 fields (Risk/Priorities/Approach/Next Step), instant swap on click (no reload, no accordion), active/inactive styling reusing Services' existing weight-600/weight-400-muted convention, and a typed content array separate from component logic.
+- Researched the interaction pattern first, same discipline as Services/How We Work: `ui-ux-pro-max`'s `ux` domain (keyboard-nav/focus-state/tab-order guidance) and a `21st.dev` component search for "sidebar tabs detail panel selector," both confirming this is the WAI-ARIA "Tabs" pattern — a `tablist` of `tab`s driving one `tabpanel` via state — not a same-page anchor-nav list like Services' `CategoryNav` (that one scroll-spies real hrefs to always-rendered sections; here only one panel is ever on screen).
+- Built `IndustriesExplorer`: real `role="tablist"`/`tab`/`tabpanel` semantics on `<button>`s (not `NavLink`, which is a real page-navigating `<Link>`) with full keyboard support (Arrow/Home/End, roving `tabIndex`). Active/inactive styling reimplements `NavLink`'s locked `size="lg"` split (D-019) rather than inventing a new rule. Desktop: sticky vertical tablist. Mobile: the identical tab set rendered horizontally with `overflow-x-auto`/`whitespace-nowrap` — verified zero horizontal overflow at 390px.
+- Built `industries-data.ts` — all 9 industries as a typed array, content copied verbatim. **Verified byte-for-byte via a Node script** that parses the source `.md` and diffs every field against the built array programmatically (not a visual read-through) — all 9 industries × 4 fields matched exactly on the first pass.
+- `nextStep.kind` routes each CTA to the correct real existing target (not new content): "Get Your Cyber Health Score" → the live Tally assessment via the existing `AssessmentCta`; every "Talk to Oragrol About X" variant → `/contact`, same as every other "Talk to Oragrol" CTA site-wide.
+- Flagged rather than silently decided: no separate abstract-line-motif hero visual was built (D-008's original direction) — the structure spec given this round didn't call for one, and the interactive explorer itself is the "revealed via interaction" element; a future round could still add one. Also reused `FinalCta` at the page bottom (consistency with every other shipped page, not explicitly requested — flagged as a choice, not invented content).
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean (`/industries` now a static route, 11 total). Playwright clicked through 3 industries confirming the panel swaps to the correct real content every time (checked via `innerText`, not a glance); keyboard `ArrowDown` correctly moved tab selection; zero horizontal overflow at 390px. Screenshots sent to the user showing two different industries selected plus the mobile tab bar.
+- Surfaced, not fixed (out of scope): the sitewide floating "Under attack?" widget can visually overlap the panel's Next-Step CTA button at some scroll positions on this page — a pre-existing floating-element layout issue, not specific to Industries.
+
+**Files changed:**
+- New: `app/industries/page.tsx`, `app/components/sections/industries/{hero,industries-explorer,industries-data}.tsx/.ts`
+- `DECISIONS.md` (D-044), `PROJECT_MASTER.md` (Step 9 → IMPLEMENTED, Current Position), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The pre-existing "Under attack?" widget overlap noted above — real, but out of scope for this instruction.
+
+**Problems solved:**
+- Step 9 fully built from a real, sourced content brief with byte-for-byte verification, not a paraphrase — matching this project's content-accuracy discipline (CLAUDE.md §8) for client-facing MSSP copy.
+
+**Still open / needs verification:**
+- Mohammad's review of `/industries`.
+- Awaiting Mohammad's review of Step 8 (How We Work) and the Cyber Health ambient hero (D-043) — both still open from prior sessions.
+- Nav contrast (visual check only, carried over) — still the only long-standing open item.
+
+**Next recommended step:**
+- Get Industries reviewed; Step 10 (Resources/Insights) is next once outstanding reviews clear.
+
+---
+
+### 2026-08-15 — Cyber Health ambient hero shipped live (D-043)
+**Completed:**
+- User (in-session, standing in for Mohammad's sign-off) gave the final go-ahead on D-043's prototype: replace `GaugeVisual` with `HeroAmbientLoader` in the live hero, and explicitly re-specified the wording — "Assess." → "Prioritize." → "Protect." every ~2.2s — resolving last session's flagged wording note in favor of keeping the original words as given rather than reconciling with the locked How We Work vocabulary.
+- Confirmed nothing needed building from scratch: the D-043 prototype (`hero-ambient-loader.tsx`, `RotatingRing`/`FadeText` extracted into `ai-loader.tsx`) already satisfied every requirement (persistent/no isLoading flag, reduced-motion, IntersectionObserver offscreen-pause, `--color-accent`/`--color-background` tokens only, headline/subhead/CTAs untouched) — wired it in rather than re-deriving it.
+- `hero.tsx`: swapped the `GaugeVisual` import/usage for `HeroAmbientLoader`, added an inline comment pointing to D-043. Removed `/cyber-health/prototype-hero` and the prototype-only `CyberHealthHeroAmbientPrototype` component, per the same prototype-lifecycle convention as D-039/D-040 and D-041/D-042 (noindex prototype routes get deleted once the real decision is made). Updated `cyber-health/page.tsx`'s own doc comment (still referenced `GaugeVisual`). Left `gauge-visual.tsx` itself in place, unused, available for revert — same convention as `StrataVisual` after D-039/D-040.
+- Verification: `.next` cleared (stale route-manifest reference to the deleted prototype route caused a transient `tsc` error, resolved by clearing the cache — not a real code problem), then `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean. Dev server restarted clean to clear stale HMR state from the deleted route.
+- **Screenshot-methodology finding, surfaced rather than worked around silently:** the Chrome-extension automation tab in this environment reports `document.hidden === true` / `document.hasFocus() === false` even immediately after an explicit click on the page, regardless of `tabs_create_mcp`d fresh tabs — Chrome throttles/freezes CSS animations and `setInterval` timers on such tabs, which produced a string of misleading screenshots (the fade-in stuck at "P", then "PR", advancing by roughly one letter per screenshot call — consistent with Chrome forcing exactly one paint per `captureScreenshot` call and otherwise freezing the compositor). Diagnosed via direct DOM query (`getComputedStyle(letterSpan).opacity` reading `0` for every letter of "Prioritize." while screenshots showed partial glyphs) before concluding it was a capture artifact, not a real animation bug. Switched to the project's own documented method (CLAUDE.md §7: Playwright via `playwright-core`, scripted from the scratchpad) instead of fighting the extension — Playwright's headless page has no such hidden-tab throttling, and correctly captured all three required states on the first pass: (a) live proof screenshot with "PRIORITIZE." fully opaque and the ring mid-spin, sent to the user; (b) reduced-motion context — 0 `.animate-spin` elements, static "Assess. Prioritize. Protect." label; (c) scroll-based IntersectionObserver check — `.animate-spin` count 1 in view → 0 scrolled to page bottom → 1 back in view.
+
+**Files changed:**
+- `app/components/sections/cyber-health/hero.tsx` (`GaugeVisual` → `HeroAmbientLoader`)
+- `app/cyber-health/page.tsx` (doc comment only)
+- Deleted: `app/cyber-health/prototype-hero/page.tsx`, `app/components/sections/cyber-health/hero-ambient-prototype.tsx`
+- `DECISIONS.md` (D-043 status → shipped)
+- `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The Chrome-extension screenshot-throttling issue above — real, but a tooling/environment artifact, not a defect in the shipped code (confirmed by the DOM-level opacity check and by the clean Playwright capture of the same page).
+
+**Problems solved:**
+- D-043 fully closed: prototype → live, with direct-evidence proof (not code-level claims) for every one of the 7 stated requirements.
+
+**Still open / needs verification:**
+- Step 9 — Industries content brief, not yet received.
+- Nav contrast (visual check only, carried over) — still the only long-standing open item.
+
+**Next recommended step:**
+- Step 9 — Industries, once Mohammad sends the per-industry content brief.
+
+---
+
+### 2026-08-14 (continued 24) — Cyber Health hero gauge reopened, ambient rotating-ring loader prototyped; wording flag surfaced (D-043)
+**Completed:**
+- Mohammad reopened D-008's `GaugeVisual` hero visual, requesting a persistent ambient animated visual reusing D-042's `AiLoader` ring rather than duplicating it, with 5 required changes for the different (continuous, page-lifetime) use case: no action language, reduced-motion holding indefinitely, verified performance with offscreen throttling if needed, locked color palette, and preserved headline/subhead/CTAs. Prototype-first, same as every prior visual-change round.
+- Refactored `ai-loader.tsx` to export `RotatingRing` (now takes a `spinning` prop) and `FadeText` (now takes a `wordKey`) as shared building blocks, rather than copy-pasting the ring/fade-text markup into a new file — genuine reuse, not superficial. `AiLoader` itself now composes these internally; verified the refactor is byte-identical in output to the pre-refactor version (`RotatingRing size={96}` reproduces the original `h-24 w-24`/`inset-3` geometry exactly).
+- Built `HeroAmbientLoader`: cycles through Mohammad's exact given words ("Assess." / "Prioritize." / "Protect.") every 2.2s via `setInterval`, gated off entirely (never started) when `usePrefersReducedMotion` is true — verified by sampling DOM state at t=0s and t=8s under `reducedMotion: 'reduce'`, both showing zero `.animate-spin` elements and the same static text, not just checked once at the start. An `IntersectionObserver` on the wrapper pauses the ring's CSS animation and the word-cycle interval when scrolled out of view — verified `.animate-spin` count is 1 in view, 0 once scrolled away.
+- Performance measured, not assumed: 59fps sampled on desktop (normal CPU), 61fps sampled at a 390px viewport under CDP 4x CPU throttling — a CSS-only, compositor-driven animation, no meaningful cost either case, offscreen-pausing implemented regardless since this now runs indefinitely per visitor rather than AiLoader's brief 2.6s.
+- A wording note flagged, not silently resolved either way: Mohammad's given words only partially match the already-locked How We Work 4-stage vocabulary ("Understand/Prioritize/Protect/Improve," D-035/D-036) — "Assess" isn't one of the four. Built with his words exactly as given, per his own explicit "confirm with me if you want different wording" invitation — surfaced for his decision, not changed unilaterally.
+- Built `/cyber-health/prototype-hero`: shows the current live hero (`CyberHealthHero`, `GaugeVisual`, unchanged) stacked above the new prototype (`CyberHealthHeroAmbientPrototype`, `HeroAmbientLoader`) with identical copy, same comparison pattern as D-039's Kinetic Grid prototype. `hero.tsx`/`GaugeVisual` completely untouched.
+- Full verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean (10 routes); fresh clean rebuild; zero horizontal overflow at 1920/390px; both normal-motion and reduced-motion states screenshotted and reviewed directly (with proper scroll-through wait before capture, this project's established methodology for avoiding false "content missing" alarms from unfired `Reveal` animations).
+
+**Files changed:**
+- Refactored: `app/components/sections/cyber-health/ai-loader.tsx` (extracted `RotatingRing`, `FadeText`)
+- New: `app/components/sections/cyber-health/hero-ambient-loader.tsx`, `app/components/sections/cyber-health/hero-ambient-prototype.tsx`, `app/cyber-health/prototype-hero/page.tsx`
+- `DECISIONS.md` (D-043), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- None — this was a clean build. One thing flagged rather than silently resolved: the wording partial-mismatch with How We Work's locked stage names.
+
+**Problems solved:**
+- Reused (not duplicated) D-042's ring/fade-text visual treatment across two structurally different use cases (brief overlay vs. persistent hero) via a genuine shared-component extraction, per the instruction's explicit requirement.
+
+**Still open — needs Mohammad's input, not resolved unilaterally:**
+- Approval/rejection of the ambient hero visual itself.
+- The wording flag: keep "Assess./Prioritize./Protect." as given, or align to the locked How We Work vocabulary instead.
+
+**Next recommended step:**
+- Await Mohammad's review of `/cyber-health/prototype-hero` and his wording decision before wiring into the live page.
+
+---
+
+### 2026-08-14 (continued 23) — Cyber Health loader repurposed to a generic transition, wired live into both CTAs; /cyber-health/prototype-loader removed (D-042)
+**Completed:**
+- Mohammad confirmed D-041's architecture finding was correct and directed a repurpose: "this shouldn't narrate real backend steps that aren't actually visible to the frontend... Repurpose the loader as a brief, generic transition only — a few seconds showing something like 'Preparing your assessment...' before redirecting to the Tally form... Keep the color remap, reduced-motion handling, and clean component work you already did. Wire this in as the loading state shown during the click-to-redirect transition to Tally."
+- Rewrote `ai-loader.tsx`: removed the `STEPS` array, `stepIndex` state, and `setInterval`-based advancement entirely; replaced with one static `MESSAGE = "Preparing your assessment..."` constant. Visual treatment (rotating conic-gradient ring, layered inset-shadow core, letter-by-letter fade text) and the reduced-motion-gated static-label fallback are otherwise unchanged from D-041.
+- Designed around a real risk before building the wrong thing: a JS-triggered `window.open()` inside a delayed `setTimeout` loses the synchronous-user-gesture context browsers require, and would very likely get silently popup-blocked on this live, revenue-critical path. Built a new `AssessmentCta` wrapper instead — the underlying element stays a genuine `<a target="_blank" rel="noopener noreferrer">` with no `preventDefault`, so native navigation (middle-click, right-click, keyboard) is completely unmodified; the `onClick` handler shows a fixed full-screen overlay containing `AiLoader` alongside that native navigation, for 2.6s, then auto-hides.
+- Wired `AssessmentCta` into both of Cyber Health's "Get Your Cyber Health Score" CTAs — `hero.tsx` and `closing-cta.tsx`. Secondary "Talk to Oragrol" buttons (internal `/contact` links) untouched.
+- Removed `/cyber-health/prototype-loader`, same lifecycle as every prior prototype route this session.
+- A locator mistake caught mid-verification, not misreported: the first Playwright pass matched SiteHeader's own nav CTA (same accessible name, different `href`, internal `/cyber-health` link) instead of the hero's real `AssessmentCta`. Confirmed via `outerHTML` inspection before concluding anything, then re-scoped to `a[href*="tally.so"]`. A one-off timing flake in that same first run (overlay screenshot landed empty due to unusually slow new-tab-open latency that run) was distinguished from a real bug by re-running twice more (both passed) and by an isolated timing trace sampling overlay presence at 9 checkpoints from t+50ms to t+2864ms, which showed consistent, correct behavior throughout.
+- Full verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean (9 routes, prototype route confirmed gone); fresh clean rebuild; Playwright confirmed real Tally navigation via `context.waitForEvent('page')` in both normal-motion (hero) and reduced-motion (closing-cta) contexts; screenshotted both states; confirmed zero `.animate-spin` elements in the reduced-motion overlay; zero horizontal overflow; console 404s traced to pre-existing RSC prefetches for not-yet-built nav routes, confirmed unrelated to this change via a clean pageload with no clicks.
+
+**Files changed:**
+- Rewrote: `app/components/sections/cyber-health/ai-loader.tsx`
+- New: `app/components/sections/cyber-health/assessment-cta.tsx`
+- Edited: `app/components/sections/cyber-health/hero.tsx`, `app/components/sections/cyber-health/closing-cta.tsx`
+- Removed: `app/cyber-health/prototype-loader/page.tsx`
+- `DECISIONS.md` (D-042), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- A test-locator mistake (matched the wrong CTA) and a one-off timing flake — both caught and correctly diagnosed as test artifacts, not product bugs, before being reported as anything.
+
+**Problems solved:**
+- D-041's open architecture question (whether/where the loader should attach) is now fully resolved per Mohammad's explicit direction — no longer a blocking item.
+- Popup-blocker risk on a live, revenue-critical CTA designed around proactively, not discovered after shipping.
+
+**Still open / needs verification:**
+- Order of Step 9 (Industries) content brief — not yet supplied.
+- Nav contrast (visual check only, carried over) — still the only long-standing open item.
+
+**Next recommended step:**
+- Step 9 (Industries) needs a full per-industry content brief from Mohammad before it can be built.
+
+---
+
+### 2026-08-14 (continued 22) — Cyber Health processing-screen loader prototyped natively; two premise checks surfaced (D-041)
+**Completed:**
+- Mohammad requested an "ai-loader" processing animation for Cyber Health, framed as filling an already-documented "Processing Screen" spec gap, with a source code block that came through empty. Searched `21st.dev` first (same recovery approach that worked for Kinetic Grid) — no confident match this time; the described bugs (raw `class` attributes, missing base CSS, a specific purple/pink palette, dead `useState`) read as a non-21st.dev HTML/CSS snippet this project has no search access to. Built a native implementation of the described EFFECT instead — flagged explicitly as such, not presented as literally sourced code.
+- Checked the instruction's stated premise before building further, per this project's own discipline: grepped all project docs for "Processing Screen" and the 5 named steps — zero hits, no such spec section exists in this repo. More significantly, confirmed via `PROJECT_MASTER.md` Step 7 (an existing, already-documented architectural decision) that this codebase has NO in-app processing pipeline at all — the real Assessment/Score/AI-Analysis/CRM flow runs entirely on the external, already-live Tally MVP. Displaying a fake "Calculate Score → ... → Update HubSpot" progress animation as if this app performs those steps would misrepresent the product — a real Honesty Rule concern surfaced and reported, not silently built around.
+- Proceeded with the requested prototype anyway (the instruction itself already scoped "wiring into live" as a separate, later step) — built `AiLoader`: a rotating conic-gradient ring with a layered inset-shadow core (reusing the `color-mix()`-via-inline-style technique already established for `capability-spotlight.tsx`'s icon badge), letter-by-letter fade-up text cycling through the exact 5 given step names, and `usePrefersReducedMotion`-gated fallback (plain static label, no ring at all, when reduced motion is on).
+- Verified all 5 required fixes with direct evidence: each of the 5 step states individually screenshotted and confirmed via exact DOM text match (not timing alone); reduced-motion state confirmed to contain zero ring/animation elements via a precisely-scoped query (an initial broader check gave a false positive from an unrelated `aria-hidden` element elsewhere on the page — caught and corrected before concluding anything); confirmed text still advances through all 5 steps under reduced motion (only the visual animation is gated, not the underlying progress info); confirmed live `/cyber-health` has zero loader-related content — nothing wired in.
+- Full verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (10 routes); fresh clean rebuild; zero overflow.
+
+**Files changed:**
+- New: `app/components/sections/cyber-health/ai-loader.tsx`, `app/cyber-health/prototype-loader/page.tsx`
+- `app/globals.css` (one new `@keyframes` for the letter-fade effect — first custom keyframe in the file)
+- `DECISIONS.md` (D-041), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- Missing source code (resolved via native rebuild, flagged).
+- The "Processing Screen" spec claim doesn't match this repo's record.
+- A real architectural mismatch: this codebase has no in-app pipeline for a processing screen to represent honestly.
+- A false-positive in my own first verification check (too-broad selector) — caught and corrected within the same round.
+
+**Still open — needs Mohammad's input, not resolved unilaterally:**
+- Whether/where this loader should attach to the live Cyber Health page, given it has no real in-app process to represent.
+
+---
+
+### 2026-08-14 (continued 21) — Kinetic Grid shipped to live Solutions hero, re-verified; /solutions/prototype removed (D-040)
+**Completed:**
+- Mohammad approved D-039's prototype: "Approve the Kinetic Grid hero for Solutions. Ship it... Update DECISIONS.md to log this as an intentional replacement of D-008's original hero." Applied the exact same change from the prototype to the live `hero.tsx` — `KineticGrid` replacing `StrataVisual`, copy unchanged. Deleted `app/solutions/prototype/` and the prototype-only `hero-kinetic-prototype.tsx` component.
+- Re-ran the full verification suite against the LIVE page, not assumed to still hold from the prototype: fresh clean rebuild, `tsc`/`lint`/`build` clean (9 routes, `prototype` confirmed 404); canvas scoping re-measured (1920×520px on a 2530px page); background pixel re-sampled (exactly `rgb(10,10,10)`); reduced-motion frame re-sampled twice 600ms apart (byte-identical, confirms no animation); zero overflow at 1920/390px; confirmed via DOM query the hero section has a `<canvas>` and no `<svg>` (no `StrataVisual` remnant); full-page screenshot reviewed directly.
+- Logged D-040 per Mohammad's explicit instruction, framed as an intentional replacement of D-008's decision, not a defect fix — D-008 itself stays in the record unchanged as history.
+
+**Files changed:**
+- `app/components/sections/solutions/hero.tsx` (live: `KineticGrid` replaces `StrataVisual`)
+- Deleted: `app/solutions/prototype/page.tsx`, `app/components/sections/solutions/hero-kinetic-prototype.tsx`
+- `DECISIONS.md` (D-040), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Still open, unrelated to this change:**
+- `StrataVisual`'s file remains unused in the codebase, kept for a possible revert.
+- SiteHeader's dark-environment-on-entry assumption — long-standing, not newly introduced.
+
+**Next recommended step:**
+- Confirmed with Mohammad: next unbuilt page is Step 9 (Industries) — needs its own per-industry content brief before building, not started yet.
+
+---
+
+### 2026-08-14 (continued 20) — Solutions hero reopened: Kinetic Grid prototype, all 5 required modifications verified with direct evidence (D-039)
+**Completed:**
+- Mohammad explicitly reopened Solutions' already-approved D-008 hero visual, requesting a specific "Kinetic Grid" component (sourced via 21st.dev) as the new background. The instruction's own code block came through empty. Rather than block a second time on a missing-content issue, searched `21st.dev` directly and found an exact match ("Kinetic Grid," satoriui, id 18254) — confirmed via `get_component` that its name, description, and exact technical details (theme prop shape, `fixed inset-0`/`min-h-screen`) matched the instruction's own description before treating it as the real source.
+- Built all 5 required modifications: (1) scoped to the hero via `ResizeObserver` + wrapper-relative coordinates, not `window`; (2) color remapped to `tokens.css`'s own raw hex values (`#0a0a0a` background, `#018abe` accent), monochrome variant removed entirely; (3) reduced-motion support via the existing `usePrefersReducedMotion` hook, one static frame instead of the rAF loop; (4) performance measured, not assumed; (5) existing Solutions hero copy preserved verbatim.
+- Initially edited the LIVE `hero.tsx` directly — caught this immediately (the instruction explicitly said prototype at `/solutions/prototype` first) and reverted via `git checkout` before building the actual prototype route correctly.
+- Caught and fixed a real lint error (not just a functional bug): the sourced component's own recursive `requestAnimationFrame(animate)` inside a `const animate = useCallback(...)` tripped a `react-hooks` self-reference rule. Fixed with a hoisted local `function` declaration instead.
+- Caught two screenshot-timing false alarms (both normal and reduced-motion captures initially appeared to show the prototype's headline missing) — same category this project has now hit multiple times. Confirmed via computed-style query before re-capturing with proper scroll-through, which showed correct rendering in both cases.
+- Verified with direct evidence, not assumption, for every one of the 5 required items: canvas bounding box measured (520px tall on a 2380px page, not viewport-fixed); background pixel sampled via `getImageData` (exactly `rgb(10,10,10)`); reduced-motion frame sampled twice 600ms apart and found byte-identical (proves no animation running); FPS measured via a real rAF-sampling script (60fps at 1920px, 56fps at 390px under a CDP 4x CPU throttle); live `/solutions` confirmed to have zero `<canvas>` elements (untouched).
+- Full verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (10 routes); fresh clean rebuild; zero overflow at 1920/390px.
+
+**Files changed:**
+- New: `app/components/sections/solutions/kinetic-grid.tsx`, `hero-kinetic-prototype.tsx`, `app/solutions/prototype/page.tsx`
+- `app/components/sections/solutions/hero.tsx` — reverted to original after an accidental direct edit, confirmed unchanged
+- `DECISIONS.md` (D-039), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- Missing source code in the instruction (resolved via direct 21st.dev search, not blocking).
+- A real lint error in the sourced component's own recursive rAF pattern.
+- Two screenshot-timing false alarms — both correctly diagnosed before being reported as real.
+- My own process slip (editing the live file before the prototype) — caught and reverted within the same turn.
+
+**Still open:**
+- Mohammad's review and approval before shipping to the live `/solutions` page.
+
+---
+
+### 2026-08-14 (continued 19) — Home teaser's matching connector-line bug fixed (D-038)
+**Completed:**
+- Mohammad confirmed fixing `home/how-we-work.tsx`'s matching bug (flagged during D-037's investigation). Applied the identical Grid-based fix — circle in `sm:col-start-2`, content alternating left/right, text-aligned toward the spine. Mobile untouched.
+- Verified: fresh clean rebuild, `tsc`/`lint`/`build` clean (9 routes); Playwright measurement at both 1920px and 390px confirms 0px delta between every circle's center and the spine's center (even tighter than the new page's 1px sub-pixel gap); zero overflow at both widths; screenshots reviewed directly at both widths, confirming the fix visually; confirmed Approach's separate horizontal 4-stage section (same labels, unrelated layout) is unaffected.
+
+**Files changed:**
+- `app/components/sections/home/how-we-work.tsx` (Grid-based circle-centering fix, same technique as D-037)
+- `DECISIONS.md` (D-038), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Still open:**
+- Mohammad's review of the overall How We Work page build (D-036/D-037) and this Home fix.
+
+---
+
+### 2026-08-14 (continued 18) — Stage Sequence connector-line bug fixed; cited reference component found to have the identical bug (D-037)
+**Completed:**
+- Mohammad reported the connector line doesn't pass through the alternating stage circles, and named `home/how-we-work.tsx`'s own teaser as a working reference to check against. Investigated the reference directly before assuming it was correct — measured its actual live circle and spine positions (not read from source alone): circles at x=340/1100, spine at x=720, at 1440px. The reference has the exact same disconnect, confirmed via both DOM measurement and a direct screenshot of that section. Reported this rather than either silently copying a broken pattern or silently staying quiet about the reference also being wrong.
+- Root cause identified in both components: a fixed-position spine (`left-1/2 -translate-x-1/2`) combined with `flex-row-reverse` alternation, which packs each row's circle+content toward that row's own flex-start edge (alternating left/right) — never toward the actual center where the spine sits.
+- Real fix, not a reference-matching patch: restructured the `sm:`+ layout as CSS Grid with the circle always explicitly in the center column (`sm:col-start-2`, the same column the spine targets) — guaranteed by construction, not incidental row width. Content alternates into the left or right column depending on stage, text-aligned toward the spine. Mobile (already correct, single left-aligned column) untouched.
+- Verified the specific requirement (screenshots at 1920px and 390px showing the line passing through each circle) with actual measurement, not just a screenshot glance: at 1920px, all 4 circles' center-x exactly matches the spine's center-x (0px delta). At 390px, 1px delta (sub-pixel rounding). Screenshots at both widths confirm this visually.
+- Full verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (9 routes); fresh clean rebuild; zero overflow at 1920/390px.
+- Flagged, not actioned: `home/how-we-work.tsx` still has the same bug — out of scope for this instruction (different page), left for Mohammad's decision.
+
+**Files changed:**
+- `app/components/sections/how-we-work/stage-sequence.tsx` (Grid-based circle-centering fix)
+- `DECISIONS.md` (D-037), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The reported bug (real, confirmed).
+- The cited reference component has the identical bug — a real finding surfaced during investigation, not something Mohammad had asked to be checked, reported anyway per this project's own "don't stay quiet about it" discipline.
+
+**Still open:**
+- Mohammad's review of the fix.
+- Whether to also fix `home/how-we-work.tsx`'s matching bug.
+
+---
+
+### 2026-08-14 (continued 17) — Step 8 (How We Work) content-complete: full page built from supplied copy, byte-for-byte verified (D-036)
+**Completed:**
+- Mohammad supplied the real page copy (hero headline/subhead, 4 full stage paragraphs, closing band). Built the full page around the already-approved-pending hero visual: `HowWeWorkHero` (headline/subhead + the D-035 visual, White environment — kept deliberately, since the visual is a nested dark panel that needs a lighter surrounding environment to read as elevated, explained in the component's own comment), `StageSequence` (4 full-paragraph stages, a page-level scale-up of `home/how-we-work.tsx`'s own vertical spine+circle teaser pattern — the same "reuse the technique, scale it up" move Cyber Health's `Flow` already made from `Approach.tsx`), `HowWeWorkClosingCta` (page-specific, single button, same ring/dark visual family as `FinalCta`/Cyber Health's `ClosingCta` but its own component since the given copy doesn't match either).
+- Verified copy fidelity with actual evidence, not a glance: wrote a Playwright script asserting byte-for-byte string equality between the supplied text and the rendered DOM for all 12 content pieces (headline, subhead, 4 stage titles, 4 stage paragraphs, closing headline, closing button). All 12 passed exactly.
+- Caught and correctly diagnosed a screenshot false alarm: the first mobile full-page screenshot appeared to show the Stage Sequence section completely blank. Investigated via computed-style query before concluding anything — confirmed `opacity: 1`, correct position, fully visible; root cause was the screenshot script's 400ms per-scroll wait being too short for the section's staggered `Reveal` animations, the same category of false alarm this project's own history already has a precedent for (Cyber Health's `Flow`). Re-captured with a longer wait and confirmed all 4 stages render correctly.
+- Flagged one judgment call rather than silently resolving it: the hero visual's own short stage one-liners now sit directly above the Stage Sequence's full-paragraph versions of the same 4 stages. Left unchanged (wasn't asked to revise the hero visual), flagged for Mohammad's read on whether the repetition is intentional or redundant.
+- Full verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (9 routes); fresh clean rebuild; zero overflow at 1440/390px; `noindex` removed now that real content exists.
+
+**Files changed:**
+- New: `app/components/sections/how-we-work/hero.tsx`, `stage-sequence.tsx`, `closing-cta.tsx`
+- `app/how-we-work/page.tsx` (rebuilt to compose the 3 new sections, `noindex` removed)
+- `DECISIONS.md` (D-036), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The mobile screenshot false alarm — caught and correctly diagnosed within this same round, not left for Mohammad to discover.
+
+**Still open / needs verification:**
+- Mohammad's review of the finished page.
+- His read on the hero-visual/Stage-Sequence content echo, flagged above.
+
+**Next recommended step:**
+- Await review. If approved, ask whether to continue to Step 9 (Industries) or handle further How We Work feedback first.
+
+---
+
+### 2026-08-14 (continued 16) — Step 8 (How We Work) started: hero visual built and self-verified; page copy flagged as missing, not invented (D-035)
+**Completed:**
+- Mohammad's build instruction for Step 8 was meant to include the full page copy, prefixed with clear instructions not to invent/add/reword anything. The message's copy section contained only the literal placeholder text `[PASTE THE FULL COPY ABOVE HERE]` — no real content. Flagged this immediately rather than guessing what the copy might have said or building placeholder-quality text to fill the gap.
+- Did the requested research anyway, since it didn't depend on the missing copy: `ui-ux-pro-max --domain chart` for cyclical/loop process data (Sankey/Process Mining both flagged with real accessibility caveats, rejected — same category of mismatch as Capability 08's earlier research); `mcp__21st__search` for a circular/looping component (nothing literally cyclical surfaced — "Animated Roadmap" is a path, not a closed loop). Built `HowWeWorkCycleVisual` natively instead, reusing this codebase's own proven techniques (`GaugeVisual`'s polar-coordinate math, `HeroSchematicVisual`'s node/connector language) rather than forcing a mismatched import.
+- The visual: 4 numbered nodes at compass positions, connected by directional accent arcs with arrowhead markers forming a closed loop — including the literal Improve→Understand closing segment Mohammad specifically asked for. A single slow flowing-dash animation reinforces the cycle, respecting `prefers-reduced-motion` (verified in a dedicated reduced-motion browser context, not just assumed).
+- Caught a real bug before build: an early draft applied `font-heading` via className to the shared `Text` component, which already carries `font-body` in its base string — the same `cn()` conflict pattern documented in D-016/D-019. Fixed with a plain `<p>` instead of fighting the shared component.
+- Caught and corrected a verification miss within the same round: the first computed-style check used a generic `document.querySelector('svg')`, which grabbed the site header's logo SVG (first in DOM order) instead of the diagram, and appeared to show 0 paths / no marker — looked like a real bug. Re-ran the check scoped specifically to the diagram's own `viewBox` and confirmed the arcs/marker/animation are all genuinely present and correctly computed. Logged the near-miss in `DECISIONS.md` rather than silently correcting it and moving on.
+- Built `/how-we-work` (noindex) containing only the confirmed-safe page label, the hero visual, and the instructed CTA text ("Talk to Oragrol" → `/contact`) — no invented headline/body copy. Full verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (9 routes); fresh clean rebuild; zero overflow at 1440/390px; zero non-pre-existing console errors; screenshots at both widths plus a reduced-motion context reviewed directly.
+
+**Files changed:**
+- New: `app/components/sections/how-we-work/cycle-visual.tsx`, `app/how-we-work/page.tsx`
+- `DECISIONS.md` (D-035), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The missing copy block (user-message issue, not a code defect) — caught before any content was invented.
+- The `font-heading`/`Text` conflict and the wrong-SVG verification miss — both caught and fixed within this same round, not left for a later round to discover.
+
+**Still open / needs verification:**
+- The actual "How We Work" page copy, from Mohammad.
+- Mohammad's review of the hero-visual prototype itself.
+
+**Next recommended step:**
+- Await the real copy block, then build the rest of Step 8 around the now-approved-pending hero visual.
+
+---
+
+### 2026-08-14 (continued 15) — Services signed off complete; docs updated; next page confirmed as Step 8 (D-034)
+**Completed:**
+- Mohammad gave explicit final sign-off: "Services is approved and complete." Logged D-034 in `DECISIONS.md` closing the entire visual-redesign thread (D-011 through D-034) with a summary of the final state per capability.
+- Updated `PROJECT_MASTER.md`: Step 5's status line changed to "SIGNED OFF, COMPLETE," a new paragraph added under it summarizing the Visual Design Correction thread's final state; Current Position (Section 7) updated with the D-034 sign-off and the confirmed next-step identification.
+- Read `PROJECT_MASTER.md`'s Build Sequence (Section 3) in full to identify the next page correctly rather than assuming: Steps 6 (Solutions) and 7 (Cyber Health) are already marked IMPLEMENTED — built before the D-009 page-by-page rollout rule existed — so the next PENDING step is **Step 8 — How We Work**. Confirmed this explicitly per Mohammad's own instruction ("confirm which page that is... before starting") rather than starting work on an assumption.
+- Trimmed `PROJECT_MEMORY.md`'s Next Steps list — removed now-superseded per-capability shipping bullets (fully captured in `DECISIONS.md` D-021 through D-034 already) and consolidated the durable cross-round lessons (grid stretch, badge-width truncation, illustrative-data flagging, etc.) into one compact list entry instead of six separate ones.
+
+**Files changed:**
+- `DECISIONS.md` (D-034), `PROJECT_MASTER.md` (Step 5 + Current Position), `PROJECT_MEMORY.md` (Current Status, Next Steps, this entry)
+
+**Next recommended step:**
+- Confirm with Mohammad that Step 8 (How We Work) is correct before starting real build work on it, and check whether a detailed content brief exists beyond the one-line design note already in `PROJECT_MASTER.md`.
+
+---
+
+### 2026-08-14 (continued 14) — Capability 03 extended per Mohammad's confirmation; all 8 capabilities ground-truth-verified; final 1920px sign-off screenshot sent (D-033)
+**Completed:**
+- Asked Mohammad directly (AskUserQuestion) rather than guessing how to resolve the D-032 discrepancy. He chose: extend the dashboard treatment to Capability 03 now, as a new decision.
+- `live-services.tsx`'s `CapabilityVisual` selector now matches both `n === "02"` and `n === "03"` for `CapabilityDashboardVisual`. Component takes no per-capability props (shared illustrative content) — reused as-is, not forked.
+- Full verification: killed stray node processes, cleared `.next`, `npm run build`/`tsc`/`lint` all clean (8 routes, no prototype routes remain anywhere); Playwright DOM/text-content check on all 8 rows individually confirms exactly one treatment each, no overlaps, no gaps: 01→orb only, 02→score card, 03→score card, 04→ring, 05→feed, 06→findings, 07→fleet, 08→playbook; zero overflow at 1440/1920/390px; zero non-pre-existing console errors.
+- Captured and sent the final full-page 1920px screenshot Mohammad requested, now that Capability 03's state is actually resolved and verified rather than assumed.
+
+**Files changed:**
+- `app/components/sections/services/live-services.tsx` (Capability 03 mark extension)
+- `DECISIONS.md` (D-033), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems solved:**
+- Resolved the D-032 discrepancy correctly — asked rather than guessed, then verified the actual result rather than trusting the instruction alone.
+
+**Still open / needs verification:**
+- Mohammad's actual sign-off on the final screenshot — not to be assumed from silence.
+
+**Next recommended step:**
+- Await his review. If approved, Services' visual-treatment work is done; ask what's next (another page's visual system, or further Services feedback).
+
+---
+
+### 2026-08-14 (continued 13) — Capability 02 shipped, verified; Capability 03 factual discrepancy found and flagged, not resolved either way (D-032)
+**Completed:**
+- Mohammad approved D-021's prototype. `live-services.tsx`'s `CapabilityVisual` selector gained a second branch — Capability 02 now renders `CapabilityDashboardVisual`. Deleted `app/services/prototype-v2/` — no prototype routes remain anywhere in the project.
+- The same message asked to "confirm Capability 03 still correctly shows the same dashboard treatment (it was approved as an extension of 02 earlier)." Checked this claim directly before doing anything with it: grepped `DECISIONS.md`/`PROJECT_MEMORY.md`/`PROJECT_MASTER.md` for any Capability 03 + dashboard reference — none exists. Re-read D-021's own text: explicitly "prototype ONE new treatment for Capability 02," never mentions 03. Checked the actual current code (`live-services.tsx`'s pre-edit `CapabilityVisual`) — only ever special-cased `n === "04"`, row 03 always fell through to the orb. Confirmed on a fresh production server via DOM/text-content query and a direct screenshot: Capability 03 renders the orb (ghost-numeral marker present), not the score card. The premise in Mohammad's message doesn't match any part of the project record.
+- Did not act on the unconfirmed premise either direction — did not silently extend the dashboard treatment to Capability 03 (would be inventing a decision that was never made, un-researched, no prototype/review step), and did not falsely report it as "confirmed correct" (would violate the Honesty Rule — it demonstrably isn't what he described). Flagged the discrepancy directly instead, per this project's own explicit rule for disagreeing with a stated premise.
+- Held the "final all 8 distinct" full-page screenshot Mohammad separately requested — generating it now would either misrepresent Capability 03's actual state or require guessing which way he wants it resolved.
+- Verified the Capability 02 ship itself thoroughly regardless: `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (8 routes); fresh clean rebuild; zero overflow at 1440/390px; zero non-pre-existing console errors; screenshot of rows 02/03 reviewed side by side.
+
+**Files changed:**
+- `app/components/sections/services/live-services.tsx` (Capability 02 mark swap)
+- Deleted: `app/services/prototype-v2/page.tsx`
+- `DECISIONS.md` (D-032), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The Capability 03 discrepancy — a false premise in the user's own instruction, caught by checking the record before acting rather than trusting the stated premise.
+
+**Still open / needs verification:**
+- Mohammad's answer on Capability 03 (misremembered, or does he want it extended now as a fresh decision).
+- The final 1920px sign-off screenshot, blocked on the above.
+
+**Next recommended step:**
+- Await his clarification before generating the requested final screenshot.
+
+---
+
+### 2026-08-14 (continued 12) — Capability 08 shipped live, verified; all 8 capabilities now individually treated; full-page 1920px screenshot for sign-off (D-031)
+**Completed:**
+- Mohammad approved D-030's prototype. `additional-capabilities.tsx`'s `CapabilityMark` selector gained a fourth branch — Capability 08 now renders `CapabilityPlaybookMark`. Deleted `app/services/prototype-v7/`. This closes the "Capabilities 04-08 shell rethink" thread opened by Mohammad's Round 7 instruction.
+- Verified: killed stray node processes, cleared `.next`, `npm run build`/`tsc`/`lint` all clean (9 routes, `prototype-v7` confirmed 404); DOM measurement shows all 4 finalizing cards at their own distinct natural heights (05: 450px, 06: 456px, 07: 370px, 08: 424px) — no stretching, the D-025 `items-start` fix held across all 4 replacements; zero overflow at 1440/1920/390px; zero non-pre-existing console errors.
+- Captured the full-page 1920px screenshot Mohammad requested for whole-page review (fresh production server, incremental scroll to trigger all `Reveal` on-scroll animations before capture, zero overflow confirmed at 1920px specifically) and sent it to him.
+
+**Files changed:**
+- `app/components/sections/services/additional-capabilities.tsx` (Capability 08 mark swap)
+- Deleted: `app/services/prototype-v7/page.tsx`
+- `DECISIONS.md` (D-031), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Still open / needs verification:**
+- Mohammad's whole-page review of the 1920px screenshot.
+- D-021 (Capability 02's dashboard-mockup prototype) remains the only open visual-treatment decision on Services.
+
+**Next recommended step:**
+- Await his full-page sign-off or further feedback.
+
+---
+
+### 2026-08-14 (continued 11) — Round 11: Capability 08 (Incident Response) shell prototype — LAST of the 8, self-verified (D-030)
+**Completed:**
+- Researched before building: `ui-ux-pro-max --domain chart` for process/sequence data (Process Map/Sankey both flagged with real accessibility caveats, too complex for a 4-step plan; UX-domain search confirmed a simple numbered step-sequence indicator instead); `mcp__21st__search` for playbook/timeline components ("How It Works," "How We Do It" — both real connected-step-card patterns, confirmed the mechanic, not imported directly).
+- Built `CapabilityPlaybookMark`: 4 connected phases (Detect/Contain/Recover/Review), numbered dots joined by a vertical spine — reusing the "connecting spine" TECHNIQUE Cyber Health's `Flow` already established on this site, at a much smaller scale. A genuinely 5th distinct mechanic among all capabilities addressed.
+- Considered and deliberately dropped a risk before building: an early draft showed one phase as "in progress." Dropped because a marketing page simulating a live "currently responding" state risks reading as an actual ongoing incident. All four phases render as an equal-weight static sequence instead.
+- Checked the shared-layout risk explicitly and found no issue (mark isn't taller than Capability 07's pictogram, confirmed via the in-context screenshot).
+- Built `/services/prototype-v7` (noindex), Capabilities 05/06/07 already reflecting their shipped treatments in both rows so only 08 differs. Self-verified against actual screenshots before reporting (per instruction): full clean rebuild, `tsc`/`lint`/`build` clean (10 routes), zero overflow at 390px, zero non-pre-existing console errors, DOM query confirming live `/services` Capability 08 unaffected, and the final screenshot reviewed directly — connecting line/dots align correctly, all four labels legible, no defects found.
+
+**Files changed:**
+- New: `app/components/sections/services/capability-playbook-mark.tsx`, `app/services/prototype-v7/page.tsx`
+- `DECISIONS.md` (D-030), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Still open / needs verification:**
+- Mohammad's review of D-030 — the last capability. If approved, all 8 have their own researched treatment.
+
+**Next recommended step:**
+- Await his decision. If approved and shipped, ask whether Services is now considered fully approved, or whether another review pass is coming before moving to another page.
+
+---
+
+### 2026-08-14 (continued 10) — Capability 07 shipped live, verified (D-029)
+**Completed:**
+- Mohammad approved D-028's prototype. `additional-capabilities.tsx`'s `CapabilityMark` selector gained a third branch — Capability 07 now renders `CapabilityFleetMark`. Deleted `app/services/prototype-v6/`.
+- Verified: killed stray node processes, cleared `.next`, `npm run build`/`tsc`/`lint` all clean (9 routes, `prototype-v6` confirmed 404); DOM measurement of all 4 finalizing cards confirms Capability 08 stays at 252px (unaffected) while 05/06/07 are 450/456/370px; zero overflow at 1440/390px; zero non-pre-existing console errors; screenshot reviewed directly.
+
+**Files changed:**
+- `app/components/sections/services/additional-capabilities.tsx` (Capability 07 mark swap)
+- Deleted: `app/services/prototype-v6/page.tsx`
+- `DECISIONS.md` (D-029), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Next recommended step:**
+- Research and prototype Capability 08 (Incident Response) next — the LAST of the 8, same process.
+
+---
+
+### 2026-08-14 (continued 9) — Round 10: Capability 07 (Endpoint Protection/EDR) shell prototype, self-verified before reporting (D-028)
+**Completed:**
+- Researched before building: `ui-ux-pro-max --domain chart` for device/coverage data — the specific query returned nothing, broadened to "part to whole coverage percentage protected total" and got Waffle Chart/Pictogram, explicitly more accessible than pie/donut for this data shape; informed a literal grid-of-devices visual (endpoints are discrete, countable units). `mcp__21st__search` didn't surface a device-specific match; "Card Status List" confirmed the general per-item-status-cell pattern, applied to the pictogram cells.
+- Built `CapabilityFleetMark`: a 5x2 grid of device icons (Laptop/Monitor/Smartphone/Server, cycled), 9 accent "protected," 1 muted "not yet," with a "9/10" figure — a fourth genuinely different mechanic among the capabilities addressed (not a ring, feed, or ranked list).
+- Checked the shared-layout risk explicitly (per instruction) and found no issue this time — confirmed via the in-context whole-row screenshot that the pictogram isn't taller than the plain orb mark it replaces, so no grid change needed.
+- Built `/services/prototype-v6` (noindex), Capabilities 05/06 already reflecting their shipped D-025/D-027 treatments in both rows so only 07 differs. Self-verified against actual screenshots before reporting (per instruction): full clean rebuild, `tsc`/`lint`/`build` clean (10 routes), zero overflow at 390px, zero non-pre-existing console errors, DOM query confirming live `/services` Capability 07 unaffected, and the final screenshot reviewed directly for legibility/layout defects before this entry was written — no truncation or layout issues found this time (unlike D-026).
+
+**Files changed:**
+- New: `app/components/sections/services/capability-fleet-mark.tsx`, `app/services/prototype-v6/page.tsx`
+- `DECISIONS.md` (D-028), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Still open / needs verification:**
+- Mohammad's review of D-028.
+
+**Next recommended step:**
+- Await his decision. Capability 08 (Incident Response) is the last of the 8, still needs its own individually-researched treatment.
+
+---
+
+### 2026-08-14 (continued 8) — Capability 06 shipped live, verified; refactored per-capability mark selector (D-027)
+**Completed:**
+- Mohammad approved D-026's prototype. Refactored `additional-capabilities.tsx`'s per-capability mark rendering from a growing `n === "05"` ternary into a small `CapabilityMark({ service })` selector — cleaner than stacking a second ternary branch, and matches the pattern `LiveServices` already uses for its own per-row visual. Capability 06 now renders `CapabilityFindingsMark`; 07-08 still fall through to the default orb. Deleted `app/services/prototype-v5/`.
+- Verified: killed stray node processes, cleared `.next`, `npm run build`/`tsc`/`lint` all clean (9 routes, `prototype-v5` confirmed 404); DOM measurement of all 4 finalizing cards confirms 07/08 stay at 252px (unaffected) while 05/06 are 450/456px — the D-025 `items-start` grid fix continues to hold for a second taller mark automatically; zero overflow at 1440/390px; zero non-pre-existing console errors; screenshot reviewed directly.
+
+**Files changed:**
+- `app/components/sections/services/additional-capabilities.tsx` (Capability 06 mark swap + `CapabilityMark` selector refactor)
+- Deleted: `app/services/prototype-v5/page.tsx`
+- `DECISIONS.md` (D-027), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Next recommended step:**
+- Research and prototype Capability 07 (Endpoint Protection/EDR) next, same process.
+
+---
+
+### 2026-08-14 (continued 7) — Round 9: Capability 06 (Penetration Testing) shell prototype, truncation bug caught and fixed (D-026)
+**Completed:**
+- Researched before building: `ui-ux-pro-max --domain chart` for severity/findings data (recommended sorted-descending "Compare Categories" treatment — informed a ranked list, not a score or unordered grid); `mcp__21st__search` for findings-report components (mostly small badge/chip primitives — confirmed severity tag as the right atomic unit, composed with the existing `RiskBadge` rather than a new import).
+- Built `CapabilityFindingsMark`: 4 illustrative example findings, each with a `RiskBadge` severity tag, sorted critical→low — deliberately a different composition from Capability 02's score card and Capability 05's activity feed.
+- Caught a real bug via screenshot review (not assumed correct from code): finding labels truncated illegibly next to the widest severity badges. First fix (shortening labels) was only partial — two rows still clipped, since it's the badge's own width (varies by tier: "Critical" is much wider than "Low") driving available space, not label length alone. Second fix (natural text wrap instead of forced `truncate`) resolved it fully — re-verified with a fresh screenshot after each change, not just once.
+- Built `/services/prototype-v5` (noindex) — whole 4-card row shown twice, Capability 05 reflecting its already-shipped D-025 treatment in both so only Capability 06 differs. Full verification after each fix: `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (10 routes); fresh clean rebuild; zero overflow at 390px; zero non-pre-existing console errors; confirmed live `/services` Capability 06 unaffected.
+
+**Files changed:**
+- New: `app/components/sections/services/capability-findings-mark.tsx`, `app/services/prototype-v5/page.tsx`
+- `DECISIONS.md` (D-026), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The truncation bug above — caught before presenting as final, not after Mohammad's own review flagged it (unlike a few earlier rounds this session).
+
+**Still open / needs verification:**
+- Mohammad's review of D-026.
+
+**Next recommended step:**
+- Await his decision before touching 07-08.
+
+---
+
+### 2026-08-14 (continued 6) — Capability 05 shipped live with items-start grid fix, verified (D-025)
+**Completed:**
+- Mohammad approved D-024's prototype with an explicit requirement: verify the `items-start` grid fix doesn't break 06-08 before confirming. Added `CapabilityMonitorMark` for Capability 05 in `additional-capabilities.tsx`, added `lg:items-start` to the grid. Deleted `app/services/prototype-v4/`.
+- Verified the specific requirement via Playwright `getBoundingClientRect()` on a fresh production server: Capability 05's card is 450px tall (the new mark); Capabilities 06/07/08 are each 252px — their own natural unstretched height, confirming the grid no longer forces them to match 05's height.
+- Full verification: killed stray node processes, cleared `.next`, `npm run build`/`tsc`/`lint` all clean (9 routes, `prototype-v4` confirmed 404); zero overflow at 1440/390px; zero non-pre-existing console errors; screenshot reviewed directly.
+
+**Files changed:**
+- `app/components/sections/services/additional-capabilities.tsx` (Capability 05 mark swap + grid `items-start`)
+- Deleted: `app/services/prototype-v4/page.tsx`
+- `DECISIONS.md` (D-025), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Next recommended step:**
+- Research and prototype Capability 06 (Penetration Testing) next, same process.
+
+---
+
+### 2026-08-14 (continued 5) — Round 8: Capability 05 (MDR) shell prototype (D-024)
+**Completed:**
+- Researched before building: `ui-ux-pro-max --domain chart` for real-time monitoring data (recommended streaming viz, flagged flashing-element accessibility risk — informed a single restrained `motion-safe:`/`motion-reduce:` pulse instead of a ticker); `mcp__21st__search` for live activity feed components (found "Chrono Board," confirmed the "timestamped event list + live indicator" pattern, rebuilt with existing primitives rather than importing).
+- Found and surfaced a scope question before building: Capability 05 lives in `additional-capabilities.tsx`'s shared 4-card grid (D-007's finalizing tier), not a full row like 01-04. Kept it in that format — flagged explicitly rather than assuming a promotion to full-row status.
+- Built `CapabilityMonitorMark` (live-pulse dot + Radar icon + 2 illustrative timestamped alert rows) for Capability 05 only.
+- Found and flagged a real layout consequence: the new mark is taller than the plain icon mark, and the live grid's default CSS Grid stretch behavior would force 06-08's still-plain cards to match, leaving empty space — demonstrated directly in the prototype (shows the whole 4-card row twice, not just Capability 05 in isolation) with `items-start` applied only inside the prototype's own second grid, not the live file.
+- Built `/services/prototype-v4` (noindex). Full verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (10 routes); fresh clean rebuild; zero overflow at 390px; zero non-pre-existing console errors; confirmed via DOM query that live `/services` Capability 05 card is unaffected.
+
+**Files changed:**
+- New: `app/components/sections/services/capability-monitor-mark.tsx`, `app/services/prototype-v4/page.tsx`
+- `DECISIONS.md` (D-024), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- The card-height/grid-stretch issue above — found before it could become a real bug on ship, not after.
+
+**Still open / needs verification:**
+- Mohammad's review of D-024, including the `items-start` grid fix required if approved.
+
+**Next recommended step:**
+- Await his decision before touching 06-08 or the live grid.
+
+---
+
+### 2026-08-14 (continued 4) — Capability 04 shipped live; /services/prototype-v3 removed (D-023)
+**Completed:**
+- Mohammad approved D-022's prototype. Added a small `CapabilityVisual({ service })` selector in `live-services.tsx` — Capability 04 now renders `CapabilityTrainingVisual` in place of the orb; rows 01-03 unaffected. Deleted `app/services/prototype-v3/`.
+- Full verification: killed stray node processes, cleared `.next`, `npm run build` clean (regenerated Next's route-type-validator, which had gone stale after the route deletion and caused a transient standalone-`tsc` error — resolved once `.next` was rebuilt, not a real code issue), `npx tsc --noEmit`/`npm run lint` both clean after; 9 routes (`prototype-v3` confirmed 404, `prototype-v2` still present/unaffected); DOM query confirmed rows 01-03 still show the orb's ghost-numeral marker and row 04 now shows the completion-ring SVG; zero overflow at 390px; zero non-pre-existing console errors; screenshot reviewed directly.
+
+**Files changed:**
+- `app/components/sections/services/live-services.tsx` (per-row visual selector)
+- Deleted: `app/services/prototype-v3/page.tsx`
+- `DECISIONS.md` (D-023), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Next recommended step:**
+- Research and prototype Capability 05 (Managed Security Services / 24/7 MDR) next, same process.
+
+---
+
+### 2026-08-14 (continued 3) — Round 7: Capabilities 04-08 shell rethink, prototyped on Capability 04 (D-022)
+**Completed:**
+- Researched before building, per explicit instruction: `ui-ux-pro-max --domain style` for current B2B SaaS/security panel guidance (surfaced Bento Grids/Dimensional Layering as current well-supported patterns; explicitly ruled out Glassmorphism and Cyberpunk UI as not fitting "premium, restrained"); `mcp__21st__search` for real training/progress components (ProjectProgressCard, Onboarding Checklist, Skills Progress Dashboard — confirmed the pattern, not imported wholesale due to unrelated dependency trees, same reasoning as D-021); re-fetched Bell Business's service-panel page specifically for this round and found it's actually flat (title+description only, no visual variety) — confirmed Bell isn't the source for "vary the visual," only for spacing/hierarchy discipline, same as before.
+- Built `CapabilityTrainingVisual` for Capability 04 (Security Awareness Training): module checklist (4 generic topics, complete/in-progress/pending status icons) + a single accent-colored completion ring with a centered percentage, replacing the orb's node-diagram/icon-badge/ghost-numeral formula. Kept the outer dark elevated-card container as a through-line device across rows — flagged explicitly as a judgment call for Mohammad to confirm or override, not asserted as settled.
+- Content governance: the 84% figure and 4 module names are NEW illustrative values (no existing training-completion precedent to reuse, unlike Capability 02's reused 78/100) — explicitly flagged as such in both the component comment and the on-page label.
+- Built `/services/prototype-v3` (noindex) showing current vs. new treatment with identical Capability 04 copy. Confirmed via DOM query that live `/services` row 04 still renders its original `.env-dark` orb panel — nothing live touched.
+- Full verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (10 routes); killed stray node processes, cleared `.next`, fresh `npm run start`; zero horizontal overflow at 390px; zero non-pre-existing console errors; screenshot reviewed directly.
+
+**Files changed:**
+- New: `app/components/sections/services/capability-training-visual.tsx`, `app/services/prototype-v3/page.tsx`
+- `DECISIONS.md` (D-022), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- None. Confirmed no dependency-tree drift by hand-rebuilding with existing primitives instead of importing 21st code directly.
+
+**Problems solved:**
+- Delivered a genuinely distinct third visual formula (checklist+ring, vs. gauge card vs. orb) with a stated, traceable research trail rather than an asserted design choice.
+
+**Still open / needs verification:**
+- Mohammad's review of D-022. If approved, capabilities 05-08 each need their own individually-researched treatment — not a reuse of this same checklist/ring formula, which was scoped to training content specifically.
+
+**Next recommended step:**
+- Await his decision before touching 05-08 or any other capability.
+
+---
+
+### 2026-08-14 (continued 2) — Round 6: row top-alignment fix; Capability 02 dashboard-mockup prototype (D-021)
+**Completed:**
+- Item 1 (top alignment): found the row grid used `md:items-center` (vertically centers two columns of possibly-unequal height) instead of `md:items-start`. Row 01's short one-line headline made both columns nearly equal height by coincidence, masking the bug; rows 02/03's longer names wrap to two H3 lines, so `items-center` visibly shifted the graphic column down. One-line fix (`items-center` → `items-start`). Verified with Playwright `getBoundingClientRect()` on rows 01/02/03: `delta: 0` on all three, not just the one reported.
+- Item 2 (visual variety prototype): researched via `mcp__21st__search` (found "Financial Score Cards," pulled its real code, but it's built on an unrelated "liquid glass" component system not present in this codebase — and this session's own earlier `ui-ux-pro-max` search had already flagged that exact style as a weaker choice) and `ui-ux-pro-max`'s chart domain (confirmed a score/gauge treatment with numeric value + tier label is the right chart type for this kind of data). Rather than import an unrelated dependency tree, reused a pattern already built and approved in this codebase — Cyber Health's `OutputShape` illustrative score/risk-breakdown card — re-themed into Services' own dark panel shell as a new `CapabilityDashboardVisual` component. Exact same illustrative numbers (78/100, Medium, same 4 categories) as the already-approved source, not invented. Built `/services/prototype-v2` (noindex) showing both treatments side by side with identical Capability 02 copy. Did not touch `live-services.tsx`'s data, `capability-spotlight.tsx`, or rows 3-8.
+- Full verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (9 routes); killed stray node processes, cleared `.next`, fresh `npm run start`; zero horizontal overflow at 390px on both `/services` and `/services/prototype-v2`; zero non-pre-existing console errors; screenshots of rows 01/02/03 and the full prototype-v2 comparison reviewed directly.
+
+**Files changed:**
+- `app/components/sections/services/live-services.tsx` (`items-center` → `items-start`)
+- New: `app/components/sections/services/capability-dashboard-visual.tsx`, `app/services/prototype-v2/page.tsx`
+- `DECISIONS.md` (D-021), `PROJECT_MASTER.md`, `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- None beyond the two reported.
+
+**Problems solved:**
+- Alignment bug traced to the specific CSS property responsible (`items-center` vs. `items-start`), not patched with per-row margins that would drift again.
+- Delivered a genuinely different, non-generic visual direction for review by reusing this project's own already-approved data-viz pattern instead of introducing a new external dependency tree or inventing new illustrative numbers.
+
+**Still open / needs verification:**
+- Mohammad's review of D-021, both parts.
+
+**Next recommended step:**
+- Await his decision on the prototype-v2 direction before touching any other row.
+
+---
+
+### 2026-08-14 (continued) — Round 5: CTA-alignment structural fix, sidebar weight genuinely split by state (D-020)
+**Completed:**
+- Item 1 (CTA offset on 24" monitors): read the code first per instruction rather than assuming a fix — Mohammad's specific hypothesis (button not nested in the graphic's container) wasn't quite right, the button *was* a sibling inside the same wrapping div, but the real bug was one level down: `mx-auto max-w-md` lived only on `CapabilitySpotlightVisual` itself (self-centers the 448px panel inside a much wider grid column on large screens), while the `ButtonLink` sibling below had no matching width constraint and rendered from the column's own left edge instead. Fixed by making a single shared `<div className="mx-auto max-w-md">` the true parent of both elements, removing the duplicate constraint from the visual's own className. Verified with Playwright at real 1440/1920/2560px viewports via `getBoundingClientRect()` — `leftDelta: 0` at every width, not just one — plus screenshots reviewed directly.
+- Item 2 (sidebar weight): D-019's fix had applied one uniform `font-medium` to every sidebar item regardless of state, which is why it still read as "all bold" — a uniformly-medium list is still uniformly heavier than the page's body text. Replaced with a genuine active/inactive split on `NavLink`'s `lg` tier only (the site header/footer's `default` tier untouched): active → `font-semibold` (600) + existing `text-accent`, unchanged; inactive → `font-normal` (400) + `text-text-muted` (switched off `text-text-secondary`, which is near-black on White, not actually gray). Verified computed styles directly in a fresh Playwright browser context: active item reads `font-weight: 600`, all 7 inactive items read `font-weight: 400` / `color: rgb(107, 114, 128)` — not just the source checked.
+- Full verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean; killed stray node processes, cleared `.next`, fresh `npm run start` before any measurement, per the stale-cache lesson from D-018/D-019.
+
+**Files changed:**
+- `app/components/sections/services/live-services.tsx` (shared width wrapper for visual + CTA)
+- `app/components/ui/link.tsx` (`NavLink`'s `lg` tier: active/inactive weight + color split)
+- `DECISIONS.md` (D-020), `PROJECT_MASTER.md` (Current Position), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- None beyond the two reported. Confirmed the `default` NavLink tier (header/footer) is unaffected by the `lg`-only change.
+
+**Problems solved:**
+- Both items verified with real measurements/computed styles at the specific conditions Mohammad reported (24" width; active vs. inactive state), not just re-reading source.
+
+**Still open / needs verification:**
+- Mohammad's direct review of D-020.
+
+**Next recommended step:**
+- Await review; if approved, Services may be fully signed off — check whether Mohammad wants to move to Step 8 or extend the visual system to another page next.
+
+---
+
+### 2026-08-14 — ui-ux-pro-max skill installed; Capability 02 reviewed, no change made
+**Completed:**
+- Installed the `ui-ux-pro-max` Claude Code plugin at Mohammad's request (marketplace `nextlevelbuilder/ui-ux-pro-max-skill`) to check whether it suggests a genuinely better treatment for the already-approved Capability 02 row (Risk Assessment & Compliance) before it's considered final. This is a different tool from the earlier `ui-ux-pro-max-skill.nextlevelbuilder.io` reference site that hung the browser during D-014's rollout (that was a hosted web page; this is a proper Claude Code plugin with a local Python search script) — no conflict with that earlier "skip it" decision.
+- The skill's search tool needed Python; none was installed. Asked Mohammad, who chose to install it — installed Python 3.12.10 via `winget` (`Python.Python.3.12`).
+- Ran the skill's local design-system/style/typography/ux database searches against Capability 02's actual built treatment (nested dark glow-lit panel, ghost numeral, soft-3D icon badge, schematic node diagram, content column with accent eyebrow/bold headline/4-field grid/CTA):
+  - `--design-system "cybersecurity MSSP B2B enterprise SaaS professional trust"` → recommended a "Trust & Authority" pattern (certification badges, case-study metrics, before/after comparisons) with a different palette (navy/slate) and font (Plus Jakarta Sans). Not applicable: this is a page/site-level trust-signal pattern, not a per-capability-row pattern; the palette/fonts are Oragrol's own locked brand tokens from earlier steps, not up for reinvention here; and the suggested content (certs, case-study metrics) isn't confirmed real data — inventing it would violate this project's own Honesty Rule (CLAUDE.md §8).
+  - `--domain style "dark glass glow panel enterprise security dashboard"` → closest match was "Dark Mode (OLED)" with minimal-glow effects (WCAG AAA), which is what's already built. Genuinely fancier alternatives in the same result set (Liquid Glass, Spatial UI/VisionOS glass) are explicitly flagged in the skill's own data as moderate-poor performance and/or contrast-risk — worse choices for this context, not better.
+  - `--domain typography "Space Grotesk geometric heading professional"` → the closest professional-SaaS match is "Tech Startup" (Space Grotesk heading + DM Sans body), confirming Space Grotesk is a sound, on-category heading choice for this product type. No pairing in the results scored Inter (the current body font) as a weaker choice, or proposed a pairing that would outperform the current Space Grotesk/Inter combination for this stack.
+  - `--domain ux "feature row hierarchy visual weight numeral icon"` → returned general checklist items (hover-state feedback, sequential heading hierarchy, consistent type scale). Cross-checked against the actual code: `H2` ("Available today.") → `H3` (capability name) is sequential, no skipped heading level; hover states exist via `group-hover` with 150-300ms transitions (the `shadow-accent`/`translate`/`scale` fix from D-016); focus-visible rings present on interactive elements (`NavLink`, `ButtonLink`); `prefers-reduced-motion` is respected via a dedicated hook (`use-reduced-motion.ts`) that `Reveal` already checks. `Caption tone="muted"` contrast on the White environment was already explicitly audited in D-010 (computes ~4.84:1, passing) — re-confirmed by reading `tokens.css` directly, not re-tested.
+- **Verdict reported to Mohammad:** the skill's own database doesn't surface a genuinely better treatment for this row — it's consistent with, not different from, what D-013 through D-019 already converged on (which was itself benchmarked against real B2B security-SaaS references: QClay, Cybershield, Tokenex). Did **not** recreate `/services/prototype`, since there's no different treatment to put side-by-side. Live `/services` was not touched.
+
+**Files changed:**
+- `PROJECT_MEMORY.md` (this entry). No component/route files changed — review-only, no code change.
+
+**Problems found:**
+- None in the built row. The skill's generic B2B "Trust & Authority" recommendation doesn't fit a single capability row's scope and would require unconfirmed content (certifications, case-study metrics) to execute honestly — flagged, not pursued.
+
+**Problems solved:**
+- Answered Mohammad's actual question (does a genuinely better treatment exist) with real search evidence rather than a guess, and avoided an unnecessary rebuild cycle by reporting "no" clearly instead of manufacturing a difference to justify the tool.
+
+**Still open / needs verification:**
+- Mohammad's review of D-019 (see Next Steps #1) — unaffected by this session, still pending.
+
+**Next recommended step:**
+- Await Mohammad's decision on whether Services is now fully approved, or whether another round of feedback is coming.
+
+---
+
+### 2026-08-13
+**Completed:**
+- Full visual/UX audit of the live site — AUDIT ONLY, explicitly no code/copy/component changes made or intended this session.
+- Confirmed scope before starting: an example audit-report-layout image supplied alongside the brief was formatting reference only — no finding, number, or wording from it was used; every finding below came from actually opening the rendered site.
+- Started `npm run dev`, used Playwright (`playwright-core`, per CLAUDE.md's documented method) to capture real incremental-scroll screenshots (not `fullPage`) of all 4 built pages (`/`, `/services`, `/solutions`, `/cyber-health`) at desktop (1440px), tablet (834px), and mobile (390px) — 48 screenshots, zero console/network errors.
+- Verified no horizontal overflow at 1440/834/390/320px on any built page (`scrollWidth` vs `clientWidth` check).
+- Exercised interactive elements directly: mobile hamburger nav, desktop search modal, FAQ accordion, CTA hover, keyboard Tab focus order.
+- Computed WCAG contrast ratios directly from the locked hex values in `tokens.css` (not estimated): white text on primary accent button = 3.90:1 (fails AA normal-text 4.5:1, passes large-text/UI-component 3:1); `--color-text-muted` on dark background = 4.09:1 (also fails AA normal-text). Both are new findings, not previously logged.
+- Found and screenshotted a real mobile nav defect: the open-state menu overlay doesn't extend to a full-height solid background — hero content, including a second "Get Your Cyber Health Score" button, is visible underneath it.
+- Found the closing-CTA section (`FinalCta`-pattern: ring decoration + "Know where you stand. Know what to do next." + dual buttons) is pixel-identical across Home, Services, and Solutions — confirmed via direct side-by-side screenshot comparison at matched scroll depth. Cyber Health is the one exception (different copy, same layout/decoration).
+- Confirmed the D-008 per-page-motif pattern is only half-applied on both pages that have one: Solutions' isometric strata and Cyber Health's arc gauge both appear once in their hero and never again on the same page — the Level cards / Flow / Reassurance sections directly below revert to the generic bordered-card-with-circle-icon pattern used everywhere else on the site.
+- Produced the **Oragrol Visual Redesign Blueprint** — executive summary, top-10 prioritized problem list, page-by-page audit (4 pages), visual-system-gap breakdown (incl. a dedicated Hero/"Aperture O" section — a new hero direction named in this session's brief as the successor to the frozen 16-frame sequence), 3 highest-impact changes, 3 recommended prototypes, and a full strategy blueprint (background/typography/hero/motion/3D/interaction/responsive) — published as a private Claude artifact, link delivered to Mohammad in-chat.
+- Logged the rollout sequencing as D-009 (see `DECISIONS.md`): blueprint stops for review/approval; once approved, implement on `/services` ONLY first (agreed proving ground); do not extend to any other page until Services is reviewed and approved.
+- Stopped the dev server; confirmed no files under source control were modified this session (`git status` clean going in, still clean at audit's end aside from this memory-file update).
+
+**Decisions:** D-009 logged (blueprint approval gate + Services-first rollout order; see `DECISIONS.md`).
+
+**Verification:** No build/typecheck/lint run — no code was touched. Screenshot evidence and computed contrast ratios are the audit's own verification method; both are embedded in the delivered artifact as exhibits.
+
+**Next:** Awaiting Mohammad's review of the blueprint artifact. Do not begin implementation, on Services or any other page, before that approval — see Next Steps above.
+
+---
+
+### 2026-08-13 (continued) — approval, two bug fixes, plain-markdown copy
+**Completed:**
+- Saved the blueprint content verbatim as `VISUAL_REDESIGN_BLUEPRINT.md` in the project root, on request, for reading/sharing without the artifact viewer. Noted in D-009.
+- Mohammad approved the blueprint and confirmed the two independent bugs it surfaced (#5 mobile nav, #6/#7 contrast) should be fixed immediately, not gated behind blueprint rollout.
+- Fixed the mobile nav overlay (`app/components/site/site-header.tsx`): converted from an in-flow `max-height` accordion to a `fixed` full-viewport panel (opaque background, body-scroll lock while open, `inert`+`aria-hidden` while closed). Verified via Playwright: body overflow toggles correctly, `panel.inert` is `true` when closed, no bleed-through at 390px.
+- Fixed both WCAG AA contrast failures via new scoped tokens in `tokens.css`, not by changing the locked `--accent` or the shared `--text-muted` raw value: added `--accent-strong` (`#017CAC`, ~4.7:1 with white text, used only by `Button`/`ButtonLink`'s primary variant) and an `.env-dark`-only `--text-muted` override (`#75828D`, ~5.0:1, since White/Light-blue already passed). Reviewed every other `bg-accent` usage site-wide (pentest-addon badge icon, tier-cards progress bar, checkbox/radio) and confirmed none are text-on-fill, so none needed the swap.
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run build` succeeded (all 5 routes present). Playwright screenshots + computed-style checks confirmed both fixes render correctly and produce zero console errors; screenshots sent to Mohammad.
+- Logged as D-010 in `DECISIONS.md`.
+
+**Decisions:** D-010 logged.
+
+---
+
+### 2026-08-13 (continued 2) — Prototype 2 built
+**Completed:**
+- Built `SchematicVisual` (`app/components/sections/services/schematic-visual.tsx`) — the Services schematic-linework motif (D-008): a hub-and-spoke blueprint diagram, orthogonal connector traces, faint dot-grid background, same `color-mix` fill-progression technique already established by StrataVisual.
+- Applied it to exactly one row — "Risk Assessment & Compliance" — via `SchematicRowPrototype`, copy copied verbatim from `live-services.tsx`, nothing new written.
+- Shown on a new noindex, nav-unlinked route `/services/prototype`, next to the current live row for direct comparison — same disposable-preview pattern as `/style-guide`. The live `/services` page itself was not touched.
+- Found and fixed a real, previously-latent bug while building this: `var(--color-surface)`/`var(--color-border)` don't reliably track a Section's per-environment override when read directly via `var()` (rendered the hub solid black on this White-environment page instead of a light accent-tinted panel). Root-caused via computed-style inspection, fixed by consuming the raw semantic tokens (`var(--surface)`/`var(--border)`) instead — confirmed correct after the fix. `StrataVisual`/`GaugeVisual` have the same latent issue but are unaffected today (Dark-only) — flagged for later, not fixed in this pass (see Next Steps).
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run build` succeeded (6 routes, `/services/prototype` added). Playwright screenshots at desktop (1280px) and mobile (390px), zero console errors, zero horizontal overflow. Confirmed `/services` renders unchanged (no regression — no existing file was modified).
+- Logged as D-011.
+
+**Decisions:** D-011 logged (Prototype 2 + the discovered token bug).
+
+---
+
+### 2026-08-13 (continued 3) — Services D-008 retrofit shipped, prototype route removed
+**Completed:**
+- Mohammad approved Prototype 2. Asked one clarifying question before proceeding (the 8 capabilities span two structurally different sections — 4 full-width rows in `LiveServices`, 4 compact no-CTA cards in `AdditionalCapabilities`, a deliberate live/not-yet-live distinction from D-007) — answer: keep both structures, adapt the schematic motif to each rather than unifying into one layout.
+- `LiveServices.tsx`: remaining 3 rows (Virtual CISO, Vulnerability Assessment & Management, Security Awareness Training) now use the same `SchematicVisual` treatment as the approved prototype's row — all 4 live rows visually consistent.
+- `AdditionalCapabilities.tsx`: added `SchematicMark`, a compact variant (two short corner ticks, no dot grid, no output node) replacing the plain Lucide icon in each of the 4 cards — carries the visual language through without giving not-yet-live capabilities the same visual weight as live ones (existing card grid, no-CTA, "finalizing" badge all kept as-is).
+- Deleted `/services/prototype` and `SchematicRowPrototype` — no longer needed now that the treatment is live. Cleared `.next` cache to drop the stale route from Next's generated type validator after deletion (confirmed clean typecheck after).
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run build` succeeded (8 routes, `/services/prototype` gone). Full-page Playwright screenshots (real incremental scroll, not `fullPage`-only) at 1440px and 390px — zero console errors, zero horizontal overflow. Confirmed on a freshly restarted dev server that `/services` returns 200 and `/services/prototype` returns 404.
+- Sent a full-page screenshot of the shipped `/services` page to Mohammad.
+- Logged as D-012 — the D-008 Services retrofit ([[D-007]]) is now COMPLETE.
+
+**Decisions:** D-012 logged.
+
+---
+
+### 2026-08-13 (continued 4) — Design Correction round (D-013), 21st.dev authorized
+**Completed:**
+- Mohammad reviewed the shipped D-012 page live and rejected it — "still small icon decoration on a flat background, not real graphic design" — and supplied `SERVICES_REDESIGN_PROMPT.md` (via `C:\Users\60183\Downloads\`) with 3 concrete Dribbble references and 7 specific, checkable requirements, plus explicit process rules (use 21st.dev/Magic if available, benchmark against references, state technique before generating, one row first, side-by-side review).
+- Opened and viewed all 3 references directly in Chrome (QClay: dark atmospheric glow + light-beam sweeps; Cybershield: photographic imagery + dark shadowed icon cards; Tokenex: dark card on gradient canvas + one large radial illustration). None showed a literal 3D-rendered object — that specific claim in the brief came from a broader search, not these 3 links — flagged that distinction to Mohammad rather than silently building toward the more literal wording.
+- `21st` MCP was unauthenticated. Asked Mohammad how to proceed (authorize now vs. skip and build from references directly) — he chose to authorize; completed the OAuth flow. Also asked his preference on 3D-rendered vs. CSS-simulated depth — he chose CSS-simulated (no new asset pipeline).
+- Used `21st`'s `get_inspiration`/`search` (free) then `get_component` (paid retrieval) to pull real code for **"Card with Glow" (id 59, ibelick)** — a `motion/react` gradient-glow layer — adapted into `glow-effect.tsx`: locked-accent-only palette, defaulted to `mode="static"` since the original's other modes loop infinitely, which conflicts with this project's own documented motion restraint (flagged explicitly, not silently chosen).
+- Stated the full technique plan in chat (which of the brief's 7 requirements map to which technique, and why) before writing any component code, per the brief's own required process step.
+- Built, prototype-only, not wired into the live page: `glow-effect.tsx`, `hero-schematic-visual.tsx` (~40% bigger than the shipped `SchematicVisual`, kept as a separate file so D-012's live component isn't touched), `capability-spotlight.tsx` (the full row — nested `.env-dark` elevated panel, glow layer, oversized real-index numeral, soft-3D gradient/shadow icon badge). Recreated `/services/prototype` (noindex) showing the shipped D-012 row next to the new prototype, with a written 3-reference benchmark table.
+- Color governance: flagged that white/black appear once, mixed into the accent as tonal highlight/shadow inside the icon badge — not a new decorative hue, per the brief's own color note.
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean (one `react/no-unescaped-entities` catch, fixed), `npm run build` succeeded (9 routes). Playwright screenshots at desktop (1280px) and mobile (390px), zero console errors, zero horizontal overflow. Confirmed via `git status` that no existing/shipped file was modified — only new files added, `/services` itself unaffected.
+- Logged as D-013.
+
+**Decisions:** D-013 logged (prototype round; does not change D-012's shipped state).
+
+---
+
+### 2026-08-13 (continued 5) — Design Correction shipped to all 8 capabilities (D-014)
+**Completed:**
+- Mohammad reviewed the D-013 prototype live — "this is a real improvement, meets the brief" — approved it for the remaining 7 capabilities, adapted per the existing size/weight distinction (same split as D-012).
+- Mid-rollout: Mohammad asked me to check a third-party site, `ui-ux-pro-max-skill.nextlevelbuilder.io` ("UI UX Pro Max" — design-reference database, Claude-Code-integrated, `uip`/`uipro init` setup command), for anything that would improve the approved prototype further, before touching the other rows. Homepage loaded fine; its "How it Works" page hung the browser tab twice (30s CDP timeouts, unresponsive renderer) before any setup command could be seen. Did not run any install/init command — flagged as a standing rule (verify what a third-party setup script does before running it), independent of the hang. Asked Mohammad how to proceed; he chose to skip it and continue with the already-approved 21st.dev-based version.
+- Generalized `capability-spotlight.tsx` from the single hardcoded prototype into `CapabilitySpotlightVisual({ n, icon })` (full treatment) and `CapabilitySpotlightMark({ icon })` (compact treatment) — same relationship as D-012's `SchematicVisual`/`SchematicMark`.
+- `live-services.tsx`: all 4 rows (was 1 prototyped + 3 old-schematic) now use `CapabilitySpotlightVisual`. `additional-capabilities.tsx`: all 4 cards now use `CapabilitySpotlightMark` in place of `SchematicMark`.
+- Deleted `/services/prototype` — no longer needed. Cleared `.next` cache, confirmed clean typecheck after.
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run build` succeeded (8 routes, `/services/prototype` gone). Full-page Playwright screenshots (real incremental scroll) at 1440px and 390px — zero console errors, zero horizontal overflow. Confirmed on a freshly restarted dev server that `/services` returns 200 and `/services/prototype` returns 404.
+- Sent a full-page screenshot of the fully rolled-out `/services` page to Mohammad.
+- Logged as D-014 — Services Design Correction is now COMPLETE across all 8 capabilities.
+
+**Decisions:** D-014 logged.
+
+---
+
+### 2026-08-13 (continued 6) — Container fix, typography hierarchy, real hero (D-015)
+**Completed:**
+- New 4-item instruction (Services-scoped except item 1, explicit): container/dead-gutter bug, typography hierarchy, audit for rejected-motif drift, and a real hero illustration. A 5th item (regroup the 8 capabilities structurally, referencing a Bell Business page for information architecture only, not visual style) was included but explicitly held — "don't block the visual fixes on it."
+- Item 1: investigated empirically first rather than assuming — every section already used a capped `Container`; the actual defect was the mismatch between the deliberately full-bleed header (D-001) and body content capped at 1024px. Fixed `container.tsx`'s `lg`/`xl` tiers to 1280px/1440px (inside the requested range, two tiers preserved). Verified zero horizontal overflow and no visual regression on Home/Solutions/Cyber Health at 1440/1920/2560/768/375px — the one Home@2560px Playwright timeout during verification was a script wait-strategy issue (network-heavy 16-frame hero), not a real page hang, confirmed by retrying with `domcontentloaded`.
+- Item 2: added non-breaking opt-in `size` variants to `H3`/`Caption` (same pattern as `H1`'s existing `size` prop), applied only in Services' capability rows.
+- Item 3: audited and found the connector-circle elements in every panel are `HeroSchematicVisual`, built as part of D-013 and visible in both of D-013's approvals — not drift, no record of a separate rejected motif. Flagged the discrepancy to Mohammad rather than silently changing anything; he confirmed after seeing the finding: keep as-is.
+- Item 4: built `ServicesNetworkVisual` — 8 nodes (real count, from the H1) converging to one hub, in a `GlowEffect`-lit panel; `ServicesHero` rebuilt to the 2-column text|visual layout Solutions/Cyber Health already use. Deliberately a different composition from the row panels' diagram.
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run build` succeeded. Screenshots sent mid-task for the item-3 audit before any panel change was made (none was needed in the end).
+- Logged as D-015.
+
+**Decisions:** D-015 logged.
+
+---
+
+### 2026-08-13 (continued 7) — Round 2: sidebar nav resolves container issue, stronger typography, hover motion (D-016)
+**Completed:**
+- Mohammad reported D-015's container fix "did not actually resolve" the gutter complaint, with an explicit instruction not to claim success from code inspection alone. Re-investigated on a fresh production build (not dev server): the fix was genuinely applied and computing correctly (`max-width: 1280px` confirmed via DOM measurement at all 3 widths) — the real issue was mathematical, not a bug: a 1280px cap on a 2560px screen always leaves 640px margin per side. Presented this with screenshots + exact measurements, then asked Mohammad how to resolve it rather than guessing further. He chose to use item 3's new sidebar nav to occupy the gutter space instead of widening the cap further.
+- Built `CategoryNav` (new) — sticky, all 8 real capabilities, `IntersectionObserver`-driven active state, real DOM-id jump-scrolling. Widened `LiveServices`' wrapper to a `[220px_1fr]` grid so the nav has real space. Added matching ids to `AdditionalCapabilities`' cards.
+- Strengthened typography further (D-015's first pass judged insufficient): H3 `lg` tier bumped again, Caption `sm` tracking widened again, body copy bumped a full tier, added a small accent eyebrow above each headline (color contrast, staying within the site's existing "accent = eyebrow only" rule rather than recoloring full headlines).
+- Added hover motion to capability panels (border/shadow lift, icon scale+brightness) — found and fixed a real bug in the process: a Tailwind arbitrary-value shadow class using `color-mix()` generated no CSS at all (confirmed via computed-style inspection, not just a screenshot glance) — the base shadow was invisible too, not just hover. Fixed with Tailwind's built-in `shadow-accent/opacity` mechanic instead. Also ruled out a false alarm: Tailwind v4 uses standalone `translate`/`scale` CSS properties, not `transform` — a naive check reads hover motion as broken when it isn't.
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run build` succeeded, fresh production server. Zero horizontal overflow at 1440/1920/2560/768/375px. Zero non-pre-existing console errors (23 pre-existing nav-prefetch 404s for not-yet-built pages, confirmed unrelated to this round via isolated check). Real click-scroll test confirmed correct target + active-state update. Screenshots sent per Mohammad's explicit item-1 proof requirement.
+- Logged as D-016.
+
+**Decisions:** D-016 logged.
+
+---
+
+### 2026-08-13 (continued 8) — Footer overhaul, site-wide, separate commit (D-017)
+**Completed:**
+- Investigated project docs before building anything, per Mohammad's own instruction: "Blog" isn't a real page name here — the real planned page is "Resources / Insights" (Step 10, PENDING), already linked as "Resources" in the header/prior footer. Found no LinkedIn/Instagram URLs or emergency-contact info in any project doc — the existing footer already had LinkedIn flagged as a `href="#"` placeholder for the same reason. Presented all of this and asked directly rather than guessing.
+- Mohammad supplied real values: LinkedIn (`https://www.linkedin.com/company/oragrol-global/`, now live), Instagram (no real page yet, explicit placeholder), emergency contact (`+60 18-377-2761`, explicitly TEMPORARY pending a real Canadian line — flagged in a code comment), and confirmed keeping the "Resources" label (not introducing "Blog").
+- Rebuilt `SiteFooter`: Company/Resources/Legal 3-column grid from real existing nav items only (Resources column deliberately has just the one real item, not padded). `Grid`'s `md` column map didn't support 5 (needed for brand-block + 3 nav columns) — added it, additive/non-breaking.
+- Built small hand-drawn outline social icons (`social-icons.tsx`) since `lucide-react` has no brand icon exports — matches the site's existing icon style, not the platforms' literal filled logos.
+- Built `EmergencyCta` (new) — fixed bottom-right "Under attack?" pill, rendered from `RootLayout` (not `SiteFooter`) so it's genuinely site-wide/scroll-independent. Locked cyan/navy palette, no new urgency color.
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run build` succeeded. Fresh production server. Zero horizontal overflow at 1440/1920/390px across 4 pages. Zero non-pre-existing console errors. Confirmed via DOM query that every href resolves to the exact real/placeholder value intended, nothing silently wrong.
+- Committed separately from D-016's items 1-4, per instruction.
+- Logged as D-017.
+
+**Decisions:** D-017 logged. Two explicit flags carried forward unresolved: Instagram URL, real emergency contact number.
+
+---
+
+### 2026-08-13 (continued 9) — Round 3: content-area headline, sidebar weight, panel shrink; footer discrepancy investigated (D-018)
+**Completed:**
+- Mohammad reported item 4 as a real discrepancy: commit b2a7717 claimed Instagram + emergency CTA were added and visible, but his own screenshot showed neither. Investigated thoroughly rather than just re-screenshotting: read the actual current source of all three touched files (all unconditional, no hiding logic found), checked for stray duplicate server processes on the machine (found only one process ever listening on port 3000), fetched the raw server HTML via `curl` (both markers present in the literal bytes sent, zero browser/cache involved), and loaded the page in a brand-new Playwright context with fresh cache/cookies (both elements confirmed via computed style + bounding rect + screenshot). Could not reproduce the absence through any method. Most likely explanation is a stale browser tab/cache on Mohammad's side, but flagged this as the *likely* explanation, not a certainty, since his own browser can't be directly observed. Did a fully clean rebuild (killed all node processes, cleared `.next`, fresh `npm run start`) before any of this round's screenshots regardless, to rule out staleness on this end too.
+- Item 1: found the real structural issue — the row's `H3` headline lived only in the *visual* column, physically apart from the content column (Challenge/Does/Get/Outcome) it was meant to anchor, so the content area itself had no headline at all. Moved the eyebrow+headline into the content column, above the field grid; removed the now-redundant duplicate from the visual column.
+- Item 2: added a non-breaking `size` variant to the shared `NavLink` component (same pattern as `H1`/`H3`/`Caption`), new `lg` tier for `CategoryNav` only. Active-state logic untouched.
+- Item 3: `CapabilitySpotlightVisual` capped at `max-w-md`, row grid ratio shifted from even `md:grid-cols-2` to `md:grid-cols-[0.9fr_1.1fr]` — content column gets real extra width, not just empty space in the visual's own column.
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run build` succeeded, fresh production server after a full process/cache clear. Zero horizontal overflow at 1440/1920/2560/768/375px. Zero non-pre-existing console errors. Screenshots reviewed directly before reporting (row hierarchy, sidebar, full page, mobile) — not claimed from code alone, per Mohammad's explicit "do not report resolved without direct visual confirmation" instruction.
+- Logged as D-018.
+
+**Decisions:** D-018 logged.
+
+---
+
+### 2026-08-13 (continued 10) — Round 4: weight reductions, CTA fix, font-family investigated (D-019)
+**Completed:**
+- Item 2 first (font-family bug check): checked computed `font-family` for all 8 capability headlines on a fresh, `.next`-cleared production build. Before and after (no code changed): all 8 compute to `"Space Grotesk", "Space Grotesk Fallback"`, weight 700/600 — genuinely distinct from body's `Inter, "Inter Fallback"`. No bug found in the code; reported the actual values rather than asserting "fixed" for something that was never broken. Flagged the possibility this is another instance of D-018's pattern (what Mohammad sees not matching what the code/browser computes) — recommend a hard refresh if the perception persists.
+- Item 1: `NavLink`'s `lg` tier (used by `CategoryNav`) dropped `font-semibold`→`font-medium`; confirmed 600→500 computed. Active-state color/border untouched.
+- Item 3: `Caption`'s `sm` tier (used only by `ServiceField` labels) dropped from the shared `font-medium` (baked into Caption's base string) to a per-tier `font-normal`; confirmed 500→400 computed. `default` tier (every other Caption usage sitewide) explicitly kept at `font-medium` in its own tier string — nothing else on the site changes.
+- Item 4: found `LIVE_SERVICES[1]` (Risk Assessment & Compliance) was the one outlier — `"Get Your Cyber Health Score"` → `/cyber-health`, while the other 3 rows already used `"Talk to Oragrol"` → `/contact`. Changed both label and href to match (leaving the old href under new text would have been a mismatched link). Confirmed via DOM query all 4 rows now emit identical CTA pairs.
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run build` succeeded. Fully clean rebuild (all node processes killed, `.next` cleared) before this round's own screenshots, given last round's stale-cache lesson. Zero horizontal overflow at 4 widths, zero non-pre-existing console errors. Full-page screenshot captured showing all 8 capability panels for the CTA-consistency check specifically, per instruction.
+- Logged as D-019.
+
+**Decisions:** D-019 logged.
+
+**Next:** Awaiting Mohammad's review. If either the footer discrepancy or the font-family perception persists after this round's fresh rebuild, the recommended next step is asking what URL/browser state he's viewing rather than re-investigating the same code a third time — both have now been independently verified clean on the code/server side.
+
+---
+
+### 2026-08-12
+**Completed:**
+- Read `PROJECT_MASTER.md` (new source-of-truth merge doc) at session start.
+- Found substantial uncommitted work already in the tree from prior session(s): full Step 4 Home page build-out, Header Fix Pass 2/3, `/pricing` removal. Verified rather than re-done, per Core Rule ("do not redo approved work without a real defect").
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean, `npm run build` succeeded (3 static routes: `/`, `/_not-found`, `/style-guide`).
+- Visual verification via a local Playwright script (no `chromium-cli` in this environment) against `npm run dev`: screenshotted header/hero at 375, 768, 1280, 1440, 1920, 2560px. Confirmed no hard black header bar, logo pinned at a consistent left margin at every width (incl. 2560px, the specific width the nav.tsx comments call out as previously broken), mobile/tablet correctly swap to hamburger + search icons, no console/page errors at any width.
+- Backfilled `CLAUDE.md` Section 7 with real verified commands (was still `[TODO]` placeholders).
+- Logged D-001 (header no-max-width, caller-owned background), D-002 (logo inlined from source SVG geometry), D-003 (pricing route removed) in `DECISIONS.md` — all three were undocumented deliberate decisions found already implemented in the diff.
+
+**Files changed:**
+- This session: `CLAUDE.md`, `DECISIONS.md`, `PROJECT_MEMORY.md` only (docs/logging).
+- Already in the working tree from prior session(s), verified not re-done: `app/layout.tsx`, `app/page.tsx`, `app/components/ui/nav.tsx`, `app/components/ui/section.tsx`, `app/components/ui/typography.tsx`, new `app/components/{brand,motion,sections,site}/`, new `public/brand/`, `public/hero/`, `Oragrol_Logo_Final.svg`; deleted `app/pricing/page.tsx`, `app/components/pricing-card.tsx`; `package.json`/`package-lock.json` (added `motion` dependency).
+
+**Problems found:**
+- `PROJECT_MEMORY.md` and `DECISIONS.md` had never been filled in despite Steps 1-4 and two header-fix passes already having happened — no session history existed to check against `CLAUDE.md`'s "read last 3-5 entries" step.
+- Stray duplicate `app/CLAUDE.md`, `app/DECISIONS.md`, `app/PROJECT_MEMORY.md` exist (mirroring the root files, also blank) — not cleaned up this session, flagged to Mohammad, left in place pending a decision.
+
+**Problems solved:**
+- Verified the uncommitted Step 4 + header-fix work is sound (typecheck/lint/build/visual all clean) rather than leaving it unverified or redoing it.
+
+**Still open / needs verification:**
+- Stray `app/CLAUDE.md` / `app/DECISIONS.md` / `app/PROJECT_MEMORY.md` duplicates — not yet resolved.
+- Nav-link color contrast against the Hero image was checked visually only (screenshots), not with an automated contrast tool.
+- Hero frames are 1672×941, not the 3840×2160 spec in `PROJECT_MASTER.md` — flagged, needs a call from Mohammad on whether to re-render.
+
+**Next recommended step:**
+- Step 5 — Services Page.
+
+---
+
+### 2026-08-12 (later same day) — Hero: wire in all 16 frames
+**Completed:**
+- User supplied the full 16-frame set as `public/hero/hero-frames-final.zip` (not loose files as described — extracted it to `public/hero/frame-01.png` … `frame-16.png`, then deleted the zip). Old 8-file set (`hero-01-initial.png` etc.) no longer present on disk.
+- Clarified with the user before building anything: confirmed the Hero stays purely scroll-scrubbed (frame-01 at scroll start, frame-16 at scroll end, releases normally, no timer auto-loop, no wrap-around) — the earlier "crossfade when it loops from 16 back to 1" phrasing in the request didn't describe an actual mechanism in the code, since a one-pass scroll-scrub never cuts from frame-16 directly to frame-01. No crossfade-on-loop was built, by design — see the request/response exchange, not a separate D-00x entry (no durable decision was made, just a clarification of existing behavior).
+- Updated `HERO_IMAGES` in `hero.tsx` to all 16 frames in order; `frameEnvelope`/`frameOpacityStops` needed no changes (already generic on array length). Updated the file's header comment (frame count, explicit note on no-loop behavior) and simplified-path comment (`hero-01` → `frame-01`).
+
+**Files changed:**
+- `app/components/sections/home/hero.tsx` (HERO_IMAGES array + comments)
+- `public/hero/`: added `frame-01.png` … `frame-16.png`; removed old 8-file set and the intermediate zip.
+
+**Problems found:**
+- Hero frames are 1672×941 px, not the 3840×2160 4K called for in `PROJECT_MASTER.md` Step 4. Not blocking (aspect ratio is correct, ~16:9), but flagged as an open question, not silently accepted as final.
+
+**Problems solved:**
+- N/A — straightforward swap once frames were extracted and the loop-mechanism question was resolved.
+
+**Still open / needs verification:**
+- Nav contrast (visual check only), hero frame resolution (see Next Steps).
+
+**Next recommended step:**
+- Step 5 — Services Page.
+
+---
+
+### 2026-08-12 (later same day) — Remove stray app/ duplicate files
+**Completed:**
+- Deleted `app/CLAUDE.md`, `app/DECISIONS.md`, `app/PROJECT_MEMORY.md` — untracked, blank/duplicate copies of the root files (confirmed unchanged since being read in full earlier this session before deleting). `app/` directory itself untouched, all real component/route files still present.
+
+**Files changed:**
+- Removed: `app/CLAUDE.md`, `app/DECISIONS.md`, `app/PROJECT_MEMORY.md` (were never tracked in git, so no commit diff for the deletion itself — nothing to `git rm`).
+
+**Still open / needs verification:**
+- Nav contrast (visual check only), hero frame resolution (3840x2160 spec vs. actual 1672x941 — needs a call from Mohammad).
+
+**Next recommended step:**
+- Step 5 — Services Page.
+
+---
+
+### 2026-08-12 (later same day) — Diagnose and fix hero scroll flicker (frame-02/frame-01)
+**Completed:**
+- User reported a visible flicker at the very start of the Hero's scroll range (frame-02 briefly showing, then correcting back to frame-01) and asked for the exact scrollYProgress→frame-index mapping code plus a root cause.
+- Proved `frameEnvelope`/`frameOpacityStops`' math correct by hand (traced against framer-motion's own `interpolate()` clamp/per-segment-easing source in `node_modules`), then verified empirically with Playwright: rest-state and SSR markup were both correct, but a live scroll sweep revealed the real bug — framer-motion's automatic ViewTimeline hardware acceleration (triggered because `useScroll`'s `offset: ["start start", "end end"]` matches the library's "contain" preset) desyncing badly across the Hero's ~32 concurrent scroll-linked transforms. Confirmed via `getAnimations()` that a native WAAPI Animation (not plain JS) was driving opacity, and via a full-range scroll sweep that frame-01 went non-monotonic (declining correctly, then climbing back to a stuck opacity 1 for any scrollY past ~2250px, simultaneous with frame-16 also at 1).
+- Fixed by deleting `scrollYProgress.accelerate` synchronously right after the `useScroll()` call in `Hero()`, forcing framer-motion onto its plain JS/rAF path. Re-verified with the same Playwright sweeps: perfectly monotonic frame progression at every scrollY tested, frame-02 now peaks at scrollY≈210px (matches hand-calculated center≈211px almost exactly), frame-16 reached exactly at scrollY=2250 (matches hand-calculated p=1).
+- Logged the full root-cause chain and fix as DECISIONS.md D-005, including a "watch for" note since this is a project-wide framer-motion gotcha (any future `useScroll({ target, offset })` matching a named preset gets the same silent acceleration), not Hero-specific.
+- User then logged a separate, explicit decision (D-006): Hero motion quality/depth/cinematic feel is intentionally left as-is for now to unblock the rest of the site — not to be touched again without explicit instruction. Session moved on to inspecting Step 5 (Services Page) — read-only inspection, no changes made pending the user's review of a proposed structure.
+
+**Files changed:**
+- `app/components/sections/home/hero.tsx` (added the `.accelerate = undefined` line + explanatory comment, no other logic changed)
+- `DECISIONS.md` (D-005, D-006)
+
+**Problems found:**
+- Third-party library behavior (framer-motion's automatic scroll acceleration), not a bug in this project's own code — but required deep source-diving into `node_modules/framer-motion` to root-cause rather than guess.
+
+**Problems solved:**
+- Hero scroll sequence is now provably monotonic and correct end-to-end (frame-01 through frame-16), verified against hand-calculated math, not just "looks right."
+
+**Still open / needs verification:**
+- Nav contrast (visual check only). Hero frame resolution/visual-quality question is now explicitly closed per D-006 — not open, intentionally deferred, do not revisit without explicit instruction.
+
+**Next recommended step:**
+- Step 5 — Services Page (inspection phase; awaiting user review of proposed structure before any changes).
+
+---
+
+### 2026-08-12 (later same day) — Build Services hub page (Step 5)
+**Completed:**
+- Inspected before coding, per process: no `/services` route existed (only a Home-page teaser section with the 8 confirmed service one-liners + icons); catalogued the full `app/components/ui/` design system and the asymmetric-layout patterns already established in other Home sections (Approach's connected spine, How We Work's alternating stepper, Solutions' 3+1 layout).
+- Reported findings + a proposed 5-section hub-page structure; got explicit approval with two clarifications: (1) Lucide icons for now, not custom — logged as D-007, same pattern as D-006; (2) hub page only, individual per-service detail pages explicitly deferred.
+- Built `/services`: `ServicesHero` (dark environment — deliberately matches Home's opening section so SiteHeader's current dark-entry-section assumption still holds, avoiding an out-of-scope SiteHeader change), `LiveServices` (4 full-width alternating feature rows, each with Challenge/What Oragrol Does/What You Get/Outcome + a CTA — new draft copy, flagged in the component's own comment, not yet reviewed), `AdditionalCapabilities` (4 condensed cards reusing the exact locked one-liners + status badge from the Home teaser), `SolutionsBridge` (reuses Faq.tsx's existing Services-vs-Solutions copy verbatim rather than inventing new phrasing), and reused the existing `FinalCta` component directly rather than duplicating it.
+- Verification: `npx tsc --noEmit` clean, `npm run lint` clean (one real error caught and fixed — an unescaped apostrophe), `npm run build` succeeded (new static `/services` route). Visual verification caught a real methodology mistake worth remembering: a `fullPage: true` Playwright screenshot showed most sections as empty/blank — traced to `Reveal`'s `whileInView` needing genuine scroll events to fire, which Playwright's single-shot fullPage capture doesn't reliably provide. Re-verified correctly via the same incremental real-scroll methodology already used for the Hero (scrollTo + wait + screenshot per step) — page renders completely correctly; the blank sections were a screenshot-method artifact, not a real bug.
+- Updated `PROJECT_MASTER.md` (Step 5 status, Current Position) to reflect the build and the still-open copy-review item.
+
+**Files changed:**
+- New: `app/services/page.tsx`, `app/components/sections/services/{hero,live-services,additional-capabilities,solutions-bridge}.tsx`
+- `DECISIONS.md` (D-007), `PROJECT_MASTER.md` (Step 5 + Current Position)
+
+**Problems found:**
+- `fullPage` Playwright screenshots are unreliable for verifying `whileInView`-based reveal animations — worth remembering for future page verifications on this project (Solutions, Cyber Health, etc. will use the same `Reveal` component).
+
+**Problems solved:**
+- Correctly distinguished a screenshot-methodology artifact from a real rendering bug before reporting anything as broken.
+
+**Still open / needs verification:**
+- Mohammad's review of the new draft copy (problem/what-we-do/what-you-get/outcome per live service).
+- Nav contrast (visual check only, carried over from earlier sessions).
+
+**Next recommended step:**
+- Review Step 5 copy, then Step 6 — Solutions Page.
+
+---
+
+### 2026-08-12 (later same day) — Services page: fix spacing defect, sign-off
+**Completed:**
+- Mohammad reviewed `/services` directly in-browser: structure and copy both approved. One defect found: excessive blank gap between the last live-service row (Security Awareness Training) and the Additional Capabilities section start.
+- Root-caused: `LiveServices`' outer `Container` carried its own `py-24 md:py-32` (top+bottom padding), stacking on top of the last row's own `py-14` (each row's individual top+bottom padding, used for the `divide-y` inter-row rhythm) — a doubled-up bottom gap unique to this section, since no other section in the codebase wraps a `divide-y` list with per-row `py-*` inside a `Container` that also carries its own `py-*`.
+- Fixed by making the Container's padding asymmetric: `pt-24 pb-8 md:pt-32 md:pb-12` — top (entrance spacing, not flagged) stays exactly as it was; bottom is reduced since the last row's own `pb-14` already covers most of that space. Left the per-row `py-14` and the section's top padding untouched, keeping the fix scoped to exactly the reported symptom.
+- Re-verified: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean, and a targeted Playwright screenshot centered on the exact section boundary (found via `.env-light-blue`'s live `getBoundingClientRect()`, not a guessed scroll offset) confirms the gap now reads as a normal, proportionate section transition.
+
+**Files changed:**
+- `app/components/sections/services/live-services.tsx` (Container className only — `py-24 md:py-32` → `pt-24 pb-8 md:pt-32 md:pb-12`, plus an explanatory comment)
+
+**Problems found:**
+- N/A — the fix matched the initial root-cause diagnosis on the first attempt.
+
+**Problems solved:**
+- Services page spacing defect, confirmed fixed by direct measurement of the section boundary, not just "looks better."
+
+**Still open / needs verification:**
+- Nav contrast (visual check only, carried over from earlier sessions) — the only remaining open item site-wide.
+
+**Next recommended step:**
+- Step 6 — Solutions Page.
+
+---
+
+### 2026-08-12 (later same day) — Per-page visual identity system, proposed and approved (no build)
+**Completed:**
+- User raised a real design-direction problem before Step 6: Home and Services were differentiated mostly by `Section` background color/icon choice, not actual distinct visual content — risked all 9 pages feeling interchangeable if repeated.
+- Proposed a per-page visual metaphor for all 9 pages (report only, no code) — table of core concept / visual metaphor / distinctness per page — plus a unifying principle (shared color/type/spacing/motion "material," distinct "shape" per page). Explicit design constraint carried through: Home's ring+skyline stays reserved to Home (existing "never invent a similar ring" rule), so Cyber Health's data visuals use arcs/gauges, not closed rings.
+- Asked and got an answer on production method: code-generated SVG/CSS for all pages now (not commissioned imagery), with Company and Industries explicitly flagged as candidates for a future photographic/commissioned upgrade — deferred, not blocking, same pattern as D-006's hero deferral.
+- Logged the full per-page direction table and production-method decision as DECISIONS.md D-008.
+- **No code was built this session** — per explicit instruction, this was direction-approval only.
+
+**Files changed:**
+- `DECISIONS.md` (D-008, and a cross-reference note on D-007)
+- `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- N/A — process/direction session, no implementation.
+
+**Problems solved:**
+- N/A.
+
+**Still open / needs verification:**
+- Whether Services (already built under the old color-only treatment) gets retrofitted with its D-008 schematic-linework motif before, alongside, or after Step 6 — resolved next session (user chose: Solutions first, Services retrofit after — logged, see below).
+
+**Next recommended step:**
+- Step 6 — Solutions Page, built with its D-008 visual direction (ascending stacked planes/strata) from the start rather than added later.
+
+---
+
+### 2026-08-12 (later same day) — Build Solutions page (Step 6)
+**Completed:**
+- Confirmed build order first (asked, didn't assume): Solutions built now, Services' D-008 retrofit explicitly deferred to its own later pass.
+- Inspected before coding: no `/solutions` route existed, only the Home teaser (generic "Level 01/02/03" labels, no branded names — already correctly avoiding the unconfirmed-pricing trap) and Services' own dead `/solutions` cross-link. Re-confirmed `PROJECT_MASTER.md`'s Step 6 governance: pricing table is internal-reference-only, tier *names* aren't confirmed either ("distinctive branded names" is a goal, not a delivered decision) — carried the Home teaser's existing discipline (generic labels, no numbers) onto the dedicated page rather than inventing names to fill space.
+- Designed and built `StrataVisual` (`app/components/sections/solutions/strata-visual.tsx`) — Solutions' D-008 signature graphic: 3 plates sharing a baseline, increasing height and accent-intensity, using the same `color-mix(in srgb, var(--color-accent) X%, ...)` technique already established in `Approach.tsx` (not a new pattern) plus the first-ever use of `--color-accent-light` (the locked "Light tint" #97CADB token — wired into `tokens.css` since Step 1 but unused anywhere until now) for the plate-top highlight.
+- Built the full page: `SolutionsHero` (dark environment — same header-contrast reasoning as `ServicesHero`, flagged again in a comment that this recurring constraint across every future page argues for eventually making `SiteHeader` read its entry section's real environment rather than assuming dark) → `TierCards` (3 cards, each with a small bar echoing its StrataVisual plate) → `PentestAddon` (dashed border + a `+` badge on the icon, deliberately reading as a "satellite" outside the 3-level stack, not a 4th rung) + reused status-disclaimer/CTA copy verbatim → reused `FinalCta` directly.
+- Caught and fixed a real bug before it shipped: initially passed a conflicting `className="h-3 w-3"` alongside `Icon`'s `size="sm"` prop on the pentest badge — since `cn()` is plain concatenation with no conflict resolution (confirmed earlier this project, see `nav.tsx`'s own comment on the same issue), this would have been the exact class of bug already flagged as a known risk. Fixed by not fighting the size system — resized the badge circle instead.
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean (new static `/solutions` route). Scroll-verified Playwright screenshots (not `fullPage` — applying last session's lesson) at desktop and mobile widths, zero console/network errors.
+- Updated `PROJECT_MASTER.md` (Step 6 → IMPLEMENTED, Current Position → Step 7 or Services retrofit next, order not yet decided).
+
+**Files changed:**
+- New: `app/solutions/page.tsx`, `app/components/sections/solutions/{hero,strata-visual,tier-cards,pentest-addon}.tsx`
+- `PROJECT_MASTER.md` (Step 6 + Current Position)
+
+**Problems found:**
+- The `Icon` component `className` conflict described above — caught before commit, not shipped.
+
+**Problems solved:**
+- First real application of D-008's per-page visual system, proving the "code-generated, shares the existing color-mix/token idioms" approach works without inventing new patterns or new tokens beyond what's already locked.
+
+**Still open / needs verification:**
+- Order of Step 7 vs. the Services D-008 retrofit — not yet decided.
+- Nav contrast (visual check only, carried over) — still the only long-standing open item.
+
+**Next recommended step:**
+- Decide Step 7 vs. Services retrofit order.
+
+---
+
+### 2026-08-12 (later same day) — Solutions review: fix strata visual + footer logo
+**Completed:**
+- Mohammad reviewed `/solutions` in-browser. Two defects found:
+  1. `StrataVisual` didn't match the approved plan — rendered as 3 plain flat rectangles of increasing height (no overlap, no perspective), not the "overlapping/offset, isometric terrace" effect described when the direction was proposed.
+  2. Footer logo didn't match the header logo — footer was hand-typing a bold all-caps "ORAGROL" span next to a bare `OragrolRing`, instead of reusing `OragrolLogo` (the single component that owns the correct case, the "GLOBAL" subtitle, and the exact ring-to-text geometry). Visibly wrong (missing subtitle, wrong case) and architecturally wrong (a second, drifted recreation of the logo instead of one source of truth).
+- Rebuilt `StrataVisual` from scratch as true isometric geometry: each block is a top rhombus face + two extruded side faces (standard isometric-tile construction), positioned with real x/y overlap so each subsequent block visibly layers in front of the previous one (SVG document order = z-order, later-drawn on top) — not a bar-chart-style row of separate rectangles. Side faces get progressively darker `color-mix` fills than the top face per block, faking a lit-top/shadowed-side look consistent with the brief's "subtle depth, controlled reflections" direction. Kept the same design tokens/technique as v1 (no new colors invented).
+- Fixed `SiteFooter` to import and render `OragrolLogo` directly (same import SiteHeader uses) instead of hand-composing `OragrolRing` + a text span. Removed the now-unused `OragrolRing` import.
+- Verified both fixes: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean. Screenshotted the rebuilt strata visual (full hero, taller viewport to avoid fold-cropping) and a side-by-side header-vs-footer logo closeup confirming pixel-identical rendering. Re-ran the full Solutions scroll-through to confirm no regressions elsewhere on the page. Sent screenshots to Mohammad before committing, per his explicit request — got confirmation before this commit.
+
+**Files changed:**
+- `app/components/sections/solutions/strata-visual.tsx` (full rewrite — isometric block geometry)
+- `app/components/site/site-footer.tsx` (logo: `OragrolRing` + hand-typed text → `OragrolLogo`)
+
+**Problems found:**
+- The footer logo bug raises a pattern worth checking elsewhere: is `OragrolRing` (the bare ring, no text) used correctly everywhere it appears (e.g. `FinalCta`'s background accent, which is meant to be ring-only, not a full lockup), or could a similar "recreated instead of reused" drift exist anywhere else? Not audited this session — flagged in Next Steps.
+
+**Problems solved:**
+- Both defects fixed and confirmed by direct visual comparison (isometric geometry inspected at a taller viewport to see the whole shape; logos compared side-by-side crop-for-crop), not just "looks better."
+
+**Still open / needs verification:**
+- A broader audit of whether any other component recreated a brand asset by hand instead of importing it — not done, just this one instance.
+- Order of Step 7 vs. the Services D-008 retrofit — not yet decided.
+- Nav contrast (visual check only, carried over).
+
+**Next recommended step:**
+- Decide Step 7 (Cyber Health) vs. Services D-008 retrofit order.
+
+---
+
+### 2026-08-12 (later same day) — Brand-asset sweep + build Cyber Health (Step 7)
+**Completed:**
+- **Sweep (requested item 1):** searched the whole repo for hand-recreated brand elements — plain-text "ORAGROL"/"Oragrol" hits (all legitimate prose/metadata, none a visual recreation), the ring's exact geometry signature (`strokeDasharray="365 24"` — found only in the two canonical components, nowhere else), and every import site of `OragrolLogo`/`OragrolRing` (header, footer, `FinalCta`'s ring-only background accent — exactly the expected set, no extras). Conclusion: the footer (fixed last session) was the only instance. No further fixes needed.
+- **Order decision (requested item 2):** confirmed Step 7 (Cyber Health) before the Services retrofit, same reasoning as before — prove the D-008 pattern on a second page first.
+- Inspected before coding: no `/cyber-health` route existed, only the Home teaser with LOCKED content (the 7-step flow, the 6-item output shape, an explicitly-labeled illustrative mock score). Re-read `PROJECT_MASTER.md` Step 7's "Existing MVP flow (Tally-based) stays live underneath" line, searched the whole repo for any Tally URL/API route/CRM-AI-email SDK — found none, confirming the real assessment/scoring/AI/CRM pipeline runs entirely outside this codebase. Reported this gap rather than inventing a destination, and asked where the CTA should actually point.
+- User supplied the real, live URL (`https://tally.so/r/2EzROb`, already receiving real submissions). Fetched it directly to confirm it's the correct "Free Cyber Health Assessment" form and to pull real, confirmed facts (5-7 min, no commitment, AI-generated suggestions, executive PDF report) for the Reassurance section — not invented.
+- Chose link-out-in-new-tab over iframe embed (my call, as the user authorized) and explained why: no way to confirm this specific form allows iframing, and a live form with real submissions shouldn't risk a broken/blocked embed when a plain link is guaranteed to work.
+- Built `/cyber-health`: `CyberHealthHero` (dark env, same SiteHeader-contrast reasoning as every other page + `GaugeVisual`, D-008's instrument-panel motif — a 4-segment arc gauge using the risk-tier tokens as a legitimate *functional* data use, not decoration) → `Flow` (the locked 7-step sequence at full page weight, reusing Approach.tsx's connecting-spine pattern extended from 4 to 7 items via hand-written grid classes, same as Approach.tsx already does for its own non-standard column count) → `OutputShape` (the locked 6-item list + an illustrative report preview reusing the exact 78/Medium example already approved on the Home teaser, plus new illustrative "Top Risks" bars using generic, non-proprietary security-domain names, explicitly labeled illustrative) → `Reassurance` (facts sourced from the live form) → `ClosingCta` (page-specific — NOT the reused `FinalCta`, since FinalCta's own CTA points *to* `/cyber-health`, which would be circular on this exact page).
+- Verification: `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean (new static `/cyber-health` route). Scroll-verified screenshots desktop+mobile. Caught and correctly diagnosed a screenshot-methodology artifact (not a real bug): the last Flow step looked faded in one screenshot — traced to the item's staggered `Reveal` delay (0.36s) + animation duration (0.5s) exceeding my script's 400ms wait, confirmed by re-screenshotting with a longer wait. Directly verified (via DOM query, not assumption) that both on-page action CTAs resolve to the exact Tally URL with `target="_blank"`/proper `rel`, while the header/nav CTA correctly still points to `/cyber-health` itself.
+- Updated `PROJECT_MASTER.md` (Step 7 → IMPLEMENTED, Current Position, and an explicit note that the Tally flow is out of scope for this codebase).
+
+**Files changed:**
+- New: `app/cyber-health/page.tsx`, `app/components/sections/cyber-health/{hero,gauge-visual,flow,output-shape,reassurance,closing-cta}.tsx`
+- `PROJECT_MASTER.md` (Step 7 + Current Position)
+
+**Problems found:**
+- None in the sweep. One screenshot-methodology artifact during verification (described above), correctly identified as such before it could be misreported as a bug.
+
+**Problems solved:**
+- Resolved a real content-governance risk before it became a mistake: PROJECT_MASTER.md referenced an "existing MVP" without a URL anywhere in the repo — surfaced the gap and got the real answer instead of guessing or inventing a placeholder link.
+
+**Still open / needs verification:**
+- Mohammad's in-browser review of `/cyber-health` — not yet done.
+- Order of Step 8 vs. the Services D-008 retrofit — not yet decided.
+- Nav contrast (visual check only, carried over) — still the only long-standing open item.
+
+**Next recommended step:**
+- Get Cyber Health reviewed, then decide Step 8 vs. Services retrofit order.
+
+---
+
+### 2026-08-23 — Discovery session (no code) + Services hero: ultra-wide face-clipping fix
+**Completed:**
+- Opened with a requested discovery pass before touching anything: read `CLAUDE.md`, `git log`/`git status`, and the tail of `PROJECT_MEMORY.md`/`DECISIONS.md`. Reported back that the project is far more built out than Mohammad's own summary implied (12 routes, not just Home; 78 logged decisions), and flagged two of his stated facts as stale: the brand palette (superseded the day before by D-068's 6-color system) and the hero mechanism (no longer an 8-frame crossfade — it's `PerimeterRing` after D-057/059/061). Live-verified his three named "open bugs" (logo, header gradient, 2560px layout) via Playwright against the dev server rather than trusting memory alone — all three confirmed already fixed, screenshots shown, no code changed in this part of the session.
+- Second request: a surgical fix for the Services hero face clipping at 24-inch desktop widths while preserving the 14-inch reference exactly. Inspected `hero.tsx` first to find the actual mechanism (D-078's `object-[62%_36%]` + `translate-x-*`) before touching anything, then screenshotted the real bug at 1440/1920/2560 to confirm it before assuming the diagnosis.
+- Root-caused: `min-h-*` caps at 740px from `xl` up with no further increase, so as width grows past that the image has to scale ever larger to keep covering it, and the existing fixed 36%-Y crop removes more absolute top pixels as that scale grows — invisible at 1440, clipping by 1920/2560.
+- Live-tuned the fix by injecting candidate `object-position` values via Playwright at 1536/1600/1728/1920/2200/2560/3000 and screenshotting each before writing any code — landed on 3 graduated steps: `2xl:object-[62%_24%]`, `min-[2200px]:object-[62%_16%]`, `min-[2560px]:object-[62%_5%]`. Nothing below `2xl` (1536px) touched, so 1440 is byte-for-byte the pre-existing reference. Logged as D-079.
+- Verified against the actual compiled build (not the live-tuning override): `tsc`/lint/build all clean, same 85 routes; screenshots at all 5 requested widths plus the wide spot-checks confirm the head clears the header everywhere from 1536 up, and 390/768/1024/1280 are unaffected.
+
+**Files changed:**
+- `app/components/sections/services/hero.tsx` (one `className` string + its documenting comment)
+- `DECISIONS.md` (D-079), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- Two screenshots (1280, 390) came back with the headline/nav missing or malformed during the verification batch — root-caused as a transient dev-server compile race from loading 11 routes back-to-back (the same class of screenshot-methodology artifact this project's memory has flagged before, e.g. the Cyber Health `Flow` false-positive), not a real regression. Re-captured in isolation with an explicit wait and confirmed correct before reporting done — not left ambiguous.
+
+**Problems solved:**
+- Discovery session corrected two stale assumptions (palette, hero mechanism) before they could cause wasted work, and confirmed three "known bugs" were already fixed rather than re-fixing things that didn't need it.
+- Services hero ultra-wide clipping fixed with a 3-step responsive `object-position`, 14-inch baseline provably untouched.
+
+**Still open / needs verification:**
+- Mohammad's review of D-079 (not yet seen live by him). Per his "verify and STOP" instruction, this session did not commit/push — that's still open if he wants it shipped.
+- The dev-server compile-race artifact above is worth a passing mention if it recurs — not a code bug, just a note for future screenshot batches (stagger or add explicit waits on the first pass rather than after the fact).
+
+**Next recommended step:**
+- Get Mohammad's live review of the Services hero at 1920/2560, then commit/push if approved.
+
+---
+
+### 2026-08-23 (later same day) — Services hero fix revisited: discrete breakpoints replaced with one continuous formula
+**Completed:**
+- Mohammad pushed back on D-079's approach: rejected "another arbitrary width breakpoint," asked for viewport-height/aspect-ratio-aware or interpolating CSS, and asked for computed dimensions to be inspected at 6 named viewports before any change — explicitly warning not to assume physical monitor size matters.
+- Did the diagnostic first: measured the hero's actual rendered box via Playwright `getBoundingClientRect()` at all 6 viewports (1440×900/1536×864/1920×1080/1366×768/1280×720/390×844). Found the box height is a flat 740px at every desktop size regardless of viewport height (900/864/1080/768/720 all identical) — the section's `min-h` is a fixed px value the short copy never exceeds, not a `vh`-based one. Reported this back plainly: viewport height has zero effect here; width is the only real variable, so a height-aware mechanism would have nothing to respond to.
+- That same measurement surfaced a real flaw in D-079: its `2xl` bucket starts exactly at 1536px, so 1536×864 (a genuine 16" laptop width, not the reported bug) was being shifted from 36% to 24% unnecessarily.
+- Replaced the 3 discrete Tailwind breakpoint classes with one continuous `object-position` formula via inline style: `62% clamp(4%, calc(36% - max(0px, (100vw - 1536px)) * 0.0293), 36%)`. Below 1536px this reduces to exactly 36% (the original, untouched value) — confirmed via `getComputedStyle`, not just eyeballed. The `0.0293` slope was fit to reproduce D-079's own already-verified data points (not a new guess). Logged as D-080, superseding D-079's implementation (its diagnosis stands).
+- Verified: `tsc`/lint/build clean, same 85 routes. Computed-style + screenshot verification at all 6 requested viewports plus a 2560 continuity spot-check — 1440/1536/1366/1280/390 pixel/formula-identical to the pre-fix reference, 1920/2560 both clear the header.
+
+**Files changed:**
+- `app/components/sections/services/hero.tsx` (image `className`/`style` + documenting comment)
+- `DECISIONS.md` (D-080, D-079 marked superseded), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- D-079's own discrete breakpoint edge (2xl = 1536px) coincided with a real, common laptop width and over-corrected it unnecessarily — not a visible bug, but an unforced deviation from baseline the continuous formula eliminates.
+
+**Problems solved:**
+- Confirmed empirically (not assumed) that viewport height doesn't factor into this component at all — useful fact for any future work on this hero.
+- Ultra-wide clipping fix now expressed as one continuous line through the same verified data points, with zero discrete breakpoints and mathematically provable baseline preservation below 1536px.
+
+**Still open / needs verification:**
+- Mohammad's live review of D-080 (not yet seen by him). Per his "verify this single fix and STOP" instruction, this session did not commit/push beyond a local commit.
+
+**Next recommended step:**
+- Get Mohammad's live review of the Services hero at 1920/2560+ real hardware, then push if approved.
+
+---
+
+### 2026-08-23 (later same day) — Services hero: D-080 pushed live, real screenshot caught a real sign bug, fixed as D-081
+**Completed:**
+- Mohammad reported D-080 "not solved" on his real 24-inch monitor. Before touching any CSS, checked whether the fix had even reached the live site — it hadn't: both D-079 and D-080 were local-only commits (his own "don't push" instructions, honored each time), confirmed by curling the live HTML and finding the original pre-fix classes still served. Asked before pushing, got a yes, pushed, confirmed via polling the deployed HTML that the real `clamp()` fix was live, and re-screenshotted the actual production URL (not localhost) — 1440/1920/2560/mobile all looked correct.
+- Mohammad then reported a real, different defect on that now-actually-live version: top of head clear, but mouth/chin now cropped off. Verified this was genuinely a new code problem (not another deployment gap) by comparing computed styles between live and local — identical, ruling out any prod/dev mismatch.
+- Root-caused via direct empirical testing (not more theorizing): object-position's Y resolves against a NEGATIVE reference at these widths (box shorter than the scaled image), which flips the intuitive sign of `%`-`px` calc() arithmetic. D-080's `calc(36% - …)` was moving the wrong direction from the start; its outer `clamp(4%, …, 36%)` additionally had its authored min/max invert once resolved through that same negative reference, silently snapping the value to the extreme "4%" position for any width past 1536px — nearly zero top crop, ~685px of excess removed from the bottom instead, which is what ate the mouth and chin. Confirmed by testing plain unclamped percentages side by side (behaved exactly as D-079's original screenshots already showed) before touching the real fix.
+- Fixed by flipping the sign (`+` not `-`) and replacing the broken `clamp()` with a `min()` that only bounds the correction's own pixel magnitude (no percentage comparison, so it can't repeat the same trap). Coefficient `0.35` bisected empirically against real screenshots at 1920px. Logged as D-081, superseding D-080's implementation.
+- Verified: `tsc`/lint/build clean, same 85 routes. Full-section (untruncated) screenshots at all 4 requested viewports (1920×1080/1536×864/1440×900/1280×720) plus tablet/mobile — computed style shows a fully-resolved, literal `"62% 36%"` (not symbolic) at everything ≤1536px, and 1920 now shows the complete face, forehead through chin, top clear of the header.
+
+**Files changed:**
+- `app/components/sections/services/hero.tsx` (image `style` value + documenting comment)
+- `DECISIONS.md` (D-081, D-080 marked superseded), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- A real, non-obvious CSS bug: combining `%` and `px` via `calc()`/`clamp()` inside `object-position` behaves counter-intuitively when the position's percentage reference is negative (box shorter than the image) — worth remembering if this hero's positioning is ever touched again. Also re-confirms (a second time this session) that "don't push" instructions, while correctly honored, mean local verification alone can't catch everything a real deployed environment will — this bug was only findable once real hardware saw real production code.
+
+**Problems solved:**
+- Ultra-wide clipping fix now correct on both axes simultaneously (top-of-head AND full lower face), verified against the actual reported defect rather than a proxy metric.
+
+**Still open / needs verification:**
+- Mohammad's live review of D-081 (not yet seen by him — deliberately not pushed this round per his explicit instruction). He'll need to ask again before this ships to production.
+
+**Next recommended step:**
+- Get Mohammad's go-ahead to push D-081, then confirm live.
+
+---
+
+### 2026-08-23 (later still) — Services hero: replaced object-position tuning with a structural master-composition-frame fix
+**Completed:**
+- Mohammad rejected the entire D-079/080/081 approach (tuning `object-position` as a function of viewport width) and asked for a structural fix: treat the 14-inch composition as a fixed artboard, let only the background bleed wider, don't let the face re-crop/re-scale/reposition from viewport growth alone. Explicitly required inspecting the current mechanism first and verifying against real anchor points at 1440/1536/1920/2560/3440.
+- Inspected `hero.tsx` and `container.tsx` before changing anything. Root cause: the image sized itself against the full `Section` (= raw viewport), while the text sized itself against `<Container size="2xl">`'s own fluid-but-capped box (`clamp(1600px, 940px + 40vw, 2000px)`) — two different boxes that only coincided below ~1650px. Every prior object-position tuning pass was compensating for that mismatch after the fact rather than fixing it.
+- Fix: wrapped the image in a new frame div reusing `CONTAINER_MAX_WIDTH["2xl"]` — the exact same constant the text's own Container already imports elsewhere in the codebase (`nav.tsx` already established this reuse pattern). Since `next/image`'s `fill` sizes against the nearest positioned ancestor, this makes the image's `object-cover` box track the text's box in lockstep instead of the viewport. Reset `object-position` to the plain, untuned `62% 36%` — the frame capping the growth means no correction is needed.
+- Caught and fixed a real bug mid-implementation via direct DOM inspection rather than shipping on faith: `getBoundingClientRect()` showed the image's rendered box spilling ~393px past the frame's own edge at 1920px+ — `translate-x-[20%]` shifts the already-sized box AFTER `object-cover` runs, and the frame (unlike the old full-section box) had no `overflow-hidden` of its own to catch the overshoot. Added it.
+- Found and fixed one more real defect via zoomed screenshots (not assumed clean from the measurement alone): even after clipping, the frame's bare edge was a hard vertical cut through the image's own lit content at wide viewports — conflicts with this hero's own standing "no visible image frame/border" rule (D-070). Added a right-edge fade whose width is mathematically zero at 1440px and below (proven via the same clamp formula, not just visually eyeballed), so the master reference is untouched by construction. Disclosed this addition explicitly as beyond the literal ask rather than folding it in silently.
+- Verified: `tsc`/lint/build clean, same 85 routes. Measured frame/image rects at exactly 1440/1536/1920/2560/3440 (full-width at 1440/1536, symmetric inset at 1920/2560, capped/identical at 3440), confirmed `object-position` is the literal unmodified string at every width, and screenshotted (full-section, untruncated) all 5 plus tablet/mobile — 1440 is the untouched master, 1536 identical, 1920/2560/3440 all preserve the same face scale/position relative to the headline with a graceful (not hard-cut) frame edge, tablet/mobile pixel-unaffected.
+
+**Files changed:**
+- `app/components/sections/services/hero.tsx` (new frame wrapper, `object-position` reset, `overflow-hidden`, right-edge fade, consolidated D-082 doc comment)
+- `DECISIONS.md` (D-082, D-079/080/081 marked superseded), `PROJECT_MEMORY.md` (this entry)
+
+**Problems found:**
+- Two real bugs caught DURING this fix by direct measurement rather than assumed away: the `translate-x` overshoot past the frame edge, and the resulting hard-edge artifact once clipping was added. Both fixed and re-verified before reporting done, not left as known issues.
+
+**Problems solved:**
+- The actual root cause behind three straight rounds of object-position tuning (image and text tracking two different boxes) is now structurally eliminated rather than continuously compensated for.
+
+**Still open / needs verification:**
+- Mohammad's live review of D-082 (not yet seen by him — not pushed this round per his explicit instruction).
+
+**Next recommended step:**
+- Get Mohammad's go-ahead to push D-082, then confirm live on his actual monitor.
+
+---
+
