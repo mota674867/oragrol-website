@@ -51,6 +51,11 @@
 // All four stay as null stubs (trademarks, businessRegistry, paidAds) below,
 // same as before — but now because they were checked and found infeasible
 // as specified, not because they were never looked at.
+//
+// ADDED 2026-09-29 — OrgBook BC (bcRegistry field, odo-orgbook.ts). Licence
+// confirmed: OGL-BC, commercial use allowed, attribution required wherever
+// shown. BC registrations only — `absent` is never a gap for an Ontario
+// prospect. See the module header before scoring anything from it.
 
 import { runDnsResearch, type DnsResearch } from "./odo-dns";
 import { runPageResearch, type PageResearch } from "./odo-page";
@@ -68,6 +73,7 @@ import {
 import { checkWaybackHistory, type WaybackHistory } from "./odo-history";
 import { checkHiringSignal, type HiringSignal } from "./odo-hiring";
 import { fetchGeoapifyNearby } from "./odo-geoapify";
+import { lookupOrgBook, type OrgBookRecord } from "./odo-orgbook";
 
 export type ResearchFindings = {
   // Website & SEO
@@ -107,6 +113,8 @@ export type ResearchFindings = {
   trademarks: TrademarkFindings | null;
   /** Not implemented — Corporations Canada has no live per-corporation REST endpoint, only a search UI and a bulk dataset dump. See "INVESTIGATED 2026-09-29" above. */
   businessRegistry: RegistryFindings | null;
+  /** OrgBook BC — BC registration (incl. extra-provincial) matched by exact normalized name. `absent` = not registered in BC, NOT a gap. Attribution required when shown (ORGBOOK_ATTRIBUTION). */
+  bcRegistry: Determination<OrgBookRecord> | null;
   // General research
   generalResearch: GeneralResearchFindings | null;
   /** Classified competitor candidates — see odo-competitors.ts. Only confirmed_competitor and probable_competitor are report-safe. */
@@ -294,6 +302,15 @@ async function detectIndustryAndSize(
 
 // --- Main research runner ---
 
+// Number of website-dependent sources in runParallelResearch's batch. The
+// no-website branch must supply exactly this many nulls or every destructured
+// result after the gap shifts/goes undefined — which is how a 10th source
+// (hiring) was added on 2026-09-29 with only 9 placeholders, crashing every
+// "No website?" scan. Update this count whenever a website source is added.
+const WEBSITE_SOURCE_COUNT = 10;
+const WEBSITE_SOURCE_PLACEHOLDERS = (): Promise<null>[] =>
+  Array.from({ length: WEBSITE_SOURCE_COUNT }, () => Promise.resolve(null));
+
 export async function runParallelResearch(
   businessName: string,
   website: string | null,
@@ -306,6 +323,7 @@ export async function runParallelResearch(
   const [
     generalResearch,
     competitors,
+    bcRegistryResult,
     pageSpeedRawResult,
     retireRepoResult,
     ssl,
@@ -328,6 +346,8 @@ export async function runParallelResearch(
     safeFetch("Tavily:competitors", () => fetchTavily(`${businessName} competitors alternative companies`).then(results => ({
       competitors: results.map(r => ({ name: r.title || "", website: r.url || null, source: "tavily" })).slice(0, 5),
     })), errors),
+    // OrgBook BC — name-based, so it runs with or without a website.
+    safeFetch("OrgBook BC", () => lookupOrgBook(businessName), errors),
     // Website-dependent sources
     ...(hasWebsite && domain ? [
       safeFetch("PageSpeed+Compliance", () => fetchPageSpeedCompliance(domain), errors),
@@ -346,11 +366,7 @@ export async function runParallelResearch(
       safeFetch("Infra (RDAP/DNSSEC/hosting)", () => runInfraResearch(domain), errors),
       safeFetch("Wayback history", () => checkWaybackHistory(domain), errors),
       safeFetch("Hiring signal", () => checkHiringSignal(domain), errors),
-    ] : [
-      Promise.resolve(null), Promise.resolve(null), Promise.resolve(null),
-      Promise.resolve(null), Promise.resolve(null), Promise.resolve(null),
-      Promise.resolve(null), Promise.resolve(null), Promise.resolve(null),
-    ]),
+    ] : WEBSITE_SOURCE_PLACEHOLDERS()),
   ]);
 
   function getVal<T>(result: PromiseSettledResult<unknown>): T | null {
@@ -363,6 +379,7 @@ export async function runParallelResearch(
   const infra = getVal<InfraResearch>(infraResult);
   const history = getVal<Determination<WaybackHistory>>(historyResult);
   const hiring = getVal<Determination<HiringSignal>>(hiringResult);
+  const bcRegistry = getVal<Determination<OrgBookRecord>>(bcRegistryResult);
   const pageSpeedRaw = getVal<Determination<PageSpeedRaw>>(pageSpeedRawResult);
   const retireRepo = getVal<Determination<import("./odo-compliance").RetireRepo>>(retireRepoResult);
   const certAndAttackSurface = getVal<{ cert: CertFindings; attackSurface: AttackSurfaceResearch }>(certAndAttackSurfaceResult);
@@ -436,6 +453,7 @@ export async function runParallelResearch(
   }
   if (history) determinations["research.waybackHistory"] = history;
   if (hiring) determinations["business.hiringSignal"] = hiring;
+  if (bcRegistry) determinations["registry.orgbookBC"] = bcRegistry;
 
   return {
     website: websiteFindings,
@@ -460,6 +478,7 @@ export async function runParallelResearch(
     similarWeb: null,
     trademarks: null,
     businessRegistry: null,
+    bcRegistry,
     generalResearch: generalResearchData,
     competitors: competitorCandidates,
     competitorProfiles,

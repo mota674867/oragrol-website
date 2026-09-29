@@ -371,6 +371,11 @@ async function notifyZM77(
       researchSignals: {
         waybackHistory: (findings as import("@/app/lib/odo-research").ResearchFindings).history,
         hiringSignal: (findings as import("@/app/lib/odo-research").ResearchFindings).hiring,
+        // OrgBook BC (added 2026-09-29). `absent` = no BC registration, which
+        // is normal for an Ontario prospect — context only, never a gap.
+        // Attribution line must accompany it anywhere it's shown.
+        bcRegistry: (findings as import("@/app/lib/odo-research").ResearchFindings).bcRegistry ?? null,
+        bcRegistryAttribution: "Contains information licensed under the Open Government Licence – British Columbia.",
       },
       // Coverage goes to the reviewer so an incomplete scan is visible as an
       // ODO problem rather than silently reading as bad news about the client.
