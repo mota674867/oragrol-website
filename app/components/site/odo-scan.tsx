@@ -258,7 +258,27 @@ function ResearchPreview({ phase, step }: { phase: string; step: string }) {
   );
 }
 
-export default function OdoScanPage({ locale = "en", onEvent = (_e: Record<string, unknown>) => {} }: { locale?: string; onEvent?: (e: Record<string, unknown>) => void }) {
+// FIXED 2026-09-29 — this used to be an inline default parameter
+// (`onEvent = (_e) => {}`), which JS re-evaluates on every render since
+// page.tsx never passes an onEvent prop. A fresh function identity every
+// render meant `emit` -> `applyStatus` -> `pollStatus` -> `startUpdates`
+// (each memoized on the previous one via useCallback) also got a new
+// identity every render, which made the session-restore useEffect below
+// (dependency: [startUpdates]) re-fire on every single render instead of
+// once on mount. That effect unconditionally calls setPhase("researching")
+// before restarting polling/SSE, so it was resetting the UI back to the
+// research screen and tearing down/recreating the EventSource + polling
+// interval on every render, in a tight loop — this is why the status
+// vocabulary fix above never visibly took effect: the backend was already
+// returning "questioning" correctly, but the phase was being stomped back
+// to "researching" faster than a render could paint the question. Found by
+// spotting ~800 requests to /api/odo/scan/status and /events fire within
+// ~15 seconds of a single fresh scan submission (should have been ~6).
+// A stable module-level no-op fixes it: same reference every render, so
+// nothing downstream churns and the mount effect runs exactly once.
+const NOOP_EVENT_HANDLER = (_e: Record<string, unknown>) => {};
+
+export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLER }: { locale?: string; onEvent?: (e: Record<string, unknown>) => void }) {
   const [form, setForm] = useState<{name: string; email: string; company: string; website: string}>({...INITIAL_FORM});
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
   const [consent, setConsent] = useState(false);
