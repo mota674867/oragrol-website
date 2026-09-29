@@ -98,11 +98,23 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ code: "invalid_json", message: "Invalid request body." }, { status: 400 });
   }
 
-  const name = String(body.name || "").trim();
-  const email = String(body.email || "").trim().toLowerCase();
-  const company = String(body.company || "").trim();
-  const website = body.website ? String(body.website).trim() : null;
-  const consent = body.consent === true;
+  // FIXED 2026-09-29 — the live scan form (odo-scan.tsx) has always sent
+  // { lead: { name, email, company, website }, consent: { accepted, ... } },
+  // but this route only ever read flat body.name/body.email/body.consent
+  // (=== true). Every real submission failed validation with "Name, email,
+  // and company are required" before this line existed — discovered via a
+  // live test scan, not a code review. Flat fields are kept as a fallback
+  // so nothing else calling this route with the old shape breaks.
+  const lead = (body.lead && typeof body.lead === "object" ? body.lead : body) as Record<string, unknown>;
+  const name = String(lead.name || body.name || "").trim();
+  const email = String(lead.email || body.email || "").trim().toLowerCase();
+  const company = String(lead.company || body.company || "").trim();
+  const rawWebsite = lead.website ?? body.website;
+  const website = rawWebsite ? String(rawWebsite).trim() : null;
+  const consentField = body.consent;
+  const consent =
+    consentField === true ||
+    (typeof consentField === "object" && consentField !== null && (consentField as Record<string, unknown>).accepted === true);
   const hasWebsite = body.has_website !== false && !!website;
 
   // Validate required fields
