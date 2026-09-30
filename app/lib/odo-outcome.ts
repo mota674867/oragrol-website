@@ -111,13 +111,15 @@ export function rulesOutcome(ledger: Evidence[], matching: MatchingResult, busin
   };
 }
 
+export type OutcomeResult = { outcome: OutcomeNarrative; usage: { input_tokens: number; output_tokens: number } | null };
+
 export async function buildOutcomeNarrative(
   ledger: Evidence[],
   matching: MatchingResult,
   ctx: { business: string; industry: string | null; businessSize: string | null }
-): Promise<OutcomeNarrative> {
+): Promise<OutcomeResult> {
   const estimate = computeAutomationEstimate(matching);
-  const fallback = () => rulesOutcome(ledger, matching, ctx.business, estimate);
+  const fallback = (): OutcomeResult => ({ outcome: rulesOutcome(ledger, matching, ctx.business, estimate), usage: null });
   if (!process.env.ANTHROPIC_API_KEY) return fallback();
 
   const clientLedger = ledger.filter((e) => e.audience === "client");
@@ -149,6 +151,7 @@ export async function buildOutcomeNarrative(
   try {
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const res = await anthropic.messages.create({ model: MODEL, max_tokens: 900, system, messages: [{ role: "user", content: user }] }, { timeout: 30000 });
+    const usage = { input_tokens: res.usage.input_tokens, output_tokens: res.usage.output_tokens };
     const text = res.content.map((c) => (c.type === "text" ? c.text : "")).join("").trim();
     const json = text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
     const parsed = JSON.parse(json) as { situationNow?: unknown; securityOutlook?: unknown; automationOpportunity?: unknown };
@@ -156,13 +159,18 @@ export async function buildOutcomeNarrative(
     const situationNow = validateText(parsed.situationNow);
     const securityOutlook = validateText(parsed.securityOutlook);
     const automationOpportunity = autoOpps.length ? validateText(parsed.automationOpportunity) || null : null;
-    if (!situationNow || !securityOutlook || (autoOpps.length > 0 && !automationOpportunity)) return fallback();
+    if (!situationNow || !securityOutlook || (autoOpps.length > 0 && !automationOpportunity)) {
+      return { outcome: rulesOutcome(ledger, matching, ctx.business, estimate), usage };
+    }
 
     return {
-      situationNow, securityOutlook, automationOpportunity,
-      automationBenefits: autoOpps.length ? AUTOMATION_BENEFITS : [],
-      automationEstimate: autoOpps.length ? estimate : null,
-      generatedBy: "claude", generatedAt: new Date().toISOString(),
+      outcome: {
+        situationNow, securityOutlook, automationOpportunity,
+        automationBenefits: autoOpps.length ? AUTOMATION_BENEFITS : [],
+        automationEstimate: autoOpps.length ? estimate : null,
+        generatedBy: "claude", generatedAt: new Date().toISOString(),
+      },
+      usage,
     };
   } catch (err) {
     console.error("[ODO Outcome] Claude failed, using rules outcome:", err instanceof Error ? err.message : err);

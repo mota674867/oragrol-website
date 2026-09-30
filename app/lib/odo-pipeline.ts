@@ -21,6 +21,8 @@ import { buildOutcomeNarrative } from "./odo-outcome";
 import { buildReport, type OdoReport } from "./odo-report";
 import type { ResearchFindings } from "./odo-research";
 import { attachReportPdfToHubSpot } from "./odo-hubspot-report";
+import { EMPTY_USAGE, addJevUsage, mergeUsage, computeCost, type AiUsageTotals } from "./odo-cost";
+import { recordLifetimeAiCost } from "./odo-redis";
 
 const HUBSPOT_TOKEN = process.env.HUBSPOT_ACCESS_TOKEN;
 
@@ -61,7 +63,9 @@ export async function runEvaluation(
   profile: BusinessProfile,
   answers: Record<string, string>,
   questionOrder: string[],
-  questionMethod: string[]
+  questionMethod: string[],
+  /** Real Jev usage already spent picking questions during this scan, before evaluation started (odo-cost.ts) — accumulated from every /api/odo/scan/start and /api/odo/scan/answer call, so the final per-scan cost is exact, not just the evaluation-phase portion. */
+  priorAiUsage: AiUsageTotals = EMPTY_USAGE
 ): Promise<void> {
   try {
     await updateSession(sessionId, { step: "Building your evidence ledger..." });
@@ -78,7 +82,7 @@ export async function runEvaluation(
     const competitorNames = (findings.competitorProfiles ?? [])
       .filter((c) => c.classification === "confirmed_competitor" || c.classification === "probable_competitor")
       .map((c) => c.name);
-    const swot = await buildSwot(ledger, matching, {
+    const { swot, usage: swotUsage } = await buildSwot(ledger, matching, {
       business: session.visitorCompany,
       industry: profile.industry,
       businessSize: profile.businessSize,
@@ -86,11 +90,21 @@ export async function runEvaluation(
     });
 
     await updateSession(sessionId, { step: "Writing your outlook and next steps..." });
-    const outcomeNarrative = await buildOutcomeNarrative(ledger, matching, {
+    const { outcome: outcomeNarrative, usage: outcomeUsage } = await buildOutcomeNarrative(ledger, matching, {
       business: session.visitorCompany,
       industry: profile.industry,
       businessSize: profile.businessSize,
     });
+
+    // Exact per-scan AI cost (odo-cost.ts) — real token usage from every Jev
+    // call (question selection + service matching + custom-flag) and every
+    // Claude call (SWOT + outcome narrative) this scan actually made, priced
+    // at each vendor's verified rate. Never an estimate.
+    const totalUsage = mergeUsage(
+      mergeUsage(priorAiUsage, addJevUsage(EMPTY_USAGE, matching.jevUsage)),
+      { ...EMPTY_USAGE, claudeInputTokens: (swotUsage?.input_tokens ?? 0) + (outcomeUsage?.input_tokens ?? 0), claudeOutputTokens: (swotUsage?.output_tokens ?? 0) + (outcomeUsage?.output_tokens ?? 0), claudeCalls: (swotUsage ? 1 : 0) + (outcomeUsage ? 1 : 0) }
+    );
+    const aiCost = computeCost(totalUsage);
 
     // "Must be able to find nothing" (§2 #9) applies to DATA, not outcome —
     // insufficient_data means the ledger itself is too thin to say anything
@@ -113,6 +127,16 @@ export async function runEvaluation(
       condition,
       answers,
       questionMethod,
+      aiCost,
+    });
+
+    console.log(
+      `[ODO Cost] ${report.reference} — total $${aiCost.totalCostUsd.toFixed(6)} ` +
+      `(Jev $${aiCost.jevCostUsd.toFixed(6)} / ${totalUsage.jevCalls} calls, ${totalUsage.jevInputTokens} in tokens; ` +
+      `Claude $${aiCost.claudeCostUsd.toFixed(6)} / ${totalUsage.claudeCalls} calls, ${totalUsage.claudeInputTokens} in + ${totalUsage.claudeOutputTokens} out tokens)`
+    );
+    await recordLifetimeAiCost(totalUsage, aiCost.totalCostUsd).catch((err) => {
+      console.error("[ODO] Failed to record lifetime AI cost:", err);
     });
 
     await updateSession(sessionId, {

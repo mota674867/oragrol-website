@@ -281,8 +281,8 @@ export function toPublic(q: BankEntry): OdoQuestion {
 }
 
 export type NextQuestionDecision =
-  | { done: false; question: OdoQuestion; method: "jev" | "fallback"; materiality: number | null }
-  | { done: true; reason: string; method: "jev" | "fallback" };
+  | { done: false; question: OdoQuestion; method: "jev" | "fallback"; materiality: number | null; jevUsage: { input_tokens: number; output_tokens: number } | null }
+  | { done: true; reason: string; method: "jev" | "fallback"; jevUsage: { input_tokens: number; output_tokens: number } | null };
 
 /**
  * Pick the next question, or decide the questioning phase is over.
@@ -290,8 +290,8 @@ export type NextQuestionDecision =
  */
 export async function nextQuestion(ctx: QuestionContext): Promise<NextQuestionDecision> {
   const asked = Object.keys(ctx.answers).length;
-  if (asked >= MAX_QUESTIONS) return { done: true, reason: "question cap reached", method: "fallback" };
-  if ("q_open" in ctx.answers) return { done: true, reason: "closing question answered", method: "fallback" };
+  if (asked >= MAX_QUESTIONS) return { done: true, reason: "question cap reached", method: "fallback", jevUsage: null };
+  if ("q_open" in ctx.answers) return { done: true, reason: "closing question answered", method: "fallback", jevUsage: null };
 
   const pool = candidates(ctx);
   // The free-text catch-all is only ever the LAST question.
@@ -299,12 +299,12 @@ export async function nextQuestion(ctx: QuestionContext): Promise<NextQuestionDe
   const openQ = pool.find((q) => q.id === "q_open");
 
   if (structured.length === 0) {
-    return openQ ? { done: false, question: toPublic(openQ), method: "fallback", materiality: null } : { done: true, reason: "no questions left", method: "fallback" };
+    return openQ ? { done: false, question: toPublic(openQ), method: "fallback", materiality: null, jevUsage: null } : { done: true, reason: "no questions left", method: "fallback", jevUsage: null };
   }
 
   // Industry/size first when unknown — everything else is scored against them.
   const mustFirst = structured.find((q) => q.id === "q_industry") ?? structured.find((q) => q.id === "q_staff_count");
-  if (mustFirst) return { done: false, question: toPublic(mustFirst), method: "fallback", materiality: null };
+  if (mustFirst) return { done: false, question: toPublic(mustFirst), method: "fallback", materiality: null, jevUsage: null };
 
   const levels = [
     "Would not change any recommendation — already answered by research or irrelevant here",
@@ -331,17 +331,22 @@ export async function nextQuestion(ctx: QuestionContext): Promise<NextQuestionDe
     const best = scored[0];
     if (best) {
       const threshold = asked < MIN_QUESTIONS ? 0 : asked < SOFT_CAP ? 0.34 : 0.67;
-      if (best.m >= threshold) return { done: false, question: toPublic(best.q), method: "jev", materiality: best.m };
+      if (best.m >= threshold) return { done: false, question: toPublic(best.q), method: "jev", materiality: best.m, jevUsage: jev.usage };
       return openQ && !("q_open" in ctx.answers)
-        ? { done: false, question: toPublic(openQ), method: "jev", materiality: best.m }
-        : { done: true, reason: `remaining questions not material (best ${best.m.toFixed(2)})`, method: "jev" };
+        ? { done: false, question: toPublic(openQ), method: "jev", materiality: best.m, jevUsage: jev.usage }
+        : { done: true, reason: `remaining questions not material (best ${best.m.toFixed(2)})`, method: "jev", jevUsage: jev.usage };
     }
   }
 
-  // Fallback — fixed priority order, stop at the soft cap.
+  // Fallback — fixed priority order, stop at the soft cap. Jev may still have
+  // billed a call above even though nothing usable came back (e.g. every
+  // answer failed validation) — that usage must still be counted.
+  const spentUsage = jev?.usage ?? null;
   if (asked >= SOFT_CAP - 1) {
-    return openQ ? { done: false, question: toPublic(openQ), method: "fallback", materiality: null } : { done: true, reason: "soft cap reached (no Jev)", method: "fallback" };
+    return openQ
+      ? { done: false, question: toPublic(openQ), method: "fallback", materiality: null, jevUsage: spentUsage }
+      : { done: true, reason: "soft cap reached (no Jev)", method: "fallback", jevUsage: spentUsage };
   }
   const next = [...structured].sort((a, b) => a.priority - b.priority)[0];
-  return { done: false, question: toPublic(next), method: "fallback", materiality: null };
+  return { done: false, question: toPublic(next), method: "fallback", materiality: null, jevUsage: spentUsage };
 }

@@ -8,6 +8,7 @@ import { getSession, updateSession } from "@/app/lib/odo-redis";
 import { pickNextQuestion, runEvaluation, type BusinessProfile } from "@/app/lib/odo-pipeline";
 import type { NextQuestionDecision } from "@/app/lib/odo-questions";
 import type { ResearchFindings } from "@/app/lib/odo-research";
+import { EMPTY_USAGE, addJevUsage, type AiUsageTotals } from "@/app/lib/odo-cost";
 
 const MAX_QUESTIONS = 20;
 
@@ -65,8 +66,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   const decision: NextQuestionDecision =
     newQuestionsAsked >= MAX_QUESTIONS
-      ? { done: true, reason: "question cap reached", method: "fallback" }
+      ? { done: true, reason: "question cap reached", method: "fallback", jevUsage: null }
       : await pickNextQuestion(researchFindings, profile, session.hasWebsite, answers, questionOrder);
+
+  // Real Jev usage keeps accumulating across every answer in this scan
+  // (odo-cost.ts) — findings._aiUsage carries the running total from
+  // /api/odo/scan/start through every /api/odo/scan/answer call, so the
+  // figure runEvaluation ends with is the scan's exact, complete cost.
+  const priorAiUsage: AiUsageTotals = (findings._aiUsage as AiUsageTotals | undefined) ?? EMPTY_USAGE;
+  const aiUsageSoFar = addJevUsage(priorAiUsage, decision.jevUsage);
+  findings._aiUsage = aiUsageSoFar;
 
   if (decision.done) {
     // Move to evaluation phase
@@ -86,7 +95,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // generating the report was frozen mid-flight. after() keeps it alive
     // until this actually finishes.
     after(() =>
-      runEvaluation(sessionId, session, researchFindings, profile, answers, questionOrder, Object.values(questionMethods)).catch(err => {
+      runEvaluation(sessionId, session, researchFindings, profile, answers, questionOrder, Object.values(questionMethods), aiUsageSoFar).catch(err => {
         console.error("[ODO] Evaluation async failed:", err);
       })
     );

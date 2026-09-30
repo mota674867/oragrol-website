@@ -5,6 +5,7 @@
 
 import { Redis } from "@upstash/redis";
 import { createHash, randomUUID } from "crypto";
+import type { AiUsageTotals } from "./odo-cost";
 
 let redisClient: Redis | null = null;
 
@@ -218,4 +219,52 @@ export async function getIncompleteSession(email: string): Promise<{ sessionId: 
   const redis = getRedis();
   const incompleteKey = `${INCOMPLETE_PREFIX}${hashEmail(email)}`;
   return redis.get<{ sessionId: string; createdAt: number }>(incompleteKey);
+}
+
+// --- Lifetime AI cost tracking (odo-cost.ts) ---
+//
+// A running, all-time total of every dollar ODO has actually spent on Jev +
+// Claude, so Mohammad can check cumulative spend without having to add up
+// every scan's log line by hand. Read-modify-write (not atomic) — fine here
+// because ODO scans complete one at a time in practice; a lost increment
+// under real concurrent load would undercount by at most one scan's cost,
+// never overcount, and never blocks a scan either way (best-effort, like
+// every other logging path in ODO).
+
+const LIFETIME_COST_KEY = "odo:cost:lifetime";
+
+export type LifetimeAiCost = {
+  totalCostUsd: number;
+  scanCount: number;
+  usage: AiUsageTotals;
+  since: string;
+  lastUpdatedAt: string;
+};
+
+export async function recordLifetimeAiCost(usage: AiUsageTotals, costUsd: number): Promise<void> {
+  const redis = getRedis();
+  const current = await redis.get<LifetimeAiCost>(LIFETIME_COST_KEY);
+  const now = new Date().toISOString();
+  const next: LifetimeAiCost = current
+    ? {
+        totalCostUsd: Math.round((current.totalCostUsd + costUsd) * 1_000_000) / 1_000_000,
+        scanCount: current.scanCount + 1,
+        usage: {
+          jevInputTokens: current.usage.jevInputTokens + usage.jevInputTokens,
+          jevOutputTokens: current.usage.jevOutputTokens + usage.jevOutputTokens,
+          jevCalls: current.usage.jevCalls + usage.jevCalls,
+          claudeInputTokens: current.usage.claudeInputTokens + usage.claudeInputTokens,
+          claudeOutputTokens: current.usage.claudeOutputTokens + usage.claudeOutputTokens,
+          claudeCalls: current.usage.claudeCalls + usage.claudeCalls,
+        },
+        since: current.since,
+        lastUpdatedAt: now,
+      }
+    : { totalCostUsd: costUsd, scanCount: 1, usage, since: now, lastUpdatedAt: now };
+  await redis.set(LIFETIME_COST_KEY, next); // no TTL — this total should never expire
+}
+
+export async function getLifetimeAiCost(): Promise<LifetimeAiCost | null> {
+  const redis = getRedis();
+  return redis.get<LifetimeAiCost>(LIFETIME_COST_KEY);
 }

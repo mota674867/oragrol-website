@@ -8,6 +8,7 @@ import { checkCooldowns, createSession, getIncompleteSession } from "@/app/lib/o
 import { runParallelResearch, type ResearchFindings } from "@/app/lib/odo-research";
 import { pickNextQuestion, runEvaluation } from "@/app/lib/odo-pipeline";
 import { getClientIp, rateLimit } from "@/app/lib/rate-limit";
+import { EMPTY_USAGE, addJevUsage } from "@/app/lib/odo-cost";
 
 const HUBSPOT_TOKEN = process.env.HUBSPOT_ACCESS_TOKEN;
 
@@ -267,6 +268,10 @@ async function runResearchAsync(
     // (pickNextQuestion/nextQuestion never throw — see odo-questions.ts).
     const profile = { industry: findings.industry, businessSize: findings.businessSize };
     const decision = await pickNextQuestion(findings, profile, hasWebsite, {}, []);
+    // Real Jev usage from picking the very first question — carried forward
+    // (via findings._aiUsage) so the scan's final cost is exact, not just
+    // the evaluation-phase portion (odo-cost.ts).
+    const aiUsageSoFar = addJevUsage(EMPTY_USAGE, decision.jevUsage);
 
     const baseFindings: Record<string, unknown> = {
       ...(findings as unknown as Record<string, unknown>),
@@ -275,6 +280,7 @@ async function runResearchAsync(
       _researchErrors: findings.errors,
       _questionOrder: [] as string[],
       _questionMethods: {} as Record<string, string>,
+      _aiUsage: aiUsageSoFar,
     };
 
     if (decision.done) {
@@ -289,7 +295,7 @@ async function runResearchAsync(
       });
       const session = await getSession(sessionId);
       if (session) {
-        await runEvaluation(sessionId, session, findings, profile, {}, [], []);
+        await runEvaluation(sessionId, session, findings, profile, {}, [], [], aiUsageSoFar);
       }
     } else {
       await updateSession(sessionId, {

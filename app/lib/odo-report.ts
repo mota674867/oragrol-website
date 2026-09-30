@@ -21,6 +21,7 @@ import { ORGBOOK_ATTRIBUTION } from "./odo-orgbook";
 import { SERVICE_BY_CODE, type Billing } from "./odo-services";
 import { recommendSecurityLane, evaluateOrOneFlag, type SecurityLane } from "./odo-packages";
 import { recommendAutomationLane, type AutomationRecommendation } from "./odo-automation-bundles";
+import type { CostBreakdown } from "./odo-cost";
 
 export type ReportFinding = Pick<Evidence, "id" | "fact" | "raw" | "source" | "tier" | "severity" | "polarity" | "framework" | "collectedAt">;
 export type ReportPriority = { code: string; simpleName: string; category: string; group: "security" | "automation"; tier: "recommended" | "worth_exploring"; billing: Billing; why: string; evidenceIds: string[] };
@@ -74,6 +75,8 @@ export type OdoReport = {
     answers: Record<string, string>;
     questionMethod: string[];
     researchErrors: string[];
+    /** Real per-scan AI cost — sums actual token usage from every Jev/Claude call this scan made against verified vendor pricing (odo-cost.ts). Never an estimate. */
+    aiCost: CostBreakdown;
   };
 };
 
@@ -127,6 +130,7 @@ export async function buildReport(input: {
   condition: "complete" | "insufficient_data";
   answers: Record<string, string>;
   questionMethod: string[];
+  aiCost: CostBreakdown;
 }): Promise<OdoReport> {
   const { ledger, matching, swot, findings } = input;
   const client = ledger.filter((e) => e.audience === "client");
@@ -215,6 +219,7 @@ export async function buildReport(input: {
       answers: input.answers,
       questionMethod: input.questionMethod,
       researchErrors: findings.errors ?? [],
+      aiCost: input.aiCost,
     },
   };
 }

@@ -45,6 +45,8 @@ export type MatchingResult = {
   customServiceFlag: { raised: boolean; notes: string[] };
   outcome: "gaps_found" | "no_major_gaps";
   jevUsed: boolean;
+  /** Real token usage from every Jev call this function made (service-match scoring + custom-flag), for exact per-scan cost tracking (odo-cost.ts). */
+  jevUsage: { input_tokens: number; output_tokens: number };
 };
 
 const SEV_WEIGHT: Record<Evidence["severity"], number> = { high: 0.85, medium: 0.78, low: 0.62, info: 0.55 };
@@ -100,6 +102,8 @@ export async function matchServices(ledger: Evidence[], ctx: { industry: string 
   ];
   let jevAnswers: Record<string, import("./jev").JevAnswer> = {};
   let jevUsed = false;
+  let jevInputTokens = 0;
+  let jevOutputTokens = 0;
   if (candidates.length && jevConfigured()) {
     const qs: Record<string, JevQuestion> = {};
     for (const s of candidates) {
@@ -116,7 +120,11 @@ export async function matchServices(ledger: Evidence[], ctx: { industry: string 
     }
     const state = `Business: industry ${ctx.industry ?? "unknown"}, size ${ctx.businessSize ?? "unknown"}.\nEvidence ledger:\n${ledgerAsText(clientLedger, { includeInternal: false })}`;
     const res = await askJevChunked(state, qs, { label: "service-match", chunkSize: 20, timeoutMs: 15000 });
-    if (res) { jevAnswers = res.answers; jevUsed = Object.keys(res.answers).length > 0; }
+    if (res) {
+      jevAnswers = res.answers;
+      jevUsed = Object.keys(res.answers).length > 0;
+      if (res.usage) { jevInputTokens += res.usage.input_tokens; jevOutputTokens += res.usage.output_tokens; }
+    }
   }
 
   // 3) Tier with the §6.1 rules.
@@ -160,6 +168,7 @@ export async function matchServices(ledger: Evidence[], ctx: { industry: string 
       },
       { label: "custom-flag", timeoutMs: 8000 }
     );
+    if (r?.usage) { jevInputTokens += r.usage.input_tokens; jevOutputTokens += r.usage.output_tokens; }
     const oc = r?.answers.outside_catalog;
     const ur = r?.answers.urgent;
     if (oc?.type === "noul" && oc.noul >= 0.6) notes.push(`Visitor described a need that may be outside the catalog: "${openText.slice(0, 200)}"`);
@@ -174,5 +183,6 @@ export async function matchServices(ledger: Evidence[], ctx: { industry: string 
     customServiceFlag: { raised: notes.length > 0, notes: [...new Set(notes)] },
     outcome: flagged.length ? "gaps_found" : "no_major_gaps",
     jevUsed,
+    jevUsage: { input_tokens: jevInputTokens, output_tokens: jevOutputTokens },
   };
 }

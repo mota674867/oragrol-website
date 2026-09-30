@@ -88,12 +88,14 @@ export function rulesSwot(ledger: Evidence[], matching: MatchingResult, business
   return { strengths, weaknesses, opportunities, threats, summary, generatedBy: "rules", droppedPoints: 0, generatedAt: new Date().toISOString() };
 }
 
+export type SwotResult = { swot: Swot; usage: { input_tokens: number; output_tokens: number } | null };
+
 export async function buildSwot(
   ledger: Evidence[],
   matching: MatchingResult,
   ctx: { business: string; industry: string | null; businessSize: string | null; competitorNames: string[] }
-): Promise<Swot> {
-  const fallback = () => rulesSwot(ledger, matching, ctx.business);
+): Promise<SwotResult> {
+  const fallback = (): SwotResult => ({ swot: rulesSwot(ledger, matching, ctx.business), usage: null });
   if (!process.env.ANTHROPIC_API_KEY) return fallback();
 
   const clientLedger = ledger.filter((e) => e.audience === "client");
@@ -131,12 +133,13 @@ export async function buildSwot(
       system,
       messages: [{ role: "user", content: user }],
     }, { timeout: 45000 });
+    const usage = { input_tokens: res.usage.input_tokens, output_tokens: res.usage.output_tokens };
     const text = res.content.map((c) => (c.type === "text" ? c.text : "")).join("").trim();
     const json = text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
     const parsed = JSON.parse(json) as unknown;
     const { swot } = validate(parsed, new Set(clientLedger.map((e) => e.id)), ctx.competitorNames);
-    if (!swot) return fallback();
-    return { ...swot, generatedBy: "claude", generatedAt: new Date().toISOString() };
+    if (!swot) return { swot: rulesSwot(ledger, matching, ctx.business), usage };
+    return { swot: { ...swot, generatedBy: "claude", generatedAt: new Date().toISOString() }, usage };
   } catch (err) {
     console.error("[ODO SWOT] Claude failed, using rules SWOT:", err instanceof Error ? err.message : err);
     return fallback();
