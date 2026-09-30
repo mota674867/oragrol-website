@@ -18,6 +18,10 @@
 //                    you have verified ownership of, so it can never scan a
 //                    prospect. (A consented check of the single email the
 //                    prospect supplies at intake is a separate, valid idea.)
+//                    WIRED 2026-09-30 — Mohammad approved the ~$3.95/mo cost
+//                    (Pending Item #22). See odo-hibp.ts: it checks only the
+//                    visitor's own consented intake address via the
+//                    breachedaccount endpoint, never the bare domain.
 //   Shodan         — free accounts have no host-lookup API access.
 //   BuiltWith      — $295/month; replaced by native fingerprinting in
 //                    odo-page.ts.
@@ -74,6 +78,7 @@ import { checkWaybackHistory, type WaybackHistory } from "./odo-history";
 import { checkHiringSignal, type HiringSignal } from "./odo-hiring";
 import { fetchGeoapifyNearby } from "./odo-geoapify";
 import { lookupOrgBook, type OrgBookRecord } from "./odo-orgbook";
+import { checkHibpBreach, type HibpResult } from "./odo-hibp";
 
 export type ResearchFindings = {
   // Website & SEO
@@ -115,6 +120,8 @@ export type ResearchFindings = {
   businessRegistry: RegistryFindings | null;
   /** OrgBook BC — BC registration (incl. extra-provincial) matched by exact normalized name. `absent` = not registered in BC, NOT a gap. Attribution required when shown (ORGBOOK_ATTRIBUTION). */
   bcRegistry: Determination<OrgBookRecord> | null;
+  /** Credential exposure (Pending Item #22) — checks ONLY the visitor's own consented intake email via HIBP's breachedaccount endpoint. `absent` here is the GOOD outcome (never appeared in a known breach). */
+  hibp: Determination<HibpResult> | null;
   // General research
   generalResearch: GeneralResearchFindings | null;
   /** Classified competitor candidates — see odo-competitors.ts. Only confirmed_competitor and probable_competitor are report-safe. */
@@ -314,7 +321,8 @@ const WEBSITE_SOURCE_PLACEHOLDERS = (): Promise<null>[] =>
 export async function runParallelResearch(
   businessName: string,
   website: string | null,
-  hasWebsite: boolean
+  hasWebsite: boolean,
+  visitorEmail?: string | null
 ): Promise<ResearchFindings> {
   const errors: string[] = [];
   const domain = website || "";
@@ -324,6 +332,7 @@ export async function runParallelResearch(
     generalResearch,
     competitors,
     bcRegistryResult,
+    hibpResult,
     pageSpeedRawResult,
     retireRepoResult,
     ssl,
@@ -348,6 +357,8 @@ export async function runParallelResearch(
     })), errors),
     // OrgBook BC — name-based, so it runs with or without a website.
     safeFetch("OrgBook BC", () => lookupOrgBook(businessName), errors),
+    // HIBP — email-based (the visitor's own consented intake address), independent of website/hasWebsite.
+    safeFetch("HIBP credential exposure", () => checkHibpBreach(visitorEmail ?? ""), errors),
     // Website-dependent sources
     ...(hasWebsite && domain ? [
       safeFetch("PageSpeed+Compliance", () => fetchPageSpeedCompliance(domain), errors),
@@ -380,6 +391,7 @@ export async function runParallelResearch(
   const history = getVal<Determination<WaybackHistory>>(historyResult);
   const hiring = getVal<Determination<HiringSignal>>(hiringResult);
   const bcRegistry = getVal<Determination<OrgBookRecord>>(bcRegistryResult);
+  const hibp = getVal<Determination<HibpResult>>(hibpResult);
   const pageSpeedRaw = getVal<Determination<PageSpeedRaw>>(pageSpeedRawResult);
   const retireRepo = getVal<Determination<import("./odo-compliance").RetireRepo>>(retireRepoResult);
   const certAndAttackSurface = getVal<{ cert: CertFindings; attackSurface: AttackSurfaceResearch }>(certAndAttackSurfaceResult);
@@ -454,6 +466,7 @@ export async function runParallelResearch(
   if (history) determinations["research.waybackHistory"] = history;
   if (hiring) determinations["business.hiringSignal"] = hiring;
   if (bcRegistry) determinations["registry.orgbookBC"] = bcRegistry;
+  if (hibp) determinations["identity.hibpExposure"] = hibp;
 
   return {
     website: websiteFindings,
@@ -479,6 +492,7 @@ export async function runParallelResearch(
     trademarks: null,
     businessRegistry: null,
     bcRegistry,
+    hibp,
     generalResearch: generalResearchData,
     competitors: competitorCandidates,
     competitorProfiles,

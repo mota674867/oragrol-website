@@ -1,9 +1,13 @@
 // POST /api/odo/scan/answer
 // Receives visitor's answer to ODO's targeted question.
-// Updates session, generates next question or moves to evaluation phase.
+// Updates session, asks ODO's adaptive selector for the next question, or
+// moves to evaluation once questioning is over (odo-pipeline.ts).
 
 import { after, NextRequest, NextResponse } from "next/server";
 import { getSession, updateSession } from "@/app/lib/odo-redis";
+import { pickNextQuestion, runEvaluation, type BusinessProfile } from "@/app/lib/odo-pipeline";
+import type { NextQuestionDecision } from "@/app/lib/odo-questions";
+import type { ResearchFindings } from "@/app/lib/odo-research";
 
 const MAX_QUESTIONS = 20;
 
@@ -33,9 +37,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const answers = (findings._answers as Record<string, string> | undefined) || {};
   answers[questionId] = answer;
 
+  const questionOrder = [...((findings._questionOrder as string[] | undefined) || []), questionId];
+  const questionMethods = { ...((findings._questionMethods as Record<string, string> | undefined) || {}) };
+
   const newQuestionsAsked = session.questionsAsked + 1;
 
-  // Update industry/size from answers if ODO asked about them
+  // A stated industry/size answer overrides (or fills a gap in) what
+  // research alone could tell — resolved below via profile, same as
+  // odo-questions.ts's own "ask industry/size first when unknown" rule.
   if (questionId === "q_industry") {
     findings._industryDetected = answer;
   }
@@ -45,12 +54,21 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   findings._answers = answers;
+  findings._questionOrder = questionOrder;
   findings._nextQuestion = undefined; // Clear current question
 
-  // Check if we've hit max questions or have enough data
-  const shouldEvaluate = newQuestionsAsked >= MAX_QUESTIONS || hasEnoughData(answers, findings);
+  const researchFindings = findings as unknown as ResearchFindings;
+  const profile: BusinessProfile = {
+    industry: (findings._industryDetected as string | undefined) ?? researchFindings.industry ?? null,
+    businessSize: (findings._businessSizeDetected as ResearchFindings["businessSize"] | undefined) ?? researchFindings.businessSize ?? null,
+  };
 
-  if (shouldEvaluate) {
+  const decision: NextQuestionDecision =
+    newQuestionsAsked >= MAX_QUESTIONS
+      ? { done: true, reason: "question cap reached", method: "fallback" }
+      : await pickNextQuestion(researchFindings, profile, session.hasWebsite, answers, questionOrder);
+
+  if (decision.done) {
     // Move to evaluation phase
     await updateSession(sessionId, {
       questionsAsked: newQuestionsAsked,
@@ -65,10 +83,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // handler's response is sent on Vercel's serverless runtime. Without
     // after(), a scan could answer its last question, get told
     // "evaluating," and then sit there forever because the function
-    // generating the SWOT/completion was frozen mid-flight. after()
-    // keeps it alive until this actually finishes.
+    // generating the report was frozen mid-flight. after() keeps it alive
+    // until this actually finishes.
     after(() =>
-      runEvaluationAsync(sessionId, session.visitorCompany, findings, session.hubspotContactId).catch(err => {
+      runEvaluation(sessionId, session, researchFindings, profile, answers, questionOrder, Object.values(questionMethods)).catch(err => {
         console.error("[ODO] Evaluation async failed:", err);
       })
     );
@@ -81,12 +99,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     });
   }
 
-  // Generate next question
-  const nextQuestion = generateNextQuestion(questionId, answer, answers, findings, newQuestionsAsked);
+  // Not done — one more question.
+  questionMethods[decision.question.id] = decision.method;
+  findings._questionMethods = questionMethods;
 
   await updateSession(sessionId, {
     questionsAsked: newQuestionsAsked,
-    findings: { ...findings, _nextQuestion: nextQuestion },
+    findings: { ...findings, _nextQuestion: decision.question },
     status: "questioning",
     step: `Question ${newQuestionsAsked + 1}`,
   });
@@ -95,306 +114,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     status: "questioning",
     phase: "questioning",
     step: `Question ${newQuestionsAsked + 1}`,
-    question: nextQuestion,
+    question: decision.question,
     questions_asked: newQuestionsAsked,
-  });
-}
-
-function hasEnoughData(answers: Record<string, string>, findings: Record<string, unknown>): boolean {
-  const requiredAnswered = ["q_industry", "q_biggest_challenge"].every(q => answers[q]);
-  const hasResearchData = Object.keys(findings).filter(k => !k.startsWith("_")).length > 0;
-  return requiredAnswered && (hasResearchData || Object.keys(answers).length >= 5);
-}
-
-function generateNextQuestion(
-  lastQuestionId: string,
-  lastAnswer: string,
-  allAnswers: Record<string, string>,
-  findings: Record<string, unknown>,
-  questionsAsked: number
-): { id: string; text: string; options?: string[] } {
-  // Simple sequential question logic — Jev will make this intelligent
-  const asked = new Set(Object.keys(allAnswers));
-
-  if (!asked.has("q_industry")) return { id: "q_industry", text: "What industry or sector does your business operate in?", options: ["Healthcare", "Legal", "Finance & Accounting", "Technology", "Retail", "Construction", "Food & Beverage", "Education", "Marketing & Advertising", "Consulting", "Manufacturing", "Other"] };
-  if (!asked.has("q_staff_count")) return { id: "q_staff_count", text: "Approximately how many people work at your company?", options: ["1–10", "11–50", "51–200", "200+"] };
-  if (!asked.has("q_biggest_challenge")) return { id: "q_biggest_challenge", text: "What is your biggest operational challenge right now?", options: ["Cybersecurity and data protection", "Day-to-day efficiency and automation", "Growing the business", "Managing costs", "Customer experience", "Compliance and regulations"] };
-  if (!asked.has("q_current_security")) return { id: "q_current_security", text: "Do you currently have any cybersecurity protection in place for your business?", options: ["Yes, we have a dedicated IT/security team", "Yes, we use some security software", "Basic antivirus only", "Nothing formal in place", "I'm not sure"] };
-  if (!asked.has("q_data_sensitivity")) return { id: "q_data_sensitivity", text: "What type of data does your business handle?", options: ["Customer personal information (names, addresses, emails)", "Payment or financial data", "Medical or health records", "Employee records", "Proprietary business data", "Mostly public information"] };
-
-  return {
-    id: `q_custom_${questionsAsked}`,
-    text: "Is there anything else about your business operations or challenges you'd like us to know?",
-  };
-}
-
-async function runEvaluationAsync(
-  sessionId: string,
-  businessName: string,
-  findings: Record<string, unknown>,
-  hubspotContactId: string | null
-): Promise<void> {
-  const { updateSession, markSessionComplete, getSession } = await import("@/app/lib/odo-redis");
-
-  try {
-    await updateSession(sessionId, { step: "Analyzing findings..." });
-    await new Promise(r => setTimeout(r, 2000)); // Simulate Jev evaluation time
-
-    await updateSession(sessionId, { step: "Generating SWOT analysis..." });
-    await new Promise(r => setTimeout(r, 2000));
-
-    // Build SWOT from findings (Jev placeholder)
-    const swot = buildSwotPlaceholder(findings, businessName);
-
-    // Build service matches
-    const serviceMatches = buildServiceMatches(findings);
-
-    // Determine condition
-    const answers = (findings._answers as Record<string, string> | undefined) || {};
-    const hasEnoughForReport = Object.keys(answers).length >= 2 || Object.keys(findings).filter(k => !k.startsWith("_")).length >= 3;
-    const condition = hasEnoughForReport ? "complete" as const : "insufficient_data" as const;
-
-    await updateSession(sessionId, {
-      swot,
-      serviceMatches,
-      condition,
-      status: condition === "complete" ? "complete" : "insufficient_data",
-      phase: "complete",
-      step: "Scan complete",
-      findings,
-    });
-
-    // Activate cooldowns only on completed scans
-    const session = await getSession(sessionId);
-    if (session && condition === "complete") {
-      await markSessionComplete(session);
-    }
-
-    // Notify ZM77 (placeholder — ZM77 webhook endpoint)
-    await notifyZM77(sessionId, businessName, findings, swot, serviceMatches, condition, hubspotContactId, answers).catch(err => {
-      console.error("[ODO] ZM77 notification failed:", err);
-    });
-
-    // Update HubSpot
-    if (hubspotContactId && process.env.HUBSPOT_ACCESS_TOKEN) {
-      await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${hubspotContactId}`, {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${process.env.HUBSPOT_ACCESS_TOKEN}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          properties: {
-            odo_scan_status: condition,
-            odo_scan_condition: condition,
-            odo_service_matches: serviceMatches.map((m: Record<string, unknown>) => m.service).join(", "),
-          },
-        }),
-      }).catch(() => {});
-    }
-
-  } catch (err) {
-    console.error("[ODO] Evaluation failed:", err);
-    await updateSession(sessionId, { status: "failed", step: "Evaluation failed. Our team has been notified." }).catch(() => {});
-  }
-}
-
-function buildSwotPlaceholder(findings: Record<string, unknown>, businessName: string): Record<string, unknown> {
-  // Placeholder SWOT — Jev will produce real analysis
-  return {
-    strengths: [`${businessName} has an established online presence`],
-    weaknesses: ["Security posture requires review", "Digital marketing gaps identified"],
-    opportunities: ["Automation opportunities available in current workflows", "Cybersecurity investment could prevent costly breaches"],
-    threats: ["Competitors in the space are investing in security", "Regulatory compliance requirements increasing"],
-    generatedBy: "placeholder",
-    generatedAt: Date.now(),
-  };
-}
-
-function buildServiceMatches(findings: Record<string, unknown>): Record<string, unknown>[] {
-  const matches: Record<string, unknown>[] = [];
-  const f = findings as import("@/app/lib/odo-research").ResearchFindings;
-
-  // Only a CONFIRMED absence triggers a service match. A check that could not
-  // be determined must never produce a recommendation — that would be selling
-  // against a gap ODO never established.
-  const emailGaps: string[] = [];
-  if (f.dns?.spf.state === "absent") emailGaps.push("no SPF record");
-  if (f.dns?.dkim.state === "absent") emailGaps.push("no DKIM record");
-  if (f.dns?.dmarc.state === "absent") emailGaps.push("no DMARC record");
-  else if (f.dns?.dmarc.state === "observed" && f.dns.dmarc.value.isMonitorOnly) {
-    emailGaps.push(`DMARC published but set to p=none, which enforces nothing`);
-  }
-  if (emailGaps.length > 0) {
-    matches.push({
-      service: "Cybersecurity Services",
-      priority: "high",
-      reason: `Email authentication: ${emailGaps.join("; ")}`,
-      evidence: emailGaps.map((g) => ({ fact: g, source: "DNS lookup", confidence: "observed" })),
-    });
-  }
-  if (f.ssl?.grade && ["C", "D", "F"].includes(f.ssl.grade)) {
-    matches.push({ service: "Cybersecurity Services", priority: "high", reason: `SSL grade: ${f.ssl.grade}` });
-  }
-
-  // --- Real Section-18 service names for the 2026-09-29 research expansion.
-  // This is NOT the full 63-service trigger table (Pending Item #2 / Section
-  // 18 of the master reference) — that is a separate, larger build. These
-  // are only the two services today's new evidence (odo-infra.ts,
-  // odo-attack-surface.ts, odo-compliance.ts) maps to cleanly, using the
-  // real confirmed Simple Names from ORAGROL_ODO_Service_Trigger_Data.
-
-  const exposureGaps: Array<{ fact: string; source: string }> = [];
-  if (f.infra?.registration.state === "observed") {
-    const reg = f.infra.registration.value;
-    if (reg.expiringWithin90Days) {
-      exposureGaps.push({
-        fact: `Domain registration expires within 90 days${reg.expiresAt ? ` (${reg.expiresAt.slice(0, 10)})` : ""}`,
-        source: "RDAP",
-      });
-    }
-    if (!reg.transferLocked) exposureGaps.push({ fact: "Domain has no registrar transfer lock", source: "RDAP" });
-  }
-  if (f.infra?.dnssec.state === "absent") {
-    exposureGaps.push({ fact: "DNSSEC is not enabled", source: "DNS-over-HTTPS" });
-  }
-  if (f.attackSurface?.danglingCnames.state === "observed" && f.attackSurface.danglingCnames.value.length > 0) {
-    exposureGaps.push({
-      fact: `${f.attackSurface.danglingCnames.value.length} subdomain(s) with a dangling CNAME — live subdomain-takeover risk`,
-      source: "Certificate transparency + DNS",
-    });
-  }
-  if (f.attackSurface?.sensitiveSubdomains && f.attackSurface.sensitiveSubdomains.length > 0) {
-    exposureGaps.push({
-      fact: `Infrastructure-revealing subdomains found: ${f.attackSurface.sensitiveSubdomains.map((s) => s.label).join(", ")}`,
-      source: "Certificate transparency",
-    });
-  }
-  if (f.compliance?.jsLibraries.state === "observed" && f.compliance.jsLibraries.value.vulnerable.length > 0) {
-    const libs = f.compliance.jsLibraries.value.vulnerable.map((v) => `${v.name} ${v.version}`).join(", ");
-    exposureGaps.push({ fact: `Front-end JavaScript libraries with known CVEs: ${libs}`, source: "PageSpeed + retire.js vulnerability database" });
-  }
-  if (exposureGaps.length > 0) {
-    const hasTakeoverRisk = f.attackSurface?.danglingCnames.state === "observed" && f.attackSurface.danglingCnames.value.length > 0;
-    matches.push({
-      service: "Vuln Watch", // C02-S01, Vulnerability Assessment & Management
-      priority: hasTakeoverRisk ? "high" : "medium",
-      reason: `External exposure findings: ${exposureGaps.map((g) => g.fact).join("; ")}`,
-      evidence: exposureGaps.map((g) => ({ fact: g.fact, source: g.source, confidence: "observed" })),
-    });
-  }
-
-  const complianceGaps: Array<{ fact: string; source: string }> = [];
-  if (f.compliance?.accessibility && f.compliance.accessibility.score !== null && f.compliance.accessibility.score < 90) {
-    complianceGaps.push({
-      fact: `Accessibility (axe-core) score ${f.compliance.accessibility.score}/100 — a potential AODA/WCAG 2.0 AA gap for organizations with 50+ employees`,
-      source: "PageSpeed accessibility audit",
-    });
-  }
-  if (f.compliance?.preConsentTrackers && f.compliance.preConsentTrackers.trackers.length > 0) {
-    const names = f.compliance.preConsentTrackers.trackers.map((t) => t.label).join(", ");
-    complianceGaps.push({
-      fact: `Analytics/ad trackers load before any consent interaction (${names}) — a Quebec Law 25 exposure`,
-      source: "PageSpeed network log",
-    });
-  }
-  if (complianceGaps.length > 0) {
-    matches.push({
-      service: "Compliance Check", // C01-S02, Cyber Compliance Readiness
-      priority: "medium",
-      reason: `Compliance findings: ${complianceGaps.map((g) => g.fact).join("; ")}`,
-      evidence: complianceGaps.map((g) => ({ fact: g.fact, source: g.source, confidence: "observed" })),
-    });
-  }
-
-  const answers = (findings._answers as Record<string, string> | undefined) || {};
-  if (answers.q_biggest_challenge?.includes("efficiency") || answers.q_biggest_challenge?.includes("automation")) {
-    matches.push({ service: "Business Automation", priority: "medium", reason: "Visitor identified efficiency as primary challenge" });
-  }
-  // FIXED 2026-09-29 — this previously also fired on `!f.paidAds?.runningFacebookAds`,
-  // which is permanently true (paidAds is an unimplemented stub — see the
-  // "INVESTIGATED 2026-09-29" note in odo-research.ts; Facebook/Google Ads
-  // Transparency both turned out to need either a Meta developer app or have
-  // no API at all). That made this match fire on every single scan
-  // regardless of the visitor's actual answer — a fabricated finding, not a
-  // real one. Now gated on the stated answer only.
-  if (answers.q_biggest_challenge?.includes("Growing")) {
-    matches.push({ service: "OR ONE", priority: "medium", reason: "Growth challenge identified — AI agent support recommended" });
-  }
-
-  return matches;
-}
-
-async function notifyZM77(
-  sessionId: string,
-  businessName: string,
-  findings: Record<string, unknown>,
-  swot: Record<string, unknown>,
-  serviceMatches: Record<string, unknown>[],
-  condition: "complete" | "insufficient_data",
-  hubspotContactId: string | null,
-  answers: Record<string, string>
-): Promise<void> {
-  const zm77Webhook = process.env.ZM77_WEBHOOK_URL;
-  if (!zm77Webhook) {
-    console.warn("[ODO] ZM77_WEBHOOK_URL not configured — skipping ZM77 notification");
-    return;
-  }
-
-  const payload = {
-    source: "ODO",
-    event: "scan_complete",
-    sessionId,
-    businessName,
-    condition,
-    requiresApproval: true,
-    hubspotContactId,
-    findings: {
-      industry: findings._industryDetected || null,
-      businessSize: findings._businessSizeDetected || null,
-      securityFindings: {
-        ssl: (findings as import("@/app/lib/odo-research").ResearchFindings).ssl,
-        dns: (findings as import("@/app/lib/odo-research").ResearchFindings).dns,
-        wellKnown: (findings as import("@/app/lib/odo-research").ResearchFindings).page?.wellKnown ?? null,
-        securityHeaders: (findings as import("@/app/lib/odo-research").ResearchFindings).page?.securityHeaders ?? null,
-        cookies: (findings as import("@/app/lib/odo-research").ResearchFindings).page?.cookies ?? null,
-        contentSecurity: (findings as import("@/app/lib/odo-research").ResearchFindings).page?.contentSecurity ?? null,
-        // Added 2026-09-29 (Section 33 expansion) — domain/hosting/DNSSEC,
-        // dangling-CNAME/sensitive-subdomain exposure, and accessibility/
-        // pre-consent-tracker/JS-CVE compliance findings. See buildServiceMatches
-        // for which of these already drive a service match vs. are reviewer-
-        // only context for now.
-        infra: (findings as import("@/app/lib/odo-research").ResearchFindings).infra,
-        attackSurface: (findings as import("@/app/lib/odo-research").ResearchFindings).attackSurface,
-        compliance: (findings as import("@/app/lib/odo-research").ResearchFindings).compliance,
-      },
-      // Softer signals — not yet mapped to a specific service trigger (see
-      // buildServiceMatches's Section-18 note), but real, evidenced findings
-      // the reviewer should see rather than lose by leaving them unwired.
-      researchSignals: {
-        waybackHistory: (findings as import("@/app/lib/odo-research").ResearchFindings).history,
-        hiringSignal: (findings as import("@/app/lib/odo-research").ResearchFindings).hiring,
-        // OrgBook BC (added 2026-09-29). `absent` = no BC registration, which
-        // is normal for an Ontario prospect — context only, never a gap.
-        // Attribution line must accompany it anywhere it's shown.
-        bcRegistry: (findings as import("@/app/lib/odo-research").ResearchFindings).bcRegistry ?? null,
-        bcRegistryAttribution: "Contains information licensed under the Open Government Licence – British Columbia.",
-      },
-      // Coverage goes to the reviewer so an incomplete scan is visible as an
-      // ODO problem rather than silently reading as bad news about the client.
-      coverage: (findings as import("@/app/lib/odo-research").ResearchFindings).coverage ?? null,
-      researchErrors: findings._researchErrors || [],
-    },
-    answers,
-    swot,
-    serviceMatches,
-    generatedAt: new Date().toISOString(),
-    note: condition === "insufficient_data"
-      ? "INSUFFICIENT DATA — ZM77 to engage supplementary agents and present to Mohammad for decision."
-      : "Complete scan — awaiting Mohammad approval before any client communication.",
-  };
-
-  await fetch(zm77Webhook, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-ODO-Source": "oragrol-odo-v1" },
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(10000),
   });
 }

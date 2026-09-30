@@ -5,7 +5,8 @@
 
 import { after, NextRequest, NextResponse } from "next/server";
 import { checkCooldowns, createSession, getIncompleteSession } from "@/app/lib/odo-redis";
-import { runParallelResearch } from "@/app/lib/odo-research";
+import { runParallelResearch, type ResearchFindings } from "@/app/lib/odo-research";
+import { pickNextQuestion, runEvaluation } from "@/app/lib/odo-pipeline";
 import { getClientIp, rateLimit } from "@/app/lib/rate-limit";
 
 const HUBSPOT_TOKEN = process.env.HUBSPOT_ACCESS_TOKEN;
@@ -196,7 +197,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // callback finishes, instead of relying on a dangling promise that
   // may or may not survive past the response.
   after(() =>
-    runResearchAsync(session.sessionId, company, website, hasWebsite, hubspotContactId).catch(err => {
+    runResearchAsync(session.sessionId, company, website, hasWebsite, hubspotContactId, email).catch(err => {
       console.error("[ODO] Async research failed:", err);
     })
   );
@@ -218,7 +219,8 @@ async function runResearchAsync(
   businessName: string,
   website: string | null,
   hasWebsite: boolean,
-  hubspotContactId: string | null
+  hubspotContactId: string | null,
+  visitorEmail: string
 ): Promise<void> {
   const { updateSession, getSession } = await import("@/app/lib/odo-redis");
 
@@ -227,36 +229,54 @@ async function runResearchAsync(
     await updateSession(sessionId, { status: "researching", phase: "researching", step: "Analyzing your website..." });
 
     // Run all parallel API research
-    const findings = await runParallelResearch(businessName, website, hasWebsite);
+    const findings = await runParallelResearch(businessName, website, hasWebsite, visitorEmail);
 
     // Update session with findings
     await updateSession(sessionId, {
       findings: findings as unknown as Record<string, unknown>,
       phase: "questioning",
-      step: "Research complete — preparing questions...",
+      step: "Research complete — deciding what to ask...",
       status: "questioning",
     });
 
-    // Generate first question based on findings
-    // (Jev would do this — placeholder until TypeSafe DPA confirmed)
-    const firstQuestion = generateFirstQuestion(findings.industry, findings.businessSize, hasWebsite, findings);
+    // Ask ODO's adaptive selector what to ask first — Jev-scored materiality
+    // when TypeSafe is configured, a fixed priority order otherwise
+    // (pickNextQuestion/nextQuestion never throw — see odo-questions.ts).
+    const profile = { industry: findings.industry, businessSize: findings.businessSize };
+    const decision = await pickNextQuestion(findings, profile, hasWebsite, {}, []);
 
-    await updateSession(sessionId, {
-      phase: "questioning",
-      step: "Ready for questions",
-      status: "questioning",
-    });
+    const baseFindings: Record<string, unknown> = {
+      ...(findings as unknown as Record<string, unknown>),
+      _industryDetected: findings.industry,
+      _businessSizeDetected: findings.businessSize,
+      _researchErrors: findings.errors,
+      _questionOrder: [] as string[],
+      _questionMethods: {} as Record<string, string>,
+    };
 
-    // Store the first question in session for the front-end to pick up
-    const session = await getSession(sessionId);
-    if (session) {
+    if (decision.done) {
+      // Research alone already covers everything worth asking (rare, but
+      // §2/§3 says never manufacture a question just to have one) — go
+      // straight to evaluation.
       await updateSession(sessionId, {
+        findings: baseFindings,
+        status: "evaluating",
+        phase: "evaluating",
+        step: "Building your opportunity map...",
+      });
+      const session = await getSession(sessionId);
+      if (session) {
+        await runEvaluation(sessionId, session, findings, profile, {}, [], []);
+      }
+    } else {
+      await updateSession(sessionId, {
+        phase: "questioning",
+        step: "Ready for questions",
+        status: "questioning",
         findings: {
-          ...session.findings,
-          _nextQuestion: firstQuestion,
-          _industryDetected: findings.industry,
-          _businessSizeDetected: findings.businessSize,
-          _researchErrors: findings.errors,
+          ...baseFindings,
+          _nextQuestion: decision.question,
+          _questionMethods: { [decision.question.id]: decision.method },
         },
       });
     }
@@ -269,7 +289,7 @@ async function runResearchAsync(
         headers: { Authorization: `Bearer ${HUBSPOT_TOKEN}`, "Content-Type": "application/json" },
         body: JSON.stringify({
           properties: {
-            odo_scan_status: "questioning",
+            odo_scan_status: decision.done ? "evaluating" : "questioning",
             odo_industry_detected: findings.industry || "Unknown",
             odo_business_size: findings.businessSize || "Unknown",
             odo_security_score: String(securityScore),
@@ -291,54 +311,7 @@ async function runResearchAsync(
 
 // --- Helpers ---
 
-function generateFirstQuestion(
-  industry: string | null,
-  businessSize: "micro" | "small" | "medium" | "large" | null,
-  hasWebsite: boolean,
-  findings: import("@/app/lib/odo-research").ResearchFindings
-): { id: string; text: string; options?: string[] } {
-  // If no website — start with the most important question
-  if (!hasWebsite) {
-    return {
-      id: "q_industry",
-      text: "What industry or sector does your business operate in?",
-      options: ["Healthcare", "Legal", "Finance & Accounting", "Technology", "Retail", "Construction", "Food & Beverage", "Education", "Marketing & Advertising", "Consulting", "Manufacturing", "Other"],
-    };
-  }
-  // If industry not detected — ask
-  if (!industry) {
-    return {
-      id: "q_industry",
-      text: "What industry or sector does your business operate in?",
-      options: ["Healthcare", "Legal", "Finance & Accounting", "Technology", "Retail", "Construction", "Food & Beverage", "Education", "Marketing & Advertising", "Consulting", "Manufacturing", "Other"],
-    };
-  }
-  // If DMARC is published but enforcing nothing — ask about email security awareness.
-  // Note: monitor-only is the finding, not the absence of DMARC.
-  if (findings.dns?.dmarc.state === "observed" && findings.dns.dmarc.value.isMonitorOnly) {
-    return {
-      id: "q_email_security_awareness",
-      text: "Has your team experienced any phishing attempts or suspicious emails targeting your business in the last 12 months?",
-      options: ["Yes, frequently", "Yes, occasionally", "Not that we know of", "We don't monitor this"],
-    };
-  }
-  // If business size not known — ask
-  if (!businessSize) {
-    return {
-      id: "q_staff_count",
-      text: "Approximately how many people work at your company?",
-      options: ["1–10", "11–50", "51–200", "200+"],
-    };
-  }
-  // Default first question
-  return {
-    id: "q_biggest_challenge",
-    text: "What is your biggest operational challenge right now?",
-    options: ["Cybersecurity and data protection", "Day-to-day efficiency and automation", "Growing the business", "Managing costs", "Customer experience", "Compliance and regulations"],
-  };
-}
-
-function calculateSecurityScore(findings: import("@/app/lib/odo-research").ResearchFindings): number {
+function calculateSecurityScore(findings: ResearchFindings): number {
   // SCORING RULE — only a confirmed absence costs points.
   //
   // A check that could not be determined (timeout, no key, blocked origin)
@@ -349,6 +322,10 @@ function calculateSecurityScore(findings: import("@/app/lib/odo-research").Resea
   //
   // Scores are therefore computed over what was actually established, and
   // normalised, so a partial scan reports a fair score rather than a low one.
+  //
+  // NOTE — this is a rough HubSpot-property proxy only. It has no bearing
+  // on the report itself: the report's findings/priorities come from
+  // odo-matching.ts's §6.1-tiered service matches, not this score.
   let earned = 0;
   let possible = 0;
 
