@@ -151,6 +151,29 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // Create HubSpot contact immediately (best-effort — never blocks the scan)
   const hubspotContactId = await createHubSpotContact({ name, email, company, website }).catch(() => null);
 
+  // Mark it as an ODO lead from the first second, even if the visitor
+  // abandons before finishing — a partial scan is still a real, working
+  // lead worth following up on. This is also what the "ODO Scan Leads"
+  // HubSpot list filters on (client_reference IS_KNOWN), so every scan
+  // visitor shows up there immediately, not just the ones who finish.
+  //
+  // Property note (2026-09-30): the free HubSpot CRM plan was already at
+  // 10/10 custom contact properties, so rather than fight that wall, ODO
+  // repurposes "client_reference" (internal name `client_reference`,
+  // originally created for an early Oragrol Client Reference concept that
+  // was never wired up — confirmed dead via a full grep of this repo, zero
+  // hits, plus 0% fill / 0 "Used In" in HubSpot itself, plus n8n — the only
+  // other thing that could have written to it — is fully retired). We keep
+  // ODO's own value in it (in_progress / complete / insufficient_data)
+  // rather than creating a new odo_scan_condition property.
+  if (hubspotContactId && HUBSPOT_TOKEN) {
+    await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${hubspotContactId}`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${HUBSPOT_TOKEN}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ properties: { client_reference: "in_progress" } }),
+    }).catch(() => {});
+  }
+
   // Create Redis session
   const session = await createSession({
     emailHash: email,
@@ -282,21 +305,22 @@ async function runResearchAsync(
     }
 
     // Update HubSpot with research summary (best-effort)
+    //
+    // FIXED 2026-09-30 — this used to PATCH odo_industry_detected,
+    // odo_business_size and odo_security_score as separate custom contact
+    // properties. None of them were ever created in HubSpot (the portal is
+    // on the free CRM plan, already at its 10/10 custom-property cap — see
+    // client_reference above), so every one of these PATCHes had been
+    // silently no-op-ing since this was first written. Rather than spend
+    // more of a full custom property's slot than the one already repurposed
+    // (client_reference), this detail now goes into a note instead — free,
+    // unlimited, and just as visible on the contact's timeline.
     if (hubspotContactId && HUBSPOT_TOKEN) {
       const securityScore = calculateSecurityScore(findings);
-      await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${hubspotContactId}`, {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${HUBSPOT_TOKEN}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          properties: {
-            odo_scan_status: decision.done ? "evaluating" : "questioning",
-            odo_industry_detected: findings.industry || "Unknown",
-            odo_business_size: findings.businessSize || "Unknown",
-            odo_security_score: String(securityScore),
-            odo_research_errors: findings.errors.length > 0 ? findings.errors.slice(0, 5).join("; ") : "None",
-          },
-        }),
-      }).catch(() => {});
+      await addHubSpotNote(
+        hubspotContactId,
+        `ODO research complete.\nIndustry detected: ${findings.industry || "Unknown"}\nBusiness size: ${findings.businessSize || "Unknown"}\nSecurity score: ${securityScore}`
+      ).catch(() => {});
     }
 
   } catch (err) {

@@ -20,6 +20,7 @@ import { buildSwot } from "./odo-swot";
 import { buildOutcomeNarrative } from "./odo-outcome";
 import { buildReport, type OdoReport } from "./odo-report";
 import type { ResearchFindings } from "./odo-research";
+import { attachReportPdfToHubSpot } from "./odo-hubspot-report";
 
 const HUBSPOT_TOKEN = process.env.HUBSPOT_ACCESS_TOKEN;
 
@@ -133,18 +134,34 @@ export async function runEvaluation(
       console.error("[ODO] ZM77 notification failed:", err);
     });
 
+    const serviceMatchesSummary = matching.flagged.map((m) => m.simpleName).join(", ");
+
     if (session.hubspotContactId && HUBSPOT_TOKEN) {
+      // Confirmed 2026-09-30: the portal's free CRM plan was already at
+      // 10/10 custom contact properties, so ODO doesn't create a new one.
+      // Instead it repurposes "client_reference" (internal name
+      // client_reference) — verified dead via a full grep of this repo (zero
+      // hits), 0% fill / 0 "Used In" in HubSpot, and n8n (the only other
+      // thing that could write to it) being fully retired in favor of this
+      // codebase. It carries "in_progress" (set at scan start) through to
+      // "complete" / "insufficient_data" here, and doubles as the membership
+      // filter for the "ODO Scan Leads" list. odo_service_matches never
+      // became a real property either — that detail goes in the note below
+      // instead (attachReportPdfToHubSpot), same fix as the mid-scan update
+      // in scan/start/route.ts.
       await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${session.hubspotContactId}`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${HUBSPOT_TOKEN}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          properties: {
-            odo_scan_status: condition,
-            odo_scan_condition: condition,
-            odo_service_matches: matching.flagged.map((m) => m.simpleName).join(", "),
-          },
+          properties: { client_reference: condition },
         }),
       }).catch(() => {});
+
+      // Render + upload the report PDF and attach it to the contact's
+      // timeline. Best-effort and fire-and-forget by design (see
+      // odo-hubspot-report.ts) — a PDF/HubSpot hiccup must never fail an
+      // otherwise-successful scan.
+      await attachReportPdfToHubSpot(session.hubspotContactId, report, serviceMatchesSummary).catch(() => {});
     }
   } catch (err) {
     console.error("[ODO] Evaluation failed:", err);
