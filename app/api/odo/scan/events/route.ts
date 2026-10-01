@@ -55,28 +55,40 @@ export async function GET(req: NextRequest) {
             lastStep = session.step;
 
             const findings = session.findings as Record<string, unknown>;
+            const isTerminal = ["complete", "insufficient_data", "failed", "cancelled"].includes(session.status);
+            const isTerminalComplete = session.status === "complete" || session.status === "insufficient_data";
 
+            // FIXED 2026-10-01 — this used to send TWO messages back-to-back
+            // on a terminal status: a bare "status" message first, then a
+            // separate "complete" message carrying findings_summary. The
+            // client's applyStatus() reacts to the FIRST message already
+            // (status === "complete" is enough to close the EventSource),
+            // so the second message — the only one with findings_summary —
+            // was a race: sometimes delivered before the client tore down
+            // the connection, sometimes not. A live test confirmed the
+            // summary box went missing on the end screen. Every terminal
+            // status is now exactly ONE self-sufficient message, matching
+            // how the polling fallback (/api/odo/scan/status) already
+            // worked — there is no second message left to race against.
             send({
-              type: "status",
+              type: isTerminalComplete ? "complete" : "status",
               status: session.status,
               phase: session.phase,
               step: session.step,
               questions_asked: session.questionsAsked,
               question: session.status === "questioning" ? findings._nextQuestion : undefined,
+              ...(isTerminalComplete
+                ? {
+                    condition: session.condition,
+                    swot: session.swot,
+                    service_matches: session.serviceMatches,
+                    findings_summary: buildFindingsSummary(findings),
+                  }
+                : {}),
             });
 
             // Terminal states — close the stream
-            if (["complete", "insufficient_data", "failed", "cancelled"].includes(session.status)) {
-              if (session.status === "complete" || session.status === "insufficient_data") {
-                send({
-                  type: "complete",
-                  condition: session.condition,
-                  status: session.status,
-                  swot: session.swot,
-                  service_matches: session.serviceMatches,
-                  findings_summary: buildFindingsSummary(findings),
-                });
-              }
+            if (isTerminal) {
               controller.close();
               return;
             }

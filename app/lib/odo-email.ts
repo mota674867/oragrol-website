@@ -59,6 +59,24 @@ export async function sendOdoAdminReportEmail(params: {
     const qrDataUri = await QRCode.toDataURL(CONTACT_URL, { margin: 1, width: 200 }).catch(() => undefined);
     const pdf = await renderToBuffer(OdoReportPdf({ report: params.report, qrDataUri }));
 
+    // ADDED 2026-10-01 — surfaces, on every scan, whether question selection
+    // actually ran through Jev's adaptive materiality scoring or silently
+    // fell back to the fixed priority order the whole time (odo-questions.ts
+    // nextQuestion()). This is the direct, checkable answer to "ODO repeats
+    // the same question for every business" — rather than Mohammad having to
+    // take my word for whether Jev is configured in production, he can read
+    // it off the very next scan. 0 Jev / N fallback across several different
+    // businesses in a row means TYPESAFE_API_KEY is missing or Jev is
+    // erroring out on every call (askJev() in jev.ts returns null on any
+    // failure and the code falls back silently by design — safe for the
+    // visitor, but invisible unless logged somewhere like this).
+    const methods = params.report.internal.questionMethod;
+    const jevCount = methods.filter((m) => m === "jev").length;
+    const fallbackCount = methods.length - jevCount;
+    const questionMethodLine = methods.length
+      ? `Question selection: ${methods.length} asked — ${jevCount} via Jev, ${fallbackCount} via fixed fallback order${jevCount === 0 ? "  ⚠ Jev never scored a single question this scan — check TYPESAFE_API_KEY / Jev errors" : ""}`
+      : `Question selection: 0 questions asked (research alone was sufficient)`;
+
     const resend = new Resend(apiKey);
     const { data, error } = await resend.emails.send({
       from,
@@ -73,6 +91,7 @@ export async function sendOdoAdminReportEmail(params: {
         `Condition: ${params.condition}`,
         `Session ID: ${params.sessionId}`,
         `Report reference: ${params.report.reference}`,
+        questionMethodLine,
         ``,
         `This is the draft report, pending your review — it has not been sent to the client. The PDF is attached.`,
       ].join("\n"),

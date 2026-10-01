@@ -330,6 +330,16 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
   const [busy, setBusy] = useState(false);
   const pollRef = useRef<number | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
+  // FIXED 2026-10-01 — tracks which question.id selectedOptions was last
+  // cleared for. Both SSE and the polling fallback resend the SAME
+  // unanswered question on every cycle (every ~1-2.5s) until the visitor
+  // submits an answer. applyStatus() used to call setSelectedOptions([])
+  // on every single one of those resends, not just when the question
+  // actually changed — so a checked box was wiped within a couple of
+  // seconds of checking it. Found from a live report: "choose of one more
+  // option in question, when check one, it will automatically jump to
+  // uncheck after 2 second."
+  const lastQuestionIdRef = useRef<string | null>(null);
 
   const emit = useCallback((type: string, extra: Record<string, unknown> = {}) => onEvent({ type, ...extra }), [onEvent]);
 
@@ -355,8 +365,17 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     if (!next) return;
     if (payload.step) setStep(String(payload.step));
     if (payload.question) {
-      setQuestion(payload.question as {id: string; text: string; options?: Array<string | {value: string; label?: string}>; multiSelect?: boolean});
-      setSelectedOptions([]); // Fresh question — clear any previous multi-select picks.
+      const incoming = payload.question as {id: string; text: string; options?: Array<string | {value: string; label?: string}>; multiSelect?: boolean};
+      setQuestion(incoming);
+      // FIXED 2026-10-01 — only clear picks when the question actually
+      // changed. Both SSE and the polling fallback keep resending the
+      // SAME unanswered question every cycle until the visitor submits,
+      // and this used to wipe selectedOptions on every single resend —
+      // see the lastQuestionIdRef comment above for the reported symptom.
+      if (lastQuestionIdRef.current !== incoming.id) {
+        lastQuestionIdRef.current = incoming.id;
+        setSelectedOptions([]);
+      }
     }
     if (payload.findings_summary) {
       setFindingsSummary(payload.findings_summary as { security_issues: number; marketing_gaps: number; opportunities: number; total: number });
@@ -403,6 +422,18 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     } else if (next === "questioning") {
       setPhase("questions");
       setBusy(false);
+    } else if (next === "evaluating") {
+      // FIXED 2026-10-01 — the backend sets "evaluating" (odo/scan/answer,
+      // then odo-pipeline.ts's runEvaluation) for the whole stretch between
+      // the last question and the finished report: building the evidence
+      // ledger, matching services, writing the SWOT and outlook. This
+      // status had no branch of its own and fell into the catch-all below,
+      // which shows "ODO is researching" with stage 1 ("Research") bolded
+      // again — looking like the scan restarted. Found from a live report:
+      // "i complete the question but the orange bold color not shift to
+      // next stage, still shows on research."
+      setPhase("evaluating");
+      setBusy(true);
     } else {
       // "researching" (or any future/unknown value) — keep showing the
       // live research screen rather than guessing a phase name.
@@ -586,6 +617,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
 
   const showLive = phase === "researching";
   const showQuestion = phase === "questions" && question;
+  const showEvaluating = phase === "evaluating";
   const showSummary = phase === "summary";
   const showError = phase === "error";
   const headline = useMemo(() => ODO_COPY.headline, []);
@@ -733,6 +765,19 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
               <p>{message}</p>
               <button type="button" className="odo-scan__submit" onClick={() => { setPhase("idle"); setMessage(""); }}>Return to scan <span aria-hidden="true">→</span></button>
             </div>
+          ) : showEvaluating ? (
+            // ADDED 2026-10-01 alongside the "evaluating" status fix above —
+            // this is the stretch between the last question and the
+            // finished report (matching services, writing the SWOT and
+            // outlook). PhaseTrack gets the real phase so "Summary" lights
+            // up as active (anything other than "researching"/"questions"
+            // resolves to stage 3 — see PhaseTrack), instead of staying on
+            // "Research" like the old catch-all did.
+            <>
+              <PhaseTrack phase={phase} />
+              <div className="odo-scan__live-heading"><h2>ODO is building your report.</h2><span className="odo-scan__live-badge"><LiveSpinner /> LIVE</span></div>
+              <p className="odo-scan__workspace-subtitle">Matching your answers to services and writing your summary — this only takes a few seconds.</p>
+            </>
           ) : (
             <>
               <div className="odo-scan__live-heading"><h2>ODO is researching.</h2><span className="odo-scan__live-badge"><LiveSpinner /> LIVE</span></div>
