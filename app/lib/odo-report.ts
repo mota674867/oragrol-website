@@ -167,7 +167,11 @@ export async function buildReport(input: {
 
   const attributions: string[] = [];
   if (client.some((e) => e.source.startsWith("OrgBook BC"))) attributions.push(ORGBOOK_ATTRIBUTION);
-  if (client.some((e) => e.source === "Google Places")) attributions.push("Business rating data: Google.");
+  // Phase 4: broadened from an exact "Google Places" match to also catch the
+  // named-competitor evidence (odo-ledger.ts), whose source is "Google Maps
+  // (Google Places)" — same attribution requirement, one more place it can
+  // come from.
+  if (client.some((e) => e.source.startsWith("Google"))) attributions.push("Business rating data: Google.");
 
   const outcome: OdoReport["outcome"] = input.condition === "insufficient_data" ? "insufficient_data" : matching.outcome;
 

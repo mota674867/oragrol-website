@@ -23,6 +23,7 @@
 
 import type { ResearchFindings } from "./odo-research";
 import { ANSWER_EVIDENCE, type AnswerEvidenceTemplate } from "./odo-questions";
+import { reportableCompetitors } from "./odo-competitors";
 
 export type Tier = "observed" | "inferred";
 export type Polarity = "gap" | "strength" | "context";
@@ -268,6 +269,96 @@ export function researchEvidence(f: ResearchFindings): Draft[] {
   const comp = f.competitorProfiles?.filter((c) => c.classification === "confirmed_competitor" || c.classification === "probable_competitor") ?? [];
   if (comp.length) {
     add({ fact: `${comp.length} comparable local business(es) identified for benchmarking.`, raw: comp.slice(0, 5).map((c) => c.name).join(", "), source: "Tavily + Geoapify + Google Places", tier: "inferred", polarity: "context", severity: "info", area: "business", audience: "internal" });
+  }
+
+  // ---- L1 Business Profile → client-facing context (ODO brain rebuild Phase 4, 2026-10-02) ----
+  // Before this, everything odo-business-profile.ts (Claude reading up to 15
+  // site pages) learned about the business stopped at the interviewer — it
+  // shaped which questions got asked but never reached the report itself.
+  // This surfaces the two most report-worthy slices: what ODO understood
+  // about the business (grounds the rest of the report in something the
+  // client recognizes as accurate), and what sensitive data types it found
+  // on the site (context for why the data-protection findings below it
+  // matter). Deliberately light-touch — a single summary line, not a dump
+  // of every BusinessProfile field — the SWOT/outcome narrative do the
+  // interpreting, this just gives them real material to interpret.
+  const profile = f.businessProfile;
+  if (profile) {
+    const bits: string[] = [];
+    if (profile.whatTheySell) bits.push(profile.whatTheySell);
+    if (profile.businessModel !== "unclear") bits.push(`${profile.businessModel} business model`);
+    if (profile.audienceDescription) bits.push(`serving ${profile.audienceDescription}`);
+    if (profile.locations.length) bits.push(`based in ${profile.locations.join(", ")}`);
+    if (bits.length) {
+      add({
+        fact: `What ODO learned from the website: ${bits.join("; ")}.`,
+        raw: profile.summary || undefined,
+        source: "Website content analysis (ODO)",
+        tier: "inferred",
+        polarity: "context",
+        severity: "info",
+        area: "business",
+      });
+    }
+    if (profile.sensitiveDataTypes.length) {
+      add({
+        fact: `The website indicates the business collects or handles: ${profile.sensitiveDataTypes.join(", ")}.`,
+        source: "Website content analysis (ODO)",
+        tier: "inferred",
+        polarity: "context",
+        severity: "info",
+        area: "data",
+      });
+    }
+  }
+
+  // ---- L4 compliance signals → client-facing context (Phase 4) ----
+  // Same gap as above: odo-industry-rules.ts's framework flags only ever
+  // reached the interviewer's prompt, never the report. These are flagged
+  // as "worth asking about," not confirmed gaps — if the visitor answered
+  // the follow-up question, that answer already produced its own, more
+  // specific A-prefixed evidence above; this line just names which
+  // regulatory framework plausibly applies and why, so the report doesn't
+  // silently drop frameworks ODO already identified as relevant.
+  for (const sig of f.complianceSignals ?? []) {
+    add({
+      fact: `${sig.framework} likely applies: ${sig.trigger}.`,
+      source: "Industry/compliance signal detection (ODO knowledge base)",
+      tier: "inferred",
+      polarity: "context",
+      severity: "info",
+      area: "privacy",
+      framework: sig.framework,
+    });
+  }
+
+  // ---- L3 named competitors → client-facing findings (Phase 4) ----
+  // Approved 2026-10-01 with legal guardrails: neutral facts only (no
+  // "worse"/"better"/rankings), source + date on every line, "Google Maps"
+  // attribution wherever rating data is shown, never quote a competitor's
+  // reviews. Before this, `comp` above was the ONLY place competitor data
+  // reached the ledger, and it was internal-audience-only — a named
+  // competitor never actually reached the client. reportableCompetitors()
+  // is the same confirmed/probable filter as `comp`, already capped at 3 by
+  // the L3 cascade (odo-competitors.ts), so this never lists more than the
+  // approved count.
+  for (const c of reportableCompetitors(f.competitorProfiles ?? [])) {
+    const places = c.identity.state === "observed" ? c.identity.value : null;
+    const overlapText = c.serviceOverlap.matchedKeywords.length
+      ? `overlapping services (${c.serviceOverlap.matchedKeywords.join(", ")})`
+      : "the same general market";
+    const ratingText = places?.rating != null ? ` Google rating ${places.rating}★ from ${places.reviewCount ?? 0} reviews (via Google Maps).` : "";
+    add({
+      fact: `${c.name} is a verified local business in ${overlapText}.${ratingText}`,
+      raw: [places?.address ? `Address: ${places.address}` : null, c.website ? `Website: ${c.website}` : null, `Discovered via: ${c.discoverySources.join(", ")}`]
+        .filter(Boolean)
+        .join(" · "),
+      source: places ? "Google Maps (Google Places)" : c.discoverySources.join(" + "),
+      tier: "observed",
+      polarity: "context",
+      severity: "info",
+      area: "business",
+    });
   }
 
   return out;
