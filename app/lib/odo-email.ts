@@ -63,22 +63,29 @@ export async function sendOdoAdminReportEmail(params: {
     const { cover: coverImageUri, closing: closingImageUri } = getCyberHealthReportPhotos();
     const pdf = await renderToBuffer(OdoReportPdf({ report: params.report, qrDataUri, coverImageUri, closingImageUri }));
 
-    // ADDED 2026-10-01 — surfaces, on every scan, whether question selection
-    // actually ran through Jev's adaptive materiality scoring or silently
-    // fell back to the fixed priority order the whole time (odo-questions.ts
-    // nextQuestion()). This is the direct, checkable answer to "ODO repeats
-    // the same question for every business" — rather than Mohammad having to
-    // take my word for whether Jev is configured in production, he can read
-    // it off the very next scan. 0 Jev / N fallback across several different
-    // businesses in a row means TYPESAFE_API_KEY is missing or Jev is
-    // erroring out on every call (askJev() in jev.ts returns null on any
-    // failure and the code falls back silently by design — safe for the
-    // visitor, but invisible unless logged somewhere like this).
+    // ADDED 2026-10-01, UPDATED same day for the Phase 2 rebuild — surfaces,
+    // on every scan, whether question selection actually ran through
+    // Claude's dynamic interviewer (odo-interviewer.ts) or silently fell
+    // back to the old fixed-question logic (odo-questions.ts's
+    // nextQuestion(), Jev-scored or fixed-priority). This is the direct,
+    // checkable answer to "ODO repeats the same question for every
+    // business" — rather than Mohammad having to take my word for whether
+    // the interviewer is configured in production, he can read it off the
+    // very next scan. 0 Claude-sourced questions across several different
+    // businesses in a row means ANTHROPIC_API_KEY is missing or the
+    // interviewer is erroring on every call (writeNextQuestion() in
+    // odo-interviewer.ts returns the old nextQuestion()'s result on any
+    // failure and falls back silently by design — safe for the visitor, but
+    // invisible unless logged somewhere like this). "jev"/"fallback" here
+    // mean the OLD mechanism ran (odo-interviewer.ts's own fallback path) —
+    // not Jev picking questions in normal operation, which Phase 2 already
+    // ended.
     const methods = params.report.internal.questionMethod;
-    const jevCount = methods.filter((m) => m === "jev").length;
-    const fallbackCount = methods.length - jevCount;
+    const counts: Record<string, number> = { claude_custom: 0, claude_library: 0, jev: 0, fallback: 0 };
+    for (const m of methods) counts[m] = (counts[m] ?? 0) + 1;
+    const claudeCount = counts.claude_custom + counts.claude_library;
     const questionMethodLine = methods.length
-      ? `Question selection: ${methods.length} asked — ${jevCount} via Jev, ${fallbackCount} via fixed fallback order${jevCount === 0 ? "  ⚠ Jev never scored a single question this scan — check TYPESAFE_API_KEY / Jev errors" : ""}`
+      ? `Question selection: ${methods.length} asked — ${counts.claude_custom} Claude-written, ${counts.claude_library} Claude reused from the library, ${counts.jev} via legacy Jev scoring, ${counts.fallback} via fixed fallback order${claudeCount === 0 ? "  ⚠ Claude never picked a single question this scan — check ANTHROPIC_API_KEY / interviewer errors; the whole scan ran on the old fixed-question logic" : ""}`
       : `Question selection: 0 questions asked (research alone was sufficient)`;
 
     const resend = new Resend(apiKey);

@@ -1,10 +1,23 @@
-// ORAGROL ODO — Adaptive question bank
+// ORAGROL ODO — Fixed question library (fallback mechanism, post-Phase-2)
 //
-// Master Reference §2/§3: ask ONLY what research could not determine, one at
-// a time, and only while an answer could still change the outcome. Hard cap
-// 20. Target 0–3 initially, more only when material.
+// DEMOTED 2026-10-01 — Phase 2 of the ODO brain rebuild moved live question
+// SELECTION to odo-interviewer.ts: Claude now decides the next question for
+// every scan, reusing a question from this file by id when one genuinely
+// fits, or writing a custom one when nothing here does. This file's own
+// `nextQuestion()` is no longer the primary path — it is ONLY the
+// deterministic fallback odo-interviewer.ts calls when Claude is
+// unavailable, times out, or returns something unusable, so a scan never
+// stalls on an AI outage. The materiality-scoring-via-Jev logic below is
+// part of THAT fallback, not live question-picking — Jev has not picked a
+// single question in normal operation since Phase 2 shipped.
 //
-// How a question gets picked:
+// Master Reference §2/§3 (still the rule the fallback follows): ask ONLY
+// what research could not determine, one at a time, and only while an
+// answer could still change the outcome. Hard cap 15 (MAX_QUESTIONS below —
+// lowered from 20, 2026-10-01). Target 0–3 initially, more only when
+// material.
+//
+// How the FALLBACK picks a question:
 //   1. Candidates = bank minus (already asked) minus (already known from
 //      research) minus (not relevant given earlier answers).
 //   2. Jev scores each candidate's MATERIALITY — "how much would this answer
@@ -12,11 +25,14 @@
 //   3. Highest wins. Stop when the best remaining materiality is too low to
 //      justify the visitor's time, or at the cap.
 //   Without Jev (no key / error) a fixed priority order is used instead, so
-//   the scan never stalls.
+//   the fallback itself never stalls either.
 //
-// Every option maps to evidence templates (odo-ledger.ts). Hedged options
-// ("Not sure", "Not that we know of") are ALWAYS tier "inferred" — the
-// §6.1 hedged-answer-as-confirmation disqualifier, written in as data.
+// Every option maps to evidence templates (odo-ledger.ts) — this is also
+// why odo-interviewer.ts prefers reusing a library question by id over
+// inventing a near-duplicate: only a library id gets this rich, pre-vetted
+// evidence tagging automatically. Hedged options ("Not sure", "Not that we
+// know of") are ALWAYS tier "inferred" — the §6.1 hedged-answer-as-
+// confirmation disqualifier, written in as data.
 
 import { askJev, scoreToUnit, type JevQuestion } from "./jev";
 import type { Tier, Polarity, Severity, Area } from "./odo-ledger";
