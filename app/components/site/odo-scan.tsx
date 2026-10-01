@@ -330,6 +330,22 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
   const [busy, setBusy] = useState(false);
   const pollRef = useRef<number | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
+  // FIXED 2026-10-01 — guards against the SSE stream and the 2.5s polling
+  // fallback racing each other. submitAnswer() calls stopUpdates() (clears
+  // the interval, closes the EventSource) before starting fresh ones, but
+  // that cannot cancel a GET /status fetch that was already in flight from
+  // the OLD interval tick, or an SSE message already in the browser's queue
+  // before close() ran. That stale response — read from Redis BEFORE the
+  // just-submitted answer was saved — can arrive after the fresh question
+  // is already on screen and silently overwrite it with the PREVIOUS
+  // question, which the visitor then sees as ODO re-asking something they
+  // already answered. Found from a live scan: "again repeated the same
+  // question... if like this i will shutdown odo." Every status payload
+  // (both /status and /events) carries `questions_asked`, which only moves
+  // forward — so a payload reporting fewer than the highest we've already
+  // shown is necessarily a stale straggler and is dropped before touching
+  // any state, not just the question field.
+  const questionsAskedRef = useRef<number>(0);
   // FIXED 2026-10-01 — tracks which question.id selectedOptions was last
   // cleared for. Both SSE and the polling fallback resend the SAME
   // unanswered question on every cycle (every ~1-2.5s) until the visitor
@@ -363,6 +379,14 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
   const applyStatus = useCallback((payload: Record<string, unknown>) => {
     const next = payload?.status as string | undefined;
     if (!next) return;
+    // Drop stale/out-of-order updates — see questionsAskedRef above. A
+    // payload reporting fewer questions answered than we've already shown
+    // can only be a straggler from before the most recent submitAnswer().
+    const payloadQuestionsAsked = payload.questions_asked;
+    if (typeof payloadQuestionsAsked === "number") {
+      if (payloadQuestionsAsked < questionsAskedRef.current) return;
+      questionsAskedRef.current = payloadQuestionsAsked;
+    }
     if (payload.step) setStep(String(payload.step));
     if (payload.question) {
       const incoming = payload.question as {id: string; text: string; options?: Array<string | {value: string; label?: string}>; multiSelect?: boolean};
@@ -533,6 +557,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
         return;
       }
       setSessionId(String(payload.session_id));
+      questionsAskedRef.current = 0; // Fresh scan — any earlier scan's ref value must not block it.
       if (typeof window !== "undefined") window.sessionStorage.setItem("oragrol_odo_session_id", String(payload.session_id));
       emit("scan-started");
       startUpdates(String(payload.session_id), String(payload.events_url || `${ODO_ROUTES.events}?session_id=${encodeURIComponent(String(payload.session_id))}`), String(payload.status_url || ODO_ROUTES.status));
@@ -583,6 +608,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
   // cancel server-side here; the scan already finished.
   const startNewScan = () => {
     setSessionId("");
+    questionsAskedRef.current = 0; // Fresh scan — any earlier scan's ref value must not block it.
     setQuestion(null);
     setAnswer("");
     setSelectedOptions([]);
