@@ -279,8 +279,14 @@ export function answerEvidence(answers: Record<string, string>, order: string[])
   for (const qid of order) {
     const ans = answers[qid];
     if (!ans) continue;
-    const templates: AnswerEvidenceTemplate[] | undefined = ANSWER_EVIDENCE[qid]?.[ans];
-    if (templates) {
+    // Multi-select questions (odo-questions.ts's multiSelect flag) store
+    // every chosen option joined with " | " into this one string — split
+    // it back out and union each option's evidence templates. A normal
+    // single-select answer has no " | " in it, so `parts` is just [ans]
+    // and this is identical to the old single-lookup behavior.
+    const parts = ans.includes(" | ") ? ans.split(" | ") : [ans];
+    const templates: AnswerEvidenceTemplate[] = parts.flatMap((part) => ANSWER_EVIDENCE[qid]?.[part] ?? []);
+    if (templates.length) {
       for (const t of templates) out.push({ ...t, raw: `Q: ${qid} → "${ans}"`, source: "Visitor answer", questionId: qid });
     } else {
       // Free-text / unmapped answer — context only; Jev decides whether it

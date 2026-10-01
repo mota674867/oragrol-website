@@ -502,3 +502,52 @@ export async function runParallelResearch(
     coverage: coverageReport(determinations),
   };
 }
+
+// --- End-screen findings summary (Section 27 of the master reference) ---
+//
+// Shared between the SSE stream (odo/scan/events/route.ts) and the polling
+// fallback (odo/scan/status/route.ts) so both surfaces report the exact same
+// numbers for the same scan — this used to live only in the SSE route,
+// which meant a visitor whose browser fell back to polling (the documented,
+// required fallback for "browsers or deployments without SSE support") saw
+// no counts at all on the completion screen.
+//
+// This is a fast heuristic over already-gathered research signals, not the
+// full Jev-scored evaluation the final report uses — it exists so the
+// completion screen can show real, non-placeholder numbers immediately,
+// per Section 27: "Numbers are real — generated from actual ODO findings,
+// not placeholders."
+export type OdoFindingsSummary = {
+  security_issues: number;
+  marketing_gaps: number;
+  opportunities: number;
+  total: number;
+};
+
+export function buildFindingsSummary(findings: Record<string, unknown>): OdoFindingsSummary {
+  const f = findings as ResearchFindings;
+  let securityIssues = 0;
+  let marketingGaps = 0;
+  let opportunities = 0;
+
+  if (f.ssl?.grade && ["C", "D", "F"].includes(f.ssl.grade)) securityIssues++;
+  // Count only confirmed absences. A not-determined check is a coverage gap
+  // in ODO, never an issue attributed to the prospect.
+  if (f.dns?.spf.state === "absent") securityIssues++;
+  if (f.dns?.dkim.state === "absent") securityIssues++;
+  if (f.dns?.dmarc.state === "absent") securityIssues++;
+  else if (f.dns?.dmarc.state === "observed" && f.dns.dmarc.value.isMonitorOnly) securityIssues++;
+  if (f.page?.wellKnown.privacyPolicy.state === "absent") securityIssues++;
+  if (!f.paidAds?.runningFacebookAds && !f.paidAds?.runningGoogleAds) marketingGaps++;
+  if (f.website?.pageSpeedScore && f.website.pageSpeedScore < 50) marketingGaps++;
+  if (f.seo?.domainAuthority && f.seo.domainAuthority < 20) marketingGaps++;
+  if (f.technologies?.allTech && f.technologies.allTech.length < 5) opportunities++;
+  if (f.competitors?.competitors && f.competitors.competitors.length > 0) opportunities++;
+
+  return {
+    security_issues: securityIssues,
+    marketing_gaps: marketingGaps,
+    opportunities,
+    total: securityIssues + marketingGaps + opportunities,
+  };
+}

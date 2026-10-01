@@ -4,6 +4,7 @@
 
 import { NextRequest } from "next/server";
 import { getSession } from "@/app/lib/odo-redis";
+import { buildFindingsSummary } from "@/app/lib/odo-research";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -101,32 +102,4 @@ export async function GET(req: NextRequest) {
       "X-Accel-Buffering": "no",
     },
   });
-}
-
-function buildFindingsSummary(findings: Record<string, unknown>): Record<string, unknown> {
-  const f = findings as import("@/app/lib/odo-research").ResearchFindings;
-  let securityIssues = 0;
-  let marketingGaps = 0;
-  let opportunities = 0;
-
-  if (f.ssl?.grade && ["C", "D", "F"].includes(f.ssl.grade)) securityIssues++;
-  // Count only confirmed absences. A not-determined check is a coverage gap
-  // in ODO, never an issue attributed to the prospect.
-  if (f.dns?.spf.state === "absent") securityIssues++;
-  if (f.dns?.dkim.state === "absent") securityIssues++;
-  if (f.dns?.dmarc.state === "absent") securityIssues++;
-  else if (f.dns?.dmarc.state === "observed" && f.dns.dmarc.value.isMonitorOnly) securityIssues++;
-  if (f.page?.wellKnown.privacyPolicy.state === "absent") securityIssues++;
-  if (!f.paidAds?.runningFacebookAds && !f.paidAds?.runningGoogleAds) marketingGaps++;
-  if (f.website?.pageSpeedScore && f.website.pageSpeedScore < 50) marketingGaps++;
-  if (f.seo?.domainAuthority && f.seo.domainAuthority < 20) marketingGaps++;
-  if (f.technologies?.allTech && f.technologies.allTech.length < 5) opportunities++;
-  if (f.competitors?.competitors && f.competitors.competitors.length > 0) opportunities++;
-
-  return {
-    security_issues: securityIssues,
-    marketing_gaps: marketingGaps,
-    opportunities,
-    total: securityIssues + marketingGaps + opportunities,
-  };
 }

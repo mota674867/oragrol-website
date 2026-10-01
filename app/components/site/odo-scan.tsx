@@ -187,11 +187,36 @@ async function readJson(response: Response): Promise<Record<string, unknown>> {
 }
 
 function formatError(payload: Record<string, unknown> | null, fallback: string): string {
-  if ((payload as Record<string,unknown>)?.code === "email_cooldown" || (payload as Record<string,unknown>)?.code === "domain_cooldown") {
-    return "A recent scan is already on file. Your next scan will be available after the stated cooldown period.";
-  }
+  // FIXED 2026-10-01 — this used to replace the backend's actual cooldown
+  // message (the exact, Mohammad-approved copy with the real "available
+  // again on [date]" line) with a generic placeholder. Cooldown responses
+  // are now routed to CooldownModal (see submitStart) before this function
+  // is ever called, but the real message is kept here as a fallback too in
+  // case a cooldown payload ever reaches this path some other way.
   if ((payload as Record<string,unknown>)?.code === "rate_limited") return "Please wait a moment and try again.";
   return (payload as Record<string,unknown>)?.message as string || fallback;
+}
+
+function CooldownModal({ message, onClose }: { message: string; onClose: () => void }) {
+  return (
+    <div className="odo-scan__modal-overlay" role="presentation" onClick={onClose}>
+      <div
+        className="odo-scan__modal"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="odo-cooldown-title"
+        aria-describedby="odo-cooldown-message"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <p className="odo-scan__section-kicker">ONE SCAN AT A TIME</p>
+        <h2 id="odo-cooldown-title">You've already got a scan on file</h2>
+        <p id="odo-cooldown-message">{message}</p>
+        <button type="button" className="odo-scan__submit" onClick={onClose}>
+          Got it <span aria-hidden="true">→</span>
+        </button>
+      </div>
+    </div>
+  );
 }
 
 function Field({ id, label, value, onChange, placeholder, type = "text", error }: { id: string; label: string; value: string; onChange: (v: string) => void; placeholder: string; type?: string; error?: string }) {
@@ -228,6 +253,17 @@ function PhaseTrack({ phase }: { phase: string }) {
   );
 }
 
+// A visible, moving indicator while ODO works — added 2026-10-01 because the
+// research screen previously only updated a static checklist on each poll
+// (every 2.5s), with no continuously-animated element. A visitor glancing at
+// an unchanging screen between polls had no visual confirmation anything was
+// happening. This spins constantly regardless of poll timing; respects
+// prefers-reduced-motion via the existing global rule at the bottom of
+// odo-scan.css.
+function LiveSpinner() {
+  return <span className="odo-scan__spinner" aria-hidden="true" />;
+}
+
 function ResearchPreview({ phase, step }: { phase: string; step: string }) {
   const stepIndex = Math.max(0, RESEARCH_STEPS.findIndex((item) => item.key === step));
   const live = phase === "researching";
@@ -235,7 +271,7 @@ function ResearchPreview({ phase, step }: { phase: string; step: string }) {
     <section className="odo-scan__preview" aria-live="polite" aria-label={live ? "ODO research progress" : "Example research preview"}>
       <div className="odo-scan__preview-heading">
         <h2>{live ? "ODO is researching" : "A look inside the scan"}</h2>
-        <span>{live ? "LIVE" : "EXAMPLE PREVIEW"}</span>
+        <span className="odo-scan__live-badge">{live ? <><LiveSpinner /> LIVE</> : "EXAMPLE PREVIEW"}</span>
       </div>
       <div className="odo-scan__preview-track">
         <span className="odo-scan__or-mark" aria-hidden="true">OR</span>
@@ -285,9 +321,12 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
   const [phase, setPhase] = useState("idle");
   const [step, setStep] = useState("website");
   const [sessionId, setSessionId] = useState("");
-  const [question, setQuestion] = useState<{id: string; text: string; options?: Array<string | {value: string; label?: string}>} | null>(null);
+  const [question, setQuestion] = useState<{id: string; text: string; options?: Array<string | {value: string; label?: string}>; multiSelect?: boolean} | null>(null);
   const [answer, setAnswer] = useState("");
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [message, setMessage] = useState("");
+  const [cooldownModal, setCooldownModal] = useState<{ code: string; message: string } | null>(null);
+  const [findingsSummary, setFindingsSummary] = useState<{ security_issues: number; marketing_gaps: number; opportunities: number; total: number } | null>(null);
   const [busy, setBusy] = useState(false);
   const pollRef = useRef<number | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
@@ -315,7 +354,13 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     const next = payload?.status as string | undefined;
     if (!next) return;
     if (payload.step) setStep(String(payload.step));
-    if (payload.question) setQuestion(payload.question as {id: string; text: string; options?: Array<string | {value: string; label?: string}>});
+    if (payload.question) {
+      setQuestion(payload.question as {id: string; text: string; options?: Array<string | {value: string; label?: string}>; multiSelect?: boolean});
+      setSelectedOptions([]); // Fresh question — clear any previous multi-select picks.
+    }
+    if (payload.findings_summary) {
+      setFindingsSummary(payload.findings_summary as { security_issues: number; marketing_gaps: number; opportunities: number; total: number });
+    }
     if (next === "complete") {
       stopUpdates();
       setPhase("summary");
@@ -401,6 +446,8 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     setBusy(true);
     setPhase("researching");
     setMessage("");
+    setCooldownModal(null);
+    setFindingsSummary(null);
     emit("scan-start-requested");
     try {
       const response = await fetch(ODO_ROUTES.start, {
@@ -426,7 +473,14 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
       if (!response.ok) {
         setBusy(false);
         setPhase("idle");
-        setMessage(formatError(payload, "We could not start the scan. Please review your details and try again."));
+        if (payload?.code === "email_cooldown" || payload?.code === "domain_cooldown") {
+          setCooldownModal({
+            code: String(payload.code),
+            message: String(payload.message || "A recent scan is already on file. Please check back soon."),
+          });
+        } else {
+          setMessage(formatError(payload, "We could not start the scan. Please review your details and try again."));
+        }
         emit("scan-start-rejected", { code: payload?.code });
         return;
       }
@@ -465,6 +519,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
       }
       setQuestion(null);
       setAnswer("");
+      setSelectedOptions([]);
       applyStatus(payload);
       startUpdates(sessionId, String(payload.events_url || `${ODO_ROUTES.events}?session_id=${encodeURIComponent(sessionId)}`), String(payload.status_url || ODO_ROUTES.status));
     } catch {
@@ -568,13 +623,45 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
                 <h2>{question.text}</h2>
                 <form onSubmit={submitAnswer}>
                   {Array.isArray(question.options) && question.options && question.options.length ? (
-                    <div className="odo-scan__options" role="group" aria-label="Choose an answer">
-                      {(question.options || []).map((option) => {
-                        const value = typeof option === "string" ? option : option.value;
-                        const label = typeof option === "string" ? option : option.label || value;
-                        return <button key={value} type="button" className="odo-scan__option" disabled={busy} onClick={(event: React.MouseEvent<HTMLButtonElement>) => submitAnswer(event, value)}>{label}</button>;
-                      })}
-                    </div>
+                    question.multiSelect ? (
+                      <>
+                        <p className="odo-scan__multiselect-hint">Select all that apply, then continue.</p>
+                        <div className="odo-scan__options odo-scan__options--multi" role="group" aria-label="Choose one or more answers">
+                          {(question.options || []).map((option) => {
+                            const value = typeof option === "string" ? option : option.value;
+                            const label = typeof option === "string" ? option : option.label || value;
+                            const checked = selectedOptions.includes(value);
+                            return (
+                              <label key={value} className={`odo-scan__option odo-scan__option--checkbox${checked ? " is-selected" : ""}`}>
+                                <input
+                                  type="checkbox"
+                                  checked={checked}
+                                  disabled={busy}
+                                  onChange={() => setSelectedOptions((current) => (current.includes(value) ? current.filter((v) => v !== value) : [...current, value]))}
+                                />
+                                <span>{label}</span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                        <button
+                          type="button"
+                          className="odo-scan__submit"
+                          disabled={busy || selectedOptions.length === 0}
+                          onClick={(event: React.MouseEvent<HTMLButtonElement>) => submitAnswer(event, selectedOptions.join(" | "))}
+                        >
+                          Continue <span aria-hidden="true">→</span>
+                        </button>
+                      </>
+                    ) : (
+                      <div className="odo-scan__options" role="group" aria-label="Choose an answer">
+                        {(question.options || []).map((option) => {
+                          const value = typeof option === "string" ? option : option.value;
+                          const label = typeof option === "string" ? option : option.label || value;
+                          return <button key={value} type="button" className="odo-scan__option" disabled={busy} onClick={(event: React.MouseEvent<HTMLButtonElement>) => submitAnswer(event, value)}>{label}</button>;
+                        })}
+                      </div>
+                    )
                   ) : (
                     <>
                       <textarea value={answer} onChange={(event) => setAnswer(event.target.value)} rows={5} autoFocus aria-label="Your answer" placeholder="Write your answer here" />
@@ -590,6 +677,16 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
               <p className="odo-scan__section-kicker">SCAN COMPLETE</p>
               <h2>Your scan is complete.</h2>
               <p>{message}</p>
+              {findingsSummary ? (
+                <div className="odo-scan__findings-summary">
+                  <p>We identified <strong>{findingsSummary.total} area{findingsSummary.total === 1 ? "" : "s"}</strong> across your business:</p>
+                  <ul>
+                    <li><span aria-hidden="true">🔴</span> {findingsSummary.security_issues} critical finding{findingsSummary.security_issues === 1 ? "" : "s"} in your security posture</li>
+                    <li><span aria-hidden="true">🟠</span> {findingsSummary.marketing_gaps} gap{findingsSummary.marketing_gaps === 1 ? "" : "s"} in your sales and marketing system</li>
+                    <li><span aria-hidden="true">🟡</span> {findingsSummary.opportunities} opportunit{findingsSummary.opportunities === 1 ? "y" : "ies"} your competitors are already using</li>
+                  </ul>
+                </div>
+              ) : null}
               <p className="odo-scan__legal">These findings are based on publicly available information and ODO’s initial analysis. An ORAGROL specialist reviews every report before delivery.</p>
             </div>
           ) : showError ? (
@@ -601,7 +698,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
             </div>
           ) : (
             <>
-              <div className="odo-scan__live-heading"><h2>ODO is researching.</h2><span>LIVE</span></div>
+              <div className="odo-scan__live-heading"><h2>ODO is researching.</h2><span className="odo-scan__live-badge"><LiveSpinner /> LIVE</span></div>
               <p className="odo-scan__workspace-subtitle">We are reviewing your public business information before asking anything unnecessary.</p>
               <ResearchPreview phase={showLive ? "researching" : phase} step={step} />
               <button type="button" className="odo-scan__cancel" onClick={cancelScan}>Pause scan</button>
@@ -609,6 +706,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
           )}
         </section>
       </div>
+      {cooldownModal ? <CooldownModal message={cooldownModal.message} onClose={() => setCooldownModal(null)} /> : null}
     </main>
   );
 }

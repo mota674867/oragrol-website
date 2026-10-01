@@ -156,7 +156,11 @@ export async function matchServices(ledger: Evidence[], ctx: { industry: string 
   // 4) Custom-service / escalation flag.
   const notes: string[] = [];
   for (const [qid, ans] of Object.entries(ctx.answers)) {
-    for (const t of ANSWER_EVIDENCE[qid]?.[ans] ?? []) if (t.customFlag) notes.push(t.customFlag);
+    // Same " | "-joined multi-select format as odo-ledger.ts's answerEvidence().
+    const parts = ans.includes(" | ") ? ans.split(" | ") : [ans];
+    for (const part of parts) {
+      for (const t of ANSWER_EVIDENCE[qid]?.[part] ?? []) if (t.customFlag) notes.push(t.customFlag);
+    }
   }
   const openText = ctx.answers["q_open"];
   if (openText && openText.trim().length > 8 && jevConfigured()) {

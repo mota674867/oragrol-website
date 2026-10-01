@@ -34,7 +34,20 @@ export type AnswerEvidenceTemplate = {
   customFlag?: string;
 };
 
-export type OdoQuestion = { id: string; text: string; options?: string[] };
+export type OdoQuestion = {
+  id: string;
+  text: string;
+  options?: string[];
+  /**
+   * When true, the visitor can select more than one option before
+   * continuing (e.g. a business can hold both health records and payment
+   * data). Omitted/false means the existing single-select, submit-on-click
+   * behavior. Selected options are joined with " | " into a single stored
+   * answer string — see answerEvidence() in odo-ledger.ts, which splits on
+   * the same delimiter to apply every selected option's evidence.
+   */
+  multiSelect?: boolean;
+};
 
 export type QuestionContext = {
   industry: string | null;
@@ -187,8 +200,9 @@ const BANK: BankEntry[] = [
   },
   {
     id: "q_data_types", priority: 11,
-    text: "What's the most sensitive kind of information your business handles?",
+    text: "What kinds of sensitive information does your business handle? (Select all that apply)",
     options: ["Health or medical records", "Payment card or banking details", "Customer personal information", "Mostly internal business data", "Mostly public information"],
+    multiSelect: true,
     determines: "data sensitivity — decides compliance scope (PIPEDA, PHIPA, PCI) and how serious other gaps are",
     evidence: {
       "Health or medical records": [CX("Handles health or medical records.", "data", "observed", ["C08-S01", "C08-S03", "C01-S02", "C03-S03", "C08-S05"], { framework: "PHIPA / PIPEDA" })],
@@ -239,8 +253,9 @@ const BANK: BankEntry[] = [
   },
   {
     id: "q_compliance_pressure", priority: 15,
-    text: "Have clients, insurers or partners asked you to complete a security questionnaire or certification?",
+    text: "Have clients, insurers or partners asked you to complete a security questionnaire or certification? (Select all that apply)",
     options: ["Yes — SOC 2 or ISO 27001", "Yes — a cyber insurance questionnaire", "Yes — PCI for card payments", "No"],
+    multiSelect: true,
     determines: "external compliance pressure — often the real deadline behind security work",
     evidence: {
       "Yes — SOC 2 or ISO 27001": [
@@ -277,7 +292,12 @@ function candidates(ctx: QuestionContext): BankEntry[] {
 }
 
 export function toPublic(q: BankEntry): OdoQuestion {
-  return { id: q.id, text: q.text, ...(q.options ? { options: q.options } : {}) };
+  return {
+    id: q.id,
+    text: q.text,
+    ...(q.options ? { options: q.options } : {}),
+    ...(q.multiSelect ? { multiSelect: true } : {}),
+  };
 }
 
 export type NextQuestionDecision =

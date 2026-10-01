@@ -20,7 +20,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   const sessionId = String(body.session_id || "").trim();
   const questionId = String(body.question_id || "").trim();
-  const answer = String(body.answer || "").trim();
+  // Multi-select questions (odo-questions.ts's multiSelect flag) send an
+  // array of chosen options — join them the same way the frontend and
+  // odo-ledger.ts's answerEvidence() expect: " | "-delimited, as one string.
+  const rawAnswer = body.answer;
+  const answer = Array.isArray(rawAnswer)
+    ? rawAnswer.map((a) => String(a).trim()).filter(Boolean).join(" | ")
+    : String(rawAnswer || "").trim();
 
   if (!sessionId || !questionId || !answer) {
     return NextResponse.json({ code: "validation_error", message: "session_id, question_id, and answer are required." }, { status: 400 });

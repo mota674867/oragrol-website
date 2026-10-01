@@ -209,6 +209,62 @@
 .odo-scan__terminal p { color: #fff; font-size: 17px; line-height: 1.55; }
 .odo-scan__terminal .odo-scan__legal { color: #fff; font-size: 13px; }
 
+/* --- Findings summary on the completion screen (Section 27) --- added 2026-10-01 */
+.odo-scan__findings-summary { margin: 22px 0; padding: 20px 22px; background: rgb(255 255 255 / 6%); border: 1px solid rgb(255 255 255 / 22%); border-radius: 10px; }
+.odo-scan__findings-summary > p { margin: 0 0 12px; font-size: 16px; }
+.odo-scan__findings-summary ul { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
+.odo-scan__findings-summary li { color: #fff; font-size: 15px; line-height: 1.4; }
+.odo-scan__findings-summary li span { margin-right: 4px; }
+
+/* --- Multi-select questions --- added 2026-10-01 */
+.odo-scan__multiselect-hint { margin: -14px 0 14px; color: rgb(255 255 255 / 76%); font-size: 13px; }
+.odo-scan__options--multi { gap: 8px; }
+.odo-scan__option--checkbox { display: flex; align-items: center; gap: 12px; padding: 14px 16px; color: #fff; background: transparent; border: 1px solid rgb(255 255 255 / 44%); border-radius: 7px; cursor: pointer; font: 600 15px/1.35 "Manrope", system-ui, sans-serif; }
+.odo-scan__option--checkbox input { width: 18px; height: 18px; accent-color: var(--odo-orange); flex: 0 0 18px; }
+.odo-scan__option--checkbox:hover { border-color: var(--odo-orange); }
+.odo-scan__option--checkbox.is-selected { color: var(--odo-black); background: var(--odo-orange); border-color: var(--odo-orange); }
+
+/* --- A visibly alive "ODO is working" indicator --- added 2026-10-01, see
+   LiveSpinner in odo-scan.tsx for why this exists. */
+.odo-scan__live-badge { display: inline-flex; align-items: center; gap: 7px; }
+.odo-scan__spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgb(255 255 255 / 35%);
+  border-top-color: var(--odo-orange);
+  border-radius: 50%;
+  animation: odoSpin 0.8s linear infinite;
+}
+.odo-scan__research-list li.is-current .odo-scan__research-icon { animation: odoStepPulse 1.3s ease-in-out infinite; }
+@keyframes odoSpin { to { transform: rotate(360deg); } }
+@keyframes odoStepPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+/* --- Cooldown popup --- added 2026-10-01, replacing the old inline-text-only
+   cooldown message so the locked copy actually reads like a real notice. */
+.odo-scan__modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(10 10 10 / 72%);
+}
+.odo-scan__modal {
+  width: 100%;
+  max-width: 480px;
+  padding: 32px 30px;
+  color: var(--odo-off-white);
+  background: var(--odo-black);
+  border: 1px solid var(--odo-orange);
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgb(0 0 0 / 45%);
+}
+.odo-scan__modal h2 { margin: 0 0 14px; color: #fff; font-size: 24px; letter-spacing: -0.03em; }
+.odo-scan__modal p { margin: 0; color: #fff; font-size: 15px; line-height: 1.55; }
+.odo-scan__modal .odo-scan__submit { margin-top: 24px; }
+
 .odo-scan button:focus-visible,
 .odo-scan a:focus-visible,
 .odo-scan input:focus-visible,
