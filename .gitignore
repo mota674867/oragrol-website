@@ -58,3 +58,4 @@ __pycache__/
 .vercel
 .env*
 Claude outputs/
+vendor-dashboard-app/ 
