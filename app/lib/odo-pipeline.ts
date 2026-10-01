@@ -21,6 +21,7 @@ import { buildOutcomeNarrative } from "./odo-outcome";
 import { buildReport, type OdoReport } from "./odo-report";
 import type { ResearchFindings } from "./odo-research";
 import { attachReportPdfToHubSpot } from "./odo-hubspot-report";
+import { sendOdoAdminReportEmail } from "./odo-email";
 import { EMPTY_USAGE, addJevUsage, mergeUsage, computeCost, type AiUsageTotals } from "./odo-cost";
 import { recordLifetimeAiCost } from "./odo-redis";
 
@@ -58,7 +59,7 @@ export async function pickNextQuestion(
  */
 export async function runEvaluation(
   sessionId: string,
-  session: Pick<OdoSession, "visitorCompany" | "visitorWebsite" | "hubspotContactId">,
+  session: Pick<OdoSession, "visitorCompany" | "visitorWebsite" | "visitorEmail" | "hubspotContactId">,
   findings: ResearchFindings,
   profile: BusinessProfile,
   answers: Record<string, string>,
@@ -157,6 +158,28 @@ export async function runEvaluation(
     await notifyZM77(report).catch((err) => {
       console.error("[ODO] ZM77 notification failed:", err);
     });
+
+    // Stop-gap so Mohammad can actually see the finished PDF right away
+    // (odo-email.ts) — ZM77 doesn't exist yet and the HubSpot
+    // approval-gate rework is on hold, so this is the fastest real path
+    // until one of those replaces it. Internal-only; never blocks or fails
+    // the scan on error — but IS awaited (unlike a bare fire-and-forget
+    // call), because this whole function only keeps running past its
+    // caller's response thanks to Vercel's after() wrapping it one level up
+    // (api/odo/scan/answer/route.ts) — the same bug class as the ZM77/
+    // HubSpot calls already fixed here once before: an unawaited promise
+    // has no guarantee the function stays alive long enough to finish it.
+    await sendOdoAdminReportEmail({
+      report,
+      companyName: session.visitorCompany,
+      visitorEmail: session.visitorEmail,
+      sessionId,
+      condition,
+    })
+      .then((result) => {
+        if (result.state !== "sent") console.warn(`[ODO] Admin report email not sent (${result.state}):`, "reason" in result ? result.reason : result.error);
+      })
+      .catch((err) => console.error("[ODO] Admin report email failed:", err));
 
     const serviceMatchesSummary = matching.flagged.map((m) => m.simpleName).join(", ");
 
