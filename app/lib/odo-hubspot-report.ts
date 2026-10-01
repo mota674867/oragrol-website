@@ -19,6 +19,9 @@ import QRCode from "qrcode";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { OdoReportPdf } from "./odo-report-pdf";
 import type { OdoReport } from "./odo-report";
+// Same approved cover/closing photos as the Cyber Health PDF — see
+// odo-report-pdf.tsx's cover/closing-art comment and report/route.ts.
+import { getCyberHealthReportPhotos } from "./cyber-health-photos";
 
 const HUBSPOT_TOKEN = process.env.HUBSPOT_ACCESS_TOKEN;
 
@@ -88,7 +91,8 @@ export async function attachReportPdfToHubSpot(
   if (!hubspotContactId || !HUBSPOT_TOKEN) return;
   try {
     const qrDataUri = await QRCode.toDataURL(CONTACT_URL, { margin: 1, width: 200 }).catch(() => undefined);
-    const pdfBuffer = await renderToBuffer(OdoReportPdf({ report, qrDataUri }));
+    const { cover: coverImageUri, closing: closingImageUri } = getCyberHealthReportPhotos();
+    const pdfBuffer = await renderToBuffer(OdoReportPdf({ report, qrDataUri, coverImageUri, closingImageUri }));
     const filename = `ORAGROL_ODO_${report.reference}.pdf`;
 
     const fileId = await uploadFileToHubSpot(Buffer.from(pdfBuffer), filename);

@@ -24,6 +24,11 @@ import { getSession } from "@/app/lib/odo-redis";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { OdoReportPdf } from "@/app/lib/odo-report-pdf";
 import type { OdoReport } from "@/app/lib/odo-report";
+// Reuses the same approved monochrome cover/closing photos already shipped
+// for the Cyber Health PDF (Mohammad, 2026-10-01: "both photo file are
+// available on cyberhealth pdf report, we use them same there") — same two
+// files, same loader, no new asset.
+import { getCyberHealthReportPhotos } from "@/app/lib/cyber-health-photos";
 
 const NO_STORE_HEADERS = { "Cache-Control": "private, no-store" };
 
@@ -55,7 +60,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   const format = req.nextUrl.searchParams.get("format");
   if (format === "pdf") {
     const qrDataUri = await QRCode.toDataURL(CONTACT_URL, { margin: 1, width: 200 }).catch(() => undefined);
-    const buffer = await renderToBuffer(OdoReportPdf({ report, qrDataUri }));
+    const { cover: coverImageUri, closing: closingImageUri } = getCyberHealthReportPhotos();
+    const buffer = await renderToBuffer(OdoReportPdf({ report, qrDataUri, coverImageUri, closingImageUri }));
     return new NextResponse(new Uint8Array(buffer), {
       status: 200,
       headers: {

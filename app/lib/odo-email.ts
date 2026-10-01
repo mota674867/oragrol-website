@@ -28,6 +28,9 @@ import QRCode from "qrcode";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { OdoReportPdf } from "./odo-report-pdf";
 import type { OdoReport } from "./odo-report";
+// Same approved cover/closing photos as the Cyber Health PDF — see
+// odo-report-pdf.tsx's cover/closing-art comment and report/route.ts.
+import { getCyberHealthReportPhotos } from "./cyber-health-photos";
 
 const CONTACT_URL = "https://orgro.ca/contact";
 
@@ -57,7 +60,8 @@ export async function sendOdoAdminReportEmail(params: {
 
   try {
     const qrDataUri = await QRCode.toDataURL(CONTACT_URL, { margin: 1, width: 200 }).catch(() => undefined);
-    const pdf = await renderToBuffer(OdoReportPdf({ report: params.report, qrDataUri }));
+    const { cover: coverImageUri, closing: closingImageUri } = getCyberHealthReportPhotos();
+    const pdf = await renderToBuffer(OdoReportPdf({ report: params.report, qrDataUri, coverImageUri, closingImageUri }));
 
     // ADDED 2026-10-01 — surfaces, on every scan, whether question selection
     // actually ran through Jev's adaptive materiality scoring or silently
