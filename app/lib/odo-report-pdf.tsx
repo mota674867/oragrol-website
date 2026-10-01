@@ -150,8 +150,18 @@ const s = StyleSheet.create({
   positiveTitle: { fontSize: 11, color: "#154b48", fontFamily: "Helvetica-Bold", marginTop: 14, marginBottom: 6 },
 
   // ---- SWOT ----
+  // Mockup's .swot is a CSS grid (align-items: stretch by default), so each
+  // row's two quadrants visually share the row's tallest height. Tried
+  // replicating that with `flex:1` cards in react-pdf — it collapsed card
+  // height instead of stretching it (no defined row height to stretch
+  // against) and overlapped text. react-pdf's Yoga layout doesn't give a
+  // safe equivalent of CSS grid's implicit row-stretch for auto-height
+  // content, so cards are auto-height here (content-sized, not equalized) —
+  // same content and styling as the mockup, just not forced to matching
+  // heights, which is the one layout detail that doesn't carry over 1:1
+  // from a browser-rendered HTML page to react-pdf's layout engine.
   swotIntro: { fontSize: 9.5, color: SECONDARY, lineHeight: 1.45, marginBottom: 10, maxWidth: "92%" },
-  swotGrid: { flexDirection: "row", flexWrap: "wrap" },
+  swotRow: { flexDirection: "row", marginBottom: 8 },
   swotCell: { width: "50%", padding: 2 },
   swotCard: { backgroundColor: "#FFFFFF", borderTop: `3 solid ${ORANGE}`, padding: 12, margin: 4 },
   swotHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
@@ -487,21 +497,26 @@ export function OdoReportPdf({
         <View break>
           <SectionBar num={++sectionNo} title="SWOT — where the business stands" />
           <Text style={s.swotIntro}>{SWOT_EXPLAINER}</Text>
-          <View style={s.swotGrid}>
-            {([["STRENGTHS", swot.strengths], ["WEAKNESSES", swot.weaknesses], ["OPPORTUNITIES", swot.opportunities], ["THREATS", swot.threats]] as const).map(([title, points]) => (
-              <View key={title} style={s.swotCell}>
-                <View style={s.swotCard} wrap={false}>
-                  <View style={s.swotHead}>
-                    <Text style={s.swotTitle}>{title}</Text>
-                    <Text style={s.swotCount}>{points.length}</Text>
+          {([
+            [["STRENGTHS", swot.strengths], ["WEAKNESSES", swot.weaknesses]],
+            [["OPPORTUNITIES", swot.opportunities], ["THREATS", swot.threats]],
+          ] as const).map((row, rowIdx) => (
+            <View key={rowIdx} style={s.swotRow} wrap={false}>
+              {row.map(([title, points]) => (
+                <View key={title} style={s.swotCell}>
+                  <View style={s.swotCard}>
+                    <View style={s.swotHead}>
+                      <Text style={s.swotTitle}>{title}</Text>
+                      <Text style={s.swotCount}>{points.length}</Text>
+                    </View>
+                    {points.length ? points.map((p, j) => (
+                      <Text key={j} style={s.swotPoint}>• {p.text} <Text style={s.swotEvidence}>[{p.evidence.join(", ")}]</Text></Text>
+                    )) : <Text style={[s.swotPoint, { color: SECONDARY }]}>Nothing significant identified.</Text>}
                   </View>
-                  {points.length ? points.map((p, j) => (
-                    <Text key={j} style={s.swotPoint}>• {p.text} <Text style={s.swotEvidence}>[{p.evidence.join(", ")}]</Text></Text>
-                  )) : <Text style={[s.swotPoint, { color: SECONDARY }]}>Nothing significant identified.</Text>}
                 </View>
-              </View>
-            ))}
-          </View>
+              ))}
+            </View>
+          ))}
           <Text style={s.interpret}>Read the evidence alongside the summary. Each reference points back to a finding, its source and its checking date. An unconfirmed observation remains something to verify before deciding on an action.</Text>
         </View>
 
