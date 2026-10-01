@@ -96,15 +96,18 @@ export type CooldownCheckResult =
   | { allowed: false; reason: "domain_cooldown"; nextAvailableAt: number; previousScanDate: string; domain: string };
 
 export async function checkCooldowns(
-  email: string,
+  email: string | null,
   website: string | null
 ): Promise<CooldownCheckResult> {
   const redis = getRedis();
-  const emailHash = hashEmail(email);
 
-  // Check email cooldown
-  const emailKey = `${EMAIL_COOLDOWN_PREFIX}${emailHash}`;
-  const emailRecord = await redis.get<{ completedAt: number }>(emailKey);
+  // Check email cooldown (skipped when no email was given — the admin
+  // cooldown-lookup tool, Phase 5, can search by URL alone per Master Ref
+  // §26; the live scan-start flow always passes a real email, so this is
+  // additive and never changes that path's behavior).
+  const emailRecord = email
+    ? await redis.get<{ completedAt: number }>(`${EMAIL_COOLDOWN_PREFIX}${hashEmail(email)}`)
+    : null;
   if (emailRecord) {
     const nextAvailableAt = emailRecord.completedAt + EMAIL_COOLDOWN_SECONDS * 1000;
     return {
@@ -162,17 +165,28 @@ export async function activateCooldowns(email: string, website: string | null): 
   }
 }
 
-export async function clearCooldowns(email: string, website: string | null, authorizedBy: string, reason: string): Promise<void> {
+export async function clearCooldowns(email: string | null, website: string | null, authorizedBy: string, reason: string): Promise<void> {
   const redis = getRedis();
-  const emailHash = hashEmail(email);
-  await redis.del(`${EMAIL_COOLDOWN_PREFIX}${emailHash}`);
-  if (website) {
-    const domainHash = hashDomain(website);
-    await redis.del(`${DOMAIN_COOLDOWN_PREFIX}${domainHash}`);
-  }
-  // Log the reset for ZM77 audit trail
+  if (email) await redis.del(`${EMAIL_COOLDOWN_PREFIX}${hashEmail(email)}`);
+  if (website) await redis.del(`${DOMAIN_COOLDOWN_PREFIX}${hashDomain(website)}`);
+  // Log the reset for ZM77 audit trail. ZM77 itself doesn't exist yet (same
+  // stop-gap noted in odo-email.ts) — this Redis record is the real audit
+  // trail today; app/api/odo/admin/cooldown/route.ts (Phase 5) is the only
+  // caller, and it also emails Mohammad a copy of the same note so the
+  // reset is never ONLY in a Redis key nobody reads.
   const auditKey = `odo:reset:audit:${Date.now()}`;
   await redis.set(auditKey, { email, website, authorizedBy, reason, resetAt: Date.now() }, { ex: 365 * 24 * 60 * 60 });
+}
+
+/** Admin-tool read: every logged cooldown-reset audit entry, newest first — used so the reset tool can show Mohammad a history of past resets, not just perform new ones. Best-effort key scan (Upstash `keys` is fine at ODO's volume; this is an occasional admin lookup, never called from the scan hot path). */
+export async function listCooldownResetAudit(limit = 50): Promise<Array<{ email: string | null; website: string | null; authorizedBy: string; reason: string; resetAt: number }>> {
+  const redis = getRedis();
+  const keys = await redis.keys("odo:reset:audit:*");
+  keys.sort().reverse();
+  const top = keys.slice(0, limit);
+  if (!top.length) return [];
+  const records = await redis.mget<Array<{ email: string | null; website: string | null; authorizedBy: string; reason: string; resetAt: number } | null>>(...top);
+  return records.filter((r): r is NonNullable<typeof r> => r != null);
 }
 
 // --- Session management ---
