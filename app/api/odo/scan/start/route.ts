@@ -143,9 +143,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const nextDate = new Date(cooldownCheck.nextAvailableAt).toLocaleDateString("en-CA", {
       timeZone: "America/Toronto", year: "numeric", month: "long", day: "numeric",
     });
+    // Word-for-word the locked copy from the master reference (Section 25) —
+    // tightened 2026-10-01, this used to paraphrase it slightly ("please
+    // contact us" instead of "please contact us directly", a reordered
+    // first sentence on the URL message, and a dropped clause).
     const message = cooldownCheck.reason === "email_cooldown"
-      ? `It looks like you've already completed a scan with this email recently. To keep your results accurate and meaningful, each business scan is available once every 7 days. Your next scan will be available on ${nextDate}. If you have an urgent security concern in the meantime, please contact us at info@orgro.ca.`
-      : `We've already completed a discovery scan for this website on ${cooldownCheck.previousScanDate}. Each business URL can be scanned once every 30 days to ensure meaningful results. Your next scan will be available on ${nextDate}. If something critical has changed, contact our team directly — we can prioritize a manual review.`;
+      ? `It looks like you've already completed a scan with this email recently. To keep your results accurate and meaningful, each business scan is available once every 7 days. Your next scan will be available on ${nextDate}. If you have an urgent security concern in the meantime, please contact us directly at info@orgro.ca.`
+      : `We've already completed a discovery scan for this website on ${cooldownCheck.previousScanDate}. To ensure our analysis reflects meaningful changes, each business URL can be scanned once every 30 days. Your next scan will be available on ${nextDate}. If something critical has changed in your business or security situation, contact our team directly — we can prioritize a manual review.`;
     return NextResponse.json({ code: cooldownCheck.reason, message, nextAvailableAt: cooldownCheck.nextAvailableAt }, { status: 429 });
   }
 
