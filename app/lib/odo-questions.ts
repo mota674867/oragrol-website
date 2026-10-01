@@ -103,6 +103,7 @@ const BANK: BankEntry[] = [
     id: "q_biggest_challenge", priority: 3,
     text: "What is your biggest operational challenge right now?",
     options: ["Cybersecurity and data protection", "Day-to-day efficiency and automation", "Growing the business", "Managing costs", "Customer experience", "Compliance and regulations"],
+    multiSelect: true,
     determines: "the visitor's own priority — which half of the report (security vs automation) matters most to them",
     evidence: {
       "Cybersecurity and data protection": [CX("Stated priority: cybersecurity and data protection.", "governance", "observed", ["C01-S01"])],
@@ -117,6 +118,7 @@ const BANK: BankEntry[] = [
     id: "q_security_owner", priority: 4,
     text: "Who looks after IT and security for your business today?",
     options: ["A dedicated in-house IT or security person/team", "An outside IT provider", "Someone part-time, on top of their main job", "Nobody specifically", "I'm not sure"],
+    multiSelect: true,
     determines: "whether anyone owns security — a governance gap no public scan can see",
     evidence: {
       "A dedicated in-house IT or security person/team": [ST("A dedicated in-house IT/security function exists.", "governance", ["C01-S04"])],
@@ -130,6 +132,7 @@ const BANK: BankEntry[] = [
     id: "q_mfa", priority: 5,
     text: "Is multi-factor authentication (a code or app prompt, not just a password) required to sign in to email and key business systems?",
     options: ["Yes, for everyone", "Only for some people or systems", "No", "Not that I know of"],
+    multiSelect: true,
     determines: "MFA coverage — the single most common gap behind account takeovers",
     evidence: {
       "Yes, for everyone": [ST("MFA is required for everyone on email and key systems.", "identity", ["C05-S02"])],
@@ -142,6 +145,7 @@ const BANK: BankEntry[] = [
     id: "q_backups", priority: 6,
     text: "If ransomware locked your main files and systems today, could you restore them from a backup kept separately?",
     options: ["Yes, and we've tested a restore", "We have backups but haven't tested a restore", "No", "I'm not sure"],
+    multiSelect: true,
     determines: "recoverability — whether a ransomware event is an inconvenience or a business-ending event",
     evidence: {
       "Yes, and we've tested a restore": [ST("Separate backups exist and a restore has been tested.", "data", ["C08-S01"])],
@@ -154,6 +158,7 @@ const BANK: BankEntry[] = [
     id: "q_incident_plan", priority: 7,
     text: "If you had a cyber incident tomorrow — a hacked mailbox or ransomware — is there a written plan for what to do?",
     options: ["Yes, written and practised", "Yes, written but never practised", "No written plan", "I'm not sure"],
+    multiSelect: true,
     determines: "incident readiness — whether response is planned or improvised",
     evidence: {
       "Yes, written and practised": [ST("A written incident response plan exists and has been practised.", "governance", ["C01-S03", "C03-S04"])],
@@ -166,6 +171,7 @@ const BANK: BankEntry[] = [
     id: "q_training", priority: 8,
     text: "Do staff get security awareness or phishing training?",
     options: ["Yes, at least once a year", "Only when they join", "No", "I'm not sure"],
+    multiSelect: true,
     determines: "human-risk controls — most breaches start with a person, not a system",
     evidence: {
       "Yes, at least once a year": [ST("Staff receive security awareness training at least yearly.", "people", ["C04-S03"])],
@@ -178,6 +184,7 @@ const BANK: BankEntry[] = [
     id: "q_email_security_awareness", priority: 9,
     text: "Has your team seen phishing or suspicious emails targeting your business in the last 12 months?",
     options: ["Yes, frequently", "Yes, occasionally", "Not that we know of", "We don't monitor this"],
+    multiSelect: true,
     determines: "whether email-borne attacks are an active, current problem for this business",
     evidence: {
       "Yes, frequently": [G("Phishing attempts against the team are frequent (stated).", "observed", "medium", "email", ["C04-S02"]), G("Frequent phishing suggests staff need ongoing awareness training.", "inferred", "medium", "people", ["C04-S03"])],
@@ -190,6 +197,7 @@ const BANK: BankEntry[] = [
     id: "q_devices", priority: 10,
     text: "How does your team work day to day?",
     options: ["In the office, on company devices", "Company devices, partly remote", "A mix of personal and company devices", "Mostly personal devices"],
+    multiSelect: true,
     determines: "endpoint and remote-access exposure",
     evidence: {
       "In the office, on company devices": [CX("Team works in the office on company devices.", "identity")],
@@ -216,6 +224,7 @@ const BANK: BankEntry[] = [
     id: "q_systems", priority: 12,
     text: "Where do your main business systems run?",
     options: ["Microsoft 365 or Google Workspace only", "Cloud platforms like AWS or Azure (our own apps/servers)", "Our own servers in the office", "A mix of cloud and office servers"],
+    multiSelect: true,
     determines: "infrastructure footprint — whether cloud posture or on-prem hardening is in scope",
     evidence: {
       "Microsoft 365 or Google Workspace only": [CX("Runs on Microsoft 365 / Google Workspace only.", "business", "observed", ["C02-S02"])],
@@ -228,6 +237,7 @@ const BANK: BankEntry[] = [
     id: "q_ai_use", priority: 13,
     text: "Does your team use AI tools (like ChatGPT or Copilot) with customer or business data?",
     options: ["Yes, and we have rules for it", "Yes, without formal rules", "We've built AI into our product or customer service", "No", "I'm not sure"],
+    multiSelect: true,
     determines: "AI exposure — whether business data is flowing into AI tools without controls",
     evidence: {
       "Yes, and we have rules for it": [ST("AI tools are used under written rules.", "ai", ["C09-S02"])],
@@ -241,6 +251,7 @@ const BANK: BankEntry[] = [
     id: "q_manual_work", priority: 14,
     text: "Where does your team lose the most time to manual work?",
     options: ["Re-typing data between systems", "Chasing leads, quotes and follow-ups", "Answering the same customer questions", "Onboarding new clients", "Reports and spreadsheets", "Not much — we're fairly automated"],
+    multiSelect: true,
     determines: "the biggest automation opportunity — the one thing public research can only guess at",
     evidence: {
       "Re-typing data between systems": [G("Staff re-type data between systems.", "observed", "medium", "operations", ["C12-S01", "C12-S03", "C11-S02", "C12-S04"])],
