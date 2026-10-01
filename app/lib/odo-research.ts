@@ -79,6 +79,7 @@ import { checkHiringSignal, type HiringSignal } from "./odo-hiring";
 import { fetchGeoapifyNearby } from "./odo-geoapify";
 import { lookupOrgBook, type OrgBookRecord } from "./odo-orgbook";
 import { checkHibpBreach, type HibpResult } from "./odo-hibp";
+import { buildBusinessProfile, type BusinessProfile as SiteBusinessProfile } from "./odo-business-profile";
 
 export type ResearchFindings = {
   // Website & SEO
@@ -103,6 +104,10 @@ export type ResearchFindings = {
   history: Determination<WaybackHistory> | null;
   /** Careers-page hiring signal: schema.org JobPosting entries and/or a detected ATS embed. */
   hiring: Determination<HiringSignal> | null;
+  /** L1 of the deep-research rebuild (2026-10-01) — Claude's read of up to 15 of the business's own pages (odo-business-profile.ts). Drives Phase 2's dynamic interview via `.unknowns`. */
+  businessProfile: SiteBusinessProfile | null;
+  /** Real Claude usage from building businessProfile above — folded into the scan's running AiUsageTotals by the caller (odo-cost.ts's addClaudeUsage), same provenance rule as every other AI cost in ODO. */
+  businessProfileUsage: { input_tokens: number; output_tokens: number } | null;
   // Business
   googleBusiness: GoogleBusinessFindings | null;
   staffAndContacts: StaffFindings | null;
@@ -403,10 +408,36 @@ export async function runParallelResearch(
   const websiteFindings: WebsiteFindings | null =
     hasWebsite && domain ? deriveWebsiteFindings(domain, pageSpeedRaw?.state === "observed" ? pageSpeedRaw.value : null) : null;
 
+  // L1 Business Profile (odo-business-profile.ts) — approved 2026-10-01 ODO
+  // brain rebuild, roadmap item 1. Needs the homepage HTML already fetched
+  // above (odo-page.ts's runPageResearch), so it runs as a second wave here,
+  // same shape as the Geoapify call below which needs googleBusiness's
+  // location first. safeFetch keeps a Claude outage from failing the scan —
+  // buildBusinessProfile has its own internal fallback too, so this only
+  // returns null on something unexpected (a thrown non-Anthropic error).
+  let businessProfile: SiteBusinessProfile | null = null;
+  let businessProfileUsage: { input_tokens: number; output_tokens: number } | null = null;
+  if (hasWebsite && domain && homepageHtml && page?.snapshot.state === "observed") {
+    const finalUrl = page.snapshot.value.finalUrl;
+    const result = await safeFetch(
+      "Business Profile (Claude)",
+      () => buildBusinessProfile(businessName, homepageHtml, finalUrl),
+      errors
+    );
+    if (result) {
+      businessProfile = result.profile;
+      businessProfileUsage = result.usage;
+    }
+  }
+
   // Business size: no free source gives verified headcount for a private
   // Canadian SMB (Crunchbase and Hunter are both out). Whatever comes back
   // here is Inferred tier unless the client states it directly.
-  const { industry, industryKeywords, businessSize } = await detectIndustryAndSize(generalResearchData, null);
+  const { industry: keywordIndustry, industryKeywords, businessSize } = await detectIndustryAndSize(generalResearchData, null);
+  // The AI-read Business Profile is a far better industry signal than
+  // keyword-matching a Tavily snippet when it's available — prefer it, fall
+  // back to the keyword heuristic only when Claude couldn't produce one.
+  const industry = businessProfile?.industryGuess ?? keywordIndustry;
 
   // Competitor discovery — Tavily search results plus Geoapify's nearby-
   // business search (Section 33, Area 2), merged into one candidate pool.
@@ -482,6 +513,8 @@ export async function runParallelResearch(
     compliance,
     history,
     hiring,
+    businessProfile,
+    businessProfileUsage,
     googleBusiness: googleBusinessData,
     staffAndContacts: null,
     crunchbase: null,

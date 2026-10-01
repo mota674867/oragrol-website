@@ -8,7 +8,7 @@ import { checkCooldowns, createSession, getIncompleteSession, checkIpDailyLimit 
 import { runParallelResearch, type ResearchFindings } from "@/app/lib/odo-research";
 import { pickNextQuestion, runEvaluation } from "@/app/lib/odo-pipeline";
 import { getClientIp, rateLimit } from "@/app/lib/rate-limit";
-import { EMPTY_USAGE, addJevUsage } from "@/app/lib/odo-cost";
+import { EMPTY_USAGE, addJevUsage, addClaudeUsage } from "@/app/lib/odo-cost";
 import { checkDailySpendGate } from "@/app/lib/odo-spend";
 import {
   verifyTurnstile,
@@ -384,10 +384,12 @@ async function runResearchAsync(
     // (pickNextQuestion/nextQuestion never throw — see odo-questions.ts).
     const profile = { industry: findings.industry, businessSize: findings.businessSize };
     const decision = await pickNextQuestion(findings, profile, hasWebsite, {}, []);
-    // Real Jev usage from picking the very first question — carried forward
-    // (via findings._aiUsage) so the scan's final cost is exact, not just
-    // the evaluation-phase portion (odo-cost.ts).
-    const aiUsageSoFar = addJevUsage(EMPTY_USAGE, decision.jevUsage);
+    // Real usage carried forward (via findings._aiUsage) so the scan's final
+    // cost is exact, not just the evaluation-phase portion (odo-cost.ts).
+    // Includes the L1 Business Profile's Claude call (odo-business-profile.ts)
+    // — added 2026-10-01, the first AI spend that now happens during research
+    // itself rather than only during question-picking/evaluation.
+    const aiUsageSoFar = addJevUsage(addClaudeUsage(EMPTY_USAGE, findings.businessProfileUsage), decision.jevUsage);
 
     const baseFindings: Record<string, unknown> = {
       ...(findings as unknown as Record<string, unknown>),
