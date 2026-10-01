@@ -64,7 +64,7 @@
 import { runDnsResearch, type DnsResearch } from "./odo-dns";
 import { runPageResearch, type PageResearch } from "./odo-page";
 import { coverageReport, type Determination } from "./odo-evidence";
-import { classifyCompetitors, detectCity, type CompetitorProfile, type CandidateInput } from "./odo-competitors";
+import { findCascadingCompetitors, detectCity, detectCountry, type CompetitorProfile, type LocationCascadeStep } from "./odo-competitors";
 import { runInfraResearch, type InfraResearch } from "./odo-infra";
 import { runAttackSurfaceResearch, type AttackSurfaceResearch } from "./odo-attack-surface";
 import {
@@ -76,10 +76,10 @@ import {
 } from "./odo-compliance";
 import { checkWaybackHistory, type WaybackHistory } from "./odo-history";
 import { checkHiringSignal, type HiringSignal } from "./odo-hiring";
-import { fetchGeoapifyNearby } from "./odo-geoapify";
 import { lookupOrgBook, type OrgBookRecord } from "./odo-orgbook";
 import { checkHibpBreach, type HibpResult } from "./odo-hibp";
 import { buildBusinessProfile, type BusinessProfile as SiteBusinessProfile } from "./odo-business-profile";
+import { detectComplianceSignals, type ComplianceSignal } from "./odo-industry-rules";
 
 export type ResearchFindings = {
   // Website & SEO
@@ -108,6 +108,8 @@ export type ResearchFindings = {
   businessProfile: SiteBusinessProfile | null;
   /** Real Claude usage from building businessProfile above — folded into the scan's running AiUsageTotals by the caller (odo-cost.ts's addClaudeUsage), same provenance rule as every other AI cost in ODO. */
   businessProfileUsage: { input_tokens: number; output_tokens: number } | null;
+  /** L4 of the deep-research rebuild — compliance frameworks plausibly relevant to this business (odo-industry-rules.ts), each with its own interview-worthy unknowns. Free, no AI cost — rule-based against industry + the Business Profile. */
+  complianceSignals: ComplianceSignal[] | null;
   // Business
   googleBusiness: GoogleBusinessFindings | null;
   staffAndContacts: StaffFindings | null;
@@ -129,8 +131,10 @@ export type ResearchFindings = {
   hibp: Determination<HibpResult> | null;
   // General research
   generalResearch: GeneralResearchFindings | null;
-  /** Classified competitor candidates — see odo-competitors.ts. Only confirmed_competitor and probable_competitor are report-safe. */
+  /** Classified competitor candidates — see odo-competitors.ts. Only confirmed_competitor and probable_competitor are report-safe. Already capped at exactly 3 (or fewer if genuinely none could be verified — never fabricated). */
   competitorProfiles: CompetitorProfile[] | null;
+  /** Which location-cascade step (odo-competitors.ts) produced competitorProfiles — for report transparency about how local/wide the search had to go. */
+  competitorCascadeStep: LocationCascadeStep | null;
   competitors: CompetitorFindings | null;
   // Metadata
   industry: string | null;
@@ -439,23 +443,38 @@ export async function runParallelResearch(
   // back to the keyword heuristic only when Claude couldn't produce one.
   const industry = businessProfile?.industryGuess ?? keywordIndustry;
 
-  // Competitor discovery — Tavily search results plus Geoapify's nearby-
-  // business search (Section 33, Area 2), merged into one candidate pool.
-  // Geoapify needs a real coordinate, which only comes from the Google
-  // Places lookup above, and a category, which only comes from industry
-  // detection above — so both run in this second wave, not the main batch.
+  // L4 Industry/compliance rules (odo-industry-rules.ts) — approved
+  // 2026-10-01 ODO brain rebuild, roadmap item 1. Free, rule-based — no AI
+  // cost — run against the industry just resolved and whatever L1 already
+  // found about data types/tools/locations.
+  const complianceSignals = detectComplianceSignals(industry, businessProfile ? {
+    sensitiveDataTypes: businessProfile.sensitiveDataTypes,
+    toolsOrPlatformsMentioned: businessProfile.toolsOrPlatformsMentioned,
+    locations: businessProfile.locations,
+  } : null);
+
+  // L3 Competitor discovery — approved 2026-10-01 ODO brain rebuild, roadmap
+  // item 1: exactly 3 competitors via a location cascade (same city →
+  // widened radius → whole country), restricted to the prospect's own
+  // country throughout (odo-competitors.ts's findCascadingCompetitors). The
+  // Tavily candidates below feed every step; Geoapify's coordinate search
+  // only runs for the geography-bound steps and needs a real coordinate
+  // (Google Places, above) and a category (industry detection, above) — so
+  // this whole block is a second wave, not the main batch.
   const competitorCandidates = getVal<CompetitorFindings>(competitors);
   const googleBusinessData = getVal<GoogleBusinessFindings>(googleBusiness);
-  const geoapifyResult = googleBusinessData?.location
-    ? await fetchGeoapifyNearby(googleBusinessData.location, industry)
-    : null;
-  const geoapifyCandidates: CandidateInput[] = geoapifyResult?.state === "observed" ? geoapifyResult.value : [];
-
   const prospectCity = detectCity(generalResearchData?.summary ?? null) ?? detectCity(businessName);
-  const allCandidates = [...(competitorCandidates?.competitors ?? []), ...geoapifyCandidates];
-  const competitorProfiles = allCandidates.length
-    ? await classifyCompetitors(allCandidates, { industryKeywords, prospectCity })
-    : null;
+  const targetCountry = detectCountry(domain, businessProfile?.locations ?? []);
+  const cascade = await findCascadingCompetitors(
+    googleBusinessData?.location ?? null,
+    industry,
+    industryKeywords,
+    prospectCity,
+    competitorCandidates?.competitors ?? [],
+    targetCountry
+  );
+  const competitorProfiles = cascade.profiles.length ? cascade.profiles : null;
+  const competitorCascadeStep: LocationCascadeStep = cascade.cascadeStepUsed;
 
   // Coverage — which checks actually answered. Anything not_determined is a
   // gap in ODO, not a finding about the prospect.
@@ -463,7 +482,6 @@ export async function runParallelResearch(
   competitorProfiles?.forEach((p, i) => {
     determinations[`competitor.${i + 1}.identity`] = p.identity;
   });
-  if (geoapifyResult) determinations["competitor.geoapify"] = geoapifyResult;
   if (dns) {
     determinations["email.spf"] = dns.spf;
     determinations["email.dmarc"] = dns.dmarc;
@@ -515,6 +533,7 @@ export async function runParallelResearch(
     hiring,
     businessProfile,
     businessProfileUsage,
+    complianceSignals: complianceSignals.length ? complianceSignals : null,
     googleBusiness: googleBusinessData,
     staffAndContacts: null,
     crunchbase: null,
@@ -529,6 +548,7 @@ export async function runParallelResearch(
     generalResearch: generalResearchData,
     competitors: competitorCandidates,
     competitorProfiles,
+    competitorCascadeStep,
     industry,
     businessSize,
     errors,

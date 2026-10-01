@@ -27,6 +27,7 @@
 // a reviewer, never printed as a finding about the prospect's market.
 
 import { Determination, observed, absent, notDetermined } from "./odo-evidence";
+import { fetchGeoapifyNearby, type GeoLocation } from "./odo-geoapify";
 
 export type CompetitorClassification =
   | "confirmed_competitor"
@@ -145,7 +146,7 @@ async function enrichWithPlaces(name: string, cityHint: string | null): Promise<
  */
 export async function classifyCompetitors(
   candidates: CandidateInput[],
-  context: { industryKeywords: string[]; prospectCity: string | null }
+  context: { industryKeywords: string[]; prospectCity: string | null; targetCountry?: "CA" | "OTHER" }
 ): Promise<CompetitorProfile[]> {
   const top = dedupeCandidates(candidates).slice(0, 5);
 
@@ -160,12 +161,41 @@ export async function classifyCompetitors(
           ? candidateCity.toLowerCase() === context.prospectCity.toLowerCase()
           : null;
 
+      // COUNTRY GATE — approved 2026-10-01: a Canadian business only sees
+      // Canadian competitors, a foreign business only sees competitors in
+      // that same country. A wrong-country name in a client report is
+      // exactly the "credibility-ending mistake" this module's header
+      // already warns about, so this is a hard exclusion, not a downgrade —
+      // but only when the address is actually known; an address ODO
+      // couldn't verify is never treated as a country mismatch (fail open,
+      // same rule as every other check here).
+      const addressText = identity.state === "observed" ? identity.value.address?.toLowerCase() ?? "" : "";
+      const addressSaysCanada = /\bcanada\b/.test(addressText);
+      const countryMismatch =
+        identity.state === "observed" && addressText.length > 0 && context.targetCountry
+          ? (context.targetCountry === "CA" && !addressSaysCanada) ||
+            (context.targetCountry === "OTHER" && addressSaysCanada)
+          : false;
+
       const sources = new Set<string>([c.source]);
       if (identity.state === "observed") sources.add("google_places");
 
-      const identityVerified = identity.state === "observed";
+      const identityVerified = identity.state === "observed" && !countryMismatch;
       const hasOverlap = overlap.score > 0;
       const multiSource = sources.size >= 2;
+
+      if (countryMismatch) {
+        return {
+          name: c.name,
+          website: c.website,
+          discoverySources: [...sources],
+          identity,
+          serviceOverlap: overlap,
+          geographicOverlap,
+          classification: "irrelevant_candidate" as CompetitorClassification,
+          reasoning: `Verified business, but outside ${context.targetCountry === "CA" ? "Canada" : "the prospect's country"} — excluded by the country-restriction rule, never presented as a competitor.`,
+        };
+      }
 
       let classification: CompetitorClassification;
       let reasoning: string;
@@ -204,4 +234,101 @@ export async function classifyCompetitors(
 /** Only these two classifications are safe to print as a competitor finding. */
 export function reportableCompetitors(profiles: CompetitorProfile[]): CompetitorProfile[] {
   return profiles.filter((p) => p.classification === "confirmed_competitor" || p.classification === "probable_competitor");
+}
+
+// ---------------------------------------------------------------------------
+// Location-cascade competitor search — ODO brain rebuild, roadmap item 1.
+//
+// ADDED 2026-10-01 — Mohammad approved exactly this cascade: "inside canada
+// - if the business was other country, check the competitor only on that
+// country... for example for a company in vancouver, better to mention only
+// vancouver competitor, it have more effect, if not found a competitor
+// around, use the nears city, the full country." Also: "menton name can
+// help to validate our report" (competitor naming approved).
+//
+// Implementation note: "same city / nearest city / province" are done here
+// as one widening-radius search from the business's own coordinates, not as
+// three separate geocoded lookups — a 15km→60km→400km radius sweep
+// naturally picks up neighbouring cities before it reaches province scale,
+// and Geoapify (odo-geoapify.ts) only takes a radius, not a named-city
+// lookup. The final "whole country" step drops the radius filter entirely
+// and relies on Tavily's web-search candidates, which are not geography-
+// bound to begin with.
+//
+// COUNTRY RESTRICTION — a Canadian business only ever sees Canadian
+// competitors; a foreign business only ever sees competitors in that same
+// country. Country is read from the domain's TLD first (.ca is unambiguous),
+// then from the L1 Business Profile's stated locations (odo-business-
+// profile.ts), defaulting to Canada — ORAGROL's own market — only when
+// neither signal says otherwise. NEEDS VERIFICATION before this ships: the
+// Geoapify radius sweep has never been tested against a real account (see
+// odo-geoapify.ts's own header) — spot-check once deployed.
+export type LocationCascadeStep = "same_city" | "widened_radius" | "country_wide" | "none_found";
+
+export type CascadeResult = {
+  profiles: CompetitorProfile[]; // capped at 3 — "exactly 3" per Mohammad's approval, or fewer if genuinely none could be verified
+  cascadeStepUsed: LocationCascadeStep;
+};
+
+/** TLD first (unambiguous when present), then the L1 Business Profile's stated locations, defaulting to Canada (ORAGROL's own market). */
+export function detectCountry(domain: string, profileLocations: string[] = []): "CA" | "OTHER" {
+  const tld = domain.toLowerCase().split(".").pop();
+  if (tld === "ca") return "CA";
+  if (tld && ["us", "uk", "au", "nz", "ie", "de", "fr", "in", "sg"].includes(tld)) return "OTHER";
+  const text = profileLocations.join(" ").toLowerCase();
+  if (/\bcanada\b|\bontario\b|\bquebec\b|\balberta\b|\bbritish columbia\b|\bmanitoba\b/.test(text)) return "CA";
+  if (/\bunited states\b|\busa\b|\bu\.s\.\b|\bunited kingdom\b|\baustralia\b/.test(text)) return "OTHER";
+  return "CA"; // default — ORAGROL's own market, see header note
+}
+
+const CASCADE_RADII: Array<{ step: LocationCascadeStep; radiusMeters: number }> = [
+  { step: "same_city", radiusMeters: 15_000 },
+  { step: "widened_radius", radiusMeters: 400_000 }, // sweeps in the nearest city, then effectively the whole province
+];
+
+/**
+ * Widens the search radius step by step until 3 reportable (confirmed or
+ * probable) competitors are found, or every step is exhausted. Never
+ * fabricates a competitor to force a count of 3 — ODO's standing rule is
+ * "not found" is a gap, never manufactured, same as everywhere else in
+ * this research pipeline.
+ */
+export async function findCascadingCompetitors(
+  location: GeoLocation | null,
+  industry: string | null,
+  industryKeywords: string[],
+  prospectCity: string | null,
+  tavilyCandidates: CandidateInput[],
+  targetCountry: "CA" | "OTHER" = "CA"
+): Promise<CascadeResult> {
+  let lastClassified: CompetitorProfile[] = [];
+
+  if (location) {
+    for (const { step, radiusMeters } of CASCADE_RADII) {
+      const geoResult = await fetchGeoapifyNearby(location, industry, { radiusMeters, limit: 10 });
+      const geoCandidates = geoResult.state === "observed" ? geoResult.value : [];
+      const merged = dedupeCandidates([...tavilyCandidates, ...geoCandidates]);
+      if (!merged.length) continue;
+      const classified = await classifyCompetitors(merged, { industryKeywords, prospectCity, targetCountry });
+      lastClassified = classified;
+      if (reportableCompetitors(classified).length >= 3) {
+        return { profiles: reportableCompetitors(classified).slice(0, 3), cascadeStepUsed: step };
+      }
+    }
+  }
+
+  // Country-wide fallback — Tavily's web-search candidates aren't geography-
+  // bound, so this is the natural last step regardless of coordinates. The
+  // country gate inside classifyCompetitors still applies here — this step
+  // widens geography, never the country restriction.
+  if (tavilyCandidates.length) {
+    const classified = await classifyCompetitors(tavilyCandidates, { industryKeywords, prospectCity: null, targetCountry });
+    const reportable = reportableCompetitors(classified);
+    const best = reportable.length ? reportable : lastClassified.length ? reportableCompetitors(lastClassified) : [];
+    if (best.length) return { profiles: best.slice(0, 3), cascadeStepUsed: "country_wide" };
+  }
+
+  // Exhausted every step — report however many (0 included) were verified at
+  // the last attempt, never a fabricated count.
+  return { profiles: reportableCompetitors(lastClassified).slice(0, 3), cascadeStepUsed: "none_found" };
 }
