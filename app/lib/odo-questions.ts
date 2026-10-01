@@ -58,7 +58,7 @@ export type QuestionContext = {
   knownText: string;
 };
 
-type BankEntry = OdoQuestion & {
+export type BankEntry = OdoQuestion & {
   /** Fallback order when Jev is unavailable (lower first). */
   priority: number;
   /** Skip when research/earlier answers already cover it. */
@@ -301,7 +301,13 @@ const MIN_QUESTIONS = 4;
 /** Soft cap — beyond this, only continue for a clearly material question. */
 const SOFT_CAP = 8;
 
-function candidates(ctx: QuestionContext): BankEntry[] {
+/**
+ * Not-yet-asked, not-already-covered-by-research library questions — exported
+ * for odo-interviewer.ts (Phase 2, 2026-10-01) so Claude's dynamic
+ * interviewer can see what the library still has on offer and reuse one
+ * verbatim (by id) instead of inventing a near-duplicate.
+ */
+export function candidates(ctx: QuestionContext): BankEntry[] {
   return BANK.filter((b) => !(b.id in ctx.answers) && !(b.skip?.(ctx)));
 }
 
@@ -314,9 +320,16 @@ export function toPublic(q: BankEntry): OdoQuestion {
   };
 }
 
+// WIDENED 2026-10-01 for Phase 2 (odo-interviewer.ts) — `method` now also
+// carries "claude_library" / "claude_custom" and `claudeUsage` alongside the
+// existing `jevUsage`, kept as a SEPARATE field (never merged into jevUsage)
+// because Jev and Claude are priced ~70x apart (odo-cost.ts) — conflating
+// them would silently undercount real spend against the per-scan $2 cap.
+// nextQuestion() below (the pure Jev/library mechanism) always returns
+// claudeUsage: null; it never calls Claude.
 export type NextQuestionDecision =
-  | { done: false; question: OdoQuestion; method: "jev" | "fallback"; materiality: number | null; jevUsage: { input_tokens: number; output_tokens: number } | null }
-  | { done: true; reason: string; method: "jev" | "fallback"; jevUsage: { input_tokens: number; output_tokens: number } | null };
+  | { done: false; question: OdoQuestion; method: "jev" | "fallback" | "claude_library" | "claude_custom"; materiality: number | null; jevUsage: { input_tokens: number; output_tokens: number } | null; claudeUsage: { input_tokens: number; output_tokens: number } | null }
+  | { done: true; reason: string; method: "jev" | "fallback" | "claude_library" | "claude_custom"; jevUsage: { input_tokens: number; output_tokens: number } | null; claudeUsage: { input_tokens: number; output_tokens: number } | null };
 
 /**
  * Pick the next question, or decide the questioning phase is over.
@@ -324,8 +337,8 @@ export type NextQuestionDecision =
  */
 export async function nextQuestion(ctx: QuestionContext): Promise<NextQuestionDecision> {
   const asked = Object.keys(ctx.answers).length;
-  if (asked >= MAX_QUESTIONS) return { done: true, reason: "question cap reached", method: "fallback", jevUsage: null };
-  if ("q_open" in ctx.answers) return { done: true, reason: "closing question answered", method: "fallback", jevUsage: null };
+  if (asked >= MAX_QUESTIONS) return { done: true, reason: "question cap reached", method: "fallback", jevUsage: null, claudeUsage: null };
+  if ("q_open" in ctx.answers) return { done: true, reason: "closing question answered", method: "fallback", jevUsage: null, claudeUsage: null };
 
   const pool = candidates(ctx);
   // The free-text catch-all is only ever the LAST question.
@@ -333,12 +346,12 @@ export async function nextQuestion(ctx: QuestionContext): Promise<NextQuestionDe
   const openQ = pool.find((q) => q.id === "q_open");
 
   if (structured.length === 0) {
-    return openQ ? { done: false, question: toPublic(openQ), method: "fallback", materiality: null, jevUsage: null } : { done: true, reason: "no questions left", method: "fallback", jevUsage: null };
+    return openQ ? { done: false, question: toPublic(openQ), method: "fallback", materiality: null, jevUsage: null, claudeUsage: null } : { done: true, reason: "no questions left", method: "fallback", jevUsage: null, claudeUsage: null };
   }
 
   // Industry/size first when unknown — everything else is scored against them.
   const mustFirst = structured.find((q) => q.id === "q_industry") ?? structured.find((q) => q.id === "q_staff_count");
-  if (mustFirst) return { done: false, question: toPublic(mustFirst), method: "fallback", materiality: null, jevUsage: null };
+  if (mustFirst) return { done: false, question: toPublic(mustFirst), method: "fallback", materiality: null, jevUsage: null, claudeUsage: null };
 
   const levels = [
     "Would not change any recommendation — already answered by research or irrelevant here",
@@ -365,10 +378,10 @@ export async function nextQuestion(ctx: QuestionContext): Promise<NextQuestionDe
     const best = scored[0];
     if (best) {
       const threshold = asked < MIN_QUESTIONS ? 0 : asked < SOFT_CAP ? 0.34 : 0.67;
-      if (best.m >= threshold) return { done: false, question: toPublic(best.q), method: "jev", materiality: best.m, jevUsage: jev.usage };
+      if (best.m >= threshold) return { done: false, question: toPublic(best.q), method: "jev", materiality: best.m, jevUsage: jev.usage, claudeUsage: null };
       return openQ && !("q_open" in ctx.answers)
-        ? { done: false, question: toPublic(openQ), method: "jev", materiality: best.m, jevUsage: jev.usage }
-        : { done: true, reason: `remaining questions not material (best ${best.m.toFixed(2)})`, method: "jev", jevUsage: jev.usage };
+        ? { done: false, question: toPublic(openQ), method: "jev", materiality: best.m, jevUsage: jev.usage, claudeUsage: null }
+        : { done: true, reason: `remaining questions not material (best ${best.m.toFixed(2)})`, method: "jev", jevUsage: jev.usage, claudeUsage: null };
     }
   }
 
@@ -378,9 +391,9 @@ export async function nextQuestion(ctx: QuestionContext): Promise<NextQuestionDe
   const spentUsage = jev?.usage ?? null;
   if (asked >= SOFT_CAP - 1) {
     return openQ
-      ? { done: false, question: toPublic(openQ), method: "fallback", materiality: null, jevUsage: spentUsage }
-      : { done: true, reason: "soft cap reached (no Jev)", method: "fallback", jevUsage: spentUsage };
+      ? { done: false, question: toPublic(openQ), method: "fallback", materiality: null, jevUsage: spentUsage, claudeUsage: null }
+      : { done: true, reason: "soft cap reached (no Jev)", method: "fallback", jevUsage: spentUsage, claudeUsage: null };
   }
   const next = [...structured].sort((a, b) => a.priority - b.priority)[0];
-  return { done: false, question: toPublic(next), method: "fallback", materiality: null, jevUsage: spentUsage };
+  return { done: false, question: toPublic(next), method: "fallback", materiality: null, jevUsage: spentUsage, claudeUsage: null };
 }

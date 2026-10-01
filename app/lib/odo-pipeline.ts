@@ -14,7 +14,8 @@
 
 import { updateSession, markSessionComplete, getSession, type OdoSession } from "./odo-redis";
 import { buildLedger, ledgerAsText } from "./odo-ledger";
-import { nextQuestion, type NextQuestionDecision } from "./odo-questions";
+import { QUESTION_BY_ID, type NextQuestionDecision } from "./odo-questions";
+import { writeNextQuestion, type AskedQa } from "./odo-interviewer";
 import { matchServices } from "./odo-matching";
 import { buildSwot } from "./odo-swot";
 import { buildOutcomeNarrative } from "./odo-outcome";
@@ -31,9 +32,11 @@ const HUBSPOT_TOKEN = process.env.HUBSPOT_ACCESS_TOKEN;
 export type BusinessProfile = { industry: string | null; businessSize: ResearchFindings["businessSize"] };
 
 /**
- * Ask ODO's adaptive selector what to ask next, given everything known so
- * far (research + answers). Wraps buildLedger + nextQuestion so callers
- * never assemble the ledger by hand. Never throws.
+ * Ask ODO's adaptive interviewer what to ask next, given everything known so
+ * far (research + answers). Wraps buildLedger + writeNextQuestion (Phase 2,
+ * odo-interviewer.ts — Claude writes the question, falling back to the
+ * original library-only nextQuestion() on any failure) so callers never
+ * assemble the ledger or the asked-question history by hand. Never throws.
  */
 export async function pickNextQuestion(
   findings: ResearchFindings,
@@ -43,13 +46,56 @@ export async function pickNextQuestion(
   answerOrder: string[]
 ): Promise<NextQuestionDecision> {
   const ledger = buildLedger(findings, answers, answerOrder);
-  return nextQuestion({
-    industry: profile.industry,
-    businessSize: profile.businessSize,
-    hasWebsite,
-    answers,
-    knownText: ledgerAsText(ledger, { includeInternal: false }),
+
+  // Custom (Claude-generated) questions have no entry in QUESTION_BY_ID, so
+  // their text has to come from wherever the caller persisted it — see
+  // persistCustomQuestion() below, written by the two /api/odo/scan routes
+  // whenever a "claude_custom" question gets served. Read via an unsafe cast
+  // because `findings` here is genuinely the full session findings record
+  // (the callers pass it through `as unknown as ResearchFindings`), same
+  // pattern as every other `_`-prefixed scan-state field in this codebase.
+  const customQuestions = ((findings as unknown as Record<string, unknown>)._customQuestions as
+    | Record<string, { text: string; options?: string[] }>
+    | undefined) ?? {};
+  const askedSoFar: AskedQa[] = answerOrder.map((id) => ({
+    id,
+    text: QUESTION_BY_ID[id]?.text ?? customQuestions[id]?.text ?? "(unknown question)",
+    answer: answers[id] ?? "",
+  }));
+  const customQuestionCount = answerOrder.filter((id) => id.startsWith("dyn_")).length;
+
+  return writeNextQuestion({
+    ctx: {
+      industry: profile.industry,
+      businessSize: profile.businessSize,
+      hasWebsite,
+      answers,
+      knownText: ledgerAsText(ledger, { includeInternal: false }),
+    },
+    businessProfile: findings.businessProfile,
+    complianceSignals: findings.complianceSignals,
+    askedSoFar,
+    customQuestionCount,
   });
+}
+
+/**
+ * Call right after pickNextQuestion returns a "claude_custom" decision, so
+ * the NEXT call's askedSoFar (above) can resolve this question's text —
+ * QUESTION_BY_ID has no entry for a dynamically-generated id. Returns the
+ * updated findings object for the caller to persist (odo-redis.ts's
+ * updateSession); never mutates in place, same convention as the rest of
+ * the scan-state handling in the two /api/odo/scan routes.
+ */
+export function persistCustomQuestion(
+  findings: Record<string, unknown>,
+  question: { id: string; text: string; options?: string[] }
+): Record<string, unknown> {
+  const customQuestions = (findings._customQuestions as Record<string, { text: string; options?: string[] }> | undefined) ?? {};
+  return {
+    ...findings,
+    _customQuestions: { ...customQuestions, [question.id]: { text: question.text, options: question.options } },
+  };
 }
 
 /**

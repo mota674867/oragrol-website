@@ -6,7 +6,7 @@
 import { after, NextRequest, NextResponse } from "next/server";
 import { checkCooldowns, createSession, getIncompleteSession, checkIpDailyLimit } from "@/app/lib/odo-redis";
 import { runParallelResearch, type ResearchFindings } from "@/app/lib/odo-research";
-import { pickNextQuestion, runEvaluation } from "@/app/lib/odo-pipeline";
+import { pickNextQuestion, persistCustomQuestion, runEvaluation } from "@/app/lib/odo-pipeline";
 import { getClientIp, rateLimit } from "@/app/lib/rate-limit";
 import { EMPTY_USAGE, addJevUsage, addClaudeUsage } from "@/app/lib/odo-cost";
 import { checkDailySpendGate } from "@/app/lib/odo-spend";
@@ -387,11 +387,16 @@ async function runResearchAsync(
     // Real usage carried forward (via findings._aiUsage) so the scan's final
     // cost is exact, not just the evaluation-phase portion (odo-cost.ts).
     // Includes the L1 Business Profile's Claude call (odo-business-profile.ts)
-    // — added 2026-10-01, the first AI spend that now happens during research
-    // itself rather than only during question-picking/evaluation.
-    const aiUsageSoFar = addJevUsage(addClaudeUsage(EMPTY_USAGE, findings.businessProfileUsage), decision.jevUsage);
+    // and the Phase 2 interviewer's Claude call (odo-interviewer.ts) — both
+    // AI spend that now happens before/during question-picking, not only at
+    // evaluation. Jev and Claude usage are added separately, never merged —
+    // the two vendors are priced ~70x apart (odo-cost.ts).
+    const aiUsageSoFar = addClaudeUsage(
+      addJevUsage(addClaudeUsage(EMPTY_USAGE, findings.businessProfileUsage), decision.jevUsage),
+      decision.claudeUsage
+    );
 
-    const baseFindings: Record<string, unknown> = {
+    let baseFindings: Record<string, unknown> = {
       ...(findings as unknown as Record<string, unknown>),
       _industryDetected: findings.industry,
       _businessSizeDetected: findings.businessSize,
@@ -400,6 +405,12 @@ async function runResearchAsync(
       _questionMethods: {} as Record<string, string>,
       _aiUsage: aiUsageSoFar,
     };
+    // The very first question can already be Claude-generated — by this
+    // point research (including the L1 Business Profile) is already done,
+    // so the interviewer has real material to work with from question one.
+    if (!decision.done && decision.method === "claude_custom") {
+      baseFindings = persistCustomQuestion(baseFindings, decision.question);
+    }
 
     if (decision.done) {
       // Research alone already covers everything worth asking (rare, but

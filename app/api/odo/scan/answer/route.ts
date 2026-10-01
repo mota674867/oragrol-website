@@ -5,10 +5,10 @@
 
 import { after, NextRequest, NextResponse } from "next/server";
 import { getSession, updateSession } from "@/app/lib/odo-redis";
-import { pickNextQuestion, runEvaluation, type BusinessProfile } from "@/app/lib/odo-pipeline";
+import { pickNextQuestion, persistCustomQuestion, runEvaluation, type BusinessProfile } from "@/app/lib/odo-pipeline";
 import type { NextQuestionDecision } from "@/app/lib/odo-questions";
 import type { ResearchFindings } from "@/app/lib/odo-research";
-import { EMPTY_USAGE, addJevUsage, computeCost, type AiUsageTotals } from "@/app/lib/odo-cost";
+import { EMPTY_USAGE, addJevUsage, addClaudeUsage, computeCost, type AiUsageTotals } from "@/app/lib/odo-cost";
 import { isScanOverCap } from "@/app/lib/odo-spend";
 
 // Lowered from 20 to 15 — approved 2026-10-01 alongside the ODO brain
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   const decision: NextQuestionDecision =
     newQuestionsAsked >= MAX_QUESTIONS
-      ? { done: true, reason: "question cap reached", method: "fallback", jevUsage: null }
+      ? { done: true, reason: "question cap reached", method: "fallback", jevUsage: null, claudeUsage: null }
       : await pickNextQuestion(researchFindings, profile, session.hasWebsite, answers, questionOrder);
 
   // Real Jev usage keeps accumulating across every answer in this scan
@@ -84,7 +84,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // /api/odo/scan/start through every /api/odo/scan/answer call, so the
   // figure runEvaluation ends with is the scan's exact, complete cost.
   const priorAiUsage: AiUsageTotals = (findings._aiUsage as AiUsageTotals | undefined) ?? EMPTY_USAGE;
-  const aiUsageSoFar = addJevUsage(priorAiUsage, decision.jevUsage);
+  // Folds in BOTH Jev usage (legacy/fallback path) and Claude usage (Phase 2
+  // interviewer, odo-interviewer.ts) — kept as two separate adds, never
+  // merged into one field, because the two vendors are priced ~70x apart
+  // (odo-cost.ts) and conflating them would undercount real spend against
+  // the per-scan $2 cap.
+  const aiUsageSoFar = addClaudeUsage(addJevUsage(priorAiUsage, decision.jevUsage), decision.claudeUsage);
   findings._aiUsage = aiUsageSoFar;
 
   // Per-scan $2 hard cap (odo-spend.ts) — approved 2026-10-01 alongside the
@@ -93,7 +98,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // stops immediately and evaluation runs with whatever evidence exists so
   // far, rather than letting one scan's AI usage run unbounded.
   const finalDecision: NextQuestionDecision = isScanOverCap(aiUsageSoFar)
-    ? { done: true, reason: `per-scan spend cap reached ($${computeCost(aiUsageSoFar).totalCostUsd.toFixed(4)})`, method: decision.method, jevUsage: null }
+    ? { done: true, reason: `per-scan spend cap reached ($${computeCost(aiUsageSoFar).totalCostUsd.toFixed(4)})`, method: decision.method, jevUsage: null, claudeUsage: null }
     : decision;
 
   if (finalDecision.done) {
@@ -131,9 +136,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   questionMethods[finalDecision.question.id] = finalDecision.method;
   findings._questionMethods = questionMethods;
 
+  // A Claude-generated question (Phase 2, odo-interviewer.ts) has no entry
+  // in QUESTION_BY_ID, so its text has to be persisted here — the NEXT
+  // pickNextQuestion call needs it to build the asked-question history and
+  // avoid Claude repeating or rephrasing it.
+  const findingsToSave =
+    finalDecision.method === "claude_custom"
+      ? persistCustomQuestion(findings, finalDecision.question)
+      : findings;
+
   await updateSession(sessionId, {
     questionsAsked: newQuestionsAsked,
-    findings: { ...findings, _nextQuestion: finalDecision.question },
+    findings: { ...findingsToSave, _nextQuestion: finalDecision.question },
     status: "questioning",
     step: `Question ${newQuestionsAsked + 1}`,
   });
