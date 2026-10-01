@@ -292,7 +292,10 @@ export const QUESTION_BY_ID: Record<string, BankEntry> = Object.fromEntries(BANK
 export const ANSWER_EVIDENCE: Record<string, Record<string, AnswerEvidenceTemplate[]>> =
   Object.fromEntries(BANK.map((b) => [b.id, b.evidence]));
 
-export const MAX_QUESTIONS = 20;
+// Lowered from 20 to 15 — approved 2026-10-01 (Mohammad: "15 question to
+// write is enough, if no result come up, no continue"). Must match the
+// MAX_QUESTIONS constant in /api/odo/scan/answer/route.ts.
+export const MAX_QUESTIONS = 15;
 /** Below this many answers we always keep asking core questions (public research cannot see internal controls at all). */
 const MIN_QUESTIONS = 4;
 /** Soft cap — beyond this, only continue for a clearly material question. */

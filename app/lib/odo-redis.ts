@@ -268,3 +268,63 @@ export async function getLifetimeAiCost(): Promise<LifetimeAiCost | null> {
   const redis = getRedis();
   return redis.get<LifetimeAiCost>(LIFETIME_COST_KEY);
 }
+
+// --- Daily AI spend tracking + per-IP daily limit (odo-spend.ts, odo-gate.ts) ---
+//
+// ADDED 2026-10-01 — Mohammad's explicit requirement after approving the
+// ODO brain rebuild: at ~$2/scan, an unfiltered bot or prankster running
+// many scans is real money, not a theoretical risk. This is the money-side
+// half of the entry gate: a per-IP daily cap (stops one source looping the
+// form) and a global daily spend ceiling that pauses all scans and alerts
+// Mohammad the moment it's crossed (odo-spend.ts), independent of any
+// single scan's own $2 cap.
+//
+// Dates are keyed in America/Toronto (ORAGROL's home market) so "today"
+// resets at a time that matches Mohammad's own day, not UTC midnight.
+
+const DAILY_SPEND_PREFIX = "odo:spend:daily:";
+const DAILY_SPEND_ALERTED_PREFIX = "odo:spend:alerted:";
+const IP_DAILY_LIMIT_PREFIX = "odo:iplimit:daily:";
+
+/** "YYYY-MM-DD" in America/Toronto — the key every daily counter below rolls over on. */
+export function torontoDateKey(d: Date = new Date()): string {
+  return d.toLocaleDateString("en-CA", { timeZone: "America/Toronto" }); // en-CA = YYYY-MM-DD
+}
+
+/** Adds costUsd to today's running total. Read-modify-write is fine here — same tolerance as recordLifetimeAiCost: a lost increment under real concurrency undercounts by at most one scan, never overcounts, and this is a safety margin, not a billing ledger. */
+export async function recordDailySpend(costUsd: number): Promise<number> {
+  const redis = getRedis();
+  const key = `${DAILY_SPEND_PREFIX}${torontoDateKey()}`;
+  const next = await redis.incrbyfloat(key, costUsd);
+  // First write of the day sets the expiry; redundant on later writes but
+  // harmless and avoids a separate "is this the first write" branch.
+  await redis.expire(key, 2 * 24 * 60 * 60); // 2 days — comfortably outlives "today" in any timezone skew
+  return next;
+}
+
+export async function getDailySpend(): Promise<number> {
+  const redis = getRedis();
+  const val = await redis.get<number | string>(`${DAILY_SPEND_PREFIX}${torontoDateKey()}`);
+  return val ? Number(val) : 0;
+}
+
+/**
+ * Returns true only the FIRST time this is called on a given day (sets an
+ * NX flag) — so the daily-cap-crossed alert email fires once per day, not
+ * once per scan that tries to start while already paused.
+ */
+export async function claimDailyCapAlert(): Promise<boolean> {
+  const redis = getRedis();
+  const key = `${DAILY_SPEND_ALERTED_PREFIX}${torontoDateKey()}`;
+  const result = await redis.set(key, "1", { nx: true, ex: 2 * 24 * 60 * 60 });
+  return result === "OK";
+}
+
+/** Per-IP daily scan-start count. Supplements the existing in-memory 15/hour limiter (rate-limit.ts) with a real, shared, Redis-backed daily ceiling that survives across serverless instances. */
+export async function checkIpDailyLimit(ip: string, limit: number): Promise<{ ok: boolean; count: number }> {
+  const redis = getRedis();
+  const key = `${IP_DAILY_LIMIT_PREFIX}${torontoDateKey()}:${ip}`;
+  const count = await redis.incr(key);
+  if (count === 1) await redis.expire(key, 24 * 60 * 60);
+  return { ok: count <= limit, count };
+}

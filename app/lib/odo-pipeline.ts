@@ -24,6 +24,7 @@ import { attachReportPdfToHubSpot } from "./odo-hubspot-report";
 import { sendOdoAdminReportEmail } from "./odo-email";
 import { EMPTY_USAGE, addJevUsage, mergeUsage, computeCost, type AiUsageTotals } from "./odo-cost";
 import { recordLifetimeAiCost } from "./odo-redis";
+import { recordScanSpend } from "./odo-spend";
 
 const HUBSPOT_TOKEN = process.env.HUBSPOT_ACCESS_TOKEN;
 
@@ -139,6 +140,11 @@ export async function runEvaluation(
     await recordLifetimeAiCost(totalUsage, aiCost.totalCostUsd).catch((err) => {
       console.error("[ODO] Failed to record lifetime AI cost:", err);
     });
+    // Daily global spend ceiling (odo-spend.ts) — approved 2026-10-01
+    // alongside the per-scan $2 cap. Recorded once per scan, here, so the
+    // next scan's entry-gate check (checkDailySpendGate in
+    // /api/odo/scan/start) sees today's real running total.
+    await recordScanSpend(aiCost.totalCostUsd);
 
     await updateSession(sessionId, {
       swot: swot as unknown as Record<string, unknown>,

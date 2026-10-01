@@ -8,9 +8,13 @@ import { getSession, updateSession } from "@/app/lib/odo-redis";
 import { pickNextQuestion, runEvaluation, type BusinessProfile } from "@/app/lib/odo-pipeline";
 import type { NextQuestionDecision } from "@/app/lib/odo-questions";
 import type { ResearchFindings } from "@/app/lib/odo-research";
-import { EMPTY_USAGE, addJevUsage, type AiUsageTotals } from "@/app/lib/odo-cost";
+import { EMPTY_USAGE, addJevUsage, computeCost, type AiUsageTotals } from "@/app/lib/odo-cost";
+import { isScanOverCap } from "@/app/lib/odo-spend";
 
-const MAX_QUESTIONS = 20;
+// Lowered from 20 to 15 — approved 2026-10-01 alongside the ODO brain
+// rebuild (Mohammad: "then 15 question to write is enough, if no result
+// come up, no continue"). Must match odo-questions.ts's own MAX_QUESTIONS.
+const MAX_QUESTIONS = 15;
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   let body: Record<string, unknown>;
@@ -83,7 +87,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const aiUsageSoFar = addJevUsage(priorAiUsage, decision.jevUsage);
   findings._aiUsage = aiUsageSoFar;
 
-  if (decision.done) {
+  // Per-scan $2 hard cap (odo-spend.ts) — approved 2026-10-01 alongside the
+  // 15-question cap above. Checked on real measured spend, not an estimate,
+  // the same way the question-count cap works: once crossed, questioning
+  // stops immediately and evaluation runs with whatever evidence exists so
+  // far, rather than letting one scan's AI usage run unbounded.
+  const finalDecision: NextQuestionDecision = isScanOverCap(aiUsageSoFar)
+    ? { done: true, reason: `per-scan spend cap reached ($${computeCost(aiUsageSoFar).totalCostUsd.toFixed(4)})`, method: decision.method, jevUsage: null }
+    : decision;
+
+  if (finalDecision.done) {
     // Move to evaluation phase
     await updateSession(sessionId, {
       questionsAsked: newQuestionsAsked,
@@ -115,12 +128,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   // Not done — one more question.
-  questionMethods[decision.question.id] = decision.method;
+  questionMethods[finalDecision.question.id] = finalDecision.method;
   findings._questionMethods = questionMethods;
 
   await updateSession(sessionId, {
     questionsAsked: newQuestionsAsked,
-    findings: { ...findings, _nextQuestion: decision.question },
+    findings: { ...findings, _nextQuestion: finalDecision.question },
     status: "questioning",
     step: `Question ${newQuestionsAsked + 1}`,
   });
@@ -129,7 +142,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     status: "questioning",
     phase: "questioning",
     step: `Question ${newQuestionsAsked + 1}`,
-    question: decision.question,
+    question: finalDecision.question,
     questions_asked: newQuestionsAsked,
   });
 }

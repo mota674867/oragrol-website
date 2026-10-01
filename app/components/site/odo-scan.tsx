@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Script from "next/script";
 import "./odo-scan.css";
 
 /*
@@ -172,8 +173,14 @@ function validateForm(form: {name: string; email: string; company: string; websi
     errors.email = "Enter a valid work email.";
   }
   if (!form.company.trim()) errors.company = "Enter your company name.";
-  if (form.website.trim() && !/^https?:\/\/[^\s]+$/i.test(normalizeWebsite(form.website) || "")) {
-    errors.website = "Enter a valid website URL, or choose No website.";
+  // CHANGED 2026-10-01 — website is now required to start a scan (approved
+  // alongside the entry gate: ODO's research needs a real site to work
+  // from, and a no-website visitor is routed to a consultation instead of
+  // an automated scan — see the "No website?" button below).
+  if (!form.website.trim()) {
+    errors.website = "Enter your website address, or use the \"No website?\" link below.";
+  } else if (!/^https?:\/\/[^\s]+$/i.test(normalizeWebsite(form.website) || "")) {
+    errors.website = "Enter a valid website URL.";
   }
   return errors;
 }
@@ -328,6 +335,15 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
   const [cooldownModal, setCooldownModal] = useState<{ code: string; message: string } | null>(null);
   const [findingsSummary, setFindingsSummary] = useState<{ security_issues: number; marketing_gaps: number; opportunities: number; total: number } | null>(null);
   const [busy, setBusy] = useState(false);
+  // ADDED 2026-10-01 — Cloudflare Turnstile captcha (entry-gate requirement,
+  // odo-gate.ts verifyTurnstile on the backend). Rendered explicitly via
+  // window.turnstile.render (not the implicit data-sitekey div) so we can
+  // capture the token into state and reset the widget on a failed/expired
+  // check, same pattern Cloudflare's own docs recommend for SPAs.
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReady, setTurnstileReady] = useState(false);
+  const turnstileContainerRef = useRef<HTMLDivElement | null>(null);
+  const turnstileWidgetIdRef = useRef<string | null>(null);
   const pollRef = useRef<number | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
   // FIXED 2026-10-01 — guards against the SSE stream and the 2.5s polling
@@ -367,6 +383,37 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
   }, []);
 
   useEffect(() => () => stopUpdates(), [stopUpdates]);
+
+  // Render the Turnstile widget once its script has loaded AND the intake
+  // form (which holds the container div) is on screen. Runs on every
+  // render where both are true but only actually renders once, guarded by
+  // turnstileWidgetIdRef — the form only mounts the container when
+  // phase === "idle", so this effect re-fires each time that happens (e.g.
+  // after cancelScan() returns to the intake screen) and re-renders a fresh
+  // widget then.
+  useEffect(() => {
+    if (!turnstileReady || phase !== "idle") return;
+    const container = turnstileContainerRef.current;
+    const turnstile = (window as unknown as { turnstile?: { render: (el: HTMLElement, opts: Record<string, unknown>) => string; reset: (id: string) => void; remove: (id: string) => void } }).turnstile;
+    if (!container || !turnstile || turnstileWidgetIdRef.current) return;
+    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+    if (!siteKey) {
+      console.error("[ODO] NEXT_PUBLIC_TURNSTILE_SITE_KEY is not configured — captcha widget cannot render.");
+      return;
+    }
+    turnstileWidgetIdRef.current = turnstile.render(container, {
+      sitekey: siteKey,
+      callback: (token: string) => setTurnstileToken(token),
+      "expired-callback": () => setTurnstileToken(""),
+      "error-callback": () => setTurnstileToken(""),
+    });
+    return () => {
+      if (turnstileWidgetIdRef.current) {
+        turnstile.remove(turnstileWidgetIdRef.current);
+        turnstileWidgetIdRef.current = null;
+      }
+    };
+  }, [turnstileReady, phase]);
 
   // FIXED 2026-09-29 — this switch never matched the backend's real status
   // vocabulary. The backend (odo/scan/start, /answer, /status routes) has
@@ -512,6 +559,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     event.preventDefault();
     const nextErrors = validateForm(form);
     if (!consent) nextErrors["consent"] = "Accept the consent notice before starting.";
+    if (!turnstileToken) nextErrors["turnstile"] = "Please complete the verification above before starting.";
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) return;
 
@@ -528,6 +576,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
         body: JSON.stringify({
           idempotency_key: makeIdempotencyKey(),
           locale,
+          turnstile_token: turnstileToken,
           lead: {
             name: form.name.trim(),
             email: form.email.trim().toLowerCase(),
@@ -552,6 +601,12 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
           });
         } else {
           setMessage(formatError(payload, "We could not start the scan. Please review your details and try again."));
+        }
+        // The token is single-use — whatever the rejection reason, Turnstile
+        // needs a fresh challenge before the visitor can submit again.
+        setTurnstileToken("");
+        if (turnstileWidgetIdRef.current) {
+          (window as unknown as { turnstile?: { reset: (id: string) => void } }).turnstile?.reset(turnstileWidgetIdRef.current);
         }
         emit("scan-start-rejected", { code: payload?.code });
         return;
@@ -650,6 +705,11 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
 
   return (
     <main className="odo-scan" data-odo-scan data-phase={phase}>
+      <Script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+        strategy="afterInteractive"
+        onLoad={() => setTurnstileReady(true)}
+      />
       <header className="odo-scan__masthead">
         <span className="odo-scan__wordmark">ORAGROL GLOBAL</span>
         <div className="odo-scan__masthead-actions">
@@ -695,12 +755,18 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
                 <Field id="email" label="Work email" value={form.email} onChange={(value) => updateField("email", value)} placeholder="you@company.com" type="email" error={errors.email} />
                 <Field id="company" label="Company name" value={form.company} onChange={(value) => updateField("company", value)} placeholder="Business name" error={errors.company} />
                 <Field id="website" label="Website" value={form.website} onChange={(value) => updateField("website", value)} placeholder="https://yourwebsite.com" type="url" error={errors.website} />
-                <button type="button" className="odo-scan__no-website" onClick={() => updateField("website", "")}>No website?</button>
+                {/* CHANGED 2026-10-01 — no-website visitors are routed straight to a
+                    consultation instead of clearing the field and scanning anyway. */}
+                <a className="odo-scan__no-website" href="https://orgro.ca/contact">No website? Book a quick consultation instead →</a>
                 <label className="odo-scan__consent">
                   <input type="checkbox" checked={consent} onChange={(event) => { setConsent(event.target.checked); setErrors((current) => ({ ...current, consent: undefined })); }} />
                   <span>{ODO_COPY.consent} <a href="/privacy">Privacy Policy</a></span>
                 </label>
                 {errors.consent ? <p className="odo-scan__inline-error" role="alert">{errors.consent}</p> : null}
+                {/* Cloudflare Turnstile captcha — odo-gate.ts verifies this
+                    token server-side before any paid research/AI call runs. */}
+                <div ref={turnstileContainerRef} className="odo-scan__turnstile" />
+                {errors.turnstile ? <p className="odo-scan__inline-error" role="alert">{errors.turnstile}</p> : null}
                 <button type="submit" className="odo-scan__submit" disabled={busy}>
                   {busy ? "Preparing your scan…" : "Start my free scan"}<span aria-hidden="true">→</span>
                 </button>

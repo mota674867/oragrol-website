@@ -4,11 +4,26 @@
 // Returns session_id to the front-end immediately — research runs async.
 
 import { after, NextRequest, NextResponse } from "next/server";
-import { checkCooldowns, createSession, getIncompleteSession } from "@/app/lib/odo-redis";
+import { checkCooldowns, createSession, getIncompleteSession, checkIpDailyLimit } from "@/app/lib/odo-redis";
 import { runParallelResearch, type ResearchFindings } from "@/app/lib/odo-research";
 import { pickNextQuestion, runEvaluation } from "@/app/lib/odo-pipeline";
 import { getClientIp, rateLimit } from "@/app/lib/rate-limit";
 import { EMPTY_USAGE, addJevUsage } from "@/app/lib/odo-cost";
+import { checkDailySpendGate } from "@/app/lib/odo-spend";
+import {
+  verifyTurnstile,
+  checkWebsiteValidity,
+  checkIsRealBusiness,
+  isDisposableEmail,
+  emailDomainMatchesWebsite,
+  isFreeEmailDomain,
+} from "@/app/lib/odo-gate";
+
+// Per-IP daily cap on scan STARTS (not attempts) — a real, shared, Redis-
+// backed ceiling. The existing hourly in-memory limiter below still runs
+// first as a cheap first filter; this is the one that actually matters
+// against a distributed/determined source.
+const IP_DAILY_SCAN_LIMIT = 3;
 
 const HUBSPOT_TOKEN = process.env.HUBSPOT_ACCESS_TOKEN;
 
@@ -128,6 +143,103 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
   if (!consent) {
     return NextResponse.json({ code: "consent_required", message: "You must accept the consent notice to proceed." }, { status: 400 });
+  }
+
+  // --- Entry gate (odo-gate.ts, odo-spend.ts) ---
+  // ADDED 2026-10-01 — every check below runs BEFORE any paid AI call, per
+  // Mohammad's explicit requirement after approving the ODO brain rebuild:
+  // at ~$2/scan, only a real visitor should ever reach the point where that
+  // money gets spent. See odo-gate.ts's header for the full design and the
+  // one piece (free-email OTP) deliberately not built in this pass.
+
+  // 1. Daily global spend ceiling — cheapest check, and the one that must
+  // never be skipped: if ODO is already paused today, nothing below matters.
+  const dailyGate = await checkDailySpendGate();
+  if (dailyGate.paused) {
+    return NextResponse.json(
+      {
+        code: "daily_cap_reached",
+        message: "ODO has reached its scan capacity for today. Please try again tomorrow, or contact us directly at info@orgro.ca for an immediate consultation.",
+      },
+      { status: 503 }
+    );
+  }
+
+  // 2. Captcha — proves a human submitted this form.
+  const turnstileToken = String(body.turnstile_token || body.turnstileToken || "").trim();
+  const captchaOk = await verifyTurnstile(turnstileToken, ip);
+  if (!captchaOk) {
+    return NextResponse.json(
+      { code: "captcha_failed", message: "We couldn't verify you're human. Please try again." },
+      { status: 403 }
+    );
+  }
+
+  // 3. Per-IP daily limit (Redis-backed, shared across serverless instances —
+  // the existing hourly limiter above is only a cheap first filter).
+  const ipDaily = await checkIpDailyLimit(ip, IP_DAILY_SCAN_LIMIT).catch(() => ({ ok: true, count: 0 }));
+  if (!ipDaily.ok) {
+    return NextResponse.json(
+      { code: "rate_limited", message: "You've reached today's scan limit from this connection. Please try again tomorrow or contact us directly at info@orgro.ca." },
+      { status: 429 }
+    );
+  }
+
+  // 4. No website → not allowed to scan (approved 2026-10-01: public
+  // research needs a real site to work from; a no-website visitor is
+  // routed to a consultation instead of an automated scan).
+  if (!hasWebsite) {
+    return NextResponse.json(
+      {
+        code: "website_required",
+        message: "ODO's scan works from your website's public information, so a website is required to run it. If you don't have one yet, our team would rather talk to you directly — please book a quick consultation instead.",
+        consultationUrl: "https://orgro.ca/contact",
+      },
+      { status: 400 }
+    );
+  }
+
+  // 5. Disposable/temp-mail addresses are blocked outright.
+  if (isDisposableEmail(email)) {
+    return NextResponse.json(
+      { code: "disposable_email", message: "Please use a permanent email address — temporary/disposable email services aren't supported." },
+      { status: 400 }
+    );
+  }
+
+  // 6. Website must be real, reachable, not parked/for-sale/empty, and not
+  // registered within the last 48 hours.
+  const websiteCheck = await checkWebsiteValidity(website!);
+  if (!websiteCheck.valid) {
+    return NextResponse.json({ code: "invalid_website", message: websiteCheck.reason }, { status: 400 });
+  }
+
+  // 7. Email must belong to the visitor's own business domain, or be a
+  // well-known free provider. A mismatched custom domain (neither the
+  // visitor's business nor a known free provider) is rejected outright —
+  // this is the one layer that most directly stops someone scanning a
+  // business that isn't theirs. (Free-email visitors pass this layer
+  // unverified for now — see file header on the deferred OTP step.)
+  if (!emailDomainMatchesWebsite(email, website!) && !isFreeEmailDomain(email)) {
+    return NextResponse.json(
+      {
+        code: "email_mismatch",
+        message: "Please use an email address at your own business's domain (or a personal provider like Gmail) to start a scan for this website.",
+      },
+      { status: 400 }
+    );
+  }
+
+  // 8. Cheap AI check that the site reads like a real, currently operating
+  // business — not a template never filled in or content unrelated to the
+  // claimed company. Fails open (null = pass) if the AI check itself can't
+  // run; only an explicit `looksReal: false` blocks the scan.
+  const businessCheck = await checkIsRealBusiness(websiteCheck.bodyText, company);
+  if (businessCheck && !businessCheck.looksReal) {
+    return NextResponse.json(
+      { code: "not_a_business", message: "We couldn't confirm this as an active business from its website. If this is a mistake, please contact us directly at info@orgro.ca." },
+      { status: 400 }
+    );
   }
 
   // Check for incomplete previous session (returning visitor)
