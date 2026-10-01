@@ -361,26 +361,43 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     if (payload.findings_summary) {
       setFindingsSummary(payload.findings_summary as { security_issues: number; marketing_gaps: number; opportunities: number; total: number });
     }
+    // FIXED 2026-10-01 — every terminal status (complete / insufficient_data
+    // / failed / cancelled) used to leave "oragrol_odo_session_id" sitting in
+    // sessionStorage. The mount effect below restores whatever session_id is
+    // there and immediately re-polls it — so the very next time that same
+    // browser tab opened /scan (a reload, or just visiting the page again),
+    // it silently re-fetched the already-finished scan, got "complete" back
+    // again, and jumped straight to the "Scan Complete" screen instead of
+    // the intake form — permanently, until something manually cleared site
+    // data. Found from a live report: "it is not allow me even to open and
+    // enter the new email." Clearing the key here means the completion/
+    // error screen still shows once, right now, in this tab — but a fresh
+    // page load afterwards correctly starts clean.
+    const clearSavedSession = () => { if (typeof window !== "undefined") window.sessionStorage.removeItem("oragrol_odo_session_id"); };
     if (next === "complete") {
       stopUpdates();
+      clearSavedSession();
       setPhase("summary");
       setBusy(false);
       setMessage(ODO_COPY.completedSubtext);
       emit("report-pending");
     } else if (next === "insufficient_data") {
       stopUpdates();
+      clearSavedSession();
       setPhase("summary");
       setBusy(false);
       setMessage((payload.message as string) || ODO_COPY.inconclusiveSubtext);
       emit("inconclusive");
     } else if (next === "failed") {
       stopUpdates();
+      clearSavedSession();
       setPhase("error");
       setBusy(false);
       setMessage("We could not complete the scan. Please try again later or contact our team.");
       emit("failed");
     } else if (next === "cancelled") {
       stopUpdates();
+      clearSavedSession();
       setPhase("idle");
       setBusy(false);
     } else if (next === "questioning") {
@@ -526,6 +543,25 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
       setBusy(false);
       setMessage("We could not save that answer. Please try again.");
     }
+  };
+
+  // Resets the page back to the intake form from the completion screen.
+  // Added 2026-10-01 alongside the sessionStorage fix above — the summary
+  // screen previously had no way back to the form at all in the same tab
+  // (only the error screen had a "Return to scan" button). Nothing to
+  // cancel server-side here; the scan already finished.
+  const startNewScan = () => {
+    setSessionId("");
+    setQuestion(null);
+    setAnswer("");
+    setSelectedOptions([]);
+    setMessage("");
+    setFindingsSummary(null);
+    setForm({ ...INITIAL_FORM });
+    setErrors({});
+    setConsent(false);
+    if (typeof window !== "undefined") window.sessionStorage.removeItem("oragrol_odo_session_id");
+    setPhase("idle");
   };
 
   const cancelScan = async () => {
@@ -688,6 +724,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
                 </div>
               ) : null}
               <p className="odo-scan__legal">These findings are based on publicly available information and ODO’s initial analysis. An ORAGROL specialist reviews every report before delivery.</p>
+              <button type="button" className="odo-scan__submit" onClick={startNewScan}>Start another scan <span aria-hidden="true">→</span></button>
             </div>
           ) : showError ? (
             <div className="odo-scan__terminal" role="alert">
