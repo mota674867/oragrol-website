@@ -18,6 +18,8 @@
 // in the client report as a finding, and must be visible to the reviewer so
 // coverage problems surface instead of hiding as bad news about the prospect.
 
+import { safeFetch } from "./odo-ssrf-guard";
+
 export type Determination<T> =
   | { state: "observed"; value: T; source: string; collectedAt: string }
   | { state: "absent"; source: string; collectedAt: string }
@@ -107,10 +109,17 @@ export async function fetchOrDetermine(
   opts: { timeoutMs?: number; headers?: Record<string, string> } = {}
 ): Promise<Determination<{ status: number; body: string; headers: Headers }>> {
   try {
-    const res = await fetch(url, {
+    // safeFetch (odo-ssrf-guard.ts) — CRITICAL SSRF fix 2026-10-02: `url`
+    // here is built from a visitor-submitted business domain throughout
+    // this codebase's research pipeline, so a plain fetch() would request
+    // whatever that domain actually resolves to — including an internal or
+    // cloud-metadata address — and would follow a malicious redirect there
+    // too. A thrown SsrfBlockedError is caught below exactly like a
+    // timeout or any other fetch failure: it becomes "not determined",
+    // never a crash.
+    const res = await safeFetch(url, {
       headers: { "User-Agent": "ORAGROL-ODO/1.0 (+https://orgro.ca)", ...opts.headers },
       signal: AbortSignal.timeout(opts.timeoutMs ?? 10000),
-      redirect: "follow",
     });
     if (res.status === 404 || res.status === 410) return absent(source);
     if (res.status === 403 || res.status === 429) {

@@ -40,6 +40,7 @@ import { Resolver } from "node:dns/promises";
 import Anthropic from "@anthropic-ai/sdk";
 import disposableDomains from "disposable-email-domains/index.json";
 import { normalizeDomain } from "./odo-dns";
+import { safeFetch } from "./odo-ssrf-guard";
 
 // --- 1. Turnstile captcha ---
 
@@ -153,19 +154,25 @@ export async function checkWebsiteValidity(rawWebsite: string): Promise<WebsiteC
   let fetchOk = false;
   for (const candidate of [`https://${domain}`, `https://www.${domain}`]) {
     try {
-      const res = await fetch(candidate, {
-        redirect: "follow",
+      // safeFetch (odo-ssrf-guard.ts) — CRITICAL SSRF fix 2026-10-02: a
+      // plain fetch() here would happily request whatever IP this
+      // visitor-typed domain resolves to, including an internal/metadata
+      // address, and would follow a redirect to one too. A
+      // SsrfBlockedError falls into the same catch as any other
+      // unreachable-site failure below — deliberately indistinguishable
+      // to the visitor from "that site doesn't work right now".
+      const res = await safeFetch(candidate, {
         signal: AbortSignal.timeout(8000),
         headers: { "User-Agent": "Mozilla/5.0 (compatible; OragrolODO/1.0; +https://orgro.ca)" },
       });
-      if (res.ok || (res.status >= 300 && res.status < 400)) {
+      if (res.ok) {
         finalUrl = res.url;
         html = await res.text();
         fetchOk = true;
         break;
       }
     } catch {
-      // try next candidate
+      // try next candidate (covers SsrfBlockedError, timeout, DNS failure, etc.)
     }
   }
   if (!fetchOk) {

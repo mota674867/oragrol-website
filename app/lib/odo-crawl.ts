@@ -13,6 +13,7 @@
 // its only consumer is an AI prompt, never a reportable finding on its own.
 
 import { normalizeDomain } from "./odo-dns";
+import { safeFetch } from "./odo-ssrf-guard";
 
 export type PageType =
   | "about" | "services" | "pricing" | "careers" | "contact"
@@ -107,10 +108,13 @@ function selectPagesToFetch(links: Array<{ url: string; type: PageType }>): Arra
 
 async function fetchPageText(url: string): Promise<string | null> {
   try {
-    const res = await fetch(url, {
+    // safeFetch (odo-ssrf-guard.ts) — CRITICAL SSRF fix 2026-10-02: `url`
+    // here is a link discovered ON the scanned business's own site, so a
+    // malicious page could point it at an internal/metadata address and a
+    // plain fetch() would request it server-side with no check at all.
+    const res = await safeFetch(url, {
       headers: { "User-Agent": "ORAGROL-ODO/1.0 (+https://orgro.ca)" },
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      redirect: "follow",
     });
     if (!res.ok) return null;
     const html = await res.text();

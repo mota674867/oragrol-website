@@ -16,8 +16,16 @@ export const URGENT_KEYWORDS = [
   'cyberattack',
 ];
 
+// CodeQL flagged Math.random() here as insecure randomness 2026-10-02: this
+// id is sent to the chat API on every message and the upload endpoint
+// (ChatWidget.tsx), so guessing another visitor's id would mean reading or
+// adding to their conversation, including any name/email/image they gave
+// it — Math.random() is not a CSPRNG and is guessable, especially combined
+// with Date.now() narrowing the window. crypto.randomUUID() (same approach
+// odo-redis.ts's generateSessionId already uses for scan sessions) is
+// actually unpredictable.
 export function generateSessionId(): string {
-  return `chat_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+  return `chat_${Date.now()}_${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}`;
 }
 
 export function isUrgentMessage(message: string): boolean {
