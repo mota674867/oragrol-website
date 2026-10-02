@@ -118,6 +118,41 @@ export const SERVICE_CATALOG: CatalogService[] = [
   C("C10-S04", "Proof After Breach", "Certified Forensic Incident Response", "Certified Specialist Services", S, "client describes an active or recent security incident/breach needing a legally and insurance-admissible investigation, or their cyber insurer requires certified forensic findings", "project"),
 ];
 
+// FOUND 2026-10-02 — Mohammad, reviewing a live report: "from a services page
+// we only can offer whatever is avaiable on website, not some extra item are
+// avaiable on our backend." Audited every one of this catalog's 67 codes
+// against the real orgro.ca/services page (both its 16 individually-listed
+// items AND the 4 packages' included-service lists) to check:
+//   1. Is anything ODO could name here actually absent from the live page?
+//      No — every security code is covered either as one of the 16
+//      standalone items below, inside a package's included-service list (own
+//      short-label naming, e.g. "Security Weakness Check" for C02-S01 — see
+//      this file's header comment), or is C01-S01, the free lead-magnet tool
+//      excluded from paid recommendations entirely (odo-packages.ts's
+//      FREE_CODES). Nothing is backend-only.
+//   2. Does every officialName here match the live page's wording exactly?
+//      No — found 3 drifted (e.g. this file said "Privileged Access
+//      Management", the live page actually says "Privileged Access Mgmt").
+//      A client told to search the exact wording in their report could fail
+//      to recognize the shortened live version as the same item.
+// Fix: the 16 codes individually listed on the live page (12 à la carte-only
+// + 4 Certified Specialist) are never hand-duplicated here again — their
+// name comes straight from services-catalog.ts, so this file and the live
+// page can't drift apart a second time. Every other code (package-bundled or
+// automation) keeps its own officialName here, since those are never pointed
+// at as a "go search this exact name" standalone item.
+import { INDIVIDUAL_SERVICES, SPECIALIST_ENGAGEMENTS } from "@/app/[locale]/services/services-catalog";
+
+const PUBLIC_NAME_BY_CODE: Record<string, string> = Object.fromEntries([
+  ...INDIVIDUAL_SERVICES.map((s) => [s.code, s.name]),
+  ...SPECIALIST_ENGAGEMENTS.map((s) => [s.code, s.name]),
+]);
+
+for (const service of SERVICE_CATALOG) {
+  const publicName = PUBLIC_NAME_BY_CODE[service.code];
+  if (publicName) service.officialName = publicName;
+}
+
 export const SERVICE_BY_CODE: Record<string, CatalogService> = Object.fromEntries(SERVICE_CATALOG.map((s) => [s.code, s]));
 
 /** Project/engagement-billed codes (badged "By engagement" in the report, not a monthly price). */
