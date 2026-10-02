@@ -585,7 +585,10 @@ export function OdoReportPdf({
                       <>
                         <Text style={s.recLabel}>AUTOMATION / RECOMMENDED</Text>
                         <Text style={s.recName}>OR ONE</Text>
-                        <Text style={s.recSub}>Custom-built automation, scoped and priced to your business</Text>
+                        {/* Live OR ONE plan names (or-one-client.tsx tierFor) — the plan
+                            is set by the tasks the client selects in the builder, which
+                            ODO can't know, so it names the real plans instead of guessing one. */}
+                        <Text style={s.recSub}>Your plan — OR/ONE STARTER, 100, 200 or 400 — is set by the tasks you select in the OR ONE builder</Text>
                         <Text style={s.recReason}>{automationLane.recommendation.reason}</Text>
                         <Link src={`${SITE_BASE}/or-one`} style={s.recLink}>Learn more → orgro.ca/or-one</Link>
                       </>

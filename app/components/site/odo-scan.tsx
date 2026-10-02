@@ -346,6 +346,8 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
   const turnstileWidgetIdRef = useRef<string | null>(null);
   const pollRef = useRef<number | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
+  // Id of the question whose answer is in flight — see applyStatus().
+  const answeringQuestionIdRef = useRef<string | null>(null);
   // FIXED 2026-10-01 — guards against the SSE stream and the 2.5s polling
   // fallback racing each other. submitAnswer() calls stopUpdates() (clears
   // the interval, closes the EventSource) before starting fresh ones, but
@@ -429,6 +431,13 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     // Drop stale/out-of-order updates — see questionsAskedRef above. A
     // payload reporting fewer questions answered than we've already shown
     // can only be a straggler from before the most recent submitAnswer().
+    // FIXED 2026-10-02 (Mohammad's live test): while /answer is still
+    // writing the next question (~5s), SSE/polling keep reading the session,
+    // which still holds the question just answered — so it re-rendered the
+    // old question (looking unanswered) and then jumped to the new one.
+    // Any payload still carrying the question we're mid-answering is stale.
+    const payloadQ = payload.question as { id?: string } | undefined;
+    if (answeringQuestionIdRef.current && payloadQ?.id === answeringQuestionIdRef.current) return;
     const payloadQuestionsAsked = payload.questions_asked;
     if (typeof payloadQuestionsAsked === "number") {
       if (payloadQuestionsAsked < questionsAskedRef.current) return;
@@ -628,6 +637,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     event?.preventDefault();
     if (!selectedAnswer || !sessionId || busy || !question?.id) return;
     setBusy(true);
+    answeringQuestionIdRef.current = question.id;
     try {
       const response = await fetch(ODO_ROUTES.answer, {
         method: "POST",
@@ -641,6 +651,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
       });
       const payload = await readJson(response);
       if (!response.ok) {
+        answeringQuestionIdRef.current = null;
         setBusy(false);
         setMessage(formatError(payload, "We could not save that answer. Please try again."));
         return;
@@ -651,6 +662,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
       applyStatus(payload);
       startUpdates(sessionId, String(payload.events_url || `${ODO_ROUTES.events}?session_id=${encodeURIComponent(sessionId)}`), String(payload.status_url || ODO_ROUTES.status));
     } catch {
+      answeringQuestionIdRef.current = null;
       setBusy(false);
       setMessage("We could not save that answer. Please try again.");
     }
