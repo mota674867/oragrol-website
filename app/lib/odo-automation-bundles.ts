@@ -25,7 +25,7 @@
 // also unmapped here.
 
 import { askJev, jevConfigured, type JevQuestion } from "./jev";
-import type { OrOneFlag } from "./odo-packages";
+import type { OrOneFlag, OrOneTier } from "./odo-packages";
 
 export type BundleId = "sales" | "customer_service" | "finance" | "it" | "marketing";
 
@@ -85,7 +85,7 @@ async function classifyAmbiguousCodes(items: FlaggedAutomationItem[]): Promise<R
 }
 
 export type AutomationRecommendation =
-  | { kind: "or_one"; reason: string }
+  | { kind: "or_one"; reason: string; suggestedTier: OrOneTier | null }
   | { kind: "bundle"; bundle: AutomationBundle; matchedCodes: string[]; reason: string }
   | { kind: "tailored"; matchedCodes: string[]; reason: string }
   | { kind: "none" };
@@ -96,7 +96,7 @@ const MIN_WEIGHT_FOR_ANY_RECOMMENDATION = 1;
 const BUNDLE_DOMINANCE_RATIO = 0.5;
 
 export async function recommendAutomationLane(flagged: FlaggedAutomationItem[], orOne: OrOneFlag): Promise<AutomationRecommendation> {
-  if (orOne.raised) return { kind: "or_one", reason: orOne.reason };
+  if (orOne.raised) return { kind: "or_one", reason: orOne.reason, suggestedTier: orOne.suggestedTier };
 
   // C11-* (discovery/strategy) and C12-S04 (OR ONE-only signal) never pick a bundle by themselves —
   // but they still count as real automation interest, so they fall through to the Tailored

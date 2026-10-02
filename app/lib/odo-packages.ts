@@ -165,23 +165,58 @@ export function recommendSecurityLane(flagged: FlaggedItem[], serviceByCode: Rec
 // consumed by odo-automation-bundles.ts as the first branch of the
 // automation-lane decision.
 
-export type OrOneFlag = { raised: boolean; reason: string; categories: string[] };
+/**
+ * FOUND 2026-10-02 from Mohammad's first live test — the report named OR ONE
+ * but never said which of its 4 real recurring tiers (Starter/Growth/Scale/
+ * Enterprise, oragrol-tier2-packages-data.json) it had in mind, so a
+ * prospect reading it had no anchor at all. "Starter" is never suggested
+ * here: it doesn't even include the AI Orchestrator service (C12-S04), which
+ * is itself one of the two signals that raises this flag in the first
+ * place — a case that triggers OR ONE has already outgrown Starter's scope
+ * by definition. This is a STARTING POINT for the sales conversation, not a
+ * quote — the PDF card below says so — so it only ever names a tier, never
+ * shows a dollar figure (same no-price-in-PDF pattern already used for the
+ * named BA bundles above it).
+ */
+export type OrOneTier = "Growth" | "Scale" | "Enterprise";
+
+function suggestOrOneTier(businessSize: string | null, categoryCount: number): OrOneTier {
+  // Size-based floor, using the same employee bands OR ONE's real tiers are
+  // scoped around (included_users: Growth 50, Scale 150, Enterprise custom).
+  const bySize: OrOneTier | null =
+    businessSize === "large" ? "Enterprise"
+    : businessSize === "medium" ? "Scale"
+    : businessSize === "small" || businessSize === "micro" ? "Growth"
+    : null;
+  // Breadth-based floor, independent of headcount — Scale and Enterprise add
+  // whole extra service groups (IT ops, knowledge/decision engines), so a
+  // wide spread of flagged categories argues for a bigger tier even at a
+  // smaller company.
+  const byBreadth: OrOneTier = categoryCount >= 6 ? "Enterprise" : categoryCount >= 5 ? "Scale" : "Growth";
+  const RANK: Record<OrOneTier, number> = { Growth: 0, Scale: 1, Enterprise: 2 };
+  return bySize && RANK[bySize] > RANK[byBreadth] ? bySize : byBreadth;
+}
+
+export type OrOneFlag = { raised: boolean; reason: string; categories: string[]; suggestedTier: OrOneTier | null };
 
 /** C12-S04 (Intelligent Process Orchestration) and C11-S04 (AI Transformation Roadmap) are themselves signals of a coordination need, not a point fix. */
 const COORDINATION_SIGNAL_CODES = ["C12-S04", "C11-S04"];
 const MIN_AUTOMATION_CATEGORIES_FOR_OR_ONE = 3;
 
-export function evaluateOrOneFlag(flaggedCodes: { code: string; category: string; tier: "recommended" | "worth_exploring" }[]): OrOneFlag {
+export function evaluateOrOneFlag(
+  flaggedCodes: { code: string; category: string; tier: "recommended" | "worth_exploring" }[],
+  businessSize: string | null = null
+): OrOneFlag {
   const automation = flaggedCodes.filter((m) => m.code.startsWith("C1") && !m.code.startsWith("C10-"));
   const categories = [...new Set(automation.map((m) => m.category))];
   const hasCoordinationSignal = automation.some((m) => m.tier === "recommended" && COORDINATION_SIGNAL_CODES.includes(m.code));
   const broadNeed = categories.length >= MIN_AUTOMATION_CATEGORIES_FOR_OR_ONE;
 
-  if (!hasCoordinationSignal && !broadNeed) return { raised: false, reason: "", categories };
+  if (!hasCoordinationSignal && !broadNeed) return { raised: false, reason: "", categories, suggestedTier: null };
 
   const reason = hasCoordinationSignal
     ? "The findings point to a need for coordination across multiple systems or departments, not a single automation, which is what OR ONE's custom-built approach is designed for."
     : `Automation opportunities were found across ${categories.length} different areas (${categories.join(", ")}) — at that breadth, a coordinated OR ONE build is usually more effective and cost-efficient than stacking several standalone automations.`;
 
-  return { raised: true, reason, categories };
+  return { raised: true, reason, categories, suggestedTier: suggestOrOneTier(businessSize, categories.length) };
 }
