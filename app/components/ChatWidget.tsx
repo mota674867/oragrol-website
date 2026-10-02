@@ -38,16 +38,37 @@ function MsgText({text}:{text:string}){
         const mdMatch=seg.match(/^\x00MDLINK(\d+)\x00$/);
         if(mdMatch){
           const{label,href}=mdLinks[Number(mdMatch[1])];
+          // CodeQL didn't flag this branch, but it's the one actually worth
+          // fixing: markdown syntax `[label](url)` puts whatever's inside
+          // the parens straight into `href` with NO scheme check at all —
+          // unlike the two branches below, a chat message containing
+          // `[click here](javascript:alert(1))` would render a real,
+          // clickable XSS link, since React does not block javascript:
+          // hrefs. Only allow it through as a link when it's http(s) or a
+          // site-relative path; anything else renders as plain text.
+          const isSafeHref=/^https?:\/\//i.test(href)||(href.startsWith("/")&&href.length>1);
+          if(!isSafeHref)return<span key={i}>{label}</span>;
           const isExternal=/^https?:\/\//.test(href)&&!/orgro\.ca|oragrolglobal\.com/.test(href);
           return<a key={i} href={href} {...(isExternal?{target:"_blank",rel:"noopener noreferrer"}:{})} style={{color:"#ef4d00",textDecoration:"underline"}}>{label}</a>;
         }
         // Full https:// URL
-        if(seg.startsWith("http")){
+        // CodeQL #13 (js/xss-through-dom) — flagged here even though `seg`
+        // can only reach this branch already matching the split regex's
+        // `https?:\/\/[^\s),]+` alternative above (line 29), which makes a
+        // non-http(s) scheme structurally impossible. Re-checking the full
+        // scheme with .test() right at the sink, instead of relying on the
+        // split regex elsewhere in the file, makes that guarantee local and
+        // explicit rather than implicit.
+        if(/^https?:\/\//i.test(seg)){
           const isInternal=/orgro\.ca|oragrolglobal\.com/.test(seg);
           return<a key={i} href={seg} {...(isInternal?{}:{target:"_blank",rel:"noopener noreferrer"})} style={{color:"#ef4d00",textDecoration:"underline",wordBreak:"break-all"}}>{seg}</a>;
         }
         // Relative /path
-        if(seg.startsWith("/")&&seg.length>1)return<a key={i} href={seg} style={{color:"#ef4d00",textDecoration:"underline"}}>{seg}</a>;
+        // CodeQL #14 — same reasoning as #13: the split regex's path
+        // alternative (`\/[a-z][a-z0-9-]*...`) already makes a dangerous
+        // scheme here structurally impossible, but checking it explicitly
+        // at the sink removes any doubt.
+        if(/^\/[a-z0-9][a-z0-9/-]*$/i.test(seg))return<a key={i} href={seg} style={{color:"#ef4d00",textDecoration:"underline"}}>{seg}</a>;
         // Plain text
         return<span key={i}>{seg}</span>;
       })}

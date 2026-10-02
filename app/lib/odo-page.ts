@@ -329,8 +329,24 @@ export function analyzeSeo(page: PageSnapshot): SeoHealth {
   const title = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]?.trim() ?? null;
   const metaDescription =
     html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i)?.[1]?.trim() ?? null;
+  // CodeQL #19 (incomplete multi-character sanitization) — a single `/g`
+  // pass over `/<[^>]+>/` can leave a tag behind when removing one match
+  // joins the text on either side into a new one (e.g. "<scr<i>ipt>" loses
+  // "<i>" and becomes "<script>"). This text comes from the scanned
+  // business's own h1 tags, so it isn't ORAGROL-controlled. Looping the
+  // replace to a fixed point (stop once a pass changes nothing) removes any
+  // tag that reassembly could produce, not just the ones visible up front.
+  const stripTagsToFixedPoint = (s: string): string => {
+    let prev = s;
+    let next = s.replace(/<[^>]+>/g, "");
+    while (next !== prev) {
+      prev = next;
+      next = next.replace(/<[^>]+>/g, "");
+    }
+    return next;
+  };
   const h1Text = [...html.matchAll(/<h1[^>]*>([\s\S]*?)<\/h1>/gi)].map((m) =>
-    m[1].replace(/<[^>]+>/g, "").trim()
+    stripTagsToFixedPoint(m[1]).trim()
   );
 
   const imgTags = [...html.matchAll(/<img\b[^>]*>/gi)].map((m) => m[0]);

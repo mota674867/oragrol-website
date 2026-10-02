@@ -48,17 +48,34 @@ const MAX_TEXT_CHARS_PER_PAGE = 6000;
  */
 export function htmlToText(html: string): string {
   const text = html
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    // CodeQL #23 (bad HTML filtering regexp) — `<\/script>` doesn't match
+    // `</script >` or other whitespace-before-`>` variants, so a script
+    // body from the crawled page could survive into the text handed to the
+    // Claude prompt. `<\/script\s*>` closes that; same for `</style>`.
+    .replace(/<script[\s\S]*?<\/script\s*>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style\s*>/gi, " ")
     .replace(/<!--[\s\S]*?-->/g, " ")
     .replace(/<(br|p|div|li|tr|h[1-6])[^>]*>/gi, "\n")
     .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">");
+    // CodeQL #24 (double escaping/unescaping) — chaining `.replace(/&amp;/,
+    // "&")` before `.replace(/&lt;/, "<")` double-decodes a source string
+    // that intentionally wrote the literal text "&lt;" as "&amp;lt;": the
+    // first pass turns it into "&lt;", and the second then turns that into
+    // a real "<" that was never meant to be markup. Matching every entity
+    // in one pass, over the ORIGINAL text, decodes each occurrence exactly
+    // once regardless of what another entity's decoding would produce next
+    // to it.
+    .replace(/&nbsp;|&amp;|&quot;|&#39;|&lt;|&gt;/g, (entity) => {
+      switch (entity) {
+        case "&nbsp;": return " ";
+        case "&amp;": return "&";
+        case "&quot;": return '"';
+        case "&#39;": return "'";
+        case "&lt;": return "<";
+        case "&gt;": return ">";
+        default: return entity;
+      }
+    });
   return text.replace(/[ \t]+/g, " ").replace(/\n\s*\n+/g, "\n").trim();
 }
 

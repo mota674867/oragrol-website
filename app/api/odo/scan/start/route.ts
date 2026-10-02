@@ -138,7 +138,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   if (!name || !email || !company) {
     return NextResponse.json({ code: "validation_error", message: "Name, email, and company are required." }, { status: 400 });
   }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  // CodeQL #15 (polynomial regex on uncontrolled data) — this is an
+  // unauthenticated public API, so nothing stopped a raw POST (bypassing any
+  // client-side maxlength) from sending a many-thousand-character "email" to
+  // make the three-quantifier pattern below do real backtracking work. RFC
+  // 5321 caps a real email address at 320 characters, so rejecting anything
+  // longer first removes the attack surface regardless of the regex itself.
+  if (email.length > 320 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ code: "validation_error", message: "Please enter a valid email address." }, { status: 400 });
   }
   if (!consent) {

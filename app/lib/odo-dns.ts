@@ -33,7 +33,17 @@ function makeResolver() {
 }
 
 export function normalizeDomain(input: string): string {
-  return input
+  // CodeQL #20 (polynomial regex on uncontrolled data) — `input` is
+  // visitor-submitted (the scan form's "website" field has no length limit
+  // before it reaches checkWebsiteValidity in odo-gate.ts), and this
+  // function is the single shared entry point for every caller here,
+  // odo-gate.ts, odo-crawl.ts, odo-page.ts, odo-infra.ts, odo-history.ts and
+  // odo-hiring.ts. Capping the length once, here, protects every call site
+  // instead of relying on each caller to validate first — same pattern as
+  // the email-length cap added for #15. No real domain or URL comes
+  // anywhere close to this long, so this never rejects a legitimate input.
+  const bounded = input.length > 2048 ? input.slice(0, 2048) : input;
+  return bounded
     .replace(/^https?:\/\//i, "")
     .replace(/\/.*$/, "")
     .replace(/^www\./i, "")

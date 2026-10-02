@@ -92,9 +92,15 @@ const PARKED_PAGE_SIGNATURES = [
 ];
 
 function stripHtml(html: string): string {
+  // CodeQL #22 (bad HTML filtering regexp) — `<\/script>` only matches the
+  // end tag with zero whitespace before the `>` (real markup, and anything
+  // a scanned site could serve, allows `</script >` or `</script\n>`), so a
+  // script body containing attacker-controlled text could survive into
+  // bodyText used below for the parked-page checks. `<\/script\s*>` closes
+  // that gap; same fix applied to the matching `</style>` pattern.
   return html
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<script[\s\S]*?<\/script\s*>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style\s*>/gi, " ")
     .replace(/<[^>]+>/g, " ")
     .replace(/\s+/g, " ")
     .trim();
