@@ -554,7 +554,12 @@ export function OdoReportPdf({
                       <View style={s.noteCol1}>
                         <View style={{ flexDirection: "row", alignItems: "center" }}>
                           <View style={[s.statusDot, { backgroundColor: TIER_DOT_COLOR[o.tier] }]} />
-                          <Text style={s.noteTitle}>{o.simpleName}</Text>
+                          {/* Must be the name that's actually searchable on
+                              orgro.ca/services (the line below tells the
+                              client to search for it there) — the internal
+                              simpleName ("Trust Guard" etc.) doesn't exist
+                              on the public site at all. */}
+                          <Text style={s.noteTitle}>{o.officialName}</Text>
                         </View>
                         <Text style={s.noteCode}>{o.code} · {o.tier === "recommended" ? "RECOMMENDED" : "WORTH EXPLORING"}</Text>
                       </View>

@@ -24,7 +24,15 @@ import { recommendAutomationLane, type AutomationRecommendation } from "./odo-au
 import type { CostBreakdown } from "./odo-cost";
 
 export type ReportFinding = Pick<Evidence, "id" | "fact" | "raw" | "source" | "tier" | "severity" | "polarity" | "framework" | "collectedAt">;
-export type ReportPriority = { code: string; simpleName: string; category: string; group: "security" | "automation"; tier: "recommended" | "worth_exploring"; billing: Billing; why: string; evidenceIds: string[] };
+// `simpleName` (e.g. "Trust Guard") is ODO's internal shorthand — never
+// shown as the sole label on anything that also tells the client to go look
+// the item up ("search by item name... on orgro.ca/services"), because the
+// public services page lists these by `officialName` (e.g. "Zero Trust
+// Access Security") only. Carrying both lets the PDF show the name that's
+// actually searchable; FOUND 2026-10-02 from Mohammad's first live test —
+// "Additional items to consider" was showing simpleName, so a client
+// searching the exact name printed in their own report would find nothing.
+export type ReportPriority = { code: string; simpleName: string; officialName: string; category: string; group: "security" | "automation"; tier: "recommended" | "worth_exploring"; billing: Billing; why: string; evidenceIds: string[] };
 export type WebsitePointer = { label: string; path: string };
 
 export type OdoReport = {
@@ -101,7 +109,7 @@ function toFinding(e: Evidence): ReportFinding {
 }
 
 function toPriority(m: ServiceMatch): ReportPriority {
-  return { code: m.code, simpleName: m.simpleName, category: m.category, group: m.group, tier: m.tier as "recommended" | "worth_exploring", billing: SERVICE_BY_CODE[m.code]?.billing ?? "recurring", why: m.reason, evidenceIds: m.evidenceIds };
+  return { code: m.code, simpleName: m.simpleName, officialName: SERVICE_BY_CODE[m.code]?.officialName ?? m.simpleName, category: m.category, group: m.group, tier: m.tier as "recommended" | "worth_exploring", billing: SERVICE_BY_CODE[m.code]?.billing ?? "recurring", why: m.reason, evidenceIds: m.evidenceIds };
 }
 
 const WEBSITE_POINTERS: WebsitePointer[] = [

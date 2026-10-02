@@ -697,7 +697,17 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
   };
 
   const showLive = phase === "researching";
-  const showQuestion = phase === "questions" && question;
+  // "busy" during the questions phase means submitAnswer() is mid-flight —
+  // ODO is actually calling Claude live to write the next question (the
+  // odo-interviewer.ts round trip), typically a few seconds. Before this,
+  // the UI just left the just-answered question on screen with its button
+  // disabled until the next one silently swapped in — visitors read that
+  // silent multi-second gap as a stall, not as ODO doing real work (direct
+  // feedback: "push continue, then suddenly a new question appear...
+  // visitor imagine this is delay system"). showWritingNext takes over the
+  // panel the instant Continue is pressed so the wait reads as live writing.
+  const showQuestion = phase === "questions" && question && !busy;
+  const showWritingNext = phase === "questions" && busy;
   const showEvaluating = phase === "evaluating";
   const showSummary = phase === "summary";
   const showError = phase === "error";
@@ -830,6 +840,19 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
                   )}
                 </form>
                 <button type="button" className="odo-scan__cancel" onClick={cancelScan}>Pause scan</button>
+              </div>
+            </>
+          ) : showWritingNext ? (
+            // Fills the exact gap submitAnswer()'s fetch() await used to
+            // leave empty — see showWritingNext above.
+            <>
+              <PhaseTrack phase="questions" />
+              <div className="odo-scan__question-panel odo-scan__question-panel--writing" role="status" aria-live="polite">
+                <p className="odo-scan__section-kicker">ONE QUESTION AT A TIME</p>
+                <div className="odo-scan__writing-indicator">
+                  <h2>ODO is writing your next question<span className="odo-scan__typing-dots" aria-hidden="true"><span></span><span></span><span></span></span></h2>
+                </div>
+                <p className="odo-scan__workspace-subtitle">Checking your answer against what we already found about your business.</p>
               </div>
             </>
           ) : showSummary ? (

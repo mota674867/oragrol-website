@@ -94,6 +94,10 @@ export type SecurityRecommendation =
 export type IndividualOffer = {
   code: string;
   simpleName: string;
+  // The name actually listed on orgro.ca/services — the PDF tells clients
+  // to search by name there, so this (not simpleName) is what must be shown
+  // as the item's title. See odo-report.ts's ReportPriority for the same fix.
+  officialName: string;
   category: string;
   billing: Billing;
   tier: "recommended" | "worth_exploring";
@@ -115,13 +119,13 @@ type FlaggedItem = { code: string; simpleName: string; category: string; group: 
  * inside a package and so are always offered by exact name regardless of
  * the primary pick.
  */
-export function recommendSecurityLane(flagged: FlaggedItem[], serviceByCode: Record<string, { billing: Billing }>): SecurityLane {
+export function recommendSecurityLane(flagged: FlaggedItem[], serviceByCode: Record<string, { billing: Billing; officialName?: string }>): SecurityLane {
   const security = flagged.filter((m) => m.group === "security" && !FREE_CODES.has(m.code));
   const alacarteOnlySet = new Set(ALACARTE_ONLY_CODES);
 
   const individualOffers: IndividualOffer[] = security
     .filter((m) => m.category === "Certified Specialist Services" || alacarteOnlySet.has(m.code))
-    .map((m) => ({ code: m.code, simpleName: m.simpleName, category: m.category, billing: serviceByCode[m.code]?.billing ?? "recurring", tier: m.tier, why: m.reason }));
+    .map((m) => ({ code: m.code, simpleName: m.simpleName, officialName: serviceByCode[m.code]?.officialName ?? m.simpleName, category: m.category, billing: serviceByCode[m.code]?.billing ?? "recurring", tier: m.tier, why: m.reason }));
 
   const packageEligible = security
     .filter((m) => m.tier === "recommended" && m.category !== "Certified Specialist Services" && !alacarteOnlySet.has(m.code))
