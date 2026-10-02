@@ -584,22 +584,8 @@ export function OdoReportPdf({
                     {automationLane.recommendation.kind === "or_one" ? (
                       <>
                         <Text style={s.recLabel}>AUTOMATION / RECOMMENDED</Text>
-                        <Text style={s.recName}>
-                          OR ONE{automationLane.recommendation.suggestedTier ? ` — ${automationLane.recommendation.suggestedTier} tier` : ""}
-                        </Text>
-                        {/* FOUND 2026-10-02 from Mohammad's first live test — OR ONE
-                            was named with no tier at all, so a prospect had nothing
-                            to anchor to. suggestedTier (odo-packages.ts) is a
-                            starting point from company size and the breadth of
-                            flagged automation needs, never a quote — no dollar
-                            figure here, same as the bundle pick below; OR ONE's own
-                            pricing is still "provisional" per
-                            oragrol-tier2-packages-data.json until scoped live. */}
-                        <Text style={s.recSub}>
-                          {automationLane.recommendation.suggestedTier
-                            ? `Starting point based on your profile — custom-built, scoped and priced to your business`
-                            : "Custom-built automation, scoped and priced to your business"}
-                        </Text>
+                        <Text style={s.recName}>OR ONE</Text>
+                        <Text style={s.recSub}>Custom-built automation, scoped and priced to your business</Text>
                         <Text style={s.recReason}>{automationLane.recommendation.reason}</Text>
                         <Link src={`${SITE_BASE}/or-one`} style={s.recLink}>Learn more → orgro.ca/or-one</Link>
                       </>

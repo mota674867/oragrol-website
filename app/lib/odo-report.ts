@@ -164,10 +164,7 @@ export async function buildReport(input: {
     matching.flagged.map((m) => ({ code: m.code, simpleName: m.simpleName, category: m.category, group: m.group, tier: m.tier as "recommended" | "worth_exploring", reason: m.reason })),
     SERVICE_BY_CODE
   );
-  const orOneFlag = evaluateOrOneFlag(
-    matching.flagged.map((m) => ({ code: m.code, category: m.category, tier: m.tier as "recommended" | "worth_exploring" })),
-    input.businessSize
-  );
+  const orOneFlag = evaluateOrOneFlag(matching.flagged.map((m) => ({ code: m.code, category: m.category, tier: m.tier as "recommended" | "worth_exploring" })));
   const automationRecommendation = await recommendAutomationLane(
     matching.flagged.filter((m) => m.group === "automation").map((m) => ({ code: m.code, category: m.category, tier: m.tier as "recommended" | "worth_exploring", reason: m.reason })),
     orOneFlag
