@@ -94,16 +94,21 @@ export const ODO_COPY = Object.freeze({
     "ODO researches your business, identifies what matters, and turns the findings into clear priorities.",
   promise: "No sales call. No commitment.",
   preChatNote:
-    "The scan takes 3–4 minutes. ODO researches your business publicly while you answer a few quick questions. Your full report arrives within 24 hours.",
+    "The scan takes about 5–10 minutes. ODO researches your business publicly first, then asks a few questions you answer in your own words. Your report arrives within 24 hours.",
   intro:
-    "I'm ODO — OR Discovery & Opportunity Agent. Before I ask you anything, I'm going to research your business publicly.",
+    "I'm ODO — OR Discovery & Opportunity Agent. I research your business publicly first, then ask only what research can't see.",
   consent:
     "By starting your scan, you consent to ORAGROL researching publicly available information about your business and storing your contact details per our Privacy Policy.",
   humanReview: "Reviewed by an ORAGROL specialist before delivery.",
   completedSubtext:
     "Our team is reviewing your findings. Your personalized report will be in your inbox within 24 hours.",
   inconclusiveSubtext:
-    "Based on what we could gather, we do not have enough to give you a confident evaluation yet. Our team will contact you directly within 24 hours.",
+    "With the public information available and the answers given, ODO can't produce a reliable analysis report.",
+  unavailable:
+    "ODO can't continue right now — please try again a little later. Nothing was lost on your side, and this attempt won't count against you.",
+  // Master Reference §37.7 — the protection line, on every completed scan.
+  protectionLine:
+    "ODO's review is based on public information and your answers. It is not a penetration test or a compliance audit. An ORAGROL specialist reviews every report before delivery.",
 });
 
 export const ODO_BACKEND_CONTRACT = Object.freeze({
@@ -138,8 +143,8 @@ const HOW_IT_WORKS = [
   },
   {
     number: "02",
-    title: "Only relevant questions",
-    body: "We ask what the research cannot answer.",
+    title: "A real conversation",
+    body: "ODO asks what research can't see. You answer in your own words — and can ask ODO questions too.",
   },
   {
     number: "03",
@@ -321,6 +326,51 @@ function ResearchPreview({ phase, step }: { phase: string; step: string }) {
 // nothing downstream churns and the mount effect runs exactly once.
 const NOOP_EVENT_HANDLER = (_e: Record<string, unknown>) => {};
 
+// ─── Live interview chat (Master Reference §37.6) ───────────────────────────
+//
+// REBUILT 2026-10-03. The old one-question-at-a-time panel (multiple-choice
+// buttons, checkboxes, a "writing your next question" placeholder) is gone.
+// ODO and the visitor now talk in a single scrolling thread, WhatsApp-style:
+// ODO on the left, the visitor on the right, every message staying visible.
+// The visitor types answers in their own words, can press "Prefer not to
+// answer" on anything, and can ask ODO questions along the way.
+//
+// The server is the single source of truth for the conversation. Every
+// status payload carries `chat_version`, which only ever moves forward, so a
+// late or out-of-order poll can never paint an older conversation over a
+// newer one (the "answered question flashes back" bug class from the
+// 2026-10-02 live test is structurally impossible here).
+
+type ChatItem = { id: string; role: "odo" | "visitor"; kind: string; text: string; hint?: string };
+type Progress = { questions_asked: number; max_questions: number; visitor_questions_left: number };
+
+function ChatBubble({ item }: { item: ChatItem }) {
+  if (item.role === "visitor") {
+    return (
+      <div className="odo-chat__row odo-chat__row--visitor">
+        <div className={`odo-chat__bubble odo-chat__bubble--visitor${item.kind === "skip" ? " is-skip" : ""}`}>{item.text}</div>
+      </div>
+    );
+  }
+  return (
+    <div className="odo-chat__row odo-chat__row--odo">
+      <span className="odo-chat__avatar" aria-hidden="true">OR</span>
+      <div className={`odo-chat__bubble odo-chat__bubble--odo${item.kind === "question" ? " is-question" : ""}`}>{item.text}</div>
+    </div>
+  );
+}
+
+function TypingBubble() {
+  return (
+    <div className="odo-chat__row odo-chat__row--odo" role="status" aria-label="ODO is typing">
+      <span className="odo-chat__avatar" aria-hidden="true">OR</span>
+      <div className="odo-chat__bubble odo-chat__bubble--odo odo-chat__bubble--typing">
+        <span className="odo-scan__typing-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+      </div>
+    </div>
+  );
+}
+
 export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLER }: { locale?: string; onEvent?: (e: Record<string, unknown>) => void }) {
   const [form, setForm] = useState<{name: string; email: string; company: string; website: string}>({...INITIAL_FORM});
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
@@ -328,52 +378,34 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
   const [phase, setPhase] = useState("idle");
   const [step, setStep] = useState("website");
   const [sessionId, setSessionId] = useState("");
-  const [question, setQuestion] = useState<{id: string; text: string; options?: Array<string | {value: string; label?: string}>; multiSelect?: boolean} | null>(null);
-  const [answer, setAnswer] = useState("");
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [message, setMessage] = useState("");
+  const [endKind, setEndKind] = useState<"complete" | "insufficient" | null>(null);
   const [cooldownModal, setCooldownModal] = useState<{ code: string; message: string } | null>(null);
-  const [findingsSummary, setFindingsSummary] = useState<{ security_issues: number; marketing_gaps: number; opportunities: number; total: number } | null>(null);
   const [busy, setBusy] = useState(false);
+
+  // Conversation state — always replaced wholesale from the server.
+  const [chat, setChat] = useState<ChatItem[]>([]);
+  const [awaiting, setAwaiting] = useState(false);
+  const [pending, setPending] = useState<{ id: string; hint: string | null } | null>(null);
+  const [progress, setProgress] = useState<Progress | null>(null);
+  const [draft, setDraft] = useState("");
+  const [optimistic, setOptimistic] = useState<ChatItem | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const chatVersionRef = useRef(0);
+  const submittingRef = useRef(false);
+  const threadRef = useRef<HTMLDivElement | null>(null);
+  const composerRef = useRef<HTMLTextAreaElement | null>(null);
+
   // ADDED 2026-10-01 — Cloudflare Turnstile captcha (entry-gate requirement,
   // odo-gate.ts verifyTurnstile on the backend). Rendered explicitly via
-  // window.turnstile.render (not the implicit data-sitekey div) so we can
-  // capture the token into state and reset the widget on a failed/expired
-  // check, same pattern Cloudflare's own docs recommend for SPAs.
+  // window.turnstile.render so the token can be captured into state and the
+  // widget reset on a failed/expired check.
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileReady, setTurnstileReady] = useState(false);
   const turnstileContainerRef = useRef<HTMLDivElement | null>(null);
   const turnstileWidgetIdRef = useRef<string | null>(null);
   const pollRef = useRef<number | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
-  // Id of the question whose answer is in flight — see applyStatus().
-  const answeringQuestionIdRef = useRef<string | null>(null);
-  // FIXED 2026-10-01 — guards against the SSE stream and the 2.5s polling
-  // fallback racing each other. submitAnswer() calls stopUpdates() (clears
-  // the interval, closes the EventSource) before starting fresh ones, but
-  // that cannot cancel a GET /status fetch that was already in flight from
-  // the OLD interval tick, or an SSE message already in the browser's queue
-  // before close() ran. That stale response — read from Redis BEFORE the
-  // just-submitted answer was saved — can arrive after the fresh question
-  // is already on screen and silently overwrite it with the PREVIOUS
-  // question, which the visitor then sees as ODO re-asking something they
-  // already answered. Found from a live scan: "again repeated the same
-  // question... if like this i will shutdown odo." Every status payload
-  // (both /status and /events) carries `questions_asked`, which only moves
-  // forward — so a payload reporting fewer than the highest we've already
-  // shown is necessarily a stale straggler and is dropped before touching
-  // any state, not just the question field.
-  const questionsAskedRef = useRef<number>(0);
-  // FIXED 2026-10-01 — tracks which question.id selectedOptions was last
-  // cleared for. Both SSE and the polling fallback resend the SAME
-  // unanswered question on every cycle (every ~1-2.5s) until the visitor
-  // submits an answer. applyStatus() used to call setSelectedOptions([])
-  // on every single one of those resends, not just when the question
-  // actually changed — so a checked box was wiped within a couple of
-  // seconds of checking it. Found from a live report: "choose of one more
-  // option in question, when check one, it will automatically jump to
-  // uncheck after 2 second."
-  const lastQuestionIdRef = useRef<string | null>(null);
 
   const emit = useCallback((type: string, extra: Record<string, unknown> = {}) => onEvent({ type, ...extra }), [onEvent]);
 
@@ -386,13 +418,6 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
 
   useEffect(() => () => stopUpdates(), [stopUpdates]);
 
-  // Render the Turnstile widget once its script has loaded AND the intake
-  // form (which holds the container div) is on screen. Runs on every
-  // render where both are true but only actually renders once, guarded by
-  // turnstileWidgetIdRef — the form only mounts the container when
-  // phase === "idle", so this effect re-fires each time that happens (e.g.
-  // after cancelScan() returns to the intake screen) and re-renders a fresh
-  // widget then.
   useEffect(() => {
     if (!turnstileReady || phase !== "idle") return;
     const container = turnstileContainerRef.current;
@@ -417,66 +442,31 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     };
   }, [turnstileReady, phase]);
 
-  // FIXED 2026-09-29 — this switch never matched the backend's real status
-  // vocabulary. The backend (odo/scan/start, /answer, /status routes) has
-  // always used "questioning" / "complete" / "insufficient_data" /
-  // "cancelled"; this code only recognized "questions" / "report_pending" /
-  // "inconclusive", none of which the backend ever sends. Every scan that
-  // reached the question or summary stage silently fell into the `else`
-  // branch below and stayed stuck showing the research screen forever —
-  // found via a live test scan, not a code review.
   const applyStatus = useCallback((payload: Record<string, unknown>) => {
     const next = payload?.status as string | undefined;
     if (!next) return;
-    // Drop stale/out-of-order updates — see questionsAskedRef above. A
-    // payload reporting fewer questions answered than we've already shown
-    // can only be a straggler from before the most recent submitAnswer().
-    // FIXED 2026-10-02 (Mohammad's live test): while /answer is still
-    // writing the next question (~5s), SSE/polling keep reading the session,
-    // which still holds the question just answered — so it re-rendered the
-    // old question (looking unanswered) and then jumped to the new one.
-    // Any payload still carrying the question we're mid-answering is stale.
-    const payloadQ = payload.question as { id?: string } | undefined;
-    if (answeringQuestionIdRef.current && payloadQ?.id === answeringQuestionIdRef.current) return;
-    const payloadQuestionsAsked = payload.questions_asked;
-    if (typeof payloadQuestionsAsked === "number") {
-      if (payloadQuestionsAsked < questionsAskedRef.current) return;
-      questionsAskedRef.current = payloadQuestionsAsked;
-    }
-    if (payload.step) setStep(String(payload.step));
-    if (payload.question) {
-      const incoming = payload.question as {id: string; text: string; options?: Array<string | {value: string; label?: string}>; multiSelect?: boolean};
-      setQuestion(incoming);
-      // FIXED 2026-10-01 — only clear picks when the question actually
-      // changed. Both SSE and the polling fallback keep resending the
-      // SAME unanswered question every cycle until the visitor submits,
-      // and this used to wipe selectedOptions on every single resend —
-      // see the lastQuestionIdRef comment above for the reported symptom.
-      if (lastQuestionIdRef.current !== incoming.id) {
-        lastQuestionIdRef.current = incoming.id;
-        setSelectedOptions([]);
+
+    // Conversation staleness guard — see the file-section header above.
+    const version = payload.chat_version;
+    if (typeof version === "number") {
+      if (version < chatVersionRef.current) return; // a straggler from before the latest state — drop it entirely
+      if (version > chatVersionRef.current) {
+        chatVersionRef.current = version;
+        if (Array.isArray(payload.chat)) setChat(payload.chat as ChatItem[]);
+        setAwaiting(payload.awaiting === true);
+        setPending((payload.pending as { id: string; hint: string | null } | null) ?? null);
+        setProgress((payload.progress as Progress | undefined) ?? null);
+        setOptimistic(null); // the server now holds the visitor's message
       }
     }
-    if (payload.findings_summary) {
-      setFindingsSummary(payload.findings_summary as { security_issues: number; marketing_gaps: number; opportunities: number; total: number });
-    }
-    // FIXED 2026-10-01 — every terminal status (complete / insufficient_data
-    // / failed / cancelled) used to leave "oragrol_odo_session_id" sitting in
-    // sessionStorage. The mount effect below restores whatever session_id is
-    // there and immediately re-polls it — so the very next time that same
-    // browser tab opened /scan (a reload, or just visiting the page again),
-    // it silently re-fetched the already-finished scan, got "complete" back
-    // again, and jumped straight to the "Scan Complete" screen instead of
-    // the intake form — permanently, until something manually cleared site
-    // data. Found from a live report: "it is not allow me even to open and
-    // enter the new email." Clearing the key here means the completion/
-    // error screen still shows once, right now, in this tab — but a fresh
-    // page load afterwards correctly starts clean.
+    if (payload.step && next === "researching") setStep(String(payload.step));
+
     const clearSavedSession = () => { if (typeof window !== "undefined") window.sessionStorage.removeItem("oragrol_odo_session_id"); };
     if (next === "complete") {
       stopUpdates();
       clearSavedSession();
       setPhase("summary");
+      setEndKind("complete");
       setBusy(false);
       setMessage(ODO_COPY.completedSubtext);
       emit("report-pending");
@@ -484,6 +474,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
       stopUpdates();
       clearSavedSession();
       setPhase("summary");
+      setEndKind("insufficient");
       setBusy(false);
       setMessage((payload.message as string) || ODO_COPY.inconclusiveSubtext);
       emit("inconclusive");
@@ -492,7 +483,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
       clearSavedSession();
       setPhase("error");
       setBusy(false);
-      setMessage("We could not complete the scan. Please try again later or contact our team.");
+      setMessage((payload.message as string) || ODO_COPY.unavailable);
       emit("failed");
     } else if (next === "cancelled") {
       stopUpdates();
@@ -503,20 +494,9 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
       setPhase("questions");
       setBusy(false);
     } else if (next === "evaluating") {
-      // FIXED 2026-10-01 — the backend sets "evaluating" (odo/scan/answer,
-      // then odo-pipeline.ts's runEvaluation) for the whole stretch between
-      // the last question and the finished report: building the evidence
-      // ledger, matching services, writing the SWOT and outlook. This
-      // status had no branch of its own and fell into the catch-all below,
-      // which shows "ODO is researching" with stage 1 ("Research") bolded
-      // again — looking like the scan restarted. Found from a live report:
-      // "i complete the question but the orange bold color not shift to
-      // next stage, still shows on research."
       setPhase("evaluating");
       setBusy(true);
     } else {
-      // "researching" (or any future/unknown value) — keep showing the
-      // live research screen rather than guessing a phase name.
       setPhase("researching");
       setBusy(true);
     }
@@ -531,7 +511,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
       });
       applyStatus(await readJson(response));
     } catch {
-      // Keep the scan running; the next bounded poll retries without exposing internals.
+      // Keep the scan running; the next poll retries.
     }
   }, [applyStatus]);
 
@@ -541,7 +521,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
       const source = new EventSource(eventsUrl);
       eventSourceRef.current = source;
       source.onmessage = (event: MessageEvent) => {
-        try { applyStatus(JSON.parse(event.data)); } catch { /* Ignore malformed provider data. */ }
+        try { applyStatus(JSON.parse(event.data)); } catch { /* ignore malformed data */ }
       };
       source.onerror = () => source.close();
     }
@@ -559,9 +539,26 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     return undefined;
   }, [startUpdates]);
 
+  // Keep the newest message in view.
+  useEffect(() => {
+    const el = threadRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [chat, optimistic, submitting, awaiting]);
+
   const updateField = (name: string, value: string) => {
     setForm((current) => ({ ...current, [name]: value }));
     setErrors((current) => ({ ...current, [name]: undefined }));
+  };
+
+  const resetConversation = () => {
+    chatVersionRef.current = 0;
+    setChat([]);
+    setAwaiting(false);
+    setPending(null);
+    setProgress(null);
+    setDraft("");
+    setOptimistic(null);
+    setEndKind(null);
   };
 
   const submitStart = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -576,7 +573,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     setPhase("researching");
     setMessage("");
     setCooldownModal(null);
-    setFindingsSummary(null);
+    resetConversation();
     emit("scan-start-requested");
     try {
       const response = await fetch(ODO_ROUTES.start, {
@@ -611,8 +608,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
         } else {
           setMessage(formatError(payload, "We could not start the scan. Please review your details and try again."));
         }
-        // The token is single-use — whatever the rejection reason, Turnstile
-        // needs a fresh challenge before the visitor can submit again.
+        // The token is single-use — a fresh challenge is needed before retrying.
         setTurnstileToken("");
         if (turnstileWidgetIdRef.current) {
           (window as unknown as { turnstile?: { reset: (id: string) => void } }).turnstile?.reset(turnstileWidgetIdRef.current);
@@ -621,7 +617,6 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
         return;
       }
       setSessionId(String(payload.session_id));
-      questionsAskedRef.current = 0; // Fresh scan — any earlier scan's ref value must not block it.
       if (typeof window !== "undefined") window.sessionStorage.setItem("oragrol_odo_session_id", String(payload.session_id));
       emit("scan-started");
       startUpdates(String(payload.session_id), String(payload.events_url || `${ODO_ROUTES.events}?session_id=${encodeURIComponent(String(payload.session_id))}`), String(payload.status_url || ODO_ROUTES.status));
@@ -633,54 +628,69 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     }
   };
 
-  const submitAnswer = async (event: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement> | null, selectedAnswer: string = answer.trim()) => {
-    event?.preventDefault();
-    if (!selectedAnswer || !sessionId || busy || !question?.id) return;
-    setBusy(true);
-    answeringQuestionIdRef.current = question.id;
+  /** Send a typed message or a "Prefer not to answer" skip. */
+  const sendTurn = async (kind: "message" | "skip") => {
+    if (submittingRef.current || !sessionId || !pending || awaiting) return;
+    const text = draft.trim();
+    if (kind === "message" && !text) return;
+    submittingRef.current = true;
+    setSubmitting(true);
+    setMessage("");
+    setOptimistic({ id: "local-pending", role: "visitor", kind: kind === "skip" ? "skip" : "answer", text: kind === "skip" ? "Prefer not to answer" : text });
+    if (kind === "message") setDraft("");
+    const restore = () => { setOptimistic(null); if (kind === "message") setDraft(text); };
     try {
       const response = await fetch(ODO_ROUTES.answer, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
           session_id: sessionId,
-          idempotency_key: makeIdempotencyKey(),
-          question_id: question.id,
-          answer: selectedAnswer,
+          version: chatVersionRef.current,
+          ...(kind === "skip" ? { skip: true } : { message: text }),
         }),
       });
       const payload = await readJson(response);
       if (!response.ok) {
-        answeringQuestionIdRef.current = null;
-        setBusy(false);
-        setMessage(formatError(payload, "We could not save that answer. Please try again."));
+        if (payload?.code === "stale") {
+          restore();
+          applyStatus(payload);
+          setMessage("The conversation was updated — please check ODO's latest message.");
+        } else if (payload?.code === "busy") {
+          restore();
+          setMessage("ODO is still replying to your last message — one moment.");
+        } else if (payload?.status === "failed") {
+          applyStatus(payload);
+        } else {
+          restore();
+          setMessage(formatError(payload, "We couldn't send that — please try again."));
+        }
         return;
       }
-      setQuestion(null);
-      setAnswer("");
-      setSelectedOptions([]);
       applyStatus(payload);
-      startUpdates(sessionId, String(payload.events_url || `${ODO_ROUTES.events}?session_id=${encodeURIComponent(sessionId)}`), String(payload.status_url || ODO_ROUTES.status));
     } catch {
-      answeringQuestionIdRef.current = null;
-      setBusy(false);
-      setMessage("We could not save that answer. Please try again.");
+      restore();
+      setMessage("We couldn't send that — please check your connection and try again.");
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
+      composerRef.current?.focus();
     }
   };
 
-  // Resets the page back to the intake form from the completion screen.
-  // Added 2026-10-01 alongside the sessionStorage fix above — the summary
-  // screen previously had no way back to the form at all in the same tab
-  // (only the error screen had a "Return to scan" button). Nothing to
-  // cancel server-side here; the scan already finished.
+  const onComposerKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Enter sends on desktop; on touch keyboards Enter is a new line and the
+    // Send button sends (same convention as WhatsApp).
+    const coarse = typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)").matches;
+    if (event.key === "Enter" && !event.shiftKey && !coarse) {
+      event.preventDefault();
+      void sendTurn("message");
+    }
+  };
+
   const startNewScan = () => {
     setSessionId("");
-    questionsAskedRef.current = 0; // Fresh scan — any earlier scan's ref value must not block it.
-    setQuestion(null);
-    setAnswer("");
-    setSelectedOptions([]);
+    resetConversation();
     setMessage("");
-    setFindingsSummary(null);
     setForm({ ...INITIAL_FORM });
     setErrors({});
     setConsent(false);
@@ -694,6 +704,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     setBusy(false);
     setPhase("idle");
     setSessionId("");
+    resetConversation();
     if (typeof window !== "undefined") window.sessionStorage.removeItem("oragrol_odo_session_id");
     setMessage("Your scan is paused. You can start again when you are ready.");
     try {
@@ -704,25 +715,14 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
         keepalive: true,
       });
     } catch {
-      // The server applies its own retention and expiry rules if this request is interrupted.
+      // The server applies its own retention and expiry rules.
     }
   };
 
-  const showLive = phase === "researching";
-  // "busy" during the questions phase means submitAnswer() is mid-flight —
-  // ODO is actually calling Claude live to write the next question (the
-  // odo-interviewer.ts round trip), typically a few seconds. Before this,
-  // the UI just left the just-answered question on screen with its button
-  // disabled until the next one silently swapped in — visitors read that
-  // silent multi-second gap as a stall, not as ODO doing real work (direct
-  // feedback: "push continue, then suddenly a new question appear...
-  // visitor imagine this is delay system"). showWritingNext takes over the
-  // panel the instant Continue is pressed so the wait reads as live writing.
-  const showQuestion = phase === "questions" && question && !busy;
-  const showWritingNext = phase === "questions" && busy;
-  const showEvaluating = phase === "evaluating";
-  const showSummary = phase === "summary";
-  const showError = phase === "error";
+  const inConversation = phase === "questions" || phase === "evaluating" || (phase === "summary" && chat.length > 0);
+  const odoTyping = submitting || awaiting;
+  const canType = phase === "questions" && !!pending && !odoTyping;
+  const questionNumber = progress ? Math.min(progress.questions_asked, progress.max_questions) : 0;
   const headline = useMemo(() => ODO_COPY.headline, []);
 
   return (
@@ -747,7 +747,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
           <p className="odo-scan__promise">{ODO_COPY.promise}</p>
 
           <div className="odo-scan__facts" aria-label="Scan facts">
-            <div><strong>3–4</strong><span>MINUTE SCAN</span></div>
+            <div><strong>5–10</strong><span>MINUTE SCAN</span></div>
             <div><strong>Free</strong><span>NO CHARGE</span></div>
             <div><strong>24h</strong><span>REPORT DELIVERY</span></div>
           </div>
@@ -767,7 +767,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
         </section>
 
         <section className="odo-scan__workspace" aria-label="Start your business scan">
-          {phase === "idle" || phase === "error" ? (
+          {phase === "idle" ? (
             <>
               <h2>Start your business scan.</h2>
               <p className="odo-scan__workspace-subtitle">{ODO_COPY.preChatNote}</p>
@@ -777,16 +777,13 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
                 <Field id="email" label="Work email" value={form.email} onChange={(value) => updateField("email", value)} placeholder="you@company.com" type="email" error={errors.email} />
                 <Field id="company" label="Company name" value={form.company} onChange={(value) => updateField("company", value)} placeholder="Business name" error={errors.company} />
                 <Field id="website" label="Website" value={form.website} onChange={(value) => updateField("website", value)} placeholder="https://yourwebsite.com" type="url" error={errors.website} />
-                {/* CHANGED 2026-10-01 — no-website visitors are routed straight to a
-                    consultation instead of clearing the field and scanning anyway. */}
                 <a className="odo-scan__no-website" href="https://orgro.ca/contact">No website? Book a quick consultation instead →</a>
                 <label className="odo-scan__consent">
                   <input type="checkbox" checked={consent} onChange={(event) => { setConsent(event.target.checked); setErrors((current) => ({ ...current, consent: undefined })); }} />
                   <span>{ODO_COPY.consent} <a href="/privacy">Privacy Policy</a></span>
                 </label>
                 {errors.consent ? <p className="odo-scan__inline-error" role="alert">{errors.consent}</p> : null}
-                {/* Cloudflare Turnstile captcha — odo-gate.ts verifies this
-                    token server-side before any paid research/AI call runs. */}
+                {/* Cloudflare Turnstile — verified server-side before any paid research/AI call runs. */}
                 <div ref={turnstileContainerRef} className="odo-scan__turnstile" />
                 {errors.turnstile ? <p className="odo-scan__inline-error" role="alert">{errors.turnstile}</p> : null}
                 <button type="submit" className="odo-scan__submit" disabled={busy}>
@@ -797,119 +794,83 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
               </form>
               <ResearchPreview phase="idle" step="website" />
             </>
-          ) : showQuestion ? (
-            <>
-              <PhaseTrack phase="questions" />
-              <div className="odo-scan__question-panel">
-                <p className="odo-scan__section-kicker">ONE QUESTION AT A TIME</p>
-                <h2>{question.text}</h2>
-                <form onSubmit={submitAnswer}>
-                  {Array.isArray(question.options) && question.options && question.options.length ? (
-                    question.multiSelect ? (
-                      <>
-                        <p className="odo-scan__multiselect-hint">Select all that apply, then continue.</p>
-                        <div className="odo-scan__options odo-scan__options--multi" role="group" aria-label="Choose one or more answers">
-                          {(question.options || []).map((option) => {
-                            const value = typeof option === "string" ? option : option.value;
-                            const label = typeof option === "string" ? option : option.label || value;
-                            const checked = selectedOptions.includes(value);
-                            return (
-                              <label key={value} className={`odo-scan__option odo-scan__option--checkbox${checked ? " is-selected" : ""}`}>
-                                <input
-                                  type="checkbox"
-                                  checked={checked}
-                                  disabled={busy}
-                                  onChange={() => setSelectedOptions((current) => (current.includes(value) ? current.filter((v) => v !== value) : [...current, value]))}
-                                />
-                                <span>{label}</span>
-                              </label>
-                            );
-                          })}
-                        </div>
-                        <button
-                          type="button"
-                          className="odo-scan__submit"
-                          disabled={busy || selectedOptions.length === 0}
-                          onClick={(event: React.MouseEvent<HTMLButtonElement>) => submitAnswer(event, selectedOptions.join(" | "))}
-                        >
-                          Continue <span aria-hidden="true">→</span>
-                        </button>
-                      </>
-                    ) : (
-                      <div className="odo-scan__options" role="group" aria-label="Choose an answer">
-                        {(question.options || []).map((option) => {
-                          const value = typeof option === "string" ? option : option.value;
-                          const label = typeof option === "string" ? option : option.label || value;
-                          return <button key={value} type="button" className="odo-scan__option" disabled={busy} onClick={(event: React.MouseEvent<HTMLButtonElement>) => submitAnswer(event, value)}>{label}</button>;
-                        })}
-                      </div>
-                    )
-                  ) : (
-                    <>
-                      <textarea value={answer} onChange={(event) => setAnswer(event.target.value)} rows={5} autoFocus aria-label="Your answer" placeholder="Write your answer here" />
-                      <button type="submit" className="odo-scan__submit" disabled={busy || !answer.trim()}>Continue <span aria-hidden="true">→</span></button>
-                    </>
-                  )}
+          ) : phase === "error" ? (
+            <div className="odo-scan__terminal" role="alert">
+              <p className="odo-scan__section-kicker">SCAN STOPPED</p>
+              <h2>We need to try again later.</h2>
+              <p>{message || ODO_COPY.unavailable}</p>
+              <button type="button" className="odo-scan__submit" onClick={startNewScan}>Return to scan <span aria-hidden="true">→</span></button>
+            </div>
+          ) : inConversation ? (
+            <div className="odo-chat">
+              <div className="odo-chat__head">
+                <PhaseTrack phase={phase === "questions" ? "questions" : "summary"} />
+                {phase === "questions" && questionNumber > 0 ? (
+                  <p className="odo-chat__progress">Question {questionNumber} of up to {progress?.max_questions ?? 15}</p>
+                ) : null}
+              </div>
+
+              <div className="odo-chat__thread" ref={threadRef} aria-live="polite" aria-label="Conversation with ODO">
+                {chat.map((item) => <ChatBubble key={item.id} item={item} />)}
+                {optimistic ? <ChatBubble item={optimistic} /> : null}
+                {phase === "questions" && odoTyping ? <TypingBubble /> : null}
+              </div>
+
+              {phase === "questions" ? (
+                <form className="odo-chat__composer" onSubmit={(event) => { event.preventDefault(); void sendTurn("message"); }}>
+                  <textarea
+                    ref={composerRef}
+                    value={draft}
+                    onChange={(event) => setDraft(event.target.value)}
+                    onKeyDown={onComposerKeyDown}
+                    rows={3}
+                    maxLength={2000}
+                    autoFocus
+                    disabled={!canType}
+                    aria-label="Your answer"
+                    placeholder={odoTyping ? "ODO is typing…" : pending?.hint || "Type your answer…"}
+                  />
+                  <div className="odo-chat__actions">
+                    <button type="button" className="odo-chat__skip" disabled={!canType} onClick={() => void sendTurn("skip")}>
+                      Prefer not to answer
+                    </button>
+                    <button type="submit" className="odo-chat__send" disabled={!canType || !draft.trim()}>
+                      Send <span aria-hidden="true">→</span>
+                    </button>
+                  </div>
+                  {message ? <p className="odo-scan__server-message" role="alert">{message}</p> : null}
+                  <p className="odo-chat__fine">
+                    You can ask ODO a question at any time{progress ? ` — ${progress.visitor_questions_left} left during this scan` : ""}.
+                  </p>
+                  <button type="button" className="odo-scan__cancel" onClick={cancelScan}>Pause scan</button>
                 </form>
-                <button type="button" className="odo-scan__cancel" onClick={cancelScan}>Pause scan</button>
-              </div>
-            </>
-          ) : showWritingNext ? (
-            // Fills the exact gap submitAnswer()'s fetch() await used to
-            // leave empty — see showWritingNext above.
-            <>
-              <PhaseTrack phase="questions" />
-              <div className="odo-scan__question-panel odo-scan__question-panel--writing" role="status" aria-live="polite">
-                <p className="odo-scan__section-kicker">ONE QUESTION AT A TIME</p>
-                <div className="odo-scan__writing-indicator">
-                  <h2>ODO is writing your next question<span className="odo-scan__typing-dots" aria-hidden="true"><span></span><span></span><span></span></span></h2>
+              ) : phase === "evaluating" ? (
+                <div className="odo-chat__status" role="status">
+                  <LiveSpinner /> <span>ODO is preparing your review…</span>
                 </div>
-                <p className="odo-scan__workspace-subtitle">Checking your answer against what we already found about your business.</p>
-              </div>
-            </>
-          ) : showSummary ? (
+              ) : (
+                <div className="odo-scan__terminal odo-chat__ending" role="status">
+                  <p className="odo-scan__section-kicker">{endKind === "insufficient" ? "SCAN ENDED" : "INTERVIEW COMPLETE"}</p>
+                  <h2>{endKind === "insufficient" ? "Not enough reliable information." : "Thank you — your interview is complete."}</h2>
+                  <p>{message}</p>
+                  {endKind === "complete" ? <p className="odo-scan__legal">{ODO_COPY.protectionLine}</p> : null}
+                  <button type="button" className="odo-scan__submit" onClick={startNewScan}>Start another scan <span aria-hidden="true">→</span></button>
+                </div>
+              )}
+            </div>
+          ) : phase === "summary" ? (
             <div className="odo-scan__terminal" role="status">
-              <p className="odo-scan__section-kicker">SCAN COMPLETE</p>
-              <h2>Your scan is complete.</h2>
+              <p className="odo-scan__section-kicker">{endKind === "insufficient" ? "SCAN ENDED" : "SCAN COMPLETE"}</p>
+              <h2>{endKind === "insufficient" ? "Not enough reliable information." : "Your scan is complete."}</h2>
               <p>{message}</p>
-              {findingsSummary ? (
-                <div className="odo-scan__findings-summary">
-                  <p>We identified <strong>{findingsSummary.total} area{findingsSummary.total === 1 ? "" : "s"}</strong> across your business:</p>
-                  <ul>
-                    <li><span aria-hidden="true">🔴</span> {findingsSummary.security_issues} critical finding{findingsSummary.security_issues === 1 ? "" : "s"} in your security posture</li>
-                    <li><span aria-hidden="true">🟠</span> {findingsSummary.marketing_gaps} gap{findingsSummary.marketing_gaps === 1 ? "" : "s"} in your sales and marketing system</li>
-                    <li><span aria-hidden="true">🟡</span> {findingsSummary.opportunities} opportunit{findingsSummary.opportunities === 1 ? "y" : "ies"} your competitors are already using</li>
-                  </ul>
-                </div>
-              ) : null}
-              <p className="odo-scan__legal">These findings are based on publicly available information and ODO’s initial analysis. An ORAGROL specialist reviews every report before delivery.</p>
+              {endKind === "complete" ? <p className="odo-scan__legal">{ODO_COPY.protectionLine}</p> : null}
               <button type="button" className="odo-scan__submit" onClick={startNewScan}>Start another scan <span aria-hidden="true">→</span></button>
             </div>
-          ) : showError ? (
-            <div className="odo-scan__terminal" role="alert">
-              <p className="odo-scan__section-kicker">SCAN PAUSED</p>
-              <h2>We need to try again.</h2>
-              <p>{message}</p>
-              <button type="button" className="odo-scan__submit" onClick={() => { setPhase("idle"); setMessage(""); }}>Return to scan <span aria-hidden="true">→</span></button>
-            </div>
-          ) : showEvaluating ? (
-            // ADDED 2026-10-01 alongside the "evaluating" status fix above —
-            // this is the stretch between the last question and the
-            // finished report (matching services, writing the SWOT and
-            // outlook). PhaseTrack gets the real phase so "Summary" lights
-            // up as active (anything other than "researching"/"questions"
-            // resolves to stage 3 — see PhaseTrack), instead of staying on
-            // "Research" like the old catch-all did.
-            <>
-              <PhaseTrack phase={phase} />
-              <div className="odo-scan__live-heading"><h2>ODO is building your report.</h2><span className="odo-scan__live-badge"><LiveSpinner /> LIVE</span></div>
-              <p className="odo-scan__workspace-subtitle">Matching your answers to services and writing your summary — this only takes a few seconds.</p>
-            </>
           ) : (
             <>
               <div className="odo-scan__live-heading"><h2>ODO is researching.</h2><span className="odo-scan__live-badge"><LiveSpinner /> LIVE</span></div>
-              <p className="odo-scan__workspace-subtitle">We are reviewing your public business information before asking anything unnecessary.</p>
-              <ResearchPreview phase={showLive ? "researching" : phase} step={step} />
+              <p className="odo-scan__workspace-subtitle">Reviewing your public business information first, so ODO only asks what research can&apos;t see.</p>
+              <ResearchPreview phase="researching" step={step} />
               <button type="button" className="odo-scan__cancel" onClick={cancelScan}>Pause scan</button>
             </>
           )}

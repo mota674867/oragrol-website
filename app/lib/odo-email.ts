@@ -52,6 +52,9 @@ export async function sendOdoAdminReportEmail(params: {
   visitorEmail: string;
   sessionId: string;
   condition: "complete" | "insufficient_data";
+  /** Full interview with ODO's judgement of every answer (odo-pipeline.ts reviewerTranscript) — Master Reference §37.11. */
+  transcript?: string;
+  urgent?: boolean;
 }): Promise<SendOdoAdminEmailResult> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.CONTACT_FROM_EMAIL;
@@ -63,52 +66,80 @@ export async function sendOdoAdminReportEmail(params: {
     const { cover: coverImageUri, closing: closingImageUri } = getCyberHealthReportPhotos();
     const pdf = await renderToBuffer(OdoReportPdf({ report: params.report, qrDataUri, coverImageUri, closingImageUri }));
 
-    // ADDED 2026-10-01, UPDATED same day for the Phase 2 rebuild — surfaces,
-    // on every scan, whether question selection actually ran through
-    // Claude's dynamic interviewer (odo-interviewer.ts) or silently fell
-    // back to the old fixed-question logic (odo-questions.ts's
-    // nextQuestion(), Jev-scored or fixed-priority). This is the direct,
-    // checkable answer to "ODO repeats the same question for every
-    // business" — rather than Mohammad having to take my word for whether
-    // the interviewer is configured in production, he can read it off the
-    // very next scan. 0 Claude-sourced questions across several different
-    // businesses in a row means ANTHROPIC_API_KEY is missing or the
-    // interviewer is erroring on every call (writeNextQuestion() in
-    // odo-interviewer.ts returns the old nextQuestion()'s result on any
-    // failure and falls back silently by design — safe for the visitor, but
-    // invisible unless logged somewhere like this). "jev"/"fallback" here
-    // mean the OLD mechanism ran (odo-interviewer.ts's own fallback path) —
-    // not Jev picking questions in normal operation, which Phase 2 already
-    // ended.
-    const methods = params.report.internal.questionMethod;
-    const counts: Record<string, number> = { claude_custom: 0, claude_library: 0, jev: 0, fallback: 0 };
-    for (const m of methods) counts[m] = (counts[m] ?? 0) + 1;
-    const claudeCount = counts.claude_custom + counts.claude_library;
-    const questionMethodLine = methods.length
-      ? `Question selection: ${methods.length} asked — ${counts.claude_custom} Claude-written, ${counts.claude_library} Claude reused from the library, ${counts.jev} via legacy Jev scoring, ${counts.fallback} via fixed fallback order${claudeCount === 0 ? "  ⚠ Claude never picked a single question this scan — check ANTHROPIC_API_KEY / interviewer errors; the whole scan ran on the old fixed-question logic" : ""}`
-      : `Question selection: 0 questions asked (research alone was sufficient)`;
-
     const resend = new Resend(apiKey);
     const { data, error } = await resend.emails.send({
       from,
       to: [ODO_ADMIN_EMAIL],
       replyTo: from,
-      subject: `ODO scan report — ${params.companyName} (${params.report.reference})`,
+      subject: `${params.urgent ? "⚠ URGENT — " : ""}ODO scan report — ${params.companyName} (${params.report.reference})`,
       text: [
         `A new ODO scan just finished.`,
         ``,
         `Company: ${params.companyName}`,
         `Visitor email: ${params.visitorEmail}`,
         `Condition: ${params.condition}`,
+        `Outcome: ${params.report.outcome}`,
         `Session ID: ${params.sessionId}`,
         `Report reference: ${params.report.reference}`,
-        questionMethodLine,
+        `AI cost: $${params.report.internal.aiCost.totalCostUsd.toFixed(4)}`,
+        ...(params.urgent ? [``, `⚠ The visitor described an active or recent security incident. Contact them directly.`] : []),
         ``,
         `This is the draft report, pending your review — it has not been sent to the client. The PDF is attached.`,
+        ``,
+        `════ INTERVIEW ════`,
+        params.transcript ?? "(no transcript)",
       ].join("\n"),
       attachments: [{ filename: `ODO_Report_${params.report.reference}.pdf`, content: pdf }],
     });
 
+    if (error) return { state: "failed", error: `Resend error: ${error.message ?? JSON.stringify(error)}`.slice(0, 500) };
+    if (!data?.id) return { state: "failed", error: "Resend returned no email id." };
+    return { state: "sent", providerId: data.id };
+  } catch (err) {
+    return { state: "failed", error: `Email send threw: ${err instanceof Error ? err.message : String(err)}`.slice(0, 500) };
+  }
+}
+
+/**
+ * The interview ended as "not enough reliable information" (Master Reference
+ * §37.4) — no report exists, so there is no PDF. Mohammad still sees exactly
+ * why ODO stopped, with the full judged transcript, so he can tell whether
+ * the stop was right (§37.11: his review is how ODO improves).
+ */
+export async function sendOdoAdminInsufficientEmail(params: {
+  companyName: string;
+  visitorEmail: string;
+  sessionId: string;
+  reason: string;
+  transcript: string;
+  costUsd: number;
+}): Promise<SendOdoAdminEmailResult> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.CONTACT_FROM_EMAIL;
+  if (!apiKey) return { state: "skipped", reason: "RESEND_API_KEY is not configured." };
+  if (!from) return { state: "skipped", reason: "CONTACT_FROM_EMAIL is not configured." };
+  try {
+    const resend = new Resend(apiKey);
+    const { data, error } = await resend.emails.send({
+      from,
+      to: [ODO_ADMIN_EMAIL],
+      replyTo: from,
+      subject: `ODO scan stopped — not enough reliable information — ${params.companyName}`,
+      text: [
+        `An ODO scan ended without a report: the answers couldn't support a reliable analysis.`,
+        ``,
+        `Company: ${params.companyName}`,
+        `Visitor email: ${params.visitorEmail}`,
+        `Session ID: ${params.sessionId}`,
+        `Why ODO stopped: ${params.reason}`,
+        `AI cost: $${params.costUsd.toFixed(4)}`,
+        ``,
+        `No report was produced and nothing was offered to the visitor. Read the conversation below and judge whether stopping was right.`,
+        ``,
+        `════ INTERVIEW ════`,
+        params.transcript,
+      ].join("\n"),
+    });
     if (error) return { state: "failed", error: `Resend error: ${error.message ?? JSON.stringify(error)}`.slice(0, 500) };
     if (!data?.id) return { state: "failed", error: "Resend returned no email id." };
     return { state: "sent", providerId: data.id };

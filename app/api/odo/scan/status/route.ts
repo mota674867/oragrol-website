@@ -4,7 +4,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/app/lib/odo-redis";
-import { buildFindingsSummary } from "@/app/lib/odo-research";
+import { publicInterviewView, type InterviewState, type ChatMessage } from "@/app/lib/odo-interviewer";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   const sessionId = req.nextUrl.searchParams.get("session_id");
@@ -18,13 +18,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   }
 
   const findings = session.findings as Record<string, unknown>;
-  const nextQuestion = findings._nextQuestion as { id: string; text: string; options?: string[] } | undefined;
 
-  // Same end-screen numbers the SSE stream sends on completion (odo/scan
-  // events/route.ts) — polling is the required fallback for browsers/
-  // deployments without SSE support, so it needs to carry the same data,
-  // not just the generic "scan complete" status.
-  const isTerminalComplete = session.status === "complete" || session.status === "insufficient_data";
+  // The conversation (Master Reference §37.6) — ODO's and the visitor's
+  // messages only. ODO's judgements, extracted evidence and internal reasons
+  // never leave the server (publicInterviewView strips them).
+  const view = publicInterviewView(findings._interview as InterviewState | undefined, findings._chat as ChatMessage[] | undefined);
+  const terminalMessage =
+    session.status === "insufficient_data" || session.status === "failed" ? session.step : undefined;
 
   return NextResponse.json({
     session_id: sessionId,
@@ -33,10 +33,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     phase: session.phase,
     step: session.step,
     questions_asked: session.questionsAsked,
-    question: session.status === "questioning" ? nextQuestion : undefined,
-    industry: findings._industryDetected || null,
-    business_size: findings._businessSizeDetected || null,
-    has_findings: Object.keys(findings).filter(k => !k.startsWith("_")).length > 0,
-    findings_summary: isTerminalComplete ? buildFindingsSummary(findings) : undefined,
+    ...(terminalMessage ? { message: terminalMessage } : {}),
+    ...view,
   });
 }

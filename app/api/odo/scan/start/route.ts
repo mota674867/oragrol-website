@@ -6,9 +6,11 @@
 import { after, NextRequest, NextResponse } from "next/server";
 import { checkCooldowns, createSession, getIncompleteSession, checkIpDailyLimit } from "@/app/lib/odo-redis";
 import { runParallelResearch, type ResearchFindings } from "@/app/lib/odo-research";
-import { pickNextQuestion, persistCustomQuestion, runEvaluation } from "@/app/lib/odo-pipeline";
+import { interviewContext } from "@/app/lib/odo-pipeline";
+import { openInterview } from "@/app/lib/odo-interviewer";
+import { AI_UNAVAILABLE_MESSAGE } from "@/app/lib/odo-playbook";
 import { getClientIp, rateLimit } from "@/app/lib/rate-limit";
-import { EMPTY_USAGE, addJevUsage, addClaudeUsage } from "@/app/lib/odo-cost";
+import { EMPTY_USAGE, addClaudeUsage } from "@/app/lib/odo-cost";
 import { checkDailySpendGate } from "@/app/lib/odo-spend";
 import {
   verifyTurnstile,
@@ -377,73 +379,48 @@ async function runResearchAsync(
     // Run all parallel API research
     const findings = await runParallelResearch(businessName, website, hasWebsite, visitorEmail);
 
-    // Update session with findings
+    // Research done → ODO writes its opening message and first question
+    // from what it found (Master Reference §37.2). Status stays
+    // "researching" until the opening actually exists, so the browser never
+    // lands on an empty question screen.
     await updateSession(sessionId, {
       findings: findings as unknown as Record<string, unknown>,
-      phase: "questioning",
-      step: "Research complete — deciding what to ask...",
-      status: "questioning",
+      step: "Preparing your interview...",
     });
-
-    // Ask ODO's adaptive selector what to ask first — Jev-scored materiality
-    // when TypeSafe is configured, a fixed priority order otherwise
-    // (pickNextQuestion/nextQuestion never throw — see odo-questions.ts).
     const profile = { industry: findings.industry, businessSize: findings.businessSize };
-    const decision = await pickNextQuestion(findings, profile, hasWebsite, {}, []);
-    // Real usage carried forward (via findings._aiUsage) so the scan's final
-    // cost is exact, not just the evaluation-phase portion (odo-cost.ts).
-    // Includes the L1 Business Profile's Claude call (odo-business-profile.ts)
-    // and the Phase 2 interviewer's Claude call (odo-interviewer.ts) — both
-    // AI spend that now happens before/during question-picking, not only at
-    // evaluation. Jev and Claude usage are added separately, never merged —
-    // the two vendors are priced ~70x apart (odo-cost.ts).
-    const aiUsageSoFar = addClaudeUsage(
-      addJevUsage(addClaudeUsage(EMPTY_USAGE, findings.businessProfileUsage), decision.jevUsage),
-      decision.claudeUsage
-    );
-
-    let baseFindings: Record<string, unknown> = {
+    const session = await getSession(sessionId);
+    if (!session) return;
+    const opening = await openInterview(interviewContext(findings, session, profile));
+    const aiUsageSoFar = addClaudeUsage(addClaudeUsage(EMPTY_USAGE, findings.businessProfileUsage), opening.usage);
+    const baseFindings: Record<string, unknown> = {
       ...(findings as unknown as Record<string, unknown>),
       _industryDetected: findings.industry,
       _businessSizeDetected: findings.businessSize,
       _researchErrors: findings.errors,
-      _questionOrder: [] as string[],
-      _questionMethods: {} as Record<string, string>,
       _aiUsage: aiUsageSoFar,
+      _interview: opening.state,
+      _chat: opening.chat,
     };
-    // The very first question can already be Claude-generated — by this
-    // point research (including the L1 Business Profile) is already done,
-    // so the interviewer has real material to work with from question one.
-    if (!decision.done && decision.method === "claude_custom") {
-      baseFindings = persistCustomQuestion(baseFindings, decision.question);
-    }
 
-    if (decision.done) {
-      // Research alone already covers everything worth asking (rare, but
-      // §2/§3 says never manufacture a question just to have one) — go
-      // straight to evaluation.
+    if (opening.outcome === "failed") {
+      // No fixed-question fallback exists (§37.2). The scan stops honestly;
+      // no cooldown is set, so the visitor can simply try again later.
       await updateSession(sessionId, {
         findings: baseFindings,
-        status: "evaluating",
-        phase: "evaluating",
-        step: "Building your opportunity map...",
+        status: "failed",
+        phase: "failed",
+        step: AI_UNAVAILABLE_MESSAGE,
       });
-      const session = await getSession(sessionId);
-      if (session) {
-        await runEvaluation(sessionId, session, findings, profile, {}, [], [], aiUsageSoFar);
-      }
-    } else {
-      await updateSession(sessionId, {
-        phase: "questioning",
-        step: "Ready for questions",
-        status: "questioning",
-        findings: {
-          ...baseFindings,
-          _nextQuestion: decision.question,
-          _questionMethods: { [decision.question.id]: decision.method },
-        },
-      });
+      return;
     }
+
+    await updateSession(sessionId, {
+      findings: baseFindings,
+      status: "questioning",
+      phase: "questioning",
+      step: `turn-${opening.state.version}`,
+      questionsAsked: opening.state.questionsAsked,
+    });
 
     // Update HubSpot with research summary (best-effort)
     //

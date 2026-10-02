@@ -342,3 +342,23 @@ export async function checkIpDailyLimit(ip: string, limit: number): Promise<{ ok
   if (count === 1) await redis.expire(key, 24 * 60 * 60);
   return { ok: count <= limit, count };
 }
+
+// --- Interview turn lock (Master Reference §37) ---
+//
+// One interview turn per session at a time. A double-click, a second tab, or
+// a retried request must never run two Claude turns against the same state —
+// that is how an answer gets judged twice or a question gets skipped. The
+// lock self-expires so a crashed turn can never block a scan forever.
+
+const TURN_LOCK_PREFIX = "odo:turnlock:";
+
+export async function acquireTurnLock(sessionId: string): Promise<boolean> {
+  const redis = getRedis();
+  const res = await redis.set(`${TURN_LOCK_PREFIX}${sessionId}`, "1", { nx: true, ex: 90 });
+  return res === "OK";
+}
+
+export async function releaseTurnLock(sessionId: string): Promise<void> {
+  const redis = getRedis();
+  await redis.del(`${TURN_LOCK_PREFIX}${sessionId}`);
+}

@@ -4,7 +4,7 @@
 
 import { NextRequest } from "next/server";
 import { getSession } from "@/app/lib/odo-redis";
-import { buildFindingsSummary } from "@/app/lib/odo-research";
+import { publicInterviewView, type InterviewState, type ChatMessage } from "@/app/lib/odo-interviewer";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -70,21 +70,16 @@ export async function GET(req: NextRequest) {
             // status is now exactly ONE self-sufficient message, matching
             // how the polling fallback (/api/odo/scan/status) already
             // worked — there is no second message left to race against.
+            const view = publicInterviewView(findings._interview as InterviewState | undefined, findings._chat as ChatMessage[] | undefined);
             send({
               type: isTerminalComplete ? "complete" : "status",
               status: session.status,
+              condition: session.condition,
               phase: session.phase,
               step: session.step,
               questions_asked: session.questionsAsked,
-              question: session.status === "questioning" ? findings._nextQuestion : undefined,
-              ...(isTerminalComplete
-                ? {
-                    condition: session.condition,
-                    swot: session.swot,
-                    service_matches: session.serviceMatches,
-                    findings_summary: buildFindingsSummary(findings),
-                  }
-                : {}),
+              ...(session.status === "insufficient_data" || session.status === "failed" ? { message: session.step } : {}),
+              ...view,
             });
 
             // Terminal states — close the stream

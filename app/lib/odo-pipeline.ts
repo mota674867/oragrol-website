@@ -1,28 +1,24 @@
-// ORAGROL ODO — Question selection + evaluation pipeline
+// ORAGROL ODO — Interview context + evaluation pipeline
 //
-// The one place that turns (findings, answers-so-far) into "what to ask
-// next" and, once questioning ends, turns (findings, all answers) into the
-// finished report. Shared by both /api/odo/scan/start (the rare case where
-// research alone already covers everything — zero questions needed) and
-// /api/odo/scan/answer (the normal case — questioning ends after N
-// answers). Keeping this in one file means there is exactly one evaluation
-// path to get right, not two copies that can drift.
+// The one place that turns research findings into the interviewer's context
+// and, once the interview ends, turns (findings + judged answers) into the
+// finished report — or, when the answers can't be relied on, into the honest
+// "not enough reliable information" ending (Master Reference §37.4), which
+// produces no report, no offers, and stops all further AI spend.
 //
-// Every AI step underneath (Jev via odo-questions/odo-matching, Claude via
-// odo-swot) has a deterministic fallback — see those files — so nothing
-// here can hard-fail a scan just because a vendor API is slow or down.
+// Shared by /api/odo/scan/start (opening turn) and /api/odo/scan/answer
+// (every later turn), so there is exactly one evaluation path to get right.
 
 import { updateSession, markSessionComplete, getSession, type OdoSession } from "./odo-redis";
 import { buildLedger, ledgerAsText } from "./odo-ledger";
-import { QUESTION_BY_ID, type NextQuestionDecision } from "./odo-questions";
-import { writeNextQuestion, type AskedQa } from "./odo-interviewer";
+import type { InterviewContext, InterviewState, ChatMessage } from "./odo-interviewer";
 import { matchServices } from "./odo-matching";
 import { buildSwot } from "./odo-swot";
 import { buildOutcomeNarrative } from "./odo-outcome";
 import { buildReport, type OdoReport } from "./odo-report";
 import type { ResearchFindings } from "./odo-research";
 import { attachReportPdfToHubSpot } from "./odo-hubspot-report";
-import { sendOdoAdminReportEmail } from "./odo-email";
+import { sendOdoAdminReportEmail, sendOdoAdminInsufficientEmail } from "./odo-email";
 import { EMPTY_USAGE, addJevUsage, mergeUsage, computeCost, type AiUsageTotals } from "./odo-cost";
 import { recordLifetimeAiCost } from "./odo-redis";
 import { recordScanSpend } from "./odo-spend";
@@ -31,71 +27,80 @@ const HUBSPOT_TOKEN = process.env.HUBSPOT_ACCESS_TOKEN;
 
 export type BusinessProfile = { industry: string | null; businessSize: ResearchFindings["businessSize"] };
 
-/**
- * Ask ODO's adaptive interviewer what to ask next, given everything known so
- * far (research + answers). Wraps buildLedger + writeNextQuestion (Phase 2,
- * odo-interviewer.ts — Claude writes the question, falling back to the
- * original library-only nextQuestion() on any failure) so callers never
- * assemble the ledger or the asked-question history by hand. Never throws.
- */
-export async function pickNextQuestion(
+/** Everything the interviewer reads about this business — research only, client-audience only. */
+export function interviewContext(
   findings: ResearchFindings,
-  profile: BusinessProfile,
-  hasWebsite: boolean,
-  answers: Record<string, string>,
-  answerOrder: string[]
-): Promise<NextQuestionDecision> {
-  const ledger = buildLedger(findings, answers, answerOrder);
+  session: Pick<OdoSession, "visitorCompany" | "visitorWebsite">,
+  profile: BusinessProfile
+): InterviewContext {
+  // Research-only ledger: interview evidence is passed to the model through
+  // its own judged transcript, never twice.
+  const raw = findings as unknown as Record<string, unknown>;
+  const researchOnly = { ...raw, _interview: undefined } as unknown as ResearchFindings;
+  return {
+    company: session.visitorCompany,
+    website: session.visitorWebsite,
+    industry: profile.industry,
+    businessSize: profile.businessSize,
+    profile: findings.businessProfile ?? null,
+    complianceSignals: findings.complianceSignals ?? null,
+    researchText: ledgerAsText(buildLedger(researchOnly), { includeInternal: false }),
+  };
+}
 
-  // Custom (Claude-generated) questions have no entry in QUESTION_BY_ID, so
-  // their text has to come from wherever the caller persisted it — see
-  // persistCustomQuestion() below, written by the two /api/odo/scan routes
-  // whenever a "claude_custom" question gets served. Read via an unsafe cast
-  // because `findings` here is genuinely the full session findings record
-  // (the callers pass it through `as unknown as ResearchFindings`), same
-  // pattern as every other `_`-prefixed scan-state field in this codebase.
-  const customQuestions = ((findings as unknown as Record<string, unknown>)._customQuestions as
-    | Record<string, { text: string; options?: string[] }>
-    | undefined) ?? {};
-  const askedSoFar: AskedQa[] = answerOrder.map((id) => ({
-    id,
-    text: QUESTION_BY_ID[id]?.text ?? customQuestions[id]?.text ?? "(unknown question)",
-    answer: answers[id] ?? "",
-  }));
-  const customQuestionCount = answerOrder.filter((id) => id.startsWith("dyn_")).length;
-
-  return writeNextQuestion({
-    ctx: {
-      industry: profile.industry,
-      businessSize: profile.businessSize,
-      hasWebsite,
-      answers,
-      knownText: ledgerAsText(ledger, { includeInternal: false }),
-    },
-    businessProfile: findings.businessProfile,
-    complianceSignals: findings.complianceSignals,
-    askedSoFar,
-    customQuestionCount,
-  });
+/** Plain-text transcript with ODO's judgement of every turn — for Mohammad's review email only. */
+export function reviewerTranscript(state: InterviewState | undefined, chat: ChatMessage[] | undefined): string {
+  if (!state || !chat) return "(no interview)";
+  const lines = chat.map((m) => (m.role === "odo" ? `ODO: ${m.text}` : m.kind === "skip" ? "VISITOR: [Prefer not to answer]" : `VISITOR: ${m.text}`));
+  const judged = state.judged.map((j, i) => `${i + 1}. ${j.type}${j.quality ? ` / ${j.quality}` : ""} — "${j.visitorText.slice(0, 160)}"${j.note ? ` — ${j.note}` : ""}`);
+  return [
+    `Questions asked: ${state.questionsAsked} · answers: ${state.answered} · skips: ${state.skips} · nonsense: ${state.nonsense} · visitor questions: ${state.visitorQuestions}${state.urgent ? " · ⚠ URGENT INCIDENT DESCRIBED" : ""}`,
+    `Ending: ${state.ended ? `${state.ended.outcome} — ${state.ended.reason}` : "in progress"}`,
+    "",
+    "── How ODO judged each turn ──",
+    ...judged,
+    "",
+    "── Full conversation ──",
+    ...lines,
+  ].join("\n");
 }
 
 /**
- * Call right after pickNextQuestion returns a "claude_custom" decision, so
- * the NEXT call's askedSoFar (above) can resolve this question's text —
- * QUESTION_BY_ID has no entry for a dynamically-generated id. Returns the
- * updated findings object for the caller to persist (odo-redis.ts's
- * updateSession); never mutates in place, same convention as the rest of
- * the scan-state handling in the two /api/odo/scan routes.
+ * The interview ended as "not enough reliable information" (§37.4): no
+ * report, no offers, no further AI calls. Records the spend already incurred,
+ * marks the HubSpot contact, and tells Mohammad why — with the transcript —
+ * so he can judge whether ODO was right to stop.
  */
-export function persistCustomQuestion(
-  findings: Record<string, unknown>,
-  question: { id: string; text: string; options?: string[] }
-): Record<string, unknown> {
-  const customQuestions = (findings._customQuestions as Record<string, { text: string; options?: string[] }> | undefined) ?? {};
-  return {
-    ...findings,
-    _customQuestions: { ...customQuestions, [question.id]: { text: question.text, options: question.options } },
-  };
+export async function finalizeInsufficient(
+  sessionId: string,
+  session: Pick<OdoSession, "visitorCompany" | "visitorEmail" | "hubspotContactId">,
+  state: InterviewState,
+  chat: ChatMessage[],
+  aiUsage: AiUsageTotals
+): Promise<void> {
+  const cost = computeCost(aiUsage);
+  await recordLifetimeAiCost(aiUsage, cost.totalCostUsd).catch((err) => console.error("[ODO] Failed to record lifetime AI cost:", err));
+  await recordScanSpend(cost.totalCostUsd).catch((err) => console.error("[ODO] Failed to record scan spend:", err));
+  console.log(`[ODO Cost] ${sessionId} — insufficient ending, total $${cost.totalCostUsd.toFixed(6)}`);
+
+  if (session.hubspotContactId && HUBSPOT_TOKEN) {
+    await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${session.hubspotContactId}`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${HUBSPOT_TOKEN}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ properties: { client_reference: "insufficient_data" } }),
+    }).catch(() => {});
+  }
+
+  await sendOdoAdminInsufficientEmail({
+    companyName: session.visitorCompany,
+    visitorEmail: session.visitorEmail,
+    sessionId,
+    reason: state.ended?.reason ?? "insufficient",
+    transcript: reviewerTranscript(state, chat),
+    costUsd: cost.totalCostUsd,
+  })
+    .then((r) => { if (r.state !== "sent") console.warn(`[ODO] Insufficient-ending admin email not sent (${r.state}).`); })
+    .catch((err) => console.error("[ODO] Insufficient-ending admin email failed:", err));
 }
 
 /**
@@ -109,21 +114,26 @@ export async function runEvaluation(
   session: Pick<OdoSession, "visitorCompany" | "visitorWebsite" | "visitorEmail" | "hubspotContactId">,
   findings: ResearchFindings,
   profile: BusinessProfile,
-  answers: Record<string, string>,
-  questionOrder: string[],
-  questionMethod: string[],
-  /** Real Jev usage already spent picking questions during this scan, before evaluation started (odo-cost.ts) — accumulated from every /api/odo/scan/start and /api/odo/scan/answer call, so the final per-scan cost is exact, not just the evaluation-phase portion. */
+  /** Real AI usage already spent before evaluation (research, business profile, every interview turn) — so the final per-scan cost is exact, not just the evaluation-phase portion (odo-cost.ts). */
   priorAiUsage: AiUsageTotals = EMPTY_USAGE
 ): Promise<void> {
+  // The judged interview lives on the session findings (odo-interviewer.ts).
+  const raw = findings as unknown as Record<string, unknown>;
+  const interview = raw._interview as InterviewState | undefined;
+  const chat = raw._chat as ChatMessage[] | undefined;
+  const answers: Record<string, string> = Object.fromEntries(
+    (interview?.judged ?? [])
+      .filter((j) => j.type === "answer" || j.type === "answer_and_question")
+      .map((j) => [j.questionId, j.visitorText])
+  );
   try {
     await updateSession(sessionId, { step: "Building your evidence ledger..." });
-    const ledger = buildLedger(findings, answers, questionOrder);
+    const ledger = buildLedger(findings);
 
     await updateSession(sessionId, { step: "Matching services against the evidence..." });
     const matching = await matchServices(ledger, {
       industry: profile.industry,
       businessSize: profile.businessSize,
-      answers,
     });
 
     await updateSession(sessionId, { step: "Writing your summary..." });
@@ -174,7 +184,7 @@ export async function runEvaluation(
       outcomeNarrative,
       condition,
       answers,
-      questionMethod,
+      questionMethod: [],
       aiCost,
     });
 
@@ -227,6 +237,8 @@ export async function runEvaluation(
       visitorEmail: session.visitorEmail,
       sessionId,
       condition,
+      transcript: reviewerTranscript(interview, chat),
+      urgent: interview?.urgent === true,
     })
       .then((result) => {
         if (result.state !== "sent") console.warn(`[ODO] Admin report email not sent (${result.state}):`, "reason" in result ? result.reason : result.error);

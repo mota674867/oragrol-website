@@ -1,20 +1,33 @@
 // POST /api/odo/scan/answer
-// Receives visitor's answer to ODO's targeted question.
-// Updates session, asks ODO's adaptive selector for the next question, or
-// moves to evaluation once questioning is over (odo-pipeline.ts).
+//
+// One interview turn (rebuilt 2026-10-03, Master Reference §37). The visitor
+// sends either a typed message or a "Prefer not to answer" skip; ODO judges
+// it and replies — next question, a clarification, an answer to the
+// visitor's own question, a polite nonsense warning, or one of the endings.
+//
+// Request:  { session_id, version, message?: string, skip?: true }
+//   `version` is the interview version the browser last saw. A mismatch
+//   means the browser is behind (another tab, a retried request) and the
+//   turn is refused rather than run against state the visitor never saw.
+// Response: { status, chat, chat_version, awaiting, pending, progress, message? }
 
 import { after, NextRequest, NextResponse } from "next/server";
-import { getSession, updateSession } from "@/app/lib/odo-redis";
-import { pickNextQuestion, persistCustomQuestion, runEvaluation, type BusinessProfile } from "@/app/lib/odo-pipeline";
-import type { NextQuestionDecision } from "@/app/lib/odo-questions";
+import { getSession, updateSession, acquireTurnLock, releaseTurnLock, recordLifetimeAiCost } from "@/app/lib/odo-redis";
+import { interviewContext, finalizeInsufficient, runEvaluation, type BusinessProfile } from "@/app/lib/odo-pipeline";
+import {
+  recordVisitorMessage,
+  runInterviewTurn,
+  publicInterviewView,
+  type InterviewState,
+  type ChatMessage,
+} from "@/app/lib/odo-interviewer";
+import { AI_UNAVAILABLE_MESSAGE } from "@/app/lib/odo-playbook";
 import type { ResearchFindings } from "@/app/lib/odo-research";
-import { EMPTY_USAGE, addJevUsage, addClaudeUsage, computeCost, type AiUsageTotals } from "@/app/lib/odo-cost";
-import { isScanOverCap } from "@/app/lib/odo-spend";
+import { EMPTY_USAGE, addClaudeUsage, computeCost, type AiUsageTotals } from "@/app/lib/odo-cost";
+import { isScanOverCap, recordScanSpend } from "@/app/lib/odo-spend";
 
-// Lowered from 20 to 15 — approved 2026-10-01 alongside the ODO brain
-// rebuild (Mohammad: "then 15 question to write is enough, if no result
-// come up, no continue"). Must match odo-questions.ts's own MAX_QUESTIONS.
-const MAX_QUESTIONS = 15;
+/** A typed answer longer than this is not a real answer — and an unbounded body is an abuse vector. */
+const MAX_MESSAGE_CHARS = 2000;
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   let body: Record<string, unknown>;
@@ -23,140 +36,118 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   const sessionId = String(body.session_id || "").trim();
-  const questionId = String(body.question_id || "").trim();
-  // Multi-select questions (odo-questions.ts's multiSelect flag) send an
-  // array of chosen options — join them the same way the frontend and
-  // odo-ledger.ts's answerEvidence() expect: " | "-delimited, as one string.
-  const rawAnswer = body.answer;
-  const answer = Array.isArray(rawAnswer)
-    ? rawAnswer.map((a) => String(a).trim()).filter(Boolean).join(" | ")
-    : String(rawAnswer || "").trim();
+  const skip = body.skip === true;
+  const text = typeof body.message === "string" ? body.message.trim() : "";
+  const version = typeof body.version === "number" ? body.version : null;
 
-  if (!sessionId || !questionId || !answer) {
-    return NextResponse.json({ code: "validation_error", message: "session_id, question_id, and answer are required." }, { status: 400 });
+  if (!sessionId) return NextResponse.json({ code: "validation_error", message: "session_id is required." }, { status: 400 });
+  if (!skip && !text) return NextResponse.json({ code: "validation_error", message: "Please type an answer, or press “Prefer not to answer”." }, { status: 400 });
+  if (text.length > MAX_MESSAGE_CHARS) {
+    return NextResponse.json({ code: "validation_error", message: `Please keep your answer under ${MAX_MESSAGE_CHARS} characters.` }, { status: 400 });
   }
 
   const session = await getSession(sessionId).catch(() => null);
-  if (!session) {
-    return NextResponse.json({ code: "session_not_found" }, { status: 404 });
-  }
+  if (!session) return NextResponse.json({ code: "session_not_found" }, { status: 404 });
   if (session.status !== "questioning") {
     return NextResponse.json({ code: "invalid_state", message: `Session is in ${session.status} state, not questioning.` }, { status: 409 });
   }
 
   const findings = session.findings as Record<string, unknown>;
-  const answers = (findings._answers as Record<string, string> | undefined) || {};
-  answers[questionId] = answer;
-
-  const questionOrder = [...((findings._questionOrder as string[] | undefined) || []), questionId];
-  const questionMethods = { ...((findings._questionMethods as Record<string, string> | undefined) || {}) };
-
-  const newQuestionsAsked = session.questionsAsked + 1;
-
-  // A stated industry/size answer overrides (or fills a gap in) what
-  // research alone could tell — resolved below via profile, same as
-  // odo-questions.ts's own "ask industry/size first when unknown" rule.
-  if (questionId === "q_industry") {
-    findings._industryDetected = answer;
-  }
-  if (questionId === "q_staff_count") {
-    const sizeMap: Record<string, string> = { "1–10": "micro", "11–50": "small", "51–200": "medium", "200+": "large" };
-    findings._businessSizeDetected = sizeMap[answer] || null;
+  const interview = findings._interview as InterviewState | undefined;
+  const chat = (findings._chat as ChatMessage[] | undefined) ?? [];
+  if (!interview?.pending) return NextResponse.json({ code: "invalid_state", message: "No question is waiting for an answer." }, { status: 409 });
+  if (version !== null && version !== interview.version) {
+    return NextResponse.json({ code: "stale", status: session.status, ...publicInterviewView(interview, chat) }, { status: 409 });
   }
 
-  findings._answers = answers;
-  findings._questionOrder = questionOrder;
-  findings._nextQuestion = undefined; // Clear current question
+  if (!(await acquireTurnLock(sessionId).catch(() => false))) {
+    return NextResponse.json({ code: "busy", message: "ODO is still working on your last message." }, { status: 409 });
+  }
 
-  const researchFindings = findings as unknown as ResearchFindings;
-  const profile: BusinessProfile = {
-    industry: (findings._industryDetected as string | undefined) ?? researchFindings.industry ?? null,
-    businessSize: (findings._businessSizeDetected as ResearchFindings["businessSize"] | undefined) ?? researchFindings.businessSize ?? null,
-  };
+  try {
+    const input = skip ? { kind: "skip" as const } : { kind: "message" as const, text };
 
-  const decision: NextQuestionDecision =
-    newQuestionsAsked >= MAX_QUESTIONS
-      ? { done: true, reason: "question cap reached", method: "fallback", jevUsage: null, claudeUsage: null }
-      : await pickNextQuestion(researchFindings, profile, session.hasWebsite, answers, questionOrder);
+    // 1. Save the visitor's message first — a reload or poll mid-turn shows it.
+    const rec = recordVisitorMessage(interview, chat, input);
+    await updateSession(sessionId, { findings: { ...findings, _interview: rec.state, _chat: rec.chat }, step: `turn-${rec.state.version}` });
 
-  // Real Jev usage keeps accumulating across every answer in this scan
-  // (odo-cost.ts) — findings._aiUsage carries the running total from
-  // /api/odo/scan/start through every /api/odo/scan/answer call, so the
-  // figure runEvaluation ends with is the scan's exact, complete cost.
-  const priorAiUsage: AiUsageTotals = (findings._aiUsage as AiUsageTotals | undefined) ?? EMPTY_USAGE;
-  // Folds in BOTH Jev usage (legacy/fallback path) and Claude usage (Phase 2
-  // interviewer, odo-interviewer.ts) — kept as two separate adds, never
-  // merged into one field, because the two vendors are priced ~70x apart
-  // (odo-cost.ts) and conflating them would undercount real spend against
-  // the per-scan $2 cap.
-  const aiUsageSoFar = addClaudeUsage(addJevUsage(priorAiUsage, decision.jevUsage), decision.claudeUsage);
-  findings._aiUsage = aiUsageSoFar;
-
-  // Per-scan $2 hard cap (odo-spend.ts) — approved 2026-10-01 alongside the
-  // 15-question cap above. Checked on real measured spend, not an estimate,
-  // the same way the question-count cap works: once crossed, questioning
-  // stops immediately and evaluation runs with whatever evidence exists so
-  // far, rather than letting one scan's AI usage run unbounded.
-  const finalDecision: NextQuestionDecision = isScanOverCap(aiUsageSoFar)
-    ? { done: true, reason: `per-scan spend cap reached ($${computeCost(aiUsageSoFar).totalCostUsd.toFixed(4)})`, method: decision.method, jevUsage: null, claudeUsage: null }
-    : decision;
-
-  if (finalDecision.done) {
-    // Move to evaluation phase
-    await updateSession(sessionId, {
-      questionsAsked: newQuestionsAsked,
-      findings,
-      status: "evaluating",
-      phase: "evaluating",
-      step: "Building your opportunity map...",
-    });
-
-    // FIXED 2026-09-29 — same bug as /api/odo/scan/start: a bare
-    // fire-and-forget call has no guarantee it keeps running once this
-    // handler's response is sent on Vercel's serverless runtime. Without
-    // after(), a scan could answer its last question, get told
-    // "evaluating," and then sit there forever because the function
-    // generating the report was frozen mid-flight. after() keeps it alive
-    // until this actually finishes.
-    after(() =>
-      runEvaluation(sessionId, session, researchFindings, profile, answers, questionOrder, Object.values(questionMethods), aiUsageSoFar).catch(err => {
-        console.error("[ODO] Evaluation async failed:", err);
-      })
+    // 2. ODO's turn.
+    const researchFindings = findings as unknown as ResearchFindings;
+    const profile: BusinessProfile = {
+      industry: (findings._industryDetected as string | undefined) ?? researchFindings.industry ?? null,
+      businessSize: (findings._businessSizeDetected as ResearchFindings["businessSize"] | undefined) ?? researchFindings.businessSize ?? null,
+    };
+    const priorUsage: AiUsageTotals = (findings._aiUsage as AiUsageTotals | undefined) ?? EMPTY_USAGE;
+    const result = await runInterviewTurn(
+      interviewContext(researchFindings, session, profile),
+      rec.state,
+      rec.chat,
+      input,
+      { spendCapReached: isScanOverCap(priorUsage) }
     );
+    const usage = addClaudeUsage(priorUsage, result.usage);
+    const nextFindings = { ...findings, _interview: result.state, _chat: result.chat, _aiUsage: usage };
+    const view = publicInterviewView(result.state, result.chat);
 
-    return NextResponse.json({
+    if (result.outcome === "continue") {
+      await updateSession(sessionId, {
+        findings: nextFindings,
+        status: "questioning",
+        phase: "questioning",
+        step: `turn-${result.state.version}`,
+        questionsAsked: result.state.questionsAsked,
+      });
+      return NextResponse.json({ status: "questioning", ...view });
+    }
+
+    if (result.outcome === "failed") {
+      // §37.2: no fixed-question fallback. Stop honestly, no cooldown.
+      await updateSession(sessionId, { findings: nextFindings, status: "failed", phase: "failed", step: AI_UNAVAILABLE_MESSAGE });
+      const cost = computeCost(usage);
+      after(async () => {
+        await recordLifetimeAiCost(usage, cost.totalCostUsd).catch(() => {});
+        await recordScanSpend(cost.totalCostUsd).catch(() => {});
+      });
+      return NextResponse.json({ status: "failed", message: AI_UNAVAILABLE_MESSAGE, ...view });
+    }
+
+    if (result.outcome === "insufficient") {
+      const message = result.state.ended?.message ?? "";
+      await updateSession(sessionId, {
+        findings: nextFindings,
+        status: "insufficient_data",
+        condition: "insufficient_data",
+        phase: "complete",
+        step: message,
+        questionsAsked: result.state.questionsAsked,
+      });
+      after(() =>
+        finalizeInsufficient(sessionId, session, result.state, result.chat, usage).catch((err) =>
+          console.error("[ODO] finalizeInsufficient failed:", err)
+        )
+      );
+      return NextResponse.json({ status: "insufficient_data", message, ...view });
+    }
+
+    // finish → evaluation, kept alive past the response by after().
+    await updateSession(sessionId, {
+      findings: nextFindings,
       status: "evaluating",
       phase: "evaluating",
       step: "Building your opportunity map...",
-      questions_asked: newQuestionsAsked,
+      questionsAsked: result.state.questionsAsked,
     });
+    after(() =>
+      runEvaluation(sessionId, session, nextFindings as unknown as ResearchFindings, profile, usage).catch((err) =>
+        console.error("[ODO] Evaluation async failed:", err)
+      )
+    );
+    return NextResponse.json({ status: "evaluating", ...view });
+  } catch (err) {
+    console.error("[ODO] Interview turn crashed:", err);
+    await updateSession(sessionId, { status: "failed", phase: "failed", step: AI_UNAVAILABLE_MESSAGE }).catch(() => {});
+    return NextResponse.json({ status: "failed", message: AI_UNAVAILABLE_MESSAGE }, { status: 500 });
+  } finally {
+    await releaseTurnLock(sessionId).catch(() => {});
   }
-
-  // Not done — one more question.
-  questionMethods[finalDecision.question.id] = finalDecision.method;
-  findings._questionMethods = questionMethods;
-
-  // A Claude-generated question (Phase 2, odo-interviewer.ts) has no entry
-  // in QUESTION_BY_ID, so its text has to be persisted here — the NEXT
-  // pickNextQuestion call needs it to build the asked-question history and
-  // avoid Claude repeating or rephrasing it.
-  const findingsToSave =
-    finalDecision.method === "claude_custom"
-      ? persistCustomQuestion(findings, finalDecision.question)
-      : findings;
-
-  await updateSession(sessionId, {
-    questionsAsked: newQuestionsAsked,
-    findings: { ...findingsToSave, _nextQuestion: finalDecision.question },
-    status: "questioning",
-    step: `Question ${newQuestionsAsked + 1}`,
-  });
-
-  return NextResponse.json({
-    status: "questioning",
-    phase: "questioning",
-    step: `Question ${newQuestionsAsked + 1}`,
-    question: finalDecision.question,
-    questions_asked: newQuestionsAsked,
-  });
 }

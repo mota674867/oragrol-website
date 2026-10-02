@@ -22,7 +22,7 @@
 // reviewer/ZM77 only and never into the client report.
 
 import type { ResearchFindings } from "./odo-research";
-import { ANSWER_EVIDENCE, type AnswerEvidenceTemplate } from "./odo-questions";
+import type { InterviewState } from "./odo-interviewer";
 import { reportableCompetitors } from "./odo-competitors";
 
 export type Tier = "observed" | "inferred";
@@ -364,44 +364,57 @@ export function researchEvidence(f: ResearchFindings): Draft[] {
   return out;
 }
 
-/** Answer-derived facts, from the question bank's per-option templates. */
-export function answerEvidence(answers: Record<string, string>, order: string[]): Array<Draft & { questionId: string }> {
-  const out: Array<Draft & { questionId: string }> = [];
-  for (const qid of order) {
-    const ans = answers[qid];
-    if (!ans) continue;
-    // Multi-select questions (odo-questions.ts's multiSelect flag) store
-    // every chosen option joined with " | " into this one string — split
-    // it back out and union each option's evidence templates. A normal
-    // single-select answer has no " | " in it, so `parts` is just [ans]
-    // and this is identical to the old single-lookup behavior.
-    const parts = ans.includes(" | ") ? ans.split(" | ") : [ans];
-    const templates: AnswerEvidenceTemplate[] = parts.flatMap((part) => ANSWER_EVIDENCE[qid]?.[part] ?? []);
-    if (templates.length) {
-      for (const t of templates) out.push({ ...t, raw: `Q: ${qid} → "${ans}"`, source: "Visitor answer", questionId: qid });
-    } else {
-      // Free-text / unmapped answer — context only; Jev decides whether it
-      // is hedged and whether it describes an out-of-catalog need.
-      out.push({ fact: `Visitor said: "${ans.slice(0, 400)}"`, raw: ans.slice(0, 1000), source: "Visitor answer (free text)", tier: "inferred", polarity: "context", severity: "info", area: "business", questionId: qid });
-      // An active/recent breach mentioned in free text is a real, distinct
-      // need (certified forensic IR) — not just a customServiceFlag escalation
-      // note (odo-matching.ts). Without this, C10-S04 could never be
-      // recommended: no other path in the whole catalog supports it.
-      if (/breach(ed)?|hacked|ransom(ware)?|money stolen|under attack|compromised/i.test(ans)) {
-        out.push({ fact: "The visitor's own words describe an active or recent security incident.", raw: ans.slice(0, 1000), source: "Visitor answer (free text)", tier: "observed", polarity: "gap", severity: "high", area: "governance", supports: ["C10-S04", "C03-S04"], questionId: qid });
-      }
-    }
+/**
+ * Answer-derived facts (rebuilt 2026-10-03, Master Reference §37.3). Every
+ * fact here was extracted by the live interviewer from an answer it judged
+ * "valid" or "unsure" — contradictory, contradicts-public and nonsense
+ * answers produce no evidence at all, and skipped questions produce none
+ * either (a skip is unknown, never a gap). "Unsure" answers arrive already
+ * tagged tier "inferred", so a hedge can never become a confirmed finding.
+ */
+export function answerEvidence(findings: ResearchFindings): Array<Draft & { questionId: string }> {
+  const interview = (findings as unknown as Record<string, unknown>)._interview as InterviewState | undefined;
+  if (!interview) return [];
+  const out: Array<Draft & { questionId: string }> = interview.evidence.map((e) => ({
+    fact: e.fact,
+    raw: e.raw,
+    source: "Visitor answer",
+    tier: e.tier,
+    polarity: e.polarity,
+    severity: e.severity,
+    area: e.area,
+    supports: e.supports ?? [],
+    counters: e.counters ?? [],
+    ...(e.framework ? { framework: e.framework } : {}),
+    questionId: e.questionId,
+  }));
+  // An active/recent incident the visitor described is a real, distinct need
+  // (certified forensic IR) — the only path in the catalog that supports
+  // C10-S04. Flagged by the interviewer's own judgement (playbook "urgent").
+  if (interview.urgent) {
+    const turn = [...interview.judged].reverse().find((j) => j.type === "answer" || j.type === "answer_and_question") ?? interview.judged[interview.judged.length - 1];
+    out.push({
+      fact: "The visitor described an active or recent security incident.",
+      raw: turn ? turn.visitorText.slice(0, 1000) : "",
+      source: "Visitor answer",
+      tier: "observed",
+      polarity: "gap",
+      severity: "high",
+      area: "governance",
+      supports: ["C10-S04", "C03-S04"],
+      questionId: turn?.questionId ?? "urgent",
+    });
   }
   return out;
 }
 
-/** Assign stable IDs: E1..En for research, A1..An for answers. */
-export function buildLedger(findings: ResearchFindings, answers: Record<string, string>, answerOrder: string[]): Evidence[] {
+/** Assign stable IDs: E1..En for research, A1..An for interview answers. */
+export function buildLedger(findings: ResearchFindings): Evidence[] {
   const now = today();
   const research = researchEvidence(findings).map((d, i) => ({
     ...d, id: `E${i + 1}`, supports: d.supports ?? [], counters: d.counters ?? [], audience: d.audience ?? "client", collectedAt: now,
   }));
-  const ans = answerEvidence(answers, answerOrder).map((d, i) => {
+  const ans = answerEvidence(findings).map((d, i) => {
     const { questionId: _q, ...rest } = d;
     void _q;
     return { ...rest, id: `A${i + 1}`, supports: d.supports ?? [], counters: d.counters ?? [], audience: d.audience ?? "client", collectedAt: now };

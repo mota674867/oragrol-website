@@ -16,10 +16,9 @@
 // Must be able to find nothing (§2 #9): if no service clears the bar, the
 // outcome is "no major gaps found" — not a manufactured soft recommendation.
 
-import { askJevChunked, askJev, scoreToUnit, jevConfigured, type JevQuestion } from "./jev";
+import { askJevChunked, scoreToUnit, jevConfigured, type JevQuestion } from "./jev";
 import { SERVICE_CATALOG, SERVICE_BY_CODE, type CatalogService } from "./odo-services";
 import { ledgerAsText, type Evidence } from "./odo-ledger";
-import { ANSWER_EVIDENCE } from "./odo-questions";
 
 export type MatchTier = "recommended" | "worth_exploring" | "not_flagged";
 
@@ -68,8 +67,18 @@ function ruleScore(support: Evidence[], counters: Evidence[]): number {
   return inferredOrContext.length >= 2 ? 0.5 : 0.42;
 }
 
-function tierFor(score: number, observedSupport: number): MatchTier {
-  if (score >= 0.75 && observedSupport > 0) return "recommended";
+// CHANGED 2026-10-03 (Master Reference §37.4, Mohammad's live test: "with
+// any condition [it] issues a report and offers our item"). A service is now
+// flagged ONLY when at least one CONFIRMED gap supports it — an observed
+// research fact, or a clear, unhedged visitor answer. Before this, a single
+// guessed match (score >= 0.50 from inferred or context-only evidence) was
+// enough for "worth exploring", and with 67 services something nearly always
+// cleared that bar, so a clean "no major gaps" result was unreachable. Now
+// "worth exploring" means a real but lower-priority confirmed gap, never a
+// guess — and a business with no confirmed gaps gets "no major gaps".
+function tierFor(score: number, observedGaps: number): MatchTier {
+  if (observedGaps === 0) return "not_flagged";
+  if (score >= 0.75) return "recommended";
   if (score >= 0.5) return "worth_exploring";
   return "not_flagged";
 }
@@ -80,7 +89,7 @@ function reasonFor(svc: CatalogService, support: Evidence[]): string {
   return pick.map((e) => `${e.fact} [${e.id}]`).join(" ");
 }
 
-export async function matchServices(ledger: Evidence[], ctx: { industry: string | null; businessSize: string | null; answers: Record<string, string> }): Promise<MatchingResult> {
+export async function matchServices(ledger: Evidence[], ctx: { industry: string | null; businessSize: string | null }): Promise<MatchingResult> {
   const clientLedger = ledger.filter((e) => e.audience === "client");
 
   // 1) Evidence gate.
@@ -153,32 +162,13 @@ export async function matchServices(ledger: Evidence[], ctx: { industry: string 
     .filter((m) => m.tier !== "not_flagged")
     .sort((a, b) => (a.tier === b.tier ? b.score - a.score : a.tier === "recommended" ? -1 : 1));
 
-  // 4) Custom-service / escalation flag.
+  // 4) Escalation flag. The fixed question bank that used to carry
+  // per-option custom-service notes is gone (§37.2), so the one escalation
+  // left is the interviewer's own "urgent" judgement, which odo-ledger.ts
+  // turns into a C10-S04-supporting visitor-answer fact.
   const notes: string[] = [];
-  for (const [qid, ans] of Object.entries(ctx.answers)) {
-    // Same " | "-joined multi-select format as odo-ledger.ts's answerEvidence().
-    const parts = ans.includes(" | ") ? ans.split(" | ") : [ans];
-    for (const part of parts) {
-      for (const t of ANSWER_EVIDENCE[qid]?.[part] ?? []) if (t.customFlag) notes.push(t.customFlag);
-    }
-  }
-  const openText = ctx.answers["q_open"];
-  if (openText && openText.trim().length > 8 && jevConfigured()) {
-    const r = await askJev(
-      { statement: openText.slice(0, 1500), catalog_categories: [...new Set(SERVICE_CATALOG.map((s) => s.category))] },
-      {
-        outside_catalog: { type: "noul", instructions: "Does the statement describe a business need that none of the listed catalog categories would cover — note that penetration testing, SOC 2 audits, PCI-DSS assessments and forensic incident response ARE covered (Certified Specialist Services category), so only flag something genuinely uncovered or unrelated to cybersecurity, IT or business automation?" },
-        urgent: { type: "noul", instructions: "Does the statement describe an active, urgent security incident happening now (e.g. currently hacked, ransomware now, money stolen)?" },
-      },
-      { label: "custom-flag", timeoutMs: 8000 }
-    );
-    if (r?.usage) { jevInputTokens += r.usage.input_tokens; jevOutputTokens += r.usage.output_tokens; }
-    const oc = r?.answers.outside_catalog;
-    const ur = r?.answers.urgent;
-    if (oc?.type === "noul" && oc.noul >= 0.6) notes.push(`Visitor described a need that may be outside the catalog: "${openText.slice(0, 200)}"`);
-    if (ur?.type === "noul" && ur.noul >= 0.6) notes.push(`URGENT — visitor may be describing an active incident: "${openText.slice(0, 200)}"`);
-  } else if (openText && /breach(ed)?|hacked|ransom|money stolen|under attack/i.test(openText)) {
-    notes.push(`URGENT keyword escalation from free-text answer: "${openText.slice(0, 200)}"`);
+  if (ledger.some((e) => e.source === "Visitor answer" && e.supports.includes("C10-S04") && e.severity === "high")) {
+    notes.push("URGENT — the visitor described an active or recent security incident during the interview. Contact them directly.");
   }
 
   return {
