@@ -24,6 +24,7 @@ import {
 import { ENDING_NONSENSE, ENDING_SKIPS, VISITOR_QUESTION_LIMIT_REPLY } from "../app/lib/odo-playbook";
 import { answerEvidence } from "../app/lib/odo-ledger";
 import { matchServices } from "../app/lib/odo-matching";
+import { runLiveCheck } from "../app/lib/odo-live-checks";
 
 process.env.ANTHROPIC_API_KEY = "test-key";
 
@@ -36,8 +37,12 @@ proto.create = async function () {
   const next = script.shift();
   if (next === undefined) throw new Error("script exhausted");
   if (next === "fail") throw new Error("simulated API outage");
+  if (next !== "garbage" && (next as Record<string, unknown>).__tool) {
+    const t = next as { __tool: string; input: Record<string, unknown> };
+    return { content: [{ type: "tool_use", id: `tu_${calls}`, name: t.__tool, input: t.input }], stop_reason: "tool_use", usage: { input_tokens: 1000, output_tokens: 50 } };
+  }
   const text = next === "garbage" ? "sorry, I can't do JSON today" : JSON.stringify(next);
-  return { content: [{ type: "text", text }], usage: { input_tokens: 1000, output_tokens: 200, cache_read_input_tokens: 4000 } };
+  return { content: [{ type: "text", text }], stop_reason: "end_turn", usage: { input_tokens: 1000, output_tokens: 200, cache_read_input_tokens: 4000 } };
 };
 
 const ctx: InterviewContext = {
@@ -249,6 +254,40 @@ async function main() {
     const m2 = await matchServices(confirmed, { industry: "Healthcare", businessSize: "small" });
     check("a confirmed gap → that service is recommended", m2.flagged.some((f) => f.code === "C08-S01" && f.tier === "recommended"));
     check("context alone still never flags anything", !m2.flagged.some((f) => f.code === "C08-S03" || f.code === "C01-S02"));
+  }
+
+  console.log("\n18. Live check mid-interview (§37.3)");
+  {
+    const s = await open();
+    const activities: string[] = [];
+    script = [{ __tool: "check_email_security", input: {} }, turn()];
+    const rec = recordVisitorMessage(s.state, s.chat, { kind: "message", text: "We set up DMARC last week." });
+    const r = await runInterviewTurn(ctx, rec.state, rec.chat, { kind: "message", text: "We set up DMARC last week." }, { onActivity: (a) => { activities.push(a); } });
+    check("turn completes after the check", r.outcome === "continue" && r.state.pending?.id === "q2");
+    check("visitor saw what ODO was doing", activities[0] === "ODO is checking your email security records…");
+    check("check recorded for the reviewer", r.state.liveChecks?.length === 1 && r.state.liveChecks[0].tool === "check_email_security");
+    check("activity cleared once ODO replies", r.state.activity === null);
+  }
+
+  console.log("\n19. Live checks can't be steered at someone else's domain");
+  {
+    const out1 = await runLiveCheck("check_email_security", { domain: "competitor-clinic.example" }, { website: "https://mapledental.example", visitorText: "We use Jane App." });
+    check("unmentioned third-party domain refused", out1.startsWith("Refused"));
+    const out2 = await runLiveCheck("read_own_site_page", { url: "https://evil.example/admin" }, { website: "https://mapledental.example", visitorText: "see evil.example" });
+    check("page reads limited to their own site, even if mentioned", out2.startsWith("Refused"));
+    const out3 = await runLiveCheck("read_own_site_page", { url: "http://169.254.169.254/latest/meta-data" }, { website: "https://mapledental.example", visitorText: "" });
+    check("cloud-metadata address refused", out3.startsWith("Refused"));
+    const out4 = await runLiveCheck("check_email_security", { domain: "mail.mapledental.example" }, { website: "https://mapledental.example", visitorText: "" });
+    check("own subdomain allowed (no refusal)", !out4.startsWith("Refused"));
+  }
+
+  console.log("\n20. Check budget: model can't loop on tools forever");
+  {
+    const s = await open();
+    script = [{ __tool: "web_search", input: { query: "a" } }, { __tool: "web_search", input: { query: "b" } }, { __tool: "web_search", input: { query: "c" } }, turn()];
+    const rec = recordVisitorMessage(s.state, s.chat, { kind: "message", text: "We use Jane App." });
+    const r = await runInterviewTurn(ctx, rec.state, rec.chat, { kind: "message", text: "We use Jane App." });
+    check("at most 2 rounds of checks, then a forced answer", (r.state.liveChecks?.length ?? 0) <= 2 && r.outcome === "continue");
   }
 
   console.log(`\n${passed} passed, ${failed} failed (${calls} scripted model calls)\n`);

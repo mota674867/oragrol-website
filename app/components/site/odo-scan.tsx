@@ -360,11 +360,14 @@ function ChatBubble({ item }: { item: ChatItem }) {
   );
 }
 
-function TypingBubble() {
+function TypingBubble({ activity }: { activity: string | null }) {
   return (
-    <div className="odo-chat__row odo-chat__row--odo" role="status" aria-label="ODO is typing">
+    <div className="odo-chat__row odo-chat__row--odo" role="status" aria-label={activity || "ODO is typing"}>
       <span className="odo-chat__avatar" aria-hidden="true">OR</span>
       <div className="odo-chat__bubble odo-chat__bubble--odo odo-chat__bubble--typing">
+        {/* A live check mid-interview (Master Reference §37.3) shows what ODO is
+            actually doing, instead of an unexplained pause. */}
+        {activity ? <span className="odo-chat__activity">{activity}</span> : null}
         <span className="odo-scan__typing-dots" aria-hidden="true"><span></span><span></span><span></span></span>
       </div>
     </div>
@@ -386,6 +389,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
   // Conversation state — always replaced wholesale from the server.
   const [chat, setChat] = useState<ChatItem[]>([]);
   const [awaiting, setAwaiting] = useState(false);
+  const [activity, setActivity] = useState<string | null>(null);
   const [pending, setPending] = useState<{ id: string; hint: string | null } | null>(null);
   const [progress, setProgress] = useState<Progress | null>(null);
   const [draft, setDraft] = useState("");
@@ -458,6 +462,9 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
         setProgress((payload.progress as Progress | undefined) ?? null);
         setOptimistic(null); // the server now holds the visitor's message
       }
+      // `activity` changes WITHOUT a version bump while ODO runs a live
+      // check — read it from any payload that isn't stale.
+      setActivity(payload.awaiting === true ? ((payload.activity as string | null | undefined) ?? null) : null);
     }
     if (payload.step && next === "researching") setStep(String(payload.step));
 
@@ -554,6 +561,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     chatVersionRef.current = 0;
     setChat([]);
     setAwaiting(false);
+    setActivity(null);
     setPending(null);
     setProgress(null);
     setDraft("");
@@ -813,7 +821,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
               <div className="odo-chat__thread" ref={threadRef} aria-live="polite" aria-label="Conversation with ODO">
                 {chat.map((item) => <ChatBubble key={item.id} item={item} />)}
                 {optimistic ? <ChatBubble item={optimistic} /> : null}
-                {phase === "questions" && odoTyping ? <TypingBubble /> : null}
+                {phase === "questions" && odoTyping ? <TypingBubble activity={activity} /> : null}
               </div>
 
               {phase === "questions" ? (

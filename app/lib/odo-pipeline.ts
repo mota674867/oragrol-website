@@ -60,6 +60,10 @@ export function reviewerTranscript(state: InterviewState | undefined, chat: Chat
     "── How ODO judged each turn ──",
     ...judged,
     "",
+    ...(state.liveChecks?.length
+      ? ["", "── Live checks ODO ran during the interview ──", ...state.liveChecks.map((c) => `• ${c.tool} ${c.input}\n  ${c.result.replace(/\n/g, "\n  ")}`)]
+      : []),
+    "",
     "── Full conversation ──",
     ...lines,
   ].join("\n");

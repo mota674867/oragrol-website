@@ -13,7 +13,8 @@
 
 import { after, NextRequest, NextResponse } from "next/server";
 import { getSession, updateSession, acquireTurnLock, releaseTurnLock, recordLifetimeAiCost } from "@/app/lib/odo-redis";
-import { interviewContext, finalizeInsufficient, runEvaluation, type BusinessProfile } from "@/app/lib/odo-pipeline";
+import { interviewContext, finalizeInsufficient, runEvaluation, reviewerTranscript, type BusinessProfile } from "@/app/lib/odo-pipeline";
+import { sendOdoUrgentAlertEmail } from "@/app/lib/odo-email";
 import {
   recordVisitorMessage,
   runInterviewTurn,
@@ -78,14 +79,42 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       businessSize: (findings._businessSizeDetected as ResearchFindings["businessSize"] | undefined) ?? researchFindings.businessSize ?? null,
     };
     const priorUsage: AiUsageTotals = (findings._aiUsage as AiUsageTotals | undefined) ?? EMPTY_USAGE;
+    // While ODO runs a live check (odo-live-checks.ts), show the visitor what
+    // it is doing. Same interview version as the saved visitor message — the
+    // browser reads `activity` without treating it as a new conversation state.
+    let checkCount = 0;
+    const onActivity = async (activity: string) => {
+      checkCount++;
+      await updateSession(sessionId, {
+        findings: { ...findings, _interview: { ...rec.state, activity }, _chat: rec.chat },
+        step: `turn-${rec.state.version}-check-${checkCount}`,
+      });
+    };
     const result = await runInterviewTurn(
       interviewContext(researchFindings, session, profile),
       rec.state,
       rec.chat,
       input,
-      { spendCapReached: isScanOverCap(priorUsage) }
+      { spendCapReached: isScanOverCap(priorUsage), onActivity }
     );
     const usage = addClaudeUsage(priorUsage, result.usage);
+
+    // Urgent path (§37.7): alert Mohammad the moment an active incident is
+    // first described — never wait for the report. Fires once per scan.
+    if (result.state.urgent && !interview.urgent) {
+      after(() =>
+        sendOdoUrgentAlertEmail({
+          companyName: session.visitorCompany,
+          visitorName: session.visitorName,
+          visitorEmail: session.visitorEmail,
+          website: session.visitorWebsite,
+          sessionId,
+          transcript: reviewerTranscript(result.state, result.chat),
+        })
+          .then((r) => { if (r.state !== "sent") console.warn(`[ODO] Urgent alert not sent (${r.state}).`); })
+          .catch((err) => console.error("[ODO] Urgent alert failed:", err))
+      );
+    }
     const nextFindings = { ...findings, _interview: result.state, _chat: result.chat, _aiUsage: usage };
     const view = publicInterviewView(result.state, result.chat);
 

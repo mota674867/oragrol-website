@@ -38,6 +38,7 @@ import type { BusinessProfile } from "./odo-business-profile";
 import type { ComplianceSignal } from "./odo-industry-rules";
 import type { Area, Polarity, Severity } from "./odo-ledger";
 import { SERVICE_BY_CODE } from "./odo-services";
+import { LIVE_CHECK_TOOLS, runLiveCheck, activityFor, type LiveCheckContext } from "./odo-live-checks";
 
 const MODEL = "claude-sonnet-4-6";
 const TURN_TIMEOUT_MS = 35_000;
@@ -88,6 +89,10 @@ export type InterviewState = {
   evidence: InterviewEvidence[];
   /** Internal one-line reasons per turn, for Mohammad's review email. */
   reasons: string[];
+  /** Live checks run mid-interview (odo-live-checks.ts) — for Mohammad's review, never shown to the visitor. */
+  liveChecks?: Array<{ at: string; tool: string; input: string; result: string }>;
+  /** What ODO is doing right now while the visitor waits ("ODO is checking your email security records…"). */
+  activity?: string | null;
   ended?: { outcome: "finish" | "insufficient" | "failed"; reason: string; message: string };
 };
 
@@ -177,8 +182,24 @@ function parseModelJson(text: string): ModelTurn | null {
   }
 }
 
-/** One Claude call, retried once on any failure. Null = AI genuinely unavailable. */
-async function callModel(userContent: string): Promise<{ turn: ModelTurn; usage: Usage } | null> {
+export type LiveCheckRecord = { at: string; tool: string; input: string; result: string };
+
+type LiveOptions = {
+  ctx: LiveCheckContext;
+  /** Called before each check so the visitor sees what ODO is doing. */
+  onActivity?: (text: string) => Promise<void> | void;
+};
+
+/** At most this many rounds of live checks per turn, and never past this much wall-clock time. */
+const MAX_CHECK_ROUNDS = 2;
+const CHECK_TIME_BUDGET_MS = 75_000;
+
+/**
+ * One interview turn's model call, retried once on any failure. With
+ * `live`, the model may run passive live checks (odo-live-checks.ts) before
+ * giving its final JSON. Null = the AI is genuinely unavailable.
+ */
+async function callModel(userContent: string, live?: LiveOptions): Promise<{ turn: ModelTurn; usage: Usage; checks: LiveCheckRecord[] } | null> {
   if (!process.env.ANTHROPIC_API_KEY) {
     console.error("[ODO Interview] ANTHROPIC_API_KEY not configured — interview cannot run.");
     return null;
@@ -186,22 +207,59 @@ async function callModel(userContent: string): Promise<{ turn: ModelTurn; usage:
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   let usage: Usage = { input_tokens: 0, output_tokens: 0 };
   for (let attempt = 1; attempt <= 2; attempt++) {
+    const checks: LiveCheckRecord[] = [];
     try {
-      const res = await anthropic.messages.create(
-        {
-          model: MODEL,
-          max_tokens: 1200,
-          system: [{ type: "text", text: PLAYBOOK, cache_control: { type: "ephemeral" } }],
-          messages: [{ role: "user", content: userContent }],
-        },
-        { timeout: TURN_TIMEOUT_MS }
-      );
-      const u = billableUsage(res.usage as Parameters<typeof billableUsage>[0]);
-      usage = { input_tokens: usage.input_tokens + u.input_tokens, output_tokens: usage.output_tokens + u.output_tokens };
-      const text = res.content.map((c) => (c.type === "text" ? c.text : "")).join("");
-      const turn = parseModelJson(text);
-      if (turn) return { turn, usage };
-      console.error(`[ODO Interview] Unusable model output (attempt ${attempt}):`, text.slice(0, 400));
+      const messages: Anthropic.MessageParam[] = [{ role: "user", content: userContent }];
+      const started = Date.now();
+      let rounds = 0;
+      let calls = 0;
+      for (;;) {
+        if (++calls > MAX_CHECK_ROUNDS + 3) throw new Error("model kept requesting checks past its budget");
+        const checksAllowed = !!live && rounds < MAX_CHECK_ROUNDS && Date.now() - started < CHECK_TIME_BUDGET_MS;
+        const res = await anthropic.messages.create(
+          {
+            model: MODEL,
+            max_tokens: 1200,
+            system: [{ type: "text", text: PLAYBOOK, cache_control: { type: "ephemeral" } }],
+            ...(live ? { tools: LIVE_CHECK_TOOLS, tool_choice: checksAllowed ? { type: "auto" as const } : { type: "none" as const } } : {}),
+            messages,
+          },
+          { timeout: TURN_TIMEOUT_MS }
+        );
+        const u = billableUsage(res.usage as Parameters<typeof billableUsage>[0]);
+        usage = { input_tokens: usage.input_tokens + u.input_tokens, output_tokens: usage.output_tokens + u.output_tokens };
+
+        const toolUses = res.content.filter((c): c is Anthropic.ToolUseBlock => c.type === "tool_use");
+        if (live && res.stop_reason === "tool_use" && toolUses.length) {
+          messages.push({ role: "assistant", content: res.content });
+          const results: Anthropic.ToolResultBlockParam[] = [];
+          if (!checksAllowed) {
+            // Budget is enforced here in code, not by trusting tool_choice.
+            for (const tu of toolUses) results.push({ type: "tool_result", tool_use_id: tu.id, content: "No more checks this turn — decide with what you have and return the JSON." });
+            messages.push({ role: "user", content: results });
+            continue;
+          }
+          rounds++;
+          for (const [i, tu] of toolUses.entries()) {
+            if (i >= 2) { // at most two checks per round
+              results.push({ type: "tool_result", tool_use_id: tu.id, content: "Skipped — at most two checks at a time." });
+              continue;
+            }
+            await Promise.resolve(live.onActivity?.(activityFor(tu.name))).catch(() => {});
+            const result = await runLiveCheck(tu.name, tu.input, live.ctx);
+            checks.push({ at: new Date().toISOString(), tool: tu.name, input: JSON.stringify(tu.input).slice(0, 300), result: result.slice(0, 1500) });
+            results.push({ type: "tool_result", tool_use_id: tu.id, content: result });
+          }
+          messages.push({ role: "user", content: results });
+          continue;
+        }
+
+        const text = res.content.map((c) => (c.type === "text" ? c.text : "")).join("");
+        const turn = parseModelJson(text);
+        if (turn) return { turn, usage, checks };
+        console.error(`[ODO Interview] Unusable model output (attempt ${attempt}):`, text.slice(0, 400));
+        break;
+      }
     } catch (err) {
       console.error(`[ODO Interview] Claude call failed (attempt ${attempt}):`, err instanceof Error ? err.message : err);
     }
@@ -335,7 +393,7 @@ function isNearDuplicate(text: string, chat: ChatMessage[]): boolean {
 
 function end(state: InterviewState, chat: ChatMessage[], outcome: "finish" | "insufficient", reason: string, message: string, usage: Usage | null): TurnResult {
   return {
-    state: { ...state, awaiting: false, pending: null, version: state.version + 1, ended: { outcome, reason, message } },
+    state: { ...state, awaiting: false, activity: null, pending: null, version: state.version + 1, ended: { outcome, reason, message } },
     chat: [...chat, odo("closing", message)],
     usage,
     outcome,
@@ -344,7 +402,7 @@ function end(state: InterviewState, chat: ChatMessage[], outcome: "finish" | "in
 
 function failed(state: InterviewState, chat: ChatMessage[], usage: Usage | null): TurnResult {
   return {
-    state: { ...state, awaiting: false, version: state.version + 1, ended: { outcome: "failed", reason: "AI unavailable", message: "" } },
+    state: { ...state, awaiting: false, activity: null, version: state.version + 1, ended: { outcome: "failed", reason: "AI unavailable", message: "" } },
     chat,
     usage,
     outcome: "failed",
@@ -390,7 +448,7 @@ export async function runInterviewTurn(
   state: InterviewState,
   chat: ChatMessage[],
   input: { kind: "message"; text: string } | { kind: "skip" },
-  opts: { spendCapReached?: boolean } = {}
+  opts: { spendCapReached?: boolean; onActivity?: (text: string) => Promise<void> | void } = {}
 ): Promise<TurnResult> {
   const pending = state.pending;
   if (!pending) return failed(state, chat, null);
@@ -409,14 +467,24 @@ export async function runInterviewTurn(
     ? `The visitor pressed "Prefer not to answer" on the pending question. Do not judge it, do not ask it again, and set message_type "none". ${finalTurn ? "FINAL TURN — no more questions are allowed: action must be finish or insufficient." : "Move to the next most valuable question, or finish if you already have enough."}`
     : `The visitor's latest message (judge it against the pending question): """${input.text}"""\n${finalTurn ? "FINAL TURN — no NEW questions are allowed: action must be reask (only if this message is a visitor question or nonsense), finish, or insufficient." : ""}`;
 
-  const res = await callModel(buildUserContent(ctx, s, chat, turnNote));
+  // Live checks may only touch the visitor's own domain or domains they typed.
+  const live = {
+    ctx: {
+      website: ctx.website,
+      visitorText: chat.filter((m) => m.role === "visitor").map((m) => m.text).join("\n"),
+    },
+    onActivity: opts.onActivity,
+  };
+  const res = await callModel(buildUserContent(ctx, s, chat, turnNote), live);
   if (!res) return failed(s, chat, null);
   let usage: Usage | null = res.usage;
+  if (res.checks.length) s.liveChecks = [...(s.liveChecks ?? []), ...res.checks].slice(-30);
   let t = res.turn;
 
   // One retry if the model repeats an earlier topic despite the playbook.
   if ((t.action === "ask" || t.action === "clarify") && t.question && isNearDuplicate(t.question.text, chat)) {
     const retry = await callModel(buildUserContent(ctx, s, chat, turnNote + `\nYOUR PREVIOUS DRAFT REPEATED A TOPIC ALREADY ASKED ("${t.question.text}"). Ask about a different, still-unknown topic, or finish.`));
+    if (retry?.checks.length) s.liveChecks = [...(s.liveChecks ?? []), ...retry.checks];
     usage = addUsage(usage, retry?.usage ?? null);
     if (retry && !(retry.turn.question && isNearDuplicate(retry.turn.question.text, chat))) t = retry.turn;
     else if (t.action === "ask") t = { ...t, action: s.answered >= MIN_ANSWERS_BEFORE_FINISH ? "finish" : "insufficient", question: null };
@@ -439,7 +507,7 @@ export async function runInterviewTurn(
       if (s.nonsense >= 2) return end(s, chat, "insufficient", "second nonsense answer", ENDING_NONSENSE, usage);
       newChat.push(odo("reply", t.reply || NONSENSE_FALLBACK_REPLY));
       newChat.push(odo("question", pending.text, pending.hint));
-      return { state: { ...s, awaiting: false, version: s.version + 1 }, chat: newChat, usage, outcome: "continue" };
+      return { state: { ...s, awaiting: false, activity: null, version: s.version + 1 }, chat: newChat, usage, outcome: "continue" };
     }
 
     // ── Visitor asked ODO something ────────────────────────────────────────
@@ -450,14 +518,14 @@ export async function runInterviewTurn(
         s.judged = [...s.judged, { questionId: pending.id, question: pending.text, visitorText: input.text, type, note: "over visitor-question limit", at: now() }];
         newChat.push(odo("reply", VISITOR_QUESTION_LIMIT_REPLY));
         newChat.push(odo("question", pending.text, pending.hint));
-        return { state: { ...s, awaiting: false, version: s.version + 1 }, chat: newChat, usage, outcome: "continue" };
+        return { state: { ...s, awaiting: false, activity: null, version: s.version + 1 }, chat: newChat, usage, outcome: "continue" };
       }
     }
     if (type === "visitor_question") {
       s.judged = [...s.judged, { questionId: pending.id, question: pending.text, visitorText: input.text, type, at: now() }];
       newChat.push(odo("reply", t.reply || "Good question."));
       newChat.push(odo("question", pending.text, pending.hint));
-      return { state: { ...s, awaiting: false, version: s.version + 1 }, chat: newChat, usage, outcome: "continue" };
+      return { state: { ...s, awaiting: false, activity: null, version: s.version + 1 }, chat: newChat, usage, outcome: "continue" };
     }
 
     // ── A real answer (possibly with a question) — judge + extract evidence ─
@@ -485,7 +553,7 @@ export async function runInterviewTurn(
   if (t.reply) newChat.push(odo("reply", t.reply));
   newChat.push(odo("question", q.text, q.hint));
   return {
-    state: { ...s, awaiting: false, pending: q, questionsAsked: s.questionsAsked + 1, version: s.version + 1 },
+    state: { ...s, awaiting: false, activity: null, pending: q, questionsAsked: s.questionsAsked + 1, version: s.version + 1 },
     chat: newChat,
     usage,
     outcome: "continue",
@@ -499,6 +567,7 @@ export function publicInterviewView(state: InterviewState | undefined, chat: Cha
     chat: (chat ?? []).map(({ id, role, kind, text, hint }) => ({ id, role, kind, text, ...(hint ? { hint } : {}) })),
     chat_version: st.version,
     awaiting: st.awaiting,
+    activity: st.awaiting ? st.activity ?? null : null,
     pending: st.pending ? { id: st.pending.id, hint: st.pending.hint ?? null } : null,
     progress: {
       questions_asked: st.questionsAsked,

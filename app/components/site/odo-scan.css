@@ -313,7 +313,8 @@
 .odo-chat__bubble--odo.is-question { color: #fff; background: rgb(255 255 255 / 14%); border-left: 3px solid var(--odo-orange); font-weight: 600; }
 .odo-chat__bubble--visitor { color: var(--odo-black); background: var(--odo-off-white); border-radius: 14px 4px 14px 14px; }
 .odo-chat__bubble--visitor.is-skip { color: var(--odo-off-white); background: transparent; border: 1px dashed rgb(255 255 255 / 45%); font-style: italic; }
-.odo-chat__bubble--typing { padding: 14px 16px; }
+.odo-chat__bubble--typing { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 14px 16px; }
+.odo-chat__activity { color: rgb(255 255 255 / 85%); font-size: 14px; font-style: italic; }
 .odo-chat__composer { display: grid; gap: 10px; }
 .odo-chat__composer textarea {
   width: 100%;

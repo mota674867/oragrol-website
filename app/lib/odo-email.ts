@@ -147,3 +147,51 @@ export async function sendOdoAdminInsufficientEmail(params: {
     return { state: "failed", error: `Email send threw: ${err instanceof Error ? err.message : String(err)}`.slice(0, 500) };
   }
 }
+
+/**
+ * Urgent path (Master Reference §37.7): the interviewer judged that the
+ * visitor described an active or recent incident — a breach, ransomware, a
+ * hijacked account. That can't wait for the report cycle, so Mohammad is
+ * emailed the moment it happens, mid-interview, with the conversation so far.
+ * Sent at most once per scan (the caller only fires it on the first flag).
+ */
+export async function sendOdoUrgentAlertEmail(params: {
+  companyName: string;
+  visitorName: string;
+  visitorEmail: string;
+  website: string | null;
+  sessionId: string;
+  transcript: string;
+}): Promise<SendOdoAdminEmailResult> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.CONTACT_FROM_EMAIL;
+  if (!apiKey) return { state: "skipped", reason: "RESEND_API_KEY is not configured." };
+  if (!from) return { state: "skipped", reason: "CONTACT_FROM_EMAIL is not configured." };
+  try {
+    const resend = new Resend(apiKey);
+    const { data, error } = await resend.emails.send({
+      from,
+      to: [ODO_ADMIN_EMAIL],
+      replyTo: from,
+      subject: `⚠ URGENT — possible active incident — ${params.companyName}`,
+      text: [
+        `During an ODO interview just now, the visitor described what sounds like an active or recent security incident.`,
+        `ODO told them to contact info@orgro.ca directly. The interview is still running — this alert does not wait for the report.`,
+        ``,
+        `Name: ${params.visitorName}`,
+        `Company: ${params.companyName}`,
+        `Email: ${params.visitorEmail}`,
+        `Website: ${params.website ?? "—"}`,
+        `Session ID: ${params.sessionId}`,
+        ``,
+        `════ CONVERSATION SO FAR ════`,
+        params.transcript,
+      ].join("\n"),
+    });
+    if (error) return { state: "failed", error: `Resend error: ${error.message ?? JSON.stringify(error)}`.slice(0, 500) };
+    if (!data?.id) return { state: "failed", error: "Resend returned no email id." };
+    return { state: "sent", providerId: data.id };
+  } catch (err) {
+    return { state: "failed", error: `Email send threw: ${err instanceof Error ? err.message : String(err)}`.slice(0, 500) };
+  }
+}
