@@ -19,9 +19,10 @@ import { buildReport, type OdoReport } from "./odo-report";
 import type { ResearchFindings } from "./odo-research";
 import { attachReportPdfToHubSpot } from "./odo-hubspot-report";
 import { sendOdoAdminReportEmail, sendOdoAdminInsufficientEmail } from "./odo-email";
-import { EMPTY_USAGE, addJevUsage, mergeUsage, computeCost, type AiUsageTotals } from "./odo-cost";
+import { EMPTY_USAGE, addJevUsage, addClaudeUsage, addOpusUsage, mergeUsage, computeCost, type AiUsageTotals } from "./odo-cost";
+import { REPORT_MODEL } from "./odo-report-model";
 import { recordLifetimeAiCost } from "./odo-redis";
-import { recordScanSpend } from "./odo-spend";
+import { recordScanSpend, isScanOverCap } from "./odo-spend";
 import { buildBenchmark } from "./odo-benchmark";
 
 const HUBSPOT_TOKEN = process.env.HUBSPOT_ACCESS_TOKEN;
@@ -150,6 +151,7 @@ export async function runEvaluation(
       industry: profile.industry,
       businessSize: profile.businessSize,
       competitorNames,
+      overSpendCap: isScanOverCap(priorAiUsage),
     });
 
     await updateSession(sessionId, { step: "Writing your outlook and next steps..." });
@@ -157,6 +159,7 @@ export async function runEvaluation(
       business: session.visitorCompany,
       industry: profile.industry,
       businessSize: profile.businessSize,
+      overSpendCap: isScanOverCap(priorAiUsage),
     });
 
     // Exact per-scan AI cost (odo-cost.ts) — real token usage from every Jev
@@ -165,7 +168,10 @@ export async function runEvaluation(
     // at each vendor's verified rate. Never an estimate.
     const totalUsage = mergeUsage(
       mergeUsage(priorAiUsage, addJevUsage(EMPTY_USAGE, matching.jevUsage)),
-      { ...EMPTY_USAGE, claudeInputTokens: (swotUsage?.input_tokens ?? 0) + (outcomeUsage?.input_tokens ?? 0), claudeOutputTokens: (swotUsage?.output_tokens ?? 0) + (outcomeUsage?.output_tokens ?? 0), claudeCalls: (swotUsage ? 1 : 0) + (outcomeUsage ? 1 : 0) }
+      [swotUsage, outcomeUsage].reduce(
+        (acc, u) => (!u ? acc : u.model === REPORT_MODEL ? addOpusUsage(acc, u) : addClaudeUsage(acc, u)),
+        EMPTY_USAGE
+      )
     );
     const aiCost = computeCost(totalUsage);
 

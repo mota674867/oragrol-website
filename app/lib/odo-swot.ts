@@ -11,7 +11,7 @@
 // If Claude is unavailable or returns something unusable, a deterministic
 // SWOT is built straight from the ledger — the scan never fails on prose.
 
-import Anthropic from "@anthropic-ai/sdk";
+import { createReportText, type ReportUsage } from "./odo-report-model";
 import { ledgerAsText, type Evidence } from "./odo-ledger";
 import type { MatchingResult } from "./odo-matching";
 
@@ -27,7 +27,6 @@ export type Swot = {
   generatedAt: string;
 };
 
-const MODEL = "claude-sonnet-4-6";
 const QUADS = ["strengths", "weaknesses", "opportunities", "threats"] as const;
 
 const BANNED = /\$\s?\d|\bprice\b|\bpricing\b|\bcost[s]? (only|just)\b|\bguarantee|\b100%|\bwill be hacked\b|\bimminent\b|\bdisaster\b/i;
@@ -88,12 +87,12 @@ export function rulesSwot(ledger: Evidence[], matching: MatchingResult, business
   return { strengths, weaknesses, opportunities, threats, summary, generatedBy: "rules", droppedPoints: 0, generatedAt: new Date().toISOString() };
 }
 
-export type SwotResult = { swot: Swot; usage: { input_tokens: number; output_tokens: number } | null };
+export type SwotResult = { swot: Swot; usage: ReportUsage | null };
 
 export async function buildSwot(
   ledger: Evidence[],
   matching: MatchingResult,
-  ctx: { business: string; industry: string | null; businessSize: string | null; competitorNames: string[] }
+  ctx: { business: string; industry: string | null; businessSize: string | null; competitorNames: string[]; overSpendCap?: boolean }
 ): Promise<SwotResult> {
   const fallback = (): SwotResult => ({ swot: rulesSwot(ledger, matching, ctx.business), usage: null });
   if (!process.env.ANTHROPIC_API_KEY) return fallback();
@@ -126,15 +125,7 @@ export async function buildSwot(
   ].join("\n");
 
   try {
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const res = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: 1800,
-      system,
-      messages: [{ role: "user", content: user }],
-    }, { timeout: 45000 });
-    const usage = { input_tokens: res.usage.input_tokens, output_tokens: res.usage.output_tokens };
-    const text = res.content.map((c) => (c.type === "text" ? c.text : "")).join("").trim();
+    const { text, usage } = await createReportText({ max_tokens: 1800, system, messages: [{ role: "user", content: user }] }, 60000, ctx.overSpendCap);
     const json = text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
     const parsed = JSON.parse(json) as unknown;
     const { swot } = validate(parsed, new Set(clientLedger.map((e) => e.id)), ctx.competitorNames);

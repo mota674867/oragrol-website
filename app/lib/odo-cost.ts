@@ -23,6 +23,13 @@ export const PRICING = {
     verifiedAt: "2026-09-30",
     source: "openrouter.ai/anthropic/claude-sonnet-4.6",
   },
+  // Report narrative only (odo-report-model.ts).
+  opus: {
+    inputPerM: 4,       // $ per 1M input tokens (Claude Opus 5.5, standard mode)
+    outputPerM: 20,     // $ per 1M output tokens
+    verifiedAt: "2026-10-03",
+    source: "anthropic.com/claude/opus",
+  },
 } as const;
 
 export type RawUsage = { input_tokens: number; output_tokens: number };
@@ -34,6 +41,10 @@ export type AiUsageTotals = {
   claudeInputTokens: number;
   claudeOutputTokens: number;
   claudeCalls: number;
+  /** Opus (report narrative). Optional — sessions saved before 2026-10-03 don't carry it. */
+  opusInputTokens?: number;
+  opusOutputTokens?: number;
+  opusCalls?: number;
 };
 
 export const EMPTY_USAGE: AiUsageTotals = {
@@ -61,8 +72,21 @@ export function addClaudeUsage(totals: AiUsageTotals, usage: RawUsage | null | u
   };
 }
 
+export function addOpusUsage(totals: AiUsageTotals, usage: RawUsage | null | undefined): AiUsageTotals {
+  if (!usage) return totals;
+  return {
+    ...totals,
+    opusInputTokens: (totals.opusInputTokens ?? 0) + (usage.input_tokens || 0),
+    opusOutputTokens: (totals.opusOutputTokens ?? 0) + (usage.output_tokens || 0),
+    opusCalls: (totals.opusCalls ?? 0) + 1,
+  };
+}
+
 export function mergeUsage(a: AiUsageTotals, b: AiUsageTotals): AiUsageTotals {
   return {
+    opusInputTokens: (a.opusInputTokens ?? 0) + (b.opusInputTokens ?? 0),
+    opusOutputTokens: (a.opusOutputTokens ?? 0) + (b.opusOutputTokens ?? 0),
+    opusCalls: (a.opusCalls ?? 0) + (b.opusCalls ?? 0),
     jevInputTokens: a.jevInputTokens + b.jevInputTokens,
     jevOutputTokens: a.jevOutputTokens + b.jevOutputTokens,
     jevCalls: a.jevCalls + b.jevCalls,
@@ -85,9 +109,12 @@ export function computeCost(totals: AiUsageTotals): CostBreakdown {
   const jevCostUsd =
     (totals.jevInputTokens / 1_000_000) * PRICING.jev.inputPerM +
     (totals.jevOutputTokens / 1_000_000) * PRICING.jev.outputPerM;
+  // "claudeCostUsd" covers every Anthropic model: Sonnet + Opus.
   const claudeCostUsd =
     (totals.claudeInputTokens / 1_000_000) * PRICING.claude.inputPerM +
-    (totals.claudeOutputTokens / 1_000_000) * PRICING.claude.outputPerM;
+    (totals.claudeOutputTokens / 1_000_000) * PRICING.claude.outputPerM +
+    ((totals.opusInputTokens ?? 0) / 1_000_000) * PRICING.opus.inputPerM +
+    ((totals.opusOutputTokens ?? 0) / 1_000_000) * PRICING.opus.outputPerM;
   return {
     jevCostUsd: Math.round(jevCostUsd * 1_000_000) / 1_000_000,
     claudeCostUsd: Math.round(claudeCostUsd * 1_000_000) / 1_000_000,

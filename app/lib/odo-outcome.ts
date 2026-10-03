@@ -13,7 +13,7 @@
 // unavailable or returns something unusable, a deterministic version is
 // built straight from the ledger so the report never fails on prose.
 
-import Anthropic from "@anthropic-ai/sdk";
+import { createReportText, type ReportUsage } from "./odo-report-model";
 import { ledgerAsText, type Evidence } from "./odo-ledger";
 import type { MatchingResult } from "./odo-matching";
 
@@ -35,7 +35,6 @@ export type OutcomeNarrative = {
   generatedAt: string;
 };
 
-const MODEL = "claude-sonnet-4-6";
 
 const AUTOMATION_BENEFITS = [
   "Runs 24/7 — nights, weekends and holidays included, with no shift gaps to cover",
@@ -111,12 +110,12 @@ export function rulesOutcome(ledger: Evidence[], matching: MatchingResult, busin
   };
 }
 
-export type OutcomeResult = { outcome: OutcomeNarrative; usage: { input_tokens: number; output_tokens: number } | null };
+export type OutcomeResult = { outcome: OutcomeNarrative; usage: ReportUsage | null };
 
 export async function buildOutcomeNarrative(
   ledger: Evidence[],
   matching: MatchingResult,
-  ctx: { business: string; industry: string | null; businessSize: string | null }
+  ctx: { business: string; industry: string | null; businessSize: string | null; overSpendCap?: boolean }
 ): Promise<OutcomeResult> {
   const estimate = computeAutomationEstimate(matching);
   const fallback = (): OutcomeResult => ({ outcome: rulesOutcome(ledger, matching, ctx.business, estimate), usage: null });
@@ -149,10 +148,7 @@ export async function buildOutcomeNarrative(
   ].join("\n");
 
   try {
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const res = await anthropic.messages.create({ model: MODEL, max_tokens: 900, system, messages: [{ role: "user", content: user }] }, { timeout: 30000 });
-    const usage = { input_tokens: res.usage.input_tokens, output_tokens: res.usage.output_tokens };
-    const text = res.content.map((c) => (c.type === "text" ? c.text : "")).join("").trim();
+    const { text, usage } = await createReportText({ max_tokens: 900, system, messages: [{ role: "user", content: user }] }, 45000, ctx.overSpendCap);
     const json = text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
     const parsed = JSON.parse(json) as { situationNow?: unknown; securityOutlook?: unknown; automationOpportunity?: unknown };
 

@@ -25,6 +25,8 @@ import { ENDING_NONSENSE, ENDING_SKIPS, VISITOR_QUESTION_LIMIT_REPLY } from "../
 import { answerEvidence } from "../app/lib/odo-ledger";
 import { matchServices } from "../app/lib/odo-matching";
 import { runLiveCheck } from "../app/lib/odo-live-checks";
+import { createReportText, REPORT_MODEL, REPORT_FALLBACK_MODEL } from "../app/lib/odo-report-model";
+import { computeCost, addOpusUsage, EMPTY_USAGE } from "../app/lib/odo-cost";
 
 process.env.ANTHROPIC_API_KEY = "test-key";
 
@@ -288,6 +290,38 @@ async function main() {
     const rec = recordVisitorMessage(s.state, s.chat, { kind: "message", text: "We use Jane App." });
     const r = await runInterviewTurn(ctx, rec.state, rec.chat, { kind: "message", text: "We use Jane App." });
     check("at most 2 rounds of checks, then a forced answer", (r.state.liveChecks?.length ?? 0) <= 2 && r.outcome === "continue");
+  }
+
+  console.log("\n21. Quick win is kept for the report");
+  {
+    const s = await open();
+    script = [turn({ quick_win_given: true, quick_win: "Turn on MFA for the admin mailbox first." }), turn({ quick_win_given: true, quick_win: "A second tip." })];
+    let rec = recordVisitorMessage(s.state, s.chat, { kind: "message", text: "Nobody really owns IT here." });
+    let r = await runInterviewTurn(ctx, rec.state, rec.chat, { kind: "message", text: "Nobody really owns IT here." });
+    check("first quick win stored", r.state.quickWin === "Turn on MFA for the admin mailbox first.");
+    rec = recordVisitorMessage(r.state, r.chat, { kind: "message", text: "We use Microsoft 365 for email." });
+    r = await runInterviewTurn(ctx, rec.state, rec.chat, { kind: "message", text: "We use Microsoft 365 for email." });
+    check("only ONE quick win per scan (second ignored)", r.state.quickWin === "Turn on MFA for the admin mailbox first.");
+  }
+
+  console.log("\n22. Report text: Opus first, Sonnet if Opus is unavailable, cheap when over the $2 cap");
+  {
+    const seen: string[] = [];
+    const prev = proto.create;
+    proto.create = async function (params: { model: string }) {
+      seen.push(params.model);
+      if (params.model === REPORT_MODEL && seen.length === 1) throw new Error("model not available");
+      return { content: [{ type: "text", text: "{}" }], usage: { input_tokens: 100, output_tokens: 10 } };
+    };
+    const a = await createReportText({ max_tokens: 10, messages: [{ role: "user", content: "x" }] }, 1000);
+    check("falls back to Sonnet when Opus fails", a.usage.model === REPORT_FALLBACK_MODEL && seen[0] === REPORT_MODEL);
+    const b = await createReportText({ max_tokens: 10, messages: [{ role: "user", content: "x" }] }, 1000);
+    check("uses Opus when available", b.usage.model === REPORT_MODEL);
+    const c = await createReportText({ max_tokens: 10, messages: [{ role: "user", content: "x" }] }, 1000, true);
+    check("over the $2 cap → Sonnet, no Opus call", c.usage.model === REPORT_FALLBACK_MODEL && seen[seen.length - 1] === REPORT_FALLBACK_MODEL);
+    proto.create = prev;
+    const cost = computeCost(addOpusUsage(EMPTY_USAGE, { input_tokens: 1_000_000, output_tokens: 1_000_000 }));
+    check("Opus priced at $4 in + $20 out per 1M", cost.totalCostUsd === 24);
   }
 
   console.log(`\n${passed} passed, ${failed} failed (${calls} scripted model calls)\n`);
