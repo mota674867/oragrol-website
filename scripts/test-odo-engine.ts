@@ -308,7 +308,7 @@ async function main() {
   console.log("\n22. Report text: Opus first, Sonnet if Opus is unavailable, cheap when over the $2 cap");
   {
     const seen: string[] = [];
-    const prev = proto.create;
+    const prev = proto.create as (...args: unknown[]) => Promise<unknown>;
     proto.create = async function (params: { model: string }) {
       seen.push(params.model);
       if (params.model === REPORT_MODEL && seen.length === 1) throw new Error("model not available");
@@ -333,10 +333,10 @@ async function main() {
     check("bakery → no pack (general interview)", industryPackFor("Bakery", "Fresh bread and cakes") === null);
     check("'lawn care' is not a law firm", industryPackFor("Lawn care") === null);
     const seenPrompts: string[] = [];
-    const prev = proto.create;
+    const prev = proto.create as (...args: unknown[]) => Promise<unknown>;
     proto.create = async function (params: { messages: Array<{ content: unknown }> }) {
       seenPrompts.push(JSON.stringify(params.messages[0]?.content ?? ""));
-      return prev.apply(this, [params] as never);
+      return prev.call(this, params);
     };
     script = [turn()];
     await open();
