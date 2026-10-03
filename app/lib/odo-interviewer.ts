@@ -83,6 +83,8 @@ export type InterviewState = {
   nonsense: number;
   visitorQuestions: number;
   quickWinGiven: boolean;
+  /** The one free tip ODO gave during the scan (§37.7) — repeated in the report. */
+  quickWin?: string | null;
   intentAsked: boolean;
   urgent: boolean;
   judged: JudgedTurn[];
@@ -132,6 +134,7 @@ type ModelTurn = {
   assessment: unknown;
   urgent: boolean;
   quick_win_given: boolean;
+  quick_win: string | null;
   intent_question_asked: boolean;
   reply: string;
   action: string;
@@ -171,6 +174,7 @@ function parseModelJson(text: string): ModelTurn | null {
       assessment: p.assessment ?? null,
       urgent: p.urgent === true,
       quick_win_given: p.quick_win_given === true,
+      quick_win: typeof p.quick_win === "string" && p.quick_win.trim() ? p.quick_win.trim().slice(0, 400) : null,
       intent_question_asked: p.intent_question_asked === true,
       reply: typeof p.reply === "string" ? p.reply.trim().slice(0, 1200) : "",
       action: p.action,
@@ -492,7 +496,10 @@ export async function runInterviewTurn(
 
   s.reasons = [...s.reasons, t.reason].slice(-40);
   if (t.urgent) s.urgent = true;
-  if (t.quick_win_given) s.quickWinGiven = true;
+  if (t.quick_win_given && !s.quickWinGiven) {
+    s.quickWinGiven = true;
+    s.quickWin = t.quick_win ?? (t.reply ? t.reply.slice(0, 400) : null);
+  }
   if (t.intent_question_asked) s.intentAsked = true;
 
   const newChat = [...chat];

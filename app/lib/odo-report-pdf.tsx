@@ -1,6 +1,6 @@
 import React from "react";
 import { Document, Page, Text, View, StyleSheet, Image, Link } from "@react-pdf/renderer";
-import type { OdoReport, ReportFinding, ReportPriority } from "./odo-report";
+import { PROTECTION_LINE, type OdoReport, type ReportFinding, type ReportPriority } from "./odo-report";
 
 /**
  * ODO discovery report — client-facing PDF.
@@ -215,6 +215,12 @@ const s = StyleSheet.create({
   decisionNote: { fontSize: 7, color: "#3b494b", marginTop: 8 },
 
   note: { fontSize: 8.5, color: SECONDARY, lineHeight: 1.45, marginTop: 6 },
+  protection: { fontSize: 8.5, lineHeight: 1.4, color: INK, borderLeftWidth: 2, borderLeftColor: ORANGE, paddingLeft: 7, marginBottom: 12, maxWidth: "88%" },
+  callout: { borderWidth: 0.75, borderColor: "#c9d2d0", backgroundColor: "#f6f8f7", padding: 9, marginTop: 10, marginBottom: 4 },
+  calloutLabel: { fontSize: 7.5, letterSpacing: 1, color: ORANGE, fontFamily: "Helvetica-Bold", marginBottom: 3 },
+  calloutText: { fontSize: 9.5, lineHeight: 1.45, color: INK },
+  calloutSource: { fontSize: 7, color: SECONDARY, marginTop: 3 },
+  proofRaw: { fontSize: 7, fontFamily: "Courier", color: "#34403b", marginTop: 2 },
   closingTitle: { fontSize: 11, fontFamily: "Helvetica-Bold", marginTop: 14, marginBottom: 4 },
   closingText: { fontSize: 9.5, lineHeight: 1.45, color: SECONDARY },
 
@@ -226,7 +232,7 @@ const s = StyleSheet.create({
   // Sized from the mockup's .closing-art (702x292px @96dpi) = 526.5pt wide
   // (page content width) x 219pt tall; caption box overlaps bottom-left at
   // 45% width, matching .closing-art div exactly.
-  closingArt: { position: "relative", height: 219, marginBottom: 13, overflow: "hidden", backgroundColor: "#151b1d" },
+  closingArt: { position: "relative", height: 150, marginBottom: 13, overflow: "hidden", backgroundColor: "#151b1d" },
   closingArtImage: { width: "100%", height: "100%", objectFit: "cover" },
   closingArtCaption: { position: "absolute", left: 0, bottom: 0, width: "45%", backgroundColor: "#151b1d", padding: 10 },
   closingArtCaptionText: { fontSize: 17, lineHeight: 1.15, color: "#FFFFFF", fontFamily: "Helvetica-Bold" },
@@ -267,11 +273,10 @@ function fmtDate(iso: string): string {
 
 const SIZE_LABEL: Record<string, string> = { micro: "1–10 people", small: "11–50 people", medium: "51–200 people", large: "200+ people" };
 
-const SWOT_EXPLAINER =
-  "A SWOT is a simple way to look at a business from four angles at once: Strengths and Weaknesses are about the " +
-  "business today — what's already working, and what isn't. Opportunities and Threats are about what's ahead — what " +
-  "could be gained, and what could go wrong if nothing changes. Every point below is drawn from the findings in this " +
-  "report, not a generic template.";
+// Shortened 2026-10-03 (§37 report redesign: "shorter overall") — one line,
+// and at most 3 points per quadrant; every point still cites its [Ref].
+const SWOT_SHORT =
+  "Today (strengths, weaknesses) and what's ahead (opportunities, threats) — every point is drawn from a finding above, cited by its reference.";
 
 const BILLING_LABEL: Record<ReportPriority["billing"], string> = { recurring: "Subscription", project: "By engagement" };
 const TIER_DOT_COLOR: Record<"recommended" | "worth_exploring", string> = { recommended: ORANGE, worth_exploring: "#6b7470" };
@@ -308,6 +313,7 @@ function FindingRow({ f, rowNo, areaLabel, categoryStart, stripe }: { f: ReportF
         <Text style={s.proofLine}><Text style={s.proofBold}>Source: </Text>{f.source}</Text>
         <Text style={s.proofLine}><Text style={s.proofBold}>Checked </Text>{fmtDate(f.collectedAt)}</Text>
         <Text style={s.proofLine}><Text style={s.proofBold}>Ref </Text>{f.id}{f.framework ? ` · ${f.framework}` : ""}</Text>
+        {!quote && f.raw ? <Text style={s.proofRaw}>{f.raw.length > 160 ? `${f.raw.slice(0, 157)}…` : f.raw}</Text> : null}
       </View>
     </View>
   );
@@ -400,6 +406,8 @@ export function OdoReportPdf({
         <Text style={s.preparedFor}>PREPARED FOR</Text>
         <Text style={s.companyName}>{client.company}</Text>
         <Text style={s.coverIntro}>{report.summary}</Text>
+        {/* §37.7 protection line — on every report, in plain sight, not only in the legal small print. */}
+        <Text style={s.protection}>{report.protectionLine ?? PROTECTION_LINE}</Text>
 
         <View style={s.profileTable}>
           <View style={s.profileCell}>
@@ -441,7 +449,7 @@ export function OdoReportPdf({
 
         <View style={s.coverNote}>
           <Text style={s.coverNoteLabel}>Inside this report</Text>
-          <Text style={s.coverNoteText}>Evidence-led findings · Business context · Recommendations · How to read your results</Text>
+          <Text style={s.coverNoteText}>What you already do well · What we found, with the proof · Recommendations · How to read your results</Text>
         </View>
 
         {/* ---- Findings ---- */}
@@ -455,6 +463,34 @@ export function OdoReportPdf({
             <Text style={[s.legendChip, { borderWidth: 0.75, borderColor: "#4a595b", color: "#213235" }]}>UNCONFIRMED</Text>
           </View>
 
+          {strengthsAll.length > 0 ? (
+            <View>
+              <Text style={[s.positiveTitle, { marginTop: 4 }]}>Already in good shape</Text>
+              <View style={s.findingsTable}>
+                {strengthsAll.slice(0, 6).map((f, i) => (
+                  <View key={f.id} style={[s.row, { backgroundColor: POSITIVE_BG }]} wrap={false}>
+                    <View style={[s.cell, s.colArea]}>
+                      <Text style={[s.rowNo, s.rowNoPositive]}>+{String(i + 1).padStart(2, "0")}</Text>
+                      <Text style={[s.badge, { backgroundColor: POSITIVE_BADGE, color: "#fff", marginTop: 4 }]}>POSITIVE</Text>
+                    </View>
+                    <View style={[s.cell, s.colDetail, { width: "81%", borderRightWidth: 0 }]}>
+                      <Text style={s.fullFinding}>{f.fact}</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </View>
+          ) : null}
+
+          {report.benchmark ? (
+            <View style={s.callout} wrap={false}>
+              <Text style={s.calloutLabel}>HOW YOU COMPARE LOCALLY</Text>
+              <Text style={s.calloutText}>{report.benchmark.line}</Text>
+              <Text style={s.calloutSource}>Source: public DNS records, checked {fmtDate(report.benchmark.checkedAt)}. Counts only — no business is named or ranked.</Text>
+            </View>
+          ) : null}
+
+          {hasFindings ? <Text style={s.smallTitle}>What needs attention</Text> : null}
           {hasFindings ? (
             <View style={s.findingsTable}>
               <View style={s.tableHeadRow}>
@@ -473,30 +509,19 @@ export function OdoReportPdf({
             </Text>
           )}
 
-          {strengthsAll.length > 0 ? (
-            <View>
-              <Text style={s.positiveTitle}>Already in good shape</Text>
-              <View style={s.findingsTable}>
-                {strengthsAll.slice(0, 8).map((f, i) => (
-                  <View key={f.id} style={[s.row, { backgroundColor: POSITIVE_BG }]} wrap={false}>
-                    <View style={[s.cell, s.colArea]}>
-                      <Text style={[s.rowNo, s.rowNoPositive]}>+{String(i + 1).padStart(2, "0")}</Text>
-                      <Text style={[s.badge, { backgroundColor: POSITIVE_BADGE, color: "#fff", marginTop: 4 }]}>POSITIVE</Text>
-                    </View>
-                    <View style={[s.cell, s.colDetail, { width: "81%", borderRightWidth: 0 }]}>
-                      <Text style={s.fullFinding}>{f.fact}</Text>
-                    </View>
-                  </View>
-                ))}
-              </View>
+          {report.quickWin ? (
+            <View style={s.callout} wrap={false}>
+              <Text style={s.calloutLabel}>THE QUICK WIN WE SHARED DURING YOUR SCAN</Text>
+              <Text style={s.calloutText}>{report.quickWin}</Text>
             </View>
           ) : null}
+
         </View>
 
         {/* ---- SWOT ---- */}
         <View break>
           <SectionBar num={++sectionNo} title="SWOT — where the business stands" />
-          <Text style={s.swotIntro}>{SWOT_EXPLAINER}</Text>
+          <Text style={s.swotIntro}>{SWOT_SHORT}</Text>
           {([
             [["STRENGTHS", swot.strengths], ["WEAKNESSES", swot.weaknesses]],
             [["OPPORTUNITIES", swot.opportunities], ["THREATS", swot.threats]],
@@ -507,9 +532,9 @@ export function OdoReportPdf({
                   <View style={s.swotCard}>
                     <View style={s.swotHead}>
                       <Text style={s.swotTitle}>{title}</Text>
-                      <Text style={s.swotCount}>{points.length}</Text>
+                      <Text style={s.swotCount}>{Math.min(points.length, 3)}</Text>
                     </View>
-                    {points.length ? points.map((p, j) => (
+                    {points.length ? points.slice(0, 3).map((p, j) => (
                       <Text key={j} style={s.swotPoint}>• {p.text} <Text style={s.swotEvidence}>[{p.evidence.join(", ")}]</Text></Text>
                     )) : <Text style={[s.swotPoint, { color: SECONDARY }]}>Nothing significant identified.</Text>}
                   </View>
@@ -517,7 +542,6 @@ export function OdoReportPdf({
               ))}
             </View>
           ))}
-          <Text style={s.interpret}>Read the evidence alongside the summary. Each reference points back to a finding, its source and its checking date. An unconfirmed observation remains something to verify before deciding on an action.</Text>
         </View>
 
         {/* ---- Recommendation ---- */}
@@ -688,6 +712,14 @@ export function OdoReportPdf({
             {coverage.notDetermined.length ? ` Checks we could not complete: ${coverage.notDetermined.join(", ")}.` : ""}
           </Text>
           {report.attributions.length ? <Text style={s.note}>{report.attributions.join(" ")}</Text> : null}
+
+          <View style={s.callout} wrap={false}>
+            <Text style={s.calloutLabel}>FREE RE-CHECK IN 90 DAYS</Text>
+            <Text style={s.calloutText}>
+              From {fmtDate(report.recheckFrom ?? new Date(Date.parse(report.generatedAt) + 90 * 86400000).toISOString())}, ask us and ODO will re-run the same
+              public checks at no cost and show you exactly what changed since this report.
+            </Text>
+          </View>
 
           <Text style={s.closingTitle}>Questions about any of this?</Text>
           <Text style={s.closingText}>

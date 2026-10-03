@@ -22,6 +22,7 @@ import { SERVICE_BY_CODE, type Billing } from "./odo-services";
 import { recommendSecurityLane, evaluateOrOneFlag, type SecurityLane } from "./odo-packages";
 import { recommendAutomationLane, type AutomationRecommendation } from "./odo-automation-bundles";
 import type { CostBreakdown } from "./odo-cost";
+import type { Benchmark } from "./odo-benchmark";
 
 export type ReportFinding = Pick<Evidence, "id" | "fact" | "raw" | "source" | "tier" | "severity" | "polarity" | "framework" | "collectedAt">;
 // `simpleName` (e.g. "Trust Guard") is ODO's internal shorthand — never
@@ -72,6 +73,14 @@ export type OdoReport = {
   websitePointers: WebsitePointer[];
   coverage: { checksAnswered: number; notDetermined: string[]; note: string };
   attributions: string[];
+  /** §37.7 one-line, aggregate competitor comparison — null unless solidly determined (odo-benchmark.ts). */
+  benchmark: Benchmark | null;
+  /** §37.7 the one free tip ODO gave during the scan, repeated so it isn't lost. */
+  quickWin: string | null;
+  /** §37.7 free re-check offer — the date 90 days after this report. */
+  recheckFrom: string;
+  /** §37.7 protection line, shown on the cover of every report. */
+  protectionLine: string;
   internal: {
     customServiceFlag: MatchingResult["customServiceFlag"];
     internalEvidence: ReportFinding[];
@@ -118,6 +127,9 @@ const WEBSITE_POINTERS: WebsitePointer[] = [
   { label: "OR ONE custom automation builder", path: "/or-one" },
 ];
 
+export const PROTECTION_LINE =
+  "This is a discovery review based on public information and the answers you gave — not a penetration test and not a compliance audit.";
+
 export function makeReference(sessionId: string): string {
   const d = new Date();
   const ymd = `${d.getUTCFullYear()}${String(d.getUTCMonth() + 1).padStart(2, "0")}${String(d.getUTCDate()).padStart(2, "0")}`;
@@ -139,6 +151,8 @@ export async function buildReport(input: {
   answers: Record<string, string>;
   questionMethod: string[];
   aiCost: CostBreakdown;
+  benchmark?: Benchmark | null;
+  quickWin?: string | null;
 }): Promise<OdoReport> {
   const { ledger, matching, swot, findings } = input;
   const client = ledger.filter((e) => e.audience === "client");
@@ -220,6 +234,10 @@ export async function buildReport(input: {
         : "All automated checks completed.",
     },
     attributions,
+    benchmark: input.benchmark ?? null,
+    quickWin: input.quickWin ?? null,
+    recheckFrom: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+    protectionLine: PROTECTION_LINE,
     internal: {
       customServiceFlag: matching.customServiceFlag,
       internalEvidence: ledger.filter((e) => e.audience === "internal").map(toFinding),

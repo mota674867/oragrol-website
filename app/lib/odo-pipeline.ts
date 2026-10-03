@@ -22,6 +22,7 @@ import { sendOdoAdminReportEmail, sendOdoAdminInsufficientEmail } from "./odo-em
 import { EMPTY_USAGE, addJevUsage, mergeUsage, computeCost, type AiUsageTotals } from "./odo-cost";
 import { recordLifetimeAiCost } from "./odo-redis";
 import { recordScanSpend } from "./odo-spend";
+import { buildBenchmark } from "./odo-benchmark";
 
 const HUBSPOT_TOKEN = process.env.HUBSPOT_ACCESS_TOKEN;
 
@@ -175,8 +176,13 @@ export async function runEvaluation(
     const clientEvidenceCount = ledger.filter((e) => e.audience === "client").length;
     const condition: "complete" | "insufficient_data" = clientEvidenceCount >= 3 ? "complete" : "insufficient_data";
 
+    // §37.7 competitor benchmark — passive DNS only, aggregate only, never blocks the report.
+    const benchmark = await buildBenchmark(session.visitorWebsite, findings.competitorProfiles ?? null).catch(() => null);
+
     const report = await buildReport({
       sessionId,
+      benchmark,
+      quickWin: interview?.quickWin ?? null,
       company: session.visitorCompany,
       website: session.visitorWebsite,
       industry: profile.industry,

@@ -114,11 +114,13 @@ Return ONLY one JSON object, no other text:
  "assessment": {"quality": "valid"|"unsure"|"contradictory"|"contradicts_public", "note": string, "evidence": [{"fact": string, "polarity": "gap"|"strength"|"context", "severity": "high"|"medium"|"low"|"info", "area": string, "supports": string[], "counters": string[]}]} | null,
  "urgent": boolean,
  "quick_win_given": boolean,
+ "quick_win": string | null,
  "intent_question_asked": boolean,
  "reply": string,
  "action": "ask"|"clarify"|"reask"|"finish"|"insufficient",
  "question": {"text": string, "hint": string} | null,
  "reason": string}
+"quick_win" is the tip itself (1–2 plain sentences, no product names, no prices) on the turn you give it, otherwise null — it is repeated in their report.
 "reason" is an internal one-line explanation of your decision for the ORAGROL reviewer — never shown to the visitor.
 
 ════════ SERVICE CATALOG (codes for supports/counters) ════════
