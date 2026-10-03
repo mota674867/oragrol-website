@@ -253,3 +253,26 @@ export async function sendOdoAdminAbandonedEmail(params: {
     return { state: "failed", error: `Email send threw: ${err instanceof Error ? err.message : String(err)}`.slice(0, 500) };
   }
 }
+
+/** Outbound mode (§37.9): the dossier hand-off to OCS. Nothing is ever sent to the company itself. */
+export async function sendOdoOutboundDossierEmail(params: { company: string; domain: string; hasChanges: boolean; text: string }): Promise<SendOdoAdminEmailResult> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.CONTACT_FROM_EMAIL;
+  if (!apiKey) return { state: "skipped", reason: "RESEND_API_KEY is not configured." };
+  if (!from) return { state: "skipped", reason: "CONTACT_FROM_EMAIL is not configured." };
+  try {
+    const resend = new Resend(apiKey);
+    const { data, error } = await resend.emails.send({
+      from,
+      to: [ODO_ADMIN_EMAIL],
+      replyTo: from,
+      subject: `ODO outbound dossier${params.hasChanges ? " (re-run, with changes)" : ""} — ${params.company} (${params.domain})`,
+      text: params.text,
+    });
+    if (error) return { state: "failed", error: `Resend error: ${error.message ?? JSON.stringify(error)}`.slice(0, 500) };
+    if (!data?.id) return { state: "failed", error: "Resend returned no email id." };
+    return { state: "sent", providerId: data.id };
+  } catch (err) {
+    return { state: "failed", error: `Email send threw: ${err instanceof Error ? err.message : String(err)}`.slice(0, 500) };
+  }
+}
