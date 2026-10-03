@@ -38,6 +38,7 @@ import type { BusinessProfile } from "./odo-business-profile";
 import type { ComplianceSignal } from "./odo-industry-rules";
 import type { Area, Polarity, Severity } from "./odo-ledger";
 import { SERVICE_BY_CODE } from "./odo-services";
+import { industryPackFor } from "./odo-industry-depth";
 import { LIVE_CHECK_TOOLS, runLiveCheck, activityFor, type LiveCheckContext } from "./odo-live-checks";
 
 const MODEL = "claude-sonnet-4-6";
@@ -340,6 +341,17 @@ function transcriptText(chat: ChatMessage[]): string {
     .join("\n");
 }
 
+function industryDepth(ctx: InterviewContext): string[] {
+  const pack = industryPackFor(ctx.industry, ctx.profile?.whatTheySell ?? null);
+  if (!pack) return [];
+  return [
+    `=== Industry depth: ${pack.label} ===`,
+    "Specialist background to choose SHARPER questions. Never state any of this to the visitor as a fact about their business.",
+    pack.guidance,
+    "",
+  ];
+}
+
 function buildUserContent(ctx: InterviewContext, state: InterviewState, chat: ChatMessage[], turnNote: string): string {
   const compliance = ctx.complianceSignals?.length
     ? ctx.complianceSignals.map((s) => `- ${s.framework}: ${s.trigger} — still unknown: ${s.unknowns.join("; ")}`).join("\n")
@@ -356,6 +368,7 @@ function buildUserContent(ctx: InterviewContext, state: InterviewState, chat: Ch
     "=== Compliance signals ===",
     compliance,
     "",
+    ...industryDepth(ctx),
     "=== What public research established (evidence ledger) ===",
     ctx.researchText || "(research returned little — be careful not to assume)",
     "",
@@ -394,6 +407,9 @@ function isNearDuplicate(text: string, chat: ChatMessage[]): boolean {
     return shared / Math.min(a.size, b.size) > 0.7;
   });
 }
+
+/** The ended.reason for a two-strike nonsense stop — finalizeInsufficient keys the cooldown off it. */
+export const NONSENSE_STOP_REASON = "second nonsense answer";
 
 function end(state: InterviewState, chat: ChatMessage[], outcome: "finish" | "insufficient", reason: string, message: string, usage: Usage | null): TurnResult {
   return {
@@ -511,7 +527,7 @@ export async function runInterviewTurn(
     if (type === "nonsense") {
       s.nonsense += 1;
       s.judged = [...s.judged, { questionId: pending.id, question: pending.text, visitorText: input.text, type, at: now() }];
-      if (s.nonsense >= 2) return end(s, chat, "insufficient", "second nonsense answer", ENDING_NONSENSE, usage);
+      if (s.nonsense >= 2) return end(s, chat, "insufficient", NONSENSE_STOP_REASON, ENDING_NONSENSE, usage);
       newChat.push(odo("reply", t.reply || NONSENSE_FALLBACK_REPLY));
       newChat.push(odo("question", pending.text, pending.hint));
       return { state: { ...s, awaiting: false, activity: null, version: s.version + 1 }, chat: newChat, usage, outcome: "continue" };

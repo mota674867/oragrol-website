@@ -160,6 +160,30 @@ const INITIAL_FORM = Object.freeze({
   website: "",
 });
 
+// Resume within 24 hours (Master Reference §37.14 #2): the session id is kept
+// in this browser, so a visitor who closes the tab can come back and carry on
+// without paying for the research twice. Only this browser can resume — a
+// session is never handed out by email address alone.
+const SAVED_SESSION_KEY = "oragrol_odo_session";
+const RESUME_WINDOW_MS = 24 * 60 * 60 * 1000;
+function saveSession(id: string) {
+  try { window.localStorage.setItem(SAVED_SESSION_KEY, JSON.stringify({ id, savedAt: Date.now() })); } catch { /* storage unavailable */ }
+}
+function loadSession(): string | null {
+  try {
+    const raw = window.localStorage.getItem(SAVED_SESSION_KEY) ?? null;
+    if (raw) {
+      const v = JSON.parse(raw) as { id?: string; savedAt?: number };
+      if (v.id && v.savedAt && Date.now() - v.savedAt < RESUME_WINDOW_MS) return v.id;
+      window.localStorage.removeItem(SAVED_SESSION_KEY);
+    }
+    return window.sessionStorage.getItem("oragrol_odo_session_id"); // older tabs
+  } catch { return null; }
+}
+function forgetSession() {
+  try { window.localStorage.removeItem(SAVED_SESSION_KEY); window.sessionStorage.removeItem("oragrol_odo_session_id"); } catch { /* storage unavailable */ }
+}
+
 function makeIdempotencyKey() {
   if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
   return `odo-${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -468,7 +492,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     }
     if (payload.step && next === "researching") setStep(String(payload.step));
 
-    const clearSavedSession = () => { if (typeof window !== "undefined") window.sessionStorage.removeItem("oragrol_odo_session_id"); };
+    const clearSavedSession = () => { if (typeof window !== "undefined") forgetSession(); };
     if (next === "complete") {
       stopUpdates();
       clearSavedSession();
@@ -516,11 +540,20 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
         headers: { Accept: "application/json" },
         cache: "no-store",
       });
+      if (response.status === 404) {
+        // The saved scan expired — start fresh rather than wait forever.
+        stopUpdates();
+        forgetSession();
+        setSessionId("");
+        setPhase("idle");
+        setBusy(false);
+        return;
+      }
       applyStatus(await readJson(response));
     } catch {
       // Keep the scan running; the next poll retries.
     }
-  }, [applyStatus]);
+  }, [applyStatus, stopUpdates]);
 
   const startUpdates = useCallback((id: string, eventsUrl: string, statusUrl: string = ODO_ROUTES.status) => {
     stopUpdates();
@@ -538,7 +571,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
-    const savedSession = window.sessionStorage.getItem("oragrol_odo_session_id");
+    const savedSession = loadSession();
     if (!savedSession) return undefined;
     setSessionId(savedSession);
     setPhase("researching");
@@ -625,7 +658,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
         return;
       }
       setSessionId(String(payload.session_id));
-      if (typeof window !== "undefined") window.sessionStorage.setItem("oragrol_odo_session_id", String(payload.session_id));
+      if (typeof window !== "undefined") saveSession(String(payload.session_id));
       emit("scan-started");
       startUpdates(String(payload.session_id), String(payload.events_url || `${ODO_ROUTES.events}?session_id=${encodeURIComponent(String(payload.session_id))}`), String(payload.status_url || ODO_ROUTES.status));
     } catch {
@@ -702,7 +735,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     setForm({ ...INITIAL_FORM });
     setErrors({});
     setConsent(false);
-    if (typeof window !== "undefined") window.sessionStorage.removeItem("oragrol_odo_session_id");
+    if (typeof window !== "undefined") forgetSession();
     setPhase("idle");
   };
 
@@ -713,7 +746,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     setPhase("idle");
     setSessionId("");
     resetConversation();
-    if (typeof window !== "undefined") window.sessionStorage.removeItem("oragrol_odo_session_id");
+    if (typeof window !== "undefined") forgetSession();
     setMessage("Your scan is paused. You can start again when you are ready.");
     try {
       await fetch(ODO_ROUTES.cancel, {

@@ -27,6 +27,7 @@ import { matchServices } from "../app/lib/odo-matching";
 import { runLiveCheck } from "../app/lib/odo-live-checks";
 import { createReportText, REPORT_MODEL, REPORT_FALLBACK_MODEL } from "../app/lib/odo-report-model";
 import { computeCost, addOpusUsage, EMPTY_USAGE } from "../app/lib/odo-cost";
+import { industryPackFor } from "../app/lib/odo-industry-depth";
 
 process.env.ANTHROPIC_API_KEY = "test-key";
 
@@ -322,6 +323,25 @@ async function main() {
     proto.create = prev;
     const cost = computeCost(addOpusUsage(EMPTY_USAGE, { input_tokens: 1_000_000, output_tokens: 1_000_000 }));
     check("Opus priced at $4 in + $20 out per 1M", cost.totalCostUsd === 24);
+  }
+
+  console.log("\n23. Industry depth packs");
+  {
+    check("dental clinic → clinic pack", industryPackFor("Dental clinic")?.id === "clinic");
+    check("law firm → law pack", industryPackFor("Law firm")?.id === "law");
+    check("bookkeeping (from what they sell) → accounting pack", industryPackFor(null, "Bookkeeping and payroll for small businesses")?.id === "accounting");
+    check("bakery → no pack (general interview)", industryPackFor("Bakery", "Fresh bread and cakes") === null);
+    check("'lawn care' is not a law firm", industryPackFor("Lawn care") === null);
+    const seenPrompts: string[] = [];
+    const prev = proto.create;
+    proto.create = async function (params: { messages: Array<{ content: unknown }> }) {
+      seenPrompts.push(JSON.stringify(params.messages[0]?.content ?? ""));
+      return prev.apply(this, [params] as never);
+    };
+    script = [turn()];
+    await open();
+    proto.create = prev;
+    check("clinic guidance reaches the interviewer for a dental clinic", seenPrompts.some((p) => p.includes("Industry depth")));
   }
 
   console.log(`\n${passed} passed, ${failed} failed (${calls} scripted model calls)\n`);

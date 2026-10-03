@@ -9,9 +9,9 @@
 // Shared by /api/odo/scan/start (opening turn) and /api/odo/scan/answer
 // (every later turn), so there is exactly one evaluation path to get right.
 
-import { updateSession, markSessionComplete, getSession, type OdoSession } from "./odo-redis";
+import { updateSession, markSessionComplete, getSession, activateCooldowns, type OdoSession } from "./odo-redis";
 import { buildLedger, ledgerAsText } from "./odo-ledger";
-import type { InterviewContext, InterviewState, ChatMessage } from "./odo-interviewer";
+import { NONSENSE_STOP_REASON, type InterviewContext, type InterviewState, type ChatMessage } from "./odo-interviewer";
 import { matchServices } from "./odo-matching";
 import { buildSwot } from "./odo-swot";
 import { buildOutcomeNarrative } from "./odo-outcome";
@@ -79,12 +79,19 @@ export function reviewerTranscript(state: InterviewState | undefined, chat: Chat
  */
 export async function finalizeInsufficient(
   sessionId: string,
-  session: Pick<OdoSession, "visitorCompany" | "visitorEmail" | "hubspotContactId">,
+  session: Pick<OdoSession, "visitorCompany" | "visitorEmail" | "visitorWebsite" | "hubspotContactId">,
   state: InterviewState,
   chat: ChatMessage[],
   aiUsage: AiUsageTotals
 ): Promise<void> {
   const cost = computeCost(aiUsage);
+  // §37.14 #1 (default until Mohammad decides otherwise): a scan stopped for
+  // nonsense gets the normal 7-day email / 30-day website cooldown, so the
+  // research can't be farmed by typing junk. Skips and "not enough reliable
+  // information" do NOT — those are honest outcomes. An AI outage never does.
+  if (state.ended?.reason === NONSENSE_STOP_REASON) {
+    await activateCooldowns(session.visitorEmail, session.visitorWebsite).catch((err) => console.error("[ODO] Cooldown after nonsense stop failed:", err));
+  }
   await recordLifetimeAiCost(aiUsage, cost.totalCostUsd).catch((err) => console.error("[ODO] Failed to record lifetime AI cost:", err));
   await recordScanSpend(cost.totalCostUsd).catch((err) => console.error("[ODO] Failed to record scan spend:", err));
   console.log(`[ODO Cost] ${sessionId} — insufficient ending, total $${cost.totalCostUsd.toFixed(6)}`);
