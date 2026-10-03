@@ -26,7 +26,13 @@ import {
 // backed ceiling. The existing hourly in-memory limiter below still runs
 // first as a cheap first filter; this is the one that actually matters
 // against a distributed/determined source.
-const IP_DAILY_SCAN_LIMIT = 3;
+// Per-IP daily scan starts. RAISED 2026-10-03 from 3 — 3 was chosen against
+// a lone abuser, but it also blocks the normal case: ORAGROL sells to 20–500
+// person SMBs, whose staff all share one office IP, so the 4th curious person
+// at one prospect was being turned away. 10 still caps one connection's worth
+// of spend well under the global daily ceiling (odo-spend.ts), which is the
+// real money protection. It also stops internal testing dying after 3 runs.
+const IP_DAILY_SCAN_LIMIT = 10;
 
 const HUBSPOT_TOKEN = process.env.HUBSPOT_ACCESS_TOKEN;
 

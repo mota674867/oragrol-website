@@ -229,7 +229,11 @@ function formatError(payload: Record<string, unknown> | null, fallback: string):
   // are now routed to CooldownModal (see submitStart) before this function
   // is ever called, but the real message is kept here as a fallback too in
   // case a cooldown payload ever reaches this path some other way.
-  if ((payload as Record<string,unknown>)?.code === "rate_limited") return "Please wait a moment and try again.";
+  // FIXED 2026-10-03 — "rate_limited" used to be flattened to "Please wait a
+  // moment and try again", which is actively misleading for the daily
+  // per-connection limit: waiting a moment never helps, it resets at
+  // midnight. The server already sends the precise reason for both the
+  // hourly and the daily limit, so show it.
   return (payload as Record<string,unknown>)?.message as string || fallback;
 }
 
