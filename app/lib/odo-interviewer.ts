@@ -32,6 +32,11 @@ import {
   ENDING_JUDGED_INSUFFICIENT,
   NONSENSE_FALLBACK_REPLY,
   VISITOR_QUESTION_LIMIT_REPLY,
+  INTERVIEW_AREAS,
+  AREA_WEIGHTS,
+  AREA_NAMES,
+  AREA_TARGETS,
+  type InterviewArea,
 } from "./odo-playbook";
 import type { AnswerEvidenceTemplate } from "./odo-questions";
 import type { BusinessProfile } from "./odo-business-profile";
@@ -70,6 +75,9 @@ export type JudgedTurn = {
   at: string;
 };
 
+/** A question's area — one of the five, or "general" (the buying-intent question), which counts toward none. */
+export type QuestionArea = InterviewArea | "general";
+
 export type InterviewEvidence = AnswerEvidenceTemplate & { questionId: string; raw: string };
 
 export type InterviewState = {
@@ -77,8 +85,10 @@ export type InterviewState = {
   version: number;
   /** True while ODO is working on a reply (the visitor's message is saved, ODO's isn't yet). */
   awaiting: boolean;
-  pending: { id: string; text: string; hint?: string } | null;
+  pending: { id: string; text: string; hint?: string; area?: QuestionArea } | null;
   questionsAsked: number;
+  /** Questions asked per business area (Mohammad's five-area split, odo-playbook.ts). */
+  areaCounts?: Partial<Record<InterviewArea, number>>;
   answered: number;
   skips: number;
   nonsense: number;
@@ -139,7 +149,7 @@ type ModelTurn = {
   intent_question_asked: boolean;
   reply: string;
   action: string;
-  question: { text: string; hint: string } | null;
+  question: { text: string; hint: string; area: QuestionArea | null } | null;
   reason: string;
 };
 
@@ -167,7 +177,11 @@ function parseModelJson(text: string): ModelTurn | null {
     if (typeof p.action !== "string" || !ACTIONS.has(p.action)) return null;
     const q = p.question as Record<string, unknown> | null | undefined;
     const question = q && typeof q.text === "string" && q.text.trim()
-      ? { text: q.text.trim().slice(0, 320), hint: typeof q.hint === "string" ? q.hint.trim().slice(0, 180) : "" }
+      ? {
+          text: q.text.trim().slice(0, 320),
+          hint: typeof q.hint === "string" ? q.hint.trim().slice(0, 180) : "",
+          area: q.area === "general" || INTERVIEW_AREAS.includes(q.area as InterviewArea) ? (q.area as QuestionArea) : null,
+        }
       : null;
     if ((p.action === "ask" || p.action === "clarify") && !question) return null;
     return {
@@ -274,7 +288,7 @@ async function callModel(userContent: string, live?: LiveOptions): Promise<{ tur
 
 // ─── Parsing the model's judgement ───────────────────────────────────────────
 
-const AREAS: Area[] = ["email", "web", "domain", "exposure", "privacy", "governance", "identity", "data", "people", "ai", "operations", "presence", "business"];
+const AREAS: Area[] = ["email", "web", "domain", "exposure", "privacy", "governance", "identity", "data", "people", "ai", "marketing", "sales", "finance", "customer_service", "operations", "presence", "business"];
 const POLARITIES: Polarity[] = ["gap", "strength", "context"];
 const SEVERITIES: Severity[] = ["high", "medium", "low", "info"];
 const QUALITIES: AnswerQuality[] = ["valid", "unsure", "contradictory", "contradicts_public"];
@@ -341,6 +355,69 @@ function transcriptText(chat: ChatMessage[]): string {
     .join("\n");
 }
 
+// ─── Five-area coverage (Mohammad, 2026-10-03) ───────────────────────────────
+
+const areaCount = (state: InterviewState, a: InterviewArea): number => state.areaCounts?.[a] ?? 0;
+
+/** Areas that have not had a single question yet. */
+export function uncoveredAreas(state: InterviewState): InterviewArea[] {
+  return INTERVIEW_AREAS.filter((a) => areaCount(state, a) === 0);
+}
+
+/**
+ * The area furthest below its share, if the next question were asked now.
+ * Proportional, so a 9-question interview keeps the same balance as a
+ * 15-question one. Ties go to the heavier-weighted area.
+ */
+export function mostUnderCovered(state: InterviewState): InterviewArea {
+  const total = INTERVIEW_AREAS.reduce((n, a) => n + areaCount(state, a), 0);
+  return [...INTERVIEW_AREAS].sort((x, y) => {
+    const dx = AREA_WEIGHTS[x] * (total + 1) - areaCount(state, x);
+    const dy = AREA_WEIGHTS[y] * (total + 1) - areaCount(state, y);
+    return dy - dx || AREA_WEIGHTS[y] - AREA_WEIGHTS[x];
+  })[0];
+}
+
+/**
+ * Why a drafted question would break the area plan, or null if it's fine.
+ * Code-enforced so the split holds whatever the model prefers:
+ *   - an area may not go past its full-interview budget;
+ *   - once half the questions are used, uncovered areas come first;
+ *   - never use up the last slots while an area still has no question.
+ * Clarifications (resolving a contradiction) are exempt from the first two —
+ * getting a straight answer matters more than the split.
+ */
+export function offPlanReason(state: InterviewState, area: QuestionArea | null, action: string): string | null {
+  if (!area || area === "general") return null;
+  const uncovered = uncoveredAreas(state).filter((a) => a !== area);
+  const slotsLeft = MAX_INTERVIEW_QUESTIONS - state.questionsAsked;
+  if (uncovered.length && slotsLeft <= uncovered.length) {
+    return `only ${slotsLeft} question(s) remain and ${uncovered.map((a) => AREA_NAMES[a]).join(", ")} still ha${uncovered.length === 1 ? "s" : "ve"} none`;
+  }
+  if (action === "clarify") return null;
+  if (areaCount(state, area) >= AREA_TARGETS[area]) {
+    return `${AREA_NAMES[area]} has already had its full share (${AREA_TARGETS[area]} questions)`;
+  }
+  if (uncovered.length && state.questionsAsked >= 7) {
+    return `half the interview is used and ${uncovered.map((a) => AREA_NAMES[a]).join(", ")} still ha${uncovered.length === 1 ? "s" : "ve"} no question`;
+  }
+  return null;
+}
+
+function coverageText(state: InterviewState): string {
+  const lines = INTERVIEW_AREAS.map((a) => `- ${AREA_NAMES[a]}: ${areaCount(state, a)} asked (share ${Math.round(AREA_WEIGHTS[a] * 100)}%, about ${AREA_TARGETS[a]} in a full interview)`);
+  const uncovered = uncoveredAreas(state);
+  return [
+    ...lines,
+    `Most under-covered now: ${AREA_NAMES[mostUnderCovered(state)]}.${uncovered.length ? ` No question yet: ${uncovered.map((a) => AREA_NAMES[a]).join(", ")} — you cannot finish until each has had one.` : " Every area has had at least one question."}`,
+  ].join("\n");
+}
+
+function withAreaCounted(state: InterviewState, area: QuestionArea | null | undefined): InterviewState {
+  if (!area || area === "general") return state;
+  return { ...state, areaCounts: { ...state.areaCounts, [area]: areaCount(state, area) + 1 } };
+}
+
 function industryDepth(ctx: InterviewContext): string[] {
   const pack = industryPackFor(ctx.industry, ctx.profile?.whatTheySell ?? null);
   if (!pack) return [];
@@ -377,7 +454,10 @@ function buildUserContent(ctx: InterviewContext, state: InterviewState, chat: Ch
     "",
     "=== Interview state ===",
     `Questions asked: ${state.questionsAsked} of max ${MAX_INTERVIEW_QUESTIONS}. Answers received: ${state.answered}. Skips: ${state.skips}. Nonsense so far: ${state.nonsense}. Visitor questions answered: ${state.visitorQuestions} of ${MAX_VISITOR_QUESTIONS}. Quick win given: ${state.quickWinGiven ? "yes" : "no"}. Buying-intent question asked: ${state.intentAsked ? "yes" : "no"}.`,
-    state.pending ? `Pending question: "${state.pending.text}"` : "Pending question: none",
+    state.pending ? `Pending question: "${state.pending.text}"${state.pending.area ? ` (area: ${state.pending.area})` : ""}` : "Pending question: none",
+    "",
+    "=== Area coverage — follow it ===",
+    coverageText(state),
     "",
     "=== Full conversation so far ===",
     transcriptText(chat),
@@ -442,9 +522,9 @@ export async function openInterview(ctx: InterviewContext): Promise<TurnResult> 
   const state = emptyInterviewState();
   const res = await callModel(buildUserContent(ctx, state, [], OPENING_INSTRUCTION));
   if (!res || !res.turn.question || !res.turn.reply) return failed(state, [], res?.usage ?? null);
-  const q = { id: "q1", text: res.turn.question.text, hint: res.turn.question.hint || undefined };
+  const q = { id: "q1", text: res.turn.question.text, hint: res.turn.question.hint || undefined, area: res.turn.question.area ?? undefined };
   return {
-    state: { ...state, version: 1, pending: q, questionsAsked: 1, reasons: [res.turn.reason] },
+    state: { ...withAreaCounted(state, q.area), version: 1, pending: q, questionsAsked: 1, reasons: [res.turn.reason] },
     chat: [odo("opening", res.turn.reply), odo("question", q.text, q.hint)],
     usage: res.usage,
     outcome: "continue",
@@ -510,6 +590,17 @@ export async function runInterviewTurn(
     else if (t.action === "ask") t = { ...t, action: s.answered >= MIN_ANSWERS_BEFORE_FINISH ? "finish" : "insufficient", question: null };
   }
 
+  // One retry if the drafted question breaks the five-area plan. Never loops:
+  // if the retry is still off-plan, it is accepted and logged for review.
+  const planBreak = (t.action === "ask" || t.action === "clarify") && t.question ? offPlanReason(s, t.question.area, t.action) : null;
+  if (planBreak && !finalTurn) {
+    const target = AREA_NAMES[mostUnderCovered(s)];
+    const retry = await callModel(buildUserContent(ctx, s, chat, turnNote + `\nYOUR DRAFT QUESTION ("${t.question!.text}") BREAKS THE AREA PLAN: ${planBreak}. Ask your next question in ${target} instead (or another area with no question yet). Judge the visitor's message exactly as before.`));
+    usage = addUsage(usage, retry?.usage ?? null);
+    if (retry && retry.turn.question && !isNearDuplicate(retry.turn.question.text, chat)) t = retry.turn;
+    else t = { ...t, reason: `${t.reason} [area plan: ${planBreak}]` };
+  }
+
   s.reasons = [...s.reasons, t.reason].slice(-40);
   if (t.urgent) s.urgent = true;
   if (t.quick_win_given && !s.quickWinGiven) {
@@ -565,6 +656,21 @@ export async function runInterviewTurn(
   if (action === "finish" && s.answered < MIN_ANSWERS_BEFORE_FINISH && !finalTurn && t.question) action = "ask";
   if (action === "finish" && s.answered < MIN_ANSWERS_BEFORE_FINISH && finalTurn) action = "insufficient";
 
+  // Five-area rule: ODO may not finish while an area has had no question,
+  // as long as questions remain. One retry asking for the missing area; if
+  // the model still won't (or can't), the finish stands and is logged.
+  if (action === "finish" && !finalTurn && uncoveredAreas(s).length) {
+    const missing = uncoveredAreas(s).map((a) => AREA_NAMES[a]);
+    const retry = await callModel(buildUserContent(ctx, s, newChat, `You already judged the visitor's latest message — this turn is ONLY about your next move. You tried to finish, but these areas have had no question yet: ${missing.join(", ")}. You may not finish yet. Write a short bridging reply and ask the single most valuable question about ${missing[0]}, with its "area". Set message_type "none" and assessment null.`));
+    usage = addUsage(usage, retry?.usage ?? null);
+    if (retry && (retry.turn.action === "ask" || retry.turn.action === "clarify") && retry.turn.question && !isNearDuplicate(retry.turn.question.text, newChat)) {
+      t = { ...retry.turn, reason: `${t.reason} → kept going: ${missing.join(", ")} not yet covered` };
+      action = "ask";
+    } else {
+      s.reasons = [...s.reasons, `finished with uncovered areas: ${missing.join(", ")}`].slice(-40);
+    }
+  }
+
   if (action === "insufficient") return end(s, [...newChat], "insufficient", t.reason || "too little reliable information", ENDING_JUDGED_INSUFFICIENT, usage);
   if (action === "finish") {
     const closing = t.reply || "Thank you — that gives me what I need.";
@@ -572,11 +678,11 @@ export async function runInterviewTurn(
   }
 
   if (!t.question) return failed(s, chat, usage);
-  const q = { id: `q${s.questionsAsked + 1}`, text: t.question.text, hint: t.question.hint || undefined };
+  const q = { id: `q${s.questionsAsked + 1}`, text: t.question.text, hint: t.question.hint || undefined, area: t.question.area ?? undefined };
   if (t.reply) newChat.push(odo("reply", t.reply));
   newChat.push(odo("question", q.text, q.hint));
   return {
-    state: { ...s, awaiting: false, activity: null, pending: q, questionsAsked: s.questionsAsked + 1, version: s.version + 1 },
+    state: { ...withAreaCounted(s, q.area), awaiting: false, activity: null, pending: q, questionsAsked: s.questionsAsked + 1, version: s.version + 1 },
     chat: newChat,
     usage,
     outcome: "continue",

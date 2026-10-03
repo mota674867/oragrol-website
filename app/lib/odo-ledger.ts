@@ -30,7 +30,11 @@ export type Polarity = "gap" | "strength" | "context";
 export type Severity = "high" | "medium" | "low" | "info";
 export type Area =
   | "email" | "web" | "domain" | "exposure" | "privacy" | "governance"
-  | "identity" | "data" | "people" | "ai" | "operations" | "presence" | "business";
+  | "identity" | "data" | "people" | "ai"
+  // The four business areas of Mohammad's five-area split (2026-10-03); IT &
+  // cybersecurity is everything above.
+  | "marketing" | "sales" | "finance" | "customer_service"
+  | "operations" | "presence" | "business";
 
 export type Evidence = {
   id: string;
@@ -68,6 +72,10 @@ export const AREA_LABEL: Record<Area, string> = {
   data: "Data protection",
   people: "People & awareness",
   ai: "AI use",
+  marketing: "Marketing",
+  sales: "Sales",
+  finance: "Finance & admin",
+  customer_service: "Customer service",
   operations: "Operations & automation",
   presence: "Online presence",
   business: "Business profile",
@@ -220,25 +228,25 @@ export function researchEvidence(f: ResearchFindings): Draft[] {
   // ---- Online presence & business signals (context / inferred) ----
   const gb = f.googleBusiness;
   if (gb?.rating != null && gb.reviewCount != null) {
-    if (gb.rating >= 4.5 && gb.reviewCount >= 20) add({ fact: `Strong Google rating: ${gb.rating}★ from ${gb.reviewCount} reviews.`, source: "Google Places", tier: "observed", polarity: "strength", severity: "info", area: "presence" });
-    else if (gb.rating < 3.8 && gb.reviewCount >= 5) add({ fact: `Google rating is ${gb.rating}★ from ${gb.reviewCount} reviews — below the level most customers filter for.`, source: "Google Places", tier: "observed", polarity: "gap", severity: "low", area: "presence", supports: ["C15-S04", "C15-S01"] });
+    if (gb.rating >= 4.5 && gb.reviewCount >= 20) add({ fact: `Strong Google rating: ${gb.rating}★ from ${gb.reviewCount} reviews.`, source: "Google Places", tier: "observed", polarity: "strength", severity: "info", area: "marketing" });
+    else if (gb.rating < 3.8 && gb.reviewCount >= 5) add({ fact: `Google rating is ${gb.rating}★ from ${gb.reviewCount} reviews — below the level most customers filter for.`, source: "Google Places", tier: "observed", polarity: "gap", severity: "low", area: "marketing", supports: ["C15-S04", "C15-S01"] });
     else add({ fact: `Google rating: ${gb.rating}★ from ${gb.reviewCount} reviews.`, source: "Google Places", tier: "observed", polarity: "context", severity: "info", area: "presence" });
   }
   const seo = f.page?.seo;
   if (seo && seo.issues.length >= 3) {
-    add({ fact: `${seo.issues.length} on-page SEO issues on the homepage (e.g. ${seo.issues.slice(0, 2).join("; ")}).`, source: "Homepage HTML", tier: "observed", polarity: "gap", severity: "low", area: "presence" });
+    add({ fact: `${seo.issues.length} on-page SEO issues on the homepage (e.g. ${seo.issues.slice(0, 2).join("; ")}).`, source: "Homepage HTML", tier: "observed", polarity: "gap", severity: "low", area: "marketing" });
   }
   const tech = f.page?.techStack;
   if (tech) {
     if (tech.detected.length) add({ fact: `Website built with: ${tech.detected.slice(0, 8).map((t) => t.name).join(", ")}.`, source: "Homepage fingerprint", tier: "observed", polarity: "context", severity: "info", area: "business" });
-    if (!tech.hasAnalytics) add({ fact: "No website analytics detected — visitor and conversion data is not being measured.", source: "Homepage fingerprint", tier: "inferred", polarity: "gap", severity: "low", area: "operations", supports: ["C15-S05", "C13-S02"] });
-    if (!(tech.byCategory.marketing?.length)) add({ fact: "No CRM or marketing-automation tool is visible on the website (lead capture may be manual).", source: "Homepage fingerprint", tier: "inferred", polarity: "gap", severity: "low", area: "operations", supports: ["C15-S02"] });
+    if (!tech.hasAnalytics) add({ fact: "No website analytics detected — visitor and conversion data is not being measured.", source: "Homepage fingerprint", tier: "inferred", polarity: "gap", severity: "low", area: "marketing", supports: ["C15-S05", "C13-S02"] });
+    if (!(tech.byCategory.marketing?.length)) add({ fact: "No CRM or marketing-automation tool is visible on the website (lead capture may be manual).", source: "Homepage fingerprint", tier: "inferred", polarity: "gap", severity: "low", area: "sales", supports: ["C15-S02"] });
     if (tech.hasPayments) add({ fact: "The website takes payments online.", source: "Homepage fingerprint", tier: "observed", polarity: "context", severity: "info", area: "business", supports: ["C10-S03", "C08-S01", "C08-S05"] });
-    if (tech.hasChatWidget) add({ fact: "A live-chat/support widget is present on the website.", source: "Homepage fingerprint", tier: "observed", polarity: "strength", severity: "info", area: "operations" });
+    if (tech.hasChatWidget) add({ fact: "A live-chat/support widget is present on the website.", source: "Homepage fingerprint", tier: "observed", polarity: "strength", severity: "info", area: "customer_service" });
   }
   const hist = f.history;
   if (hist?.state === "observed" && hist.value.staleFor24Months) {
-    add({ fact: "The website has barely changed in 24 months (archive history).", source: "Wayback Machine", tier: "inferred", polarity: "gap", severity: "low", area: "presence", supports: ["C11-S01"] });
+    add({ fact: "The website has barely changed in 24 months (archive history).", source: "Wayback Machine", tier: "inferred", polarity: "gap", severity: "low", area: "marketing", supports: ["C11-S01"] });
   }
   const hir = f.hiring;
   if (hir?.state === "observed" && hir.value.jobPostings.length > 0) {
@@ -426,6 +434,6 @@ export function buildLedger(findings: ResearchFindings): Evidence[] {
 export function ledgerAsText(ledger: Evidence[], opts: { includeInternal?: boolean } = {}): string {
   return ledger
     .filter((e) => opts.includeInternal || e.audience === "client")
-    .map((e) => `[${e.id}] (${e.tier}, ${e.polarity}${e.severity !== "info" ? `, ${e.severity}` : ""}) ${e.fact}`)
+    .map((e) => `[${e.id}] (${e.area} · ${e.tier}, ${e.polarity}${e.severity !== "info" ? `, ${e.severity}` : ""}) ${e.fact}`)
     .join("\n");
 }

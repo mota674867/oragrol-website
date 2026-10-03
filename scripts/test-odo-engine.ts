@@ -20,8 +20,11 @@ import {
   type InterviewState,
   type ChatMessage,
   type TurnResult,
+  uncoveredAreas,
+  mostUnderCovered,
+  offPlanReason,
 } from "../app/lib/odo-interviewer";
-import { ENDING_NONSENSE, ENDING_SKIPS, VISITOR_QUESTION_LIMIT_REPLY } from "../app/lib/odo-playbook";
+import { ENDING_NONSENSE, ENDING_SKIPS, VISITOR_QUESTION_LIMIT_REPLY, AREA_WEIGHTS, AREA_TARGETS, MAX_INTERVIEW_QUESTIONS } from "../app/lib/odo-playbook";
 import { answerEvidence } from "../app/lib/odo-ledger";
 import { matchServices } from "../app/lib/odo-matching";
 import { runLiveCheck } from "../app/lib/odo-live-checks";
@@ -342,6 +345,81 @@ async function main() {
     await open();
     proto.create = prev;
     check("clinic guidance reaches the interviewer for a dental clinic", seenPrompts.some((p) => p.includes("Industry depth")));
+  }
+
+  console.log("\n24. Five areas: the split itself");
+  {
+    const w = Object.values(AREA_WEIGHTS).reduce((a, b) => a + b, 0);
+    check("weights are IT 35 / Marketing 25 / Sales 15 / Finance 15 / CS 10", AREA_WEIGHTS.it === 0.35 && AREA_WEIGHTS.marketing === 0.25 && AREA_WEIGHTS.sales === 0.15 && AREA_WEIGHTS.finance === 0.15 && AREA_WEIGHTS.customer_service === 0.1 && Math.abs(w - 1) < 1e-9);
+    const t = Object.values(AREA_TARGETS).reduce((a, b) => a + b, 0);
+    check("area budgets + 1 buying-intent question = the 15-question cap", t + 1 === MAX_INTERVIEW_QUESTIONS);
+  }
+
+  console.log("\n25. Five areas: every question is counted in its area");
+  {
+    script = [turn({ message_type: "none", assessment: null, reply: "Hello.", question: { text: "Who looks after IT today?", hint: "", area: "it" } })];
+    const o = await openInterview(ctx);
+    check("opening question counted in IT", o.state.areaCounts?.it === 1);
+    const rec = recordVisitorMessage(o.state, o.chat, { kind: "message", text: "Our office manager does." });
+    script = [turn({ question: { text: "When a new patient finds you, how did they usually hear about you?", hint: "", area: "marketing" } })];
+    const r = await runInterviewTurn(ctx, rec.state, rec.chat, { kind: "message", text: "Our office manager does." });
+    check("next question counted in Marketing", r.state.areaCounts?.marketing === 1 && r.state.areaCounts?.it === 1);
+    check("area recorded on the pending question", r.state.pending?.area === "marketing");
+    const seen: string[] = [];
+    const prev = proto.create as (...args: unknown[]) => Promise<unknown>;
+    proto.create = async function (params: { messages: Array<{ content: unknown }> }) {
+      seen.push(JSON.stringify(params.messages[0]?.content ?? ""));
+      return prev.call(this, params);
+    };
+    const rec2 = recordVisitorMessage(r.state, r.chat, { kind: "message", text: "Mostly Google and referrals." });
+    script = [turn({ question: { text: "Walk me through what happens after someone asks for a quote.", hint: "", area: "sales" } })];
+    await runInterviewTurn(ctx, rec2.state, rec2.chat, { kind: "message", text: "Mostly Google and referrals." });
+    proto.create = prev;
+    check("ODO is shown the coverage each turn", seen.some((p) => p.includes("Area coverage") && p.includes("No question yet")));
+  }
+
+  console.log("\n26. Five areas: an area can't take more than its share");
+  {
+    const base = { ...(await open()).state, questionsAsked: 5, areaCounts: { it: 5 } };
+    check("6th IT question is off-plan", offPlanReason(base, "it", "ask") !== null);
+    check("a Marketing question is fine", offPlanReason(base, "marketing", "ask") === null);
+    check("a clarification is exempt from the share limit", offPlanReason(base, "it", "clarify") === null);
+    check("the buying-intent question counts toward no area", offPlanReason(base, "general", "ask") === null);
+    check("most under-covered after 5 IT questions is Marketing", mostUnderCovered(base) === "marketing");
+
+    const st = await open();
+    const s5 = { ...st.state, questionsAsked: 5, areaCounts: { it: 5 } };
+    const rec = recordVisitorMessage(s5, st.chat, { kind: "message", text: "We back up to a USB drive on Fridays." });
+    script = [
+      turn({ question: { text: "Who has admin rights on the clinic computers?", hint: "", area: "it" } }),
+      turn({ question: { text: "How do new patients usually find you?", hint: "", area: "marketing" } }),
+    ];
+    const r = await runInterviewTurn(ctx, rec.state, rec.chat, { kind: "message", text: "We back up to a USB drive on Fridays." });
+    check("over-share IT draft is replaced by a Marketing question", r.state.pending?.area === "marketing" && r.state.areaCounts?.it === 5 && r.state.areaCounts?.marketing === 1);
+  }
+
+  console.log("\n27. Five areas: no finishing while an area has had no question");
+  {
+    const st = await open();
+    const s6 = { ...st.state, questionsAsked: 6, answered: 5, areaCounts: { it: 3, marketing: 2, sales: 1 } };
+    check("uncovered areas are Finance and Customer service", JSON.stringify(uncoveredAreas(s6)) === JSON.stringify(["finance", "customer_service"]));
+    let rec = recordVisitorMessage(s6, st.chat, { kind: "message", text: "We use a spreadsheet for leads." });
+    script = [
+      turn({ action: "finish", question: null, reply: "Thanks, that's everything." }),
+      turn({ message_type: "none", assessment: null, action: "ask", reply: "One more area.", question: { text: "How do invoices go out and get chased today?", hint: "", area: "finance" } }),
+    ];
+    let r = await runInterviewTurn(ctx, rec.state, rec.chat, { kind: "message", text: "We use a spreadsheet for leads." });
+    check("early finish turned into a Finance question", r.outcome === "continue" && r.state.pending?.area === "finance");
+    check("the closing line was not sent to the visitor", !r.chat.some((m) => m.text.includes("that's everything")));
+
+    rec = recordVisitorMessage(s6, st.chat, { kind: "message", text: "We use a spreadsheet for leads." });
+    script = [turn({ action: "finish", question: null }), turn({ action: "finish", question: null })];
+    r = await runInterviewTurn(ctx, rec.state, rec.chat, { kind: "message", text: "We use a spreadsheet for leads." });
+    check("if ODO still won't continue, it finishes — never loops", r.outcome === "finish");
+    check("…and the gap is logged for your review", r.state.reasons.some((x) => x.includes("uncovered areas")));
+
+    const s14 = { ...st.state, questionsAsked: 14, answered: 13, areaCounts: { it: 5, marketing: 4, sales: 2, finance: 2 } };
+    check("last slots are reserved for an uncovered area", offPlanReason(s14, "it", "clarify") !== null && offPlanReason(s14, "customer_service", "ask") === null);
   }
 
   console.log(`\n${passed} passed, ${failed} failed (${calls} scripted model calls)\n`);

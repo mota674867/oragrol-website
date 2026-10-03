@@ -98,7 +98,9 @@ export type OdoReport = {
 };
 
 const SECURITY_AREAS: Area[] = ["email", "web", "domain", "exposure", "privacy", "governance", "identity", "data", "people", "ai"];
-const AREA_ORDER: Area[] = ["email", "web", "exposure", "domain", "identity", "data", "governance", "people", "privacy", "ai", "operations", "presence", "business"];
+// IT & cybersecurity first (the evidence public research can prove), then
+// the four business areas in Mohammad's weighting order.
+const AREA_ORDER: Area[] = ["email", "web", "exposure", "domain", "identity", "data", "governance", "people", "privacy", "ai", "marketing", "sales", "finance", "customer_service", "operations", "presence", "business"];
 const SEV_RANK = { high: 0, medium: 1, low: 2, info: 3 } as const;
 
 const COVERAGE_LABELS: Record<string, string> = {
@@ -214,7 +216,7 @@ export async function buildReport(input: {
       strengths: client.filter((e) => e.polarity === "strength").length,
       endScreen: {
         criticalSecurity: observedGaps.filter((e) => SECURITY_AREAS.includes(e.area) && e.severity === "high").length,
-        salesMarketingGaps: gaps.filter((e) => e.area === "presence" || (e.area === "operations" && e.supports.some((s) => s.startsWith("C15")))).length,
+        salesMarketingGaps: gaps.filter((e) => e.area === "marketing" || e.area === "sales" || e.area === "presence" || (e.area === "operations" && e.supports.some((s) => s.startsWith("C15")))).length,
         automationOpportunities: matching.flagged.filter((m) => m.group === "automation").length,
       },
     },

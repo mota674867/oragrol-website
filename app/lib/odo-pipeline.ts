@@ -23,6 +23,7 @@ import { EMPTY_USAGE, addJevUsage, addClaudeUsage, addOpusUsage, mergeUsage, com
 import { REPORT_MODEL } from "./odo-report-model";
 import { recordLifetimeAiCost } from "./odo-redis";
 import { recordScanSpend, isScanOverCap } from "./odo-spend";
+import { INTERVIEW_AREAS, AREA_NAMES, AREA_TARGETS } from "./odo-playbook";
 import { buildBenchmark } from "./odo-benchmark";
 
 const HUBSPOT_TOKEN = process.env.HUBSPOT_ACCESS_TOKEN;
@@ -58,6 +59,7 @@ export function reviewerTranscript(state: InterviewState | undefined, chat: Chat
   return [
     `Questions asked: ${state.questionsAsked} · answers: ${state.answered} · skips: ${state.skips} · nonsense: ${state.nonsense} · visitor questions: ${state.visitorQuestions}${state.urgent ? " · ⚠ URGENT INCIDENT DESCRIBED" : ""}`,
     `Ending: ${state.ended ? `${state.ended.outcome} — ${state.ended.reason}` : "in progress"}`,
+    `Questions by area: ${INTERVIEW_AREAS.map((a) => `${AREA_NAMES[a]} ${state.areaCounts?.[a] ?? 0}/${AREA_TARGETS[a]}`).join(" · ")}`,
     "",
     "── How ODO judged each turn ──",
     ...judged,

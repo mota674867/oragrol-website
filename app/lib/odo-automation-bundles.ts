@@ -55,7 +55,11 @@ const DEFAULT_BUNDLE_MAP: Partial<Record<string, BundleId>> = {
 };
 
 /** Codes whose default mapping is a genuine judgment call, not a clean 1:1 — Jev gets first crack at these when available; DEFAULT_BUNDLE_MAP is the fallback. */
-const AMBIGUOUS_CODES = new Set(["C12-S01", "C12-S02", "C12-S03", "C12-S05", "C13-S01", "C13-S03"]);
+// C15-S05 (conversion/revenue data) and C13-S02 (unanalysed data) added
+// 2026-10-03: with Marketing now 25% of ODO's questions, unmeasured marketing
+// is a common finding, and those two codes can belong to Marketing rather
+// than their Sales/Finance defaults depending on what the evidence says.
+const AMBIGUOUS_CODES = new Set(["C12-S01", "C12-S02", "C12-S03", "C12-S05", "C13-S01", "C13-S03", "C15-S05", "C13-S02"]);
 
 const BUNDLE_CRITERIA: Record<string, string> = Object.fromEntries(BUNDLES.map((b) => [b.id, `${b.name} — ${b.tagline}`]));
 
