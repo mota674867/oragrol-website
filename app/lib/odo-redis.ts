@@ -216,6 +216,8 @@ export async function updateSession(sessionId: string, updates: Partial<OdoSessi
   if (!session) throw new Error(`ODO session not found: ${sessionId}`);
   const updated = { ...session, ...updates, updatedAt: Date.now() };
   await redis.set(`${SESSION_PREFIX}${sessionId}`, updated, { ex: 48 * 60 * 60 });
+  // Only a live interview can be abandoned; every other status leaves the set.
+  await touchActiveSession(sessionId, updated.status === "questioning").catch(() => {});
 }
 
 export async function markSessionComplete(session: OdoSession): Promise<void> {
@@ -361,4 +363,30 @@ export async function acquireTurnLock(sessionId: string): Promise<boolean> {
 export async function releaseTurnLock(sessionId: string): Promise<void> {
   const redis = getRedis();
   await redis.del(`${TURN_LOCK_PREFIX}${sessionId}`);
+}
+
+// --- Abandoned-scan tracking (odo-abandoned.ts) ---
+//
+// Every session in the interview is kept in a sorted set scored by its last
+// activity, so a sweep can find visitors who walked away without cancelling.
+// A lead is passed on at most once per session (SET NX claim).
+
+const ACTIVE_SET_KEY = "odo:active";
+const LEAD_CLAIM_PREFIX = "odo:lead:";
+
+export async function touchActiveSession(sessionId: string, active: boolean): Promise<void> {
+  const redis = getRedis();
+  if (active) await redis.zadd(ACTIVE_SET_KEY, { score: Date.now(), member: sessionId });
+  else await redis.zrem(ACTIVE_SET_KEY, sessionId);
+}
+
+export async function listIdleSessions(idleSinceMs: number, limit = 20): Promise<string[]> {
+  const redis = getRedis();
+  return redis.zrange<string[]>(ACTIVE_SET_KEY, 0, idleSinceMs, { byScore: true, offset: 0, count: limit });
+}
+
+export async function claimLeadHandoff(sessionId: string): Promise<boolean> {
+  const redis = getRedis();
+  const ok = await redis.set(`${LEAD_CLAIM_PREFIX}${sessionId}`, Date.now(), { nx: true, ex: 7 * 24 * 60 * 60 });
+  return ok === "OK";
 }

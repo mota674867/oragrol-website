@@ -195,3 +195,61 @@ export async function sendOdoUrgentAlertEmail(params: {
     return { state: "failed", error: `Email send threw: ${err instanceof Error ? err.message : String(err)}`.slice(0, 500) };
   }
 }
+
+/**
+ * Abandoned scan (Master Reference §37.9 — "don't waste abandoned scans"):
+ * the visitor cancelled, or went quiet mid-interview. There is no report,
+ * but the research and whatever they did say are still a warm lead, so they
+ * are passed on exactly once. Nothing is sent to the visitor.
+ */
+export async function sendOdoAdminAbandonedEmail(params: {
+  companyName: string;
+  visitorName: string;
+  visitorEmail: string;
+  website: string | null;
+  sessionId: string;
+  how: "cancelled" | "walked_away";
+  industry: string | null;
+  researchText: string;
+  transcript: string;
+  costUsd: number;
+}): Promise<SendOdoAdminEmailResult> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.CONTACT_FROM_EMAIL;
+  if (!apiKey) return { state: "skipped", reason: "RESEND_API_KEY is not configured." };
+  if (!from) return { state: "skipped", reason: "CONTACT_FROM_EMAIL is not configured." };
+  try {
+    const resend = new Resend(apiKey);
+    const { data, error } = await resend.emails.send({
+      from,
+      to: [ODO_ADMIN_EMAIL],
+      replyTo: from,
+      subject: `ODO abandoned scan — lead — ${params.companyName}`,
+      text: [
+        params.how === "cancelled"
+          ? `The visitor cancelled their ODO scan before it finished. No report was produced.`
+          : `The visitor stopped replying mid-interview (no activity for 30+ minutes). No report was produced.`,
+        `They gave their details and consent, so this is a warm lead. If they come back and finish, you'll also get the normal report email.`,
+        ``,
+        `Name: ${params.visitorName}`,
+        `Company: ${params.companyName}`,
+        `Email: ${params.visitorEmail}`,
+        `Website: ${params.website ?? "—"}`,
+        `Industry (detected): ${params.industry ?? "unknown"}`,
+        `Session ID: ${params.sessionId}`,
+        `AI cost so far: $${params.costUsd.toFixed(4)}`,
+        ``,
+        `════ PUBLIC RESEARCH (what ODO found) ════`,
+        params.researchText || "(none)",
+        ``,
+        `════ INTERVIEW SO FAR ════`,
+        params.transcript,
+      ].join("\n"),
+    });
+    if (error) return { state: "failed", error: `Resend error: ${error.message ?? JSON.stringify(error)}`.slice(0, 500) };
+    if (!data?.id) return { state: "failed", error: "Resend returned no email id." };
+    return { state: "sent", providerId: data.id };
+  } catch (err) {
+    return { state: "failed", error: `Email send threw: ${err instanceof Error ? err.message : String(err)}`.slice(0, 500) };
+  }
+}

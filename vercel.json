@@ -1,0 +1,3 @@
+{
+  "crons": [{ "path": "/api/odo/cron/abandoned", "schedule": "0 13 * * *" }]
+}

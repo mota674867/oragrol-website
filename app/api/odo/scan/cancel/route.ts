@@ -1,9 +1,11 @@
 // POST /api/odo/scan/cancel
-// Marks a session as cancelled. No cooldown penalty — abandoned scans
-// are cleared from Redis after 7 days automatically.
+// Marks a session as cancelled. No cooldown penalty. If the visitor had
+// reached the interview, the research + conversation so far are passed on
+// as a lead (odo-abandoned.ts).
 
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import { getSession, updateSession } from "@/app/lib/odo-redis";
+import { passAbandonedLead } from "@/app/lib/odo-abandoned";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   let body: Record<string, unknown>;
@@ -27,6 +29,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       phase: "cancelled",
       step: "Scan cancelled by visitor",
     }).catch(() => {});
+    // §37.9: a cancelled interview is still a lead — hand it on once.
+    if (session.status === "questioning") {
+      after(() => passAbandonedLead(session, "cancelled").catch((err) => console.error("[ODO] Abandoned lead failed:", err)));
+    }
   }
 
   return NextResponse.json({ status: "cancelled" }, { status: 200 });

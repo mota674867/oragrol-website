@@ -7,6 +7,7 @@ import { after, NextRequest, NextResponse } from "next/server";
 import { checkCooldowns, createSession, getIncompleteSession, checkIpDailyLimit } from "@/app/lib/odo-redis";
 import { runParallelResearch, type ResearchFindings } from "@/app/lib/odo-research";
 import { interviewContext } from "@/app/lib/odo-pipeline";
+import { sweepAbandonedScans } from "@/app/lib/odo-abandoned";
 import { openInterview } from "@/app/lib/odo-interviewer";
 import { AI_UNAVAILABLE_MESSAGE } from "@/app/lib/odo-playbook";
 import { getClientIp, rateLimit } from "@/app/lib/rate-limit";
@@ -349,6 +350,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       console.error("[ODO] Async research failed:", err);
     })
   );
+  // Piggy-back the abandoned-scan sweep (odo-abandoned.ts) on real traffic.
+  after(() => sweepAbandonedScans().then(() => undefined).catch(() => undefined));
 
   return NextResponse.json({
     session_id: session.sessionId,
