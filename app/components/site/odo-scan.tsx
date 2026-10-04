@@ -2,7 +2,6 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Script from "next/script";
-import { useRouter } from "next/navigation";
 import "./odo-scan.css";
 
 /*
@@ -595,7 +594,6 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
   // Private shortcut for ORAGROL staff: if the name box holds the admin
   // passcode, go to the outbound tool. The check runs on the server — the
   // passcode is never in this page's code. Anything else does nothing at all.
-  const router = useRouter();
   const lastKnock = useRef("");
   const adminKnock = (value: string) => {
     const v = value.trim();
@@ -603,7 +601,8 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     lastKnock.current = v;
     fetch("/api/odo/admin/outbound-auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ passcode: v }) })
       .then((r) => r.json())
-      .then((d: { ok?: boolean }) => { if (d.ok) router.push(`/ops/outbound#${encodeURIComponent(v)}`); })
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- hard navigation on purpose: keeps the #passcode fragment intact
+      .then((d: { ok?: boolean }) => { if (d.ok) window.location.assign(`/ops/outbound#${encodeURIComponent(v)}`); })
       .catch(() => {});
   };
 

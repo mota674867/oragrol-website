@@ -24,8 +24,9 @@ export default function OutboundTool() {
       const k = decodeURIComponent(window.location.hash.replace(/^#/, ""));
       if (!k) { setPhase("denied"); return; }
       try {
-        const r = await fetch(`/api/odo/admin/outbound?key=${encodeURIComponent(k)}&website=probe`);
-        if (r.ok) { setKey(k); setPhase("ready"); } else setPhase("denied");
+        const r = await fetch("/api/odo/admin/outbound-auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ passcode: k }) });
+        const d = (await r.json()) as { ok?: boolean };
+        if (d.ok) { setKey(k); setPhase("ready"); } else setPhase("denied");
       } catch {
         setPhase("denied");
       }
@@ -50,9 +51,14 @@ export default function OutboundTool() {
 
   async function check() {
     if (!website) { setHistory("Enter the website first."); return; }
-    const res = await fetch(`/api/odo/admin/outbound?key=${encodeURIComponent(key)}&website=${encodeURIComponent(website)}`);
-    const data = (await res.json()) as { runs?: number; dossiers?: Array<{ runAt: string }> };
-    setHistory(data.runs ? `${data.runs} run(s) on file. Latest: ${new Date(data.dossiers![0].runAt).toLocaleString()}` : "No runs on file for that website yet.");
+    try {
+      const res = await fetch(`/api/odo/admin/outbound?key=${encodeURIComponent(key)}&website=${encodeURIComponent(website)}`);
+      if (!res.ok) { setHistory("Could not read history right now."); return; }
+      const data = (await res.json()) as { runs?: number; dossiers?: Array<{ runAt: string }> };
+      setHistory(data.runs ? `${data.runs} run(s) on file. Latest: ${new Date(data.dossiers![0].runAt).toLocaleString()}` : "No runs on file for that website yet.");
+    } catch {
+      setHistory("Could not read history right now.");
+    }
   }
 
   if (phase === "checking") return <main style={{ minHeight: "60vh" }} />;
