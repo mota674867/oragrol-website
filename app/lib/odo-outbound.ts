@@ -3,6 +3,13 @@
 // The ABILITY only — how and when it is used is Mohammad's decision and
 // lives outside ODO. Input: a company name + website supplied by ORAGROL.
 // No visitor, so no interview. Output: a dossier for OCS —
+//   - a company snapshot (what they do, focus, size, locations),
+//   - up to 5 competitors (name, website, phone, email if publicly found,
+//     and what they do) — wider and looser than the exactly-3,
+//     confirmed/probable-only rule client reports use, because this is
+//     internal targeting intel, never shown to the company itself,
+//   - a posture-at-a-glance read (cybersecurity) and automation signals
+//     (AI/automation tools visible on their public site),
 //   - every finding with its proof (raw evidence + source + date),
 //   - a confidence level on each (observed = high, inferred = medium),
 //   - an explicit list of what could not be determined,
@@ -18,10 +25,14 @@
 
 import { Redis } from "@upstash/redis";
 import { runParallelResearch, type ResearchFindings } from "./odo-research";
-import { buildLedger, type Evidence } from "./odo-ledger";
+import { buildLedger, type Evidence, type Area } from "./odo-ledger";
 import { normalizeDomain } from "./odo-dns";
 import { computeCost, addClaudeUsage, EMPTY_USAGE } from "./odo-cost";
 import { recordScanSpend } from "./odo-spend";
+import { jobDescriptionFromTypes, type CompetitorProfile } from "./odo-competitors";
+import { safeFetch } from "./odo-ssrf-guard";
+import { htmlToText } from "./odo-crawl";
+import type { BusinessProfile } from "./odo-business-profile";
 
 export type DossierFinding = {
   fact: string;
@@ -35,9 +46,38 @@ export type DossierFinding = {
   key: string;
 };
 
+export type DossierCompetitor = {
+  name: string;
+  website: string | null;
+  phone: string | null;
+  email: string | null;
+  jobDescription: string;
+  /** "verified" = confirmed/probable (Places-identity-verified + service overlap). "likely" = comparable_business — same space, not fully confirmed. Never shown for irrelevant/insufficient-evidence candidates; those never reach the dossier. */
+  confidence: "verified" | "likely";
+};
+
+export type CompanySnapshot = {
+  description: string;
+  focus: string;
+  businessModel: string | null;
+  priceLevel: string | null;
+  locations: string[];
+};
+
+export type PostureSummary = {
+  verdict: "weak" | "moderate" | "strong";
+  summary: string;
+  highlights: string[];
+};
+
+export type AutomationSignals = {
+  detected: string[];
+  note: string;
+};
+
 export type Dossier = {
   kind: "odo_outbound_dossier";
-  version: 1;
+  version: 2;
   runAt: string;
   company: string;
   website: string;
@@ -45,6 +85,10 @@ export type Dossier = {
   notice: string;
   industry: string | null;
   businessSize: string | null;
+  snapshot: CompanySnapshot | null;
+  competitors: DossierCompetitor[];
+  posture: PostureSummary;
+  automation: AutomationSignals;
   gaps: DossierFinding[];
   strengths: DossierFinding[];
   context: DossierFinding[];
@@ -60,6 +104,28 @@ export const OUTBOUND_NOTICE =
 const HISTORY_PREFIX = "odo:outbound:";
 const LOCK_PREFIX = "odo:outbound:lock:";
 const KEEP_RUNS = 6;
+
+// Outbound widens the client-report competitor rule (exactly 3,
+// confirmed/probable only) to 5, allowing comparable_business to fill
+// remaining slots — approved by Mohammad 2026-10-05. This is internal
+// targeting intel, never shown to the company itself, so the stricter
+// client-report bar doesn't apply here.
+const OUTBOUND_COMPETITOR_OPTIONS = { targetCount: 5, allowComparable: true };
+
+// IT/cybersecurity areas only — the four business areas (marketing, sales,
+// finance, customer_service) and the context-only areas (operations,
+// presence, business, ai) are excluded from the posture verdict; they're
+// shown elsewhere in the dossier instead.
+const IT_SECURITY_AREAS: Area[] = ["email", "web", "domain", "exposure", "privacy", "governance", "identity", "data", "people"];
+
+// A business mentioning one of these on its public site is read as having
+// visible AI/automation tooling. Deliberately modest — this only ever
+// catches what's named on the site itself, never internal/private tool use.
+const AUTOMATION_KEYWORDS = [
+  "chatgpt", "openai", "claude", "copilot", "gemini", "ai agent", "ai assistant", "ai chatbot",
+  "zapier", "make.com", "n8n", "hubspot", "salesforce", "intercom", "drift", "calendly",
+  "marketing automation", "crm",
+];
 
 function redis(): Redis {
   const url = process.env.REDIS_KV_REST_API_URL;
@@ -88,6 +154,100 @@ function toDossierFinding(e: Evidence): DossierFinding {
   };
 }
 
+export function buildSnapshot(profile: BusinessProfile | null, businessSize: string | null): CompanySnapshot | null {
+  if (!profile) return null;
+  const bits: string[] = [];
+  if (profile.summary) bits.push(profile.summary.trim());
+  const extra: string[] = [];
+  if (profile.whatTheySell) extra.push(`They sell: ${profile.whatTheySell}.`);
+  if (profile.audienceDescription) extra.push(`Audience: ${profile.audienceDescription}.`);
+  if (profile.businessModel && profile.businessModel !== "unclear") extra.push(`Model: ${profile.businessModel}.`);
+  if (profile.priceLevel && profile.priceLevel !== "unclear") extra.push(`Price positioning: ${profile.priceLevel}.`);
+  if (businessSize) extra.push(`Estimated size: ${businessSize}.`);
+  if (profile.locations.length) extra.push(`Locations: ${profile.locations.join(", ")}.`);
+  const description = [bits.join(" "), extra.join(" ")].filter(Boolean).join("\n\n");
+  return {
+    description: description || "No usable description — site text was too thin to summarize.",
+    focus: profile.industryGuess ?? profile.whatTheySell ?? "Not determined",
+    businessModel: profile.businessModel !== "unclear" ? profile.businessModel : null,
+    priceLevel: profile.priceLevel !== "unclear" ? profile.priceLevel : null,
+    locations: profile.locations,
+  };
+}
+
+export function buildPosture(ledger: Evidence[]): PostureSummary {
+  const itFindings = ledger.filter((e) => e.audience === "client" && IT_SECURITY_AREAS.includes(e.area));
+  const gaps = itFindings.filter((e) => e.polarity === "gap");
+  const strengths = itFindings.filter((e) => e.polarity === "strength");
+  const high = gaps.filter((g) => g.severity === "high").length;
+  const medium = gaps.filter((g) => g.severity === "medium").length;
+  const low = gaps.filter((g) => g.severity === "low").length;
+
+  const verdict: PostureSummary["verdict"] = high >= 1 ? "weak" : medium >= 1 || low >= 2 ? "moderate" : "strong";
+  const parts = [high && `${high} high`, medium && `${medium} medium`, low && `${low} low`].filter(Boolean);
+  const summary = `${verdict.toUpperCase()} — ${gaps.length} gap${gaps.length === 1 ? "" : "s"} found${parts.length ? ` (${parts.join(", ")})` : ""}, ${strengths.length} strength${strengths.length === 1 ? "" : "s"}.`;
+
+  const bySeverityRank: Record<Evidence["severity"], number> = { high: 0, medium: 1, low: 2, info: 3 };
+  const highlights = [
+    ...[...gaps].sort((a, b) => bySeverityRank[a.severity] - bySeverityRank[b.severity]).slice(0, 4).map((g) => `✗ ${g.fact}`),
+    ...strengths.slice(0, 2).map((s) => `✓ ${s.fact}`),
+  ];
+
+  return { verdict, summary, highlights };
+}
+
+export function buildAutomationSignals(profile: BusinessProfile | null, ledger: Evidence[]): AutomationSignals {
+  const mentioned = profile?.toolsOrPlatformsMentioned ?? [];
+  const detected = mentioned.filter((tool) =>
+    AUTOMATION_KEYWORDS.some((kw) => tool.toLowerCase().includes(kw))
+  );
+
+  const marketingGaps = ledger.filter((e) => e.audience === "client" && e.polarity === "gap" && (e.area === "marketing" || e.area === "sales"));
+  const csStrength = ledger.some((e) => e.audience === "client" && e.polarity === "strength" && e.area === "customer_service");
+
+  const note = detected.length
+    ? `Visible tooling found on their public site: ${detected.join(", ")}.`
+    : marketingGaps.length || !csStrength
+      ? "No AI or automation tooling visible on public surfaces — reads as a business still running mostly manual client intake. (This only covers what's publicly visible; private/internal tool use can't be seen this way.)"
+      : "No AI or automation tooling named on public surfaces, though other signals look more automated than average. (Publicly-visible signal only.)";
+
+  return { detected, note };
+}
+
+/** Best-effort public email lookup on a competitor's own homepage — a cheap, non-AI fetch, not an AI call. Fails open to null; never blocks the dossier. */
+async function fetchPublicEmail(website: string): Promise<string | null> {
+  try {
+    const url = website.startsWith("http") ? website : `https://${website}`;
+    const res = await Promise.race([
+      safeFetch(url, { headers: { "User-Agent": "ORAGROL-ODO/1.0 (+https://orgro.ca)" } }),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 6000)),
+    ]);
+    if (!res) return null;
+    const html = await res.text();
+    const text = htmlToText(html);
+    const matches = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) ?? [];
+    const junk = /wixpress|sentry|example\.com|godaddy|schema\.org|\.png|\.jpg|\.gif|placeholder/i;
+    const good = matches.find((m) => !junk.test(m));
+    return good ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function toDossierCompetitor(c: CompetitorProfile): Promise<DossierCompetitor> {
+  const places = c.identity.state === "observed" ? c.identity.value : null;
+  const website = places?.website ?? c.website ?? null;
+  const email = website ? await fetchPublicEmail(website).catch(() => null) : null;
+  return {
+    name: c.name,
+    website,
+    phone: places?.phone ?? null,
+    email,
+    jobDescription: places ? jobDescriptionFromTypes(places.types) || "Not specified by Google Places" : "Not specified",
+    confidence: c.classification === "comparable_business" ? "likely" : "verified",
+  };
+}
+
 export async function getOutboundHistory(website: string): Promise<Dossier[]> {
   const domain = normalizeDomain(website);
   if (!domain) return [];
@@ -105,13 +265,18 @@ export async function runOutbound(company: string, website: string): Promise<Dos
   const domain = normalizeDomain(website);
   if (!domain) throw new Error("Not a usable website.");
   try {
-    const findings: ResearchFindings = await runParallelResearch(company, website, true, null);
+    const findings: ResearchFindings = await runParallelResearch(company, website, true, null, OUTBOUND_COMPETITOR_OPTIONS);
     const ledger = buildLedger(findings);
     const visible = ledger.filter((e) => e.audience === "client");
     const gaps = visible.filter((e) => e.polarity === "gap").map(toDossierFinding);
     const strengths = visible.filter((e) => e.polarity === "strength").map(toDossierFinding);
     const context = visible.filter((e) => e.polarity === "context").map(toDossierFinding);
     const notDetermined = (findings.coverage?.notDetermined ?? []).map((n) => `${n.check}${n.reason ? ` — ${n.reason}` : ""}`);
+
+    const snapshot = buildSnapshot(findings.businessProfile, findings.businessSize);
+    const posture = buildPosture(ledger);
+    const automation = buildAutomationSignals(findings.businessProfile, ledger);
+    const competitors = await Promise.all((findings.competitorProfiles ?? []).map(toDossierCompetitor));
 
     const history = await getOutboundHistory(website).catch(() => [] as Dossier[]);
     const prev = history[0];
@@ -131,7 +296,7 @@ export async function runOutbound(company: string, website: string): Promise<Dos
 
     const dossier: Dossier = {
       kind: "odo_outbound_dossier",
-      version: 1,
+      version: 2,
       runAt: new Date().toISOString(),
       company,
       website,
@@ -139,6 +304,10 @@ export async function runOutbound(company: string, website: string): Promise<Dos
       notice: OUTBOUND_NOTICE,
       industry: findings.industry ?? null,
       businessSize: findings.businessSize ?? null,
+      snapshot,
+      competitors,
+      posture,
+      automation,
       gaps,
       strengths,
       context,
@@ -157,6 +326,11 @@ export async function runOutbound(company: string, website: string): Promise<Dos
 export function dossierAsText(d: Dossier): string {
   const line = (f: DossierFinding) =>
     `• [${f.severity.toUpperCase()} · confidence ${f.confidence}] ${f.fact}\n    Proof: ${f.proof ?? "—"}\n    Source: ${f.source} · checked ${f.checkedAt.slice(0, 10)}`;
+  const competitorLine = (c: DossierCompetitor) =>
+    `• ${c.name} [${c.confidence === "verified" ? "VERIFIED" : "LIKELY — not fully confirmed"}]\n` +
+    `    What they do: ${c.jobDescription}\n` +
+    `    Website: ${c.website ?? "—"} · Phone: ${c.phone ?? "—"} · Email: ${c.email ?? "not found publicly"}`;
+
   return [
     d.notice,
     "",
@@ -164,6 +338,21 @@ export function dossierAsText(d: Dossier): string {
     `Website: ${d.website}`,
     `Industry (detected): ${d.industry ?? "unknown"} · Size: ${d.businessSize ?? "unknown"}`,
     `Run: ${d.runAt} · AI cost: $${d.aiCostUsd.toFixed(4)}`,
+    "",
+    `════ COMPANY SNAPSHOT ════`,
+    d.snapshot
+      ? [d.snapshot.description, "", `Primary focus: ${d.snapshot.focus}`].join("\n")
+      : "Not enough site text to build a snapshot.",
+    "",
+    `════ COMPETITORS (${d.competitors.length} found) ════`,
+    ...(d.competitors.length ? d.competitors.map(competitorLine) : ["none found near this business"]),
+    "",
+    `════ POSTURE & AUTOMATION AT A GLANCE ════`,
+    `Cybersecurity posture: ${d.posture.summary}`,
+    ...d.posture.highlights.map((h) => `  ${h}`),
+    "",
+    `AI / automation: ${d.automation.detected.length ? d.automation.detected.join(", ") : "none found"}`,
+    `  ${d.automation.note}`,
     "",
     d.changes
       ? [

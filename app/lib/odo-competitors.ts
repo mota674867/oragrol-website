@@ -42,7 +42,26 @@ export type PlacesEnrichment = {
   address: string | null;
   businessStatus: string | null;
   types: string[];
+  phone: string | null;
+  website: string | null;
 };
+
+// Google Places "types" that describe every listing (not this business
+// specifically) — stripped before the job description is built, so what's
+// left actually says what the business does.
+const GENERIC_PLACE_TYPES = new Set([
+  "point_of_interest", "establishment", "store", "premise", "subpremise",
+]);
+
+/** A short, human "what they do" line built from Places categories — e.g. "Accounting firm, Tax preparation service". Never invented: empty when Places returned nothing specific. */
+export function jobDescriptionFromTypes(types: string[]): string {
+  const words = types
+    .filter((t) => !GENERIC_PLACE_TYPES.has(t))
+    .map((t) => t.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()));
+  const seen = new Set<string>();
+  const unique = words.filter((w) => (seen.has(w) ? false : (seen.add(w), true)));
+  return unique.slice(0, 3).join(", ");
+}
 
 export type CompetitorProfile = {
   name: string;
@@ -109,7 +128,7 @@ async function enrichWithPlaces(name: string, cityHint: string | null): Promise<
         "Content-Type": "application/json",
         "X-Goog-Api-Key": apiKey,
         "X-Goog-FieldMask":
-          "places.displayName,places.rating,places.userRatingCount,places.formattedAddress,places.businessStatus,places.types",
+          "places.displayName,places.rating,places.userRatingCount,places.formattedAddress,places.businessStatus,places.types,places.nationalPhoneNumber,places.websiteUri",
       },
       body: JSON.stringify({ textQuery: cityHint ? `${name} ${cityHint}` : name }),
       signal: AbortSignal.timeout(8000),
@@ -130,6 +149,8 @@ async function enrichWithPlaces(name: string, cityHint: string | null): Promise<
         address: (place.formattedAddress as string | undefined) ?? null,
         businessStatus: (place.businessStatus as string | undefined) ?? null,
         types: (place.types as string[] | undefined) ?? [],
+        phone: (place.nationalPhoneNumber as string | undefined) ?? null,
+        website: (place.websiteUri as string | undefined) ?? null,
       },
       "google-places-new"
     );
@@ -293,14 +314,30 @@ const CASCADE_RADII: Array<{ step: LocationCascadeStep; radiusMeters: number }> 
  * "not found" is a gap, never manufactured, same as everywhere else in
  * this research pipeline.
  */
+export type CompetitorSearchOptions = {
+  /** How many reportable competitors to stop at. Default 3 — Mohammad's approved client-report count. Outbound mode (internal, not client-facing) widens this to 5. */
+  targetCount?: number;
+  /** When true, "comparable_business" (verified, same space, no confirmed overlap) may fill remaining slots once confirmed/probable are exhausted. Off by default — client reports only ever name confirmed/probable competitors. Outbound mode turns this on since it's internal targeting intel, not a claim shown to the prospect. Never includes irrelevant_candidate or insufficient_evidence either way. */
+  allowComparable?: boolean;
+};
+
+export function reportableForOptions(profiles: CompetitorProfile[], opts: Required<CompetitorSearchOptions>): CompetitorProfile[] {
+  const strict = reportableCompetitors(profiles);
+  if (!opts.allowComparable || strict.length >= opts.targetCount) return strict;
+  const comparable = profiles.filter((p) => p.classification === "comparable_business");
+  return [...strict, ...comparable.slice(0, opts.targetCount - strict.length)];
+}
+
 export async function findCascadingCompetitors(
   location: GeoLocation | null,
   industry: string | null,
   industryKeywords: string[],
   prospectCity: string | null,
   tavilyCandidates: CandidateInput[],
-  targetCountry: "CA" | "OTHER" = "CA"
+  targetCountry: "CA" | "OTHER" = "CA",
+  options: CompetitorSearchOptions = {}
 ): Promise<CascadeResult> {
+  const opts: Required<CompetitorSearchOptions> = { targetCount: options.targetCount ?? 3, allowComparable: options.allowComparable ?? false };
   let lastClassified: CompetitorProfile[] = [];
 
   if (location) {
@@ -311,8 +348,8 @@ export async function findCascadingCompetitors(
       if (!merged.length) continue;
       const classified = await classifyCompetitors(merged, { industryKeywords, prospectCity, targetCountry });
       lastClassified = classified;
-      if (reportableCompetitors(classified).length >= 3) {
-        return { profiles: reportableCompetitors(classified).slice(0, 3), cascadeStepUsed: step };
+      if (reportableForOptions(classified, opts).length >= opts.targetCount) {
+        return { profiles: reportableForOptions(classified, opts).slice(0, opts.targetCount), cascadeStepUsed: step };
       }
     }
   }
@@ -323,12 +360,12 @@ export async function findCascadingCompetitors(
   // widens geography, never the country restriction.
   if (tavilyCandidates.length) {
     const classified = await classifyCompetitors(tavilyCandidates, { industryKeywords, prospectCity: null, targetCountry });
-    const reportable = reportableCompetitors(classified);
-    const best = reportable.length ? reportable : lastClassified.length ? reportableCompetitors(lastClassified) : [];
-    if (best.length) return { profiles: best.slice(0, 3), cascadeStepUsed: "country_wide" };
+    const reportable = reportableForOptions(classified, opts);
+    const best = reportable.length ? reportable : lastClassified.length ? reportableForOptions(lastClassified, opts) : [];
+    if (best.length) return { profiles: best.slice(0, opts.targetCount), cascadeStepUsed: "country_wide" };
   }
 
   // Exhausted every step — report however many (0 included) were verified at
   // the last attempt, never a fabricated count.
-  return { profiles: reportableCompetitors(lastClassified).slice(0, 3), cascadeStepUsed: "none_found" };
+  return { profiles: reportableForOptions(lastClassified, opts).slice(0, opts.targetCount), cascadeStepUsed: "none_found" };
 }

@@ -31,6 +31,11 @@ import { runLiveCheck } from "../app/lib/odo-live-checks";
 import { createReportText, REPORT_MODEL, REPORT_FALLBACK_MODEL } from "../app/lib/odo-report-model";
 import { computeCost, addOpusUsage, EMPTY_USAGE } from "../app/lib/odo-cost";
 import { industryPackFor } from "../app/lib/odo-industry-depth";
+import { jobDescriptionFromTypes, reportableForOptions, type CompetitorProfile } from "../app/lib/odo-competitors";
+import { buildSnapshot, buildPosture, buildAutomationSignals, dossierAsText, type Dossier } from "../app/lib/odo-outbound";
+import type { Evidence } from "../app/lib/odo-ledger";
+import type { BusinessProfile } from "../app/lib/odo-business-profile";
+import { observed } from "../app/lib/odo-evidence";
 
 process.env.ANTHROPIC_API_KEY = "test-key";
 
@@ -420,6 +425,60 @@ async function main() {
 
     const s14 = { ...st.state, questionsAsked: 14, answered: 13, areaCounts: { it: 5, marketing: 4, sales: 2, finance: 2 } };
     check("last slots are reserved for an uncovered area", offPlanReason(s14, "it", "clarify") !== null && offPlanReason(s14, "customer_service", "ask") === null);
+  }
+
+  console.log("\n28. Outbound: company snapshot, widened competitors, posture & automation");
+  {
+    const ev = (p: Partial<Evidence> & Pick<Evidence, "fact" | "polarity" | "severity" | "area">): Evidence => ({
+      id: "E0", source: "test", tier: "observed", supports: [], counters: [], audience: "client", collectedAt: new Date().toISOString(), ...p,
+    });
+
+    check("jobDescriptionFromTypes strips generic types and formats the rest", jobDescriptionFromTypes(["point_of_interest", "establishment", "accounting", "finance"]) === "Accounting, Finance");
+    check("jobDescriptionFromTypes is empty when only generic types given", jobDescriptionFromTypes(["point_of_interest", "establishment"]) === "");
+
+    const confirmed: CompetitorProfile = { name: "Riverside Tax", website: null, discoverySources: ["tavily"], identity: observed({ rating: 4.5, reviewCount: 10, address: null, businessStatus: null, types: [], phone: null, website: null }, "places"), serviceOverlap: { matchedKeywords: ["tax"], score: 1 }, geographicOverlap: true, classification: "confirmed_competitor", reasoning: "" };
+    const comparable1: CompetitorProfile = { ...confirmed, name: "Clearview Financial", classification: "comparable_business" };
+    const comparable2: CompetitorProfile = { ...confirmed, name: "GTA Numbers", classification: "comparable_business" };
+    const irrelevant: CompetitorProfile = { ...confirmed, name: "Random Cafe", classification: "irrelevant_candidate" };
+    const pool = [confirmed, comparable1, comparable2, irrelevant];
+
+    check("default options (3, strict) never include comparable_business", reportableForOptions(pool, { targetCount: 3, allowComparable: false }).every((p) => p.classification !== "comparable_business"));
+    check("allowComparable fills remaining slots after confirmed/probable", reportableForOptions(pool, { targetCount: 5, allowComparable: true }).length === 3 && reportableForOptions(pool, { targetCount: 5, allowComparable: true }).some((p) => p.classification === "comparable_business"));
+    check("irrelevant_candidate never reaches the dossier either way", !reportableForOptions(pool, { targetCount: 5, allowComparable: true }).some((p) => p.name === "Random Cafe"));
+
+    const highGapLedger: Evidence[] = [ev({ fact: "No DMARC record published.", polarity: "gap", severity: "high", area: "email" })];
+    check("one high-severity IT gap reads as WEAK", buildPosture(highGapLedger).verdict === "weak" && buildPosture(highGapLedger).summary.startsWith("WEAK"));
+
+    const cleanLedger: Evidence[] = [ev({ fact: "Valid SSL/TLS on all pages.", polarity: "strength", severity: "info", area: "web" }), ev({ fact: "MFA enforced.", polarity: "strength", severity: "info", area: "identity" })];
+    check("no gaps, strengths present reads as STRONG", buildPosture(cleanLedger).verdict === "strong");
+    check("posture is computed from IT/security areas only, not marketing", buildPosture([ev({ fact: "No CRM visible.", polarity: "gap", severity: "low", area: "marketing" })]).verdict === "strong");
+
+    const profileWithTools: BusinessProfile = { whatTheySell: "Bookkeeping", businessModel: "B2B", priceLevel: "mid-market", audienceDescription: "small businesses", locations: ["Mississauga, ON"], sizeSignals: [], sensitiveDataTypes: [], toolsOrPlatformsMentioned: ["HubSpot CRM", "Calendly"], industryGuess: "Accounting & bookkeeping", unknowns: [], summary: "A boutique bookkeeping firm.", pagesRead: [], generatedBy: "claude" };
+    const autoWithTools = buildAutomationSignals(profileWithTools, []);
+    check("known automation tools are detected from the business profile", autoWithTools.detected.length === 2);
+    check("automation note says tooling was found", autoWithTools.note.includes("Visible tooling found"));
+
+    const profileNoTools: BusinessProfile = { ...profileWithTools, toolsOrPlatformsMentioned: [] };
+    const autoNoTools = buildAutomationSignals(profileNoTools, []);
+    check("no tools mentioned -> nothing detected", autoNoTools.detected.length === 0);
+    check("automation note is honest about public-only visibility", autoNoTools.note.includes("publicly visible") || autoNoTools.note.includes("Publicly-visible"));
+
+    const snap = buildSnapshot(profileWithTools, "small");
+    check("snapshot focus uses the industry guess", snap?.focus === "Accounting & bookkeeping");
+    check("snapshot description includes the AI-written summary", (snap?.description ?? "").includes("A boutique bookkeeping firm."));
+    check("snapshot is null when there's no business profile", buildSnapshot(null, null) === null);
+
+    const fakeDossier: Dossier = {
+      kind: "odo_outbound_dossier", version: 2, runAt: new Date().toISOString(), company: "Maple Ridge Bookkeeping", website: "mapleridgebooks.ca", domain: "mapleridgebooks.ca",
+      notice: "notice text", industry: "Accounting", businessSize: "small", snapshot: snap,
+      competitors: [{ name: "Riverside Tax & Accounting", website: "riversidetax.ca", phone: "416-555-0100", email: "info@riversidetax.ca", jobDescription: "Accounting firm, Tax preparation service", confidence: "verified" }],
+      posture: buildPosture(highGapLedger), automation: autoWithTools,
+      gaps: [], strengths: [], context: [], notDetermined: [], changes: null, aiCostUsd: 0.31,
+    };
+    const text = dossierAsText(fakeDossier);
+    check("dossier text includes the Company Snapshot section", text.includes("COMPANY SNAPSHOT") && text.includes("Accounting & bookkeeping"));
+    check("dossier text includes competitors with contact details", text.includes("Riverside Tax & Accounting") && text.includes("riversidetax.ca") && text.includes("416-555-0100") && text.includes("info@riversidetax.ca"));
+    check("dossier text includes posture & automation at a glance", text.includes("POSTURE & AUTOMATION AT A GLANCE") && text.includes("WEAK") && text.includes("HubSpot CRM"));
   }
 
   console.log(`\n${passed} passed, ${failed} failed (${calls} scripted model calls)\n`);

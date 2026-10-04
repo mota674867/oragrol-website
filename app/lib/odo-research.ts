@@ -64,7 +64,7 @@
 import { runDnsResearch, type DnsResearch } from "./odo-dns";
 import { runPageResearch, type PageResearch } from "./odo-page";
 import { coverageReport, type Determination } from "./odo-evidence";
-import { findCascadingCompetitors, detectCity, detectCountry, type CompetitorProfile, type LocationCascadeStep } from "./odo-competitors";
+import { findCascadingCompetitors, detectCity, detectCountry, type CompetitorProfile, type LocationCascadeStep, type CompetitorSearchOptions } from "./odo-competitors";
 import { runInfraResearch, type InfraResearch } from "./odo-infra";
 import { runAttackSurfaceResearch, type AttackSurfaceResearch } from "./odo-attack-surface";
 import {
@@ -331,7 +331,8 @@ export async function runParallelResearch(
   businessName: string,
   website: string | null,
   hasWebsite: boolean,
-  visitorEmail?: string | null
+  visitorEmail?: string | null,
+  competitorOptions?: CompetitorSearchOptions
 ): Promise<ResearchFindings> {
   const errors: string[] = [];
   const domain = website || "";
@@ -471,7 +472,8 @@ export async function runParallelResearch(
     industryKeywords,
     prospectCity,
     competitorCandidates?.competitors ?? [],
-    targetCountry
+    targetCountry,
+    competitorOptions
   );
   const competitorProfiles = cascade.profiles.length ? cascade.profiles : null;
   const competitorCascadeStep: LocationCascadeStep = cascade.cascadeStepUsed;
