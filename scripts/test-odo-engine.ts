@@ -32,7 +32,8 @@ import { createReportText, REPORT_MODEL, REPORT_FALLBACK_MODEL } from "../app/li
 import { computeCost, addOpusUsage, EMPTY_USAGE } from "../app/lib/odo-cost";
 import { industryPackFor } from "../app/lib/odo-industry-depth";
 import { jobDescriptionFromTypes, reportableForOptions, type CompetitorProfile } from "../app/lib/odo-competitors";
-import { buildSnapshot, buildPosture, buildAutomationSignals, dossierAsText, type Dossier } from "../app/lib/odo-outbound";
+import { buildSnapshot, buildPosture, buildAutomationSignals, dossierAsText, extractContact, type Dossier } from "../app/lib/odo-outbound";
+import { filterLeads } from "../app/lib/odo-outbound-leads";
 import type { Evidence } from "../app/lib/odo-ledger";
 import type { BusinessProfile } from "../app/lib/odo-business-profile";
 import { observed } from "../app/lib/odo-evidence";
@@ -469,16 +470,59 @@ async function main() {
     check("snapshot is null when there's no business profile", buildSnapshot(null, null) === null);
 
     const fakeDossier: Dossier = {
-      kind: "odo_outbound_dossier", version: 2, runAt: new Date().toISOString(), company: "Maple Ridge Bookkeeping", website: "mapleridgebooks.ca", domain: "mapleridgebooks.ca",
+      kind: "odo_outbound_dossier", version: 3, runAt: new Date().toISOString(), company: "Maple Ridge Bookkeeping", website: "mapleridgebooks.ca", domain: "mapleridgebooks.ca",
       notice: "notice text", industry: "Accounting", businessSize: "small", snapshot: snap,
       competitors: [{ name: "Riverside Tax & Accounting", website: "riversidetax.ca", phone: "416-555-0100", email: "info@riversidetax.ca", jobDescription: "Accounting firm, Tax preparation service", confidence: "verified" }],
+      recommendations: [{ name: "Email protection setup", group: "security", tier: "recommended", reason: "No DMARC record published for the domain." }],
       posture: buildPosture(highGapLedger), automation: autoWithTools,
       gaps: [], strengths: [], context: [], notDetermined: [], changes: null, aiCostUsd: 0.31,
     };
     const text = dossierAsText(fakeDossier);
     check("dossier text includes the Company Snapshot section", text.includes("COMPANY SNAPSHOT") && text.includes("Accounting & bookkeeping"));
     check("dossier text includes competitors with contact details", text.includes("Riverside Tax & Accounting") && text.includes("riversidetax.ca") && text.includes("416-555-0100") && text.includes("info@riversidetax.ca"));
+    check("dossier text names the best-matching ORAGROL services", text.includes("BEST-MATCHING ORAGROL SERVICES") && text.includes("Email protection setup") && text.includes("RECOMMENDED"));
     check("dossier text includes posture & automation at a glance", text.includes("POSTURE & AUTOMATION AT A GLANCE") && text.includes("WEAK") && text.includes("HubSpot CRM"));
+  }
+
+  console.log("\n29. Outbound: open-area leads, contact extraction, labels");
+  {
+    const hits = [
+      { title: "Top accountants in Toronto", url: "https://directory.example/top", content: "Brightline Bookkeeping, Riverside Tax" },
+      { title: "Brightline Bookkeeping", url: "https://www.brightlinebooks.ca/", content: "Bookkeeping for small business" },
+    ];
+    const leads = filterLeads(
+      [
+        { name: "Brightline Bookkeeping", website: "https://brightlinebooks.ca", whatTheyDo: "Bookkeeping for small business" },
+        { name: "Riverside Tax", website: "https://riversidetax.ca", whatTheyDo: "Tax prep" },
+        { name: "Target Co", website: "https://target.ca", whatTheyDo: "the target itself" },
+        { name: "brightline bookkeeping", website: null, whatTheyDo: "duplicate name" },
+        { name: "", website: null, whatTheyDo: "nameless" },
+      ],
+      hits.concat([{ title: "Target", url: "https://target.ca/", content: "" }]),
+      ["target.ca"],
+      5,
+    );
+    check("a website that really appeared in the results is kept", leads.find((l) => l.name === "Brightline Bookkeeping")?.website === "https://brightlinebooks.ca");
+    check("a website NOT in the results is dropped to null, never guessed", leads.find((l) => l.name === "Riverside Tax")?.website === null);
+    check("the target company itself is excluded", !leads.some((l) => l.name === "Target Co"));
+    check("duplicate and nameless entries are dropped", leads.length === 2);
+    check("the limit is respected", filterLeads([{ name: "A" }, { name: "B" }, { name: "C" }], [], [], 2).length === 2);
+
+    const c = extractContact('<p>Call us (416) 555-0100 or write <a href="mailto:hello@brightlinebooks.ca">hello@brightlinebooks.ca</a></p><img src="logo@2x.png">');
+    check("public email is extracted, image filenames ignored", c.email === "hello@brightlinebooks.ca");
+    check("North American phone number is extracted", c.phone === "(416) 555-0100");
+    check("no contact on the page gives nulls", extractContact("<p>Nothing here</p>").email === null && extractContact("<p>Nothing here</p>").phone === null);
+
+    const pdfDossier: Dossier = {
+      kind: "odo_outbound_dossier", version: 3, runAt: new Date().toISOString(), company: "Maple Ridge Bookkeeping", website: "mapleridgebooks.ca", domain: "mapleridgebooks.ca",
+      notice: "notice", industry: "Accounting", businessSize: "small", snapshot: null,
+      competitors: [{ name: "Brightline Bookkeeping", website: null, phone: null, email: null, jobDescription: "Bookkeeping", confidence: "unverified" }],
+      recommendations: [{ name: "Email protection setup", group: "security", tier: "recommended", reason: "No DMARC record." }],
+      posture: buildPosture([]), automation: { detected: [], note: "none" },
+      gaps: [{ fact: "No DMARC \u2717 record published.", proof: "dmarc absent", source: "DNS", checkedAt: new Date().toISOString(), kind: "gap", severity: "high", area: "email", confidence: "high", key: "k" }],
+      strengths: [], context: [], notDetermined: [], changes: null, aiCostUsd: 0.2,
+    };
+    check("unverified competitors are labelled in the text report", dossierAsText(pdfDossier).includes("UNVERIFIED"));
   }
 
   console.log(`\n${passed} passed, ${failed} failed (${calls} scripted model calls)\n`);

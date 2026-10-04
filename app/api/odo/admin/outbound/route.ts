@@ -18,6 +18,7 @@
 import { after, NextRequest, NextResponse } from "next/server";
 import { claimOutboundRun, runOutbound, getOutboundHistory, dossierAsText } from "@/app/lib/odo-outbound";
 import { sendOdoOutboundDossierEmail } from "@/app/lib/odo-email";
+import { renderOutboundPdf } from "@/app/lib/odo-outbound-pdf";
 import { checkWebsiteValidity } from "@/app/lib/odo-gate";
 
 export const maxDuration = 300;
@@ -47,7 +48,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     try {
       const dossier = await runOutbound(company, website);
       const hasChanges = Boolean(dossier.changes && (dossier.changes.newGaps.length || dossier.changes.resolvedGaps.length || dossier.changes.newStrengths.length || dossier.changes.lostStrengths.length));
-      const r = await sendOdoOutboundDossierEmail({ company, domain: dossier.domain, hasChanges, text: dossierAsText(dossier) });
+      // PDF is a convenience copy — if it fails to render, the text email still goes out.
+      const pdf = await renderOutboundPdf(dossier).catch((err) => { console.warn("[ODO Outbound] PDF render failed:", err); return null; });
+      const r = await sendOdoOutboundDossierEmail({ company, domain: dossier.domain, hasChanges, text: dossierAsText(dossier), pdf });
       if (r.state !== "sent") console.warn(`[ODO Outbound] Dossier email not sent (${r.state}).`);
     } catch (err) {
       console.error("[ODO Outbound] Run failed:", err);

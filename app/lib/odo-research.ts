@@ -212,13 +212,13 @@ async function fetchSslGrade(domain: string): Promise<SslFindings> {
 }
 
 
-async function fetchTavily(query: string): Promise<Array<{ title: string; url: string; content: string }>> {
+export async function fetchTavily(query: string, maxResults = 5): Promise<Array<{ title: string; url: string; content: string }>> {
   const apiKey = process.env.TAVILY_API_KEY;
   if (!apiKey) throw new Error("TAVILY_API_KEY not configured");
   const res = await fetch("https://api.tavily.com/search", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ api_key: apiKey, query, search_depth: "advanced", max_results: 5 }),
+    body: JSON.stringify({ api_key: apiKey, query, search_depth: "advanced", max_results: maxResults }),
     signal: AbortSignal.timeout(20000),
   });
   const data = await res.json() as { results: Array<{ title: string; url: string; content: string }> };

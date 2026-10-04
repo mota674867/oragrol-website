@@ -27,9 +27,11 @@ import { Redis } from "@upstash/redis";
 import { runParallelResearch, type ResearchFindings } from "./odo-research";
 import { buildLedger, type Evidence, type Area } from "./odo-ledger";
 import { normalizeDomain } from "./odo-dns";
-import { computeCost, addClaudeUsage, EMPTY_USAGE } from "./odo-cost";
+import { computeCost, addClaudeUsage, addJevUsage, EMPTY_USAGE } from "./odo-cost";
 import { recordScanSpend } from "./odo-spend";
-import { jobDescriptionFromTypes, type CompetitorProfile } from "./odo-competitors";
+import { jobDescriptionFromTypes, detectCountry, type CompetitorProfile } from "./odo-competitors";
+import { matchServices } from "./odo-matching";
+import { findSimilarBusinesses } from "./odo-outbound-leads";
 import { safeFetch } from "./odo-ssrf-guard";
 import { htmlToText } from "./odo-crawl";
 import type { BusinessProfile } from "./odo-business-profile";
@@ -52,8 +54,15 @@ export type DossierCompetitor = {
   phone: string | null;
   email: string | null;
   jobDescription: string;
-  /** "verified" = confirmed/probable (Places-identity-verified + service overlap). "likely" = comparable_business — same space, not fully confirmed. Never shown for irrelevant/insufficient-evidence candidates; those never reach the dossier. */
-  confidence: "verified" | "likely";
+  /** "verified" = confirmed/probable (Places-identity-verified + service overlap). "likely" = comparable_business — same space, not fully confirmed. "unverified" = named in public web-search results only (odo-outbound-leads.ts) — a lead to check, not a confirmed competitor. */
+  confidence: "verified" | "likely" | "unverified";
+};
+
+export type Recommendation = {
+  name: string;
+  group: "security" | "automation";
+  tier: "recommended" | "worth_exploring";
+  reason: string;
 };
 
 export type CompanySnapshot = {
@@ -77,7 +86,7 @@ export type AutomationSignals = {
 
 export type Dossier = {
   kind: "odo_outbound_dossier";
-  version: 2;
+  version: 3;
   runAt: string;
   company: string;
   website: string;
@@ -87,6 +96,7 @@ export type Dossier = {
   businessSize: string | null;
   snapshot: CompanySnapshot | null;
   competitors: DossierCompetitor[];
+  recommendations: Recommendation[];
   posture: PostureSummary;
   automation: AutomationSignals;
   gaps: DossierFinding[];
@@ -214,35 +224,39 @@ export function buildAutomationSignals(profile: BusinessProfile | null, ledger: 
   return { detected, note };
 }
 
-/** Best-effort public email lookup on a competitor's own homepage — a cheap, non-AI fetch, not an AI call. Fails open to null; never blocks the dossier. */
-async function fetchPublicEmail(website: string): Promise<string | null> {
+/** Best-effort public contact lookup on a business's own homepage — a cheap, non-AI fetch. Fails open to nulls; never blocks the dossier. */
+export async function fetchPublicContact(website: string): Promise<{ email: string | null; phone: string | null }> {
   try {
     const url = website.startsWith("http") ? website : `https://${website}`;
     const res = await Promise.race([
       safeFetch(url, { headers: { "User-Agent": "ORAGROL-ODO/1.0 (+https://orgro.ca)" } }),
       new Promise<null>((resolve) => setTimeout(() => resolve(null), 6000)),
     ]);
-    if (!res) return null;
-    const html = await res.text();
-    const text = htmlToText(html);
-    const matches = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) ?? [];
-    const junk = /wixpress|sentry|example\.com|godaddy|schema\.org|\.png|\.jpg|\.gif|placeholder/i;
-    const good = matches.find((m) => !junk.test(m));
-    return good ?? null;
+    if (!res) return { email: null, phone: null };
+    return extractContact(await res.text());
   } catch {
-    return null;
+    return { email: null, phone: null };
   }
+}
+
+/** Pure: first plausible business email and North-American phone number in page HTML. Exported for tests. */
+export function extractContact(html: string): { email: string | null; phone: string | null } {
+  const text = htmlToText(html);
+  const junk = /wixpress|sentry|example\.com|godaddy|schema\.org|\.png|\.jpg|\.gif|placeholder/i;
+  const email = (text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) ?? []).find((m) => !junk.test(m)) ?? null;
+  const phone = text.match(/(?:\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}/)?.[0] ?? null;
+  return { email, phone };
 }
 
 async function toDossierCompetitor(c: CompetitorProfile): Promise<DossierCompetitor> {
   const places = c.identity.state === "observed" ? c.identity.value : null;
   const website = places?.website ?? c.website ?? null;
-  const email = website ? await fetchPublicEmail(website).catch(() => null) : null;
+  const found = website ? await fetchPublicContact(website) : { email: null, phone: null };
   return {
     name: c.name,
     website,
-    phone: places?.phone ?? null,
-    email,
+    phone: places?.phone ?? found.phone,
+    email: found.email,
     jobDescription: places ? jobDescriptionFromTypes(places.types) || "Not specified by Google Places" : "Not specified",
     confidence: c.classification === "comparable_business" ? "likely" : "verified",
   };
@@ -278,6 +292,34 @@ export async function runOutbound(company: string, website: string): Promise<Dos
     const automation = buildAutomationSignals(findings.businessProfile, ledger);
     const competitors = await Promise.all((findings.competitorProfiles ?? []).map(toDossierCompetitor));
 
+    // Open the area: fewer than 5 verified -> pull similar businesses named in public web results (labelled unverified).
+    const profile = findings.businessProfile;
+    const city = profile?.locations[0]?.split(",")[0]?.trim() || null;
+    const region = detectCountry(domain, profile?.locations ?? []) === "CA" ? "in Canada" : profile?.locations[0] ?? "nearby";
+    const extra = await findSimilarBusinesses({
+      company,
+      domain,
+      category: profile?.industryGuess ?? profile?.whatTheySell ?? findings.industry ?? null,
+      city,
+      region,
+      excludeDomains: competitors.map((c) => (c.website ? normalizeDomain(c.website) : "")).filter(Boolean),
+      need: 5 - competitors.length,
+    });
+    const leads = await Promise.all(
+      extra.leads.map(async (l): Promise<DossierCompetitor> => {
+        const found = l.website ? await fetchPublicContact(l.website) : { email: null, phone: null };
+        return { name: l.name, website: l.website, phone: found.phone, email: found.email, jobDescription: l.whatTheyDo || "Not stated in the search results", confidence: "unverified" };
+      }),
+    );
+    const allCompetitors = [...competitors, ...leads].slice(0, 5);
+
+    // Best-matching ORAGROL services, from the same evidence-gated matcher client scans use.
+    const matching = await matchServices(ledger, { industry: findings.industry ?? null, businessSize: findings.businessSize ?? null });
+    const recommendations: Recommendation[] = matching.flagged
+      .filter((m): m is typeof m & { tier: "recommended" | "worth_exploring" } => m.tier !== "not_flagged")
+      .slice(0, 5)
+      .map((m) => ({ name: m.simpleName, group: m.group, tier: m.tier, reason: m.reason }));
+
     const history = await getOutboundHistory(website).catch(() => [] as Dossier[]);
     const prev = history[0];
     const diff = (a: DossierFinding[], b: DossierFinding[]) => a.filter((x) => !b.some((y) => y.key === x.key)).map((x) => x.fact);
@@ -291,12 +333,12 @@ export async function runOutbound(company: string, website: string): Promise<Dos
         }
       : null;
 
-    const cost = computeCost(addClaudeUsage(EMPTY_USAGE, findings.businessProfileUsage));
+    const cost = computeCost(addJevUsage(addClaudeUsage(addClaudeUsage(EMPTY_USAGE, findings.businessProfileUsage), extra.usage), matching.jevUsage));
     await recordScanSpend(cost.totalCostUsd).catch(() => {});
 
     const dossier: Dossier = {
       kind: "odo_outbound_dossier",
-      version: 2,
+      version: 3,
       runAt: new Date().toISOString(),
       company,
       website,
@@ -305,7 +347,8 @@ export async function runOutbound(company: string, website: string): Promise<Dos
       industry: findings.industry ?? null,
       businessSize: findings.businessSize ?? null,
       snapshot,
-      competitors,
+      competitors: allCompetitors,
+      recommendations,
       posture,
       automation,
       gaps,
@@ -327,7 +370,7 @@ export function dossierAsText(d: Dossier): string {
   const line = (f: DossierFinding) =>
     `• [${f.severity.toUpperCase()} · confidence ${f.confidence}] ${f.fact}\n    Proof: ${f.proof ?? "—"}\n    Source: ${f.source} · checked ${f.checkedAt.slice(0, 10)}`;
   const competitorLine = (c: DossierCompetitor) =>
-    `• ${c.name} [${c.confidence === "verified" ? "VERIFIED" : "LIKELY — not fully confirmed"}]\n` +
+    `• ${c.name} [${c.confidence === "verified" ? "VERIFIED" : c.confidence === "likely" ? "LIKELY — not fully confirmed" : "UNVERIFIED — named in public search results, check before use"}]\n` +
     `    What they do: ${c.jobDescription}\n` +
     `    Website: ${c.website ?? "—"} · Phone: ${c.phone ?? "—"} · Email: ${c.email ?? "not found publicly"}`;
 
@@ -346,6 +389,11 @@ export function dossierAsText(d: Dossier): string {
     "",
     `════ COMPETITORS (${d.competitors.length} found) ════`,
     ...(d.competitors.length ? d.competitors.map(competitorLine) : ["none found near this business"]),
+    "",
+    `════ BEST-MATCHING ORAGROL SERVICES ════`,
+    ...(d.recommendations.length
+      ? d.recommendations.map((r, i) => `${i + 1}. ${r.name} [${r.group === "security" ? "Security" : "Automation"} · ${r.tier === "recommended" ? "RECOMMENDED" : "worth exploring"}]\n    Why: ${r.reason}`)
+      : ["No strong match from public evidence alone — a discovery conversation would be needed."]),
     "",
     `════ POSTURE & AUTOMATION AT A GLANCE ════`,
     `Cybersecurity posture: ${d.posture.summary}`,
