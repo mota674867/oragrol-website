@@ -93,21 +93,6 @@ export default function OutboundTool() {
     }
   }
 
-  async function downloadWord(site = website) {
-    if (!site) { setHistory("Enter the website first."); return; }
-    try {
-      const res = await fetch(`/api/odo/admin/outbound?key=${encodeURIComponent(key)}&website=${encodeURIComponent(site)}&format=docx`);
-      if (!res.ok) { setHistory("No finished report on file for that website yet."); return; }
-      const url = URL.createObjectURL(await res.blob());
-      const a = document.createElement("a");
-      a.href = url; a.download = `ODO_Outbound_${domainOf(site)}.docx`;
-      document.body.appendChild(a); a.click(); a.remove();
-      URL.revokeObjectURL(url);
-    } catch {
-      setHistory("Could not download right now.");
-    }
-  }
-
   const page: React.CSSProperties = { minHeight: "100vh", background: "#f6f3ee", color: "#1a1a1a", fontFamily: "system-ui, sans-serif", position: "relative" };
 
   if (phase === "checking") return <main style={page} />;
@@ -126,7 +111,7 @@ export default function OutboundTool() {
       <button type="button" aria-label="Close (Esc)" title="Close (Esc)" onClick={goHome} style={{ position: "absolute", top: 16, right: 20, background: "none", border: 0, fontSize: 28, lineHeight: 1, cursor: "pointer", color: "#444" }}>×</button>
       <div style={{ maxWidth: 560, margin: "0 auto", padding: "72px 20px 60px" }}>
         <h1 style={{ fontSize: 26, marginBottom: 6, color: "#1a1a1a" }}>Outbound research</h1>
-        <p style={{ marginBottom: 24, color: "#444" }}>Enter a company and its website. ODO researches public information only, then emails you the report (PDF + Word) in 1–2 minutes. Press Esc to leave.</p>
+        <p style={{ marginBottom: 24, color: "#444" }}>Enter a company and its website. ODO researches public information only, then emails you the report (Word + PDF attached) in 1–2 minutes. Press Esc to leave.</p>
         <form onSubmit={run}>
           <label style={{ display: "block", color: "#1a1a1a" }}>Company name<input style={input} value={company} onChange={(e) => { setCompany(e.target.value); setConfirmDup(null); }} required /></label>
           <label style={{ display: "block", marginTop: 16, color: "#1a1a1a" }}>Website<input style={input} value={website} onChange={(e) => { setWebsite(e.target.value); setConfirmDup(null); }} placeholder="https://example.com" required /></label>
@@ -135,7 +120,6 @@ export default function OutboundTool() {
               <b>Researched before.</b> {confirmDup.company} was done {confirmDup.runs} time{confirmDup.runs === 1 ? "" : "s"}, last on {fmt(confirmDup.lastRunAt)}. Do it again? (A re-run also shows what changed.)
               <div style={{ display: "flex", gap: 10, marginTop: 10, flexWrap: "wrap" }}>
                 <button type="submit" style={{ ...btn, background: "#db5227", color: "#fff", border: 0 }}>Yes, run again</button>
-                <button type="button" onClick={() => void downloadWord(confirmDup.website)} style={{ ...btn, background: "#fff", color: "#111", border: "1px solid #111" }}>Download last Word report</button>
                 <button type="button" onClick={() => setConfirmDup(null)} style={{ ...btn, background: "#fff", color: "#111", border: "1px solid #888" }}>Cancel</button>
               </div>
             </div>
@@ -143,7 +127,6 @@ export default function OutboundTool() {
             <div style={{ display: "flex", gap: 12, marginTop: 20, flexWrap: "wrap" }}>
               <button type="submit" disabled={busy} style={{ ...btn, background: "#111", color: "#fff", border: 0 }}>{busy ? "Starting…" : "Run research"}</button>
               <button type="button" onClick={check} style={{ ...btn, background: "#fff", color: "#111", border: "1px solid #111" }}>Check history</button>
-              <button type="button" onClick={() => void downloadWord()} style={{ ...btn, background: "#fff", color: "#111", border: "1px solid #111" }}>Download Word report</button>
             </div>
           )}
         </form>
@@ -158,7 +141,6 @@ export default function OutboundTool() {
                   <b>{c.company}</b> <span style={{ color: "#555" }}>{c.domain}</span>
                   <div style={{ fontSize: 13, color: "#666" }}>{c.runs} run{c.runs === 1 ? "" : "s"} · last {fmt(c.lastRunAt)}</div>
                 </button>
-                <button type="button" onClick={() => void downloadWord(c.website)} style={{ background: "none", border: 0, cursor: "pointer", color: "#db5227", fontSize: 14 }}>Word</button>
               </div>
             ))}
           </section>
