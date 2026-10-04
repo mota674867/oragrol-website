@@ -24,6 +24,8 @@
 // Runs are kept in Redis per domain (last 6), so a re-run can report changes.
 
 import { Redis } from "@upstash/redis";
+import { evaluateOrOneFlag } from "./odo-packages";
+import { recommendAutomationLane, TAILORED_AUTOMATION, type AutomationRecommendation } from "./odo-automation-bundles";
 import { runParallelResearch, type ResearchFindings } from "./odo-research";
 import { buildLedger, type Evidence, type Area } from "./odo-ledger";
 import { normalizeDomain } from "./odo-dns";
@@ -65,6 +67,14 @@ export type Recommendation = {
   reason: string;
 };
 
+/** The package-level pick for the automation side: OR ONE, a named Business Automation bundle, or Tailored Automation — same decision logic client reports use. */
+export type AutomationLane = {
+  kind: "or_one" | "bundle" | "tailored";
+  name: string;
+  tagline: string | null;
+  reason: string;
+};
+
 export type CompanySnapshot = {
   description: string;
   focus: string;
@@ -97,6 +107,8 @@ export type Dossier = {
   snapshot: CompanySnapshot | null;
   competitors: DossierCompetitor[];
   recommendations: Recommendation[];
+  /** Absent on dossiers stored before this field existed; null when public evidence shows no clear automation package. */
+  automationLane?: AutomationLane | null;
   posture: PostureSummary;
   automation: AutomationSignals;
   gaps: DossierFinding[];
@@ -268,6 +280,15 @@ export async function getOutboundHistory(website: string): Promise<Dossier[]> {
   return (await redis().get<Dossier[]>(`${HISTORY_PREFIX}${domain}`)) ?? [];
 }
 
+const INDEX_KEY = "odo:outbound:index";
+export type OutboundIndexEntry = { company: string; website: string; domain: string; lastRunAt: string; runs: number };
+
+/** Every company researched so far, newest first — powers the "researched before" notice. */
+export async function listOutboundIndex(): Promise<OutboundIndexEntry[]> {
+  const all = (await redis().hgetall<Record<string, OutboundIndexEntry>>(INDEX_KEY).catch(() => null)) ?? {};
+  return Object.values(all).sort((a, b) => b.lastRunAt.localeCompare(a.lastRunAt));
+}
+
 /** One run per domain at a time (research takes 1–2 minutes). */
 export async function claimOutboundRun(website: string): Promise<boolean> {
   const domain = normalizeDomain(website);
@@ -320,6 +341,13 @@ export async function runOutbound(company: string, website: string): Promise<Dos
       .slice(0, 5)
       .map((m) => ({ name: m.simpleName, group: m.group, tier: m.tier, reason: m.reason }));
 
+    const orOneFlag = evaluateOrOneFlag(matching.flagged.map((m) => ({ code: m.code, category: m.category, tier: m.tier as "recommended" | "worth_exploring" })));
+    const lane = await recommendAutomationLane(
+      matching.flagged.filter((m) => m.group === "automation").map((m) => ({ code: m.code, category: m.category, tier: m.tier as "recommended" | "worth_exploring", reason: m.reason })),
+      orOneFlag,
+    ).catch((): AutomationRecommendation => ({ kind: "none" }));
+    const automationLane = toAutomationLane(lane);
+
     const history = await getOutboundHistory(website).catch(() => [] as Dossier[]);
     const prev = history[0];
     const diff = (a: DossierFinding[], b: DossierFinding[]) => a.filter((x) => !b.some((y) => y.key === x.key)).map((x) => x.fact);
@@ -349,6 +377,7 @@ export async function runOutbound(company: string, website: string): Promise<Dos
       snapshot,
       competitors: allCompetitors,
       recommendations,
+      automationLane,
       posture,
       automation,
       gaps,
@@ -359,10 +388,19 @@ export async function runOutbound(company: string, website: string): Promise<Dos
       aiCostUsd: cost.totalCostUsd,
     };
     await redis().set(`${HISTORY_PREFIX}${domain}`, [dossier, ...history].slice(0, KEEP_RUNS));
+    await redis().hset(INDEX_KEY, { [domain]: { company, website, domain, lastRunAt: dossier.runAt, runs: history.length + 1 } satisfies OutboundIndexEntry }).catch(() => {});
     return dossier;
   } finally {
     await redis().del(`${LOCK_PREFIX}${domain}`).catch(() => {});
   }
+}
+
+/** Maps the shared lane decision onto the dossier's own simple shape. Real product names only (OR ONE, the five BA bundles, Tailored Automation). */
+export function toAutomationLane(r: AutomationRecommendation): AutomationLane | null {
+  if (r.kind === "or_one") return { kind: "or_one", name: "OR ONE", tagline: null, reason: r.reason };
+  if (r.kind === "bundle") return { kind: "bundle", name: `Business Automation: ${r.bundle.name}`, tagline: r.bundle.tagline, reason: r.reason };
+  if (r.kind === "tailored") return { kind: "tailored", name: TAILORED_AUTOMATION.name, tagline: TAILORED_AUTOMATION.tagline, reason: r.reason };
+  return null;
 }
 
 /** Plain-text dossier for the OCS hand-off email. */
@@ -394,6 +432,11 @@ export function dossierAsText(d: Dossier): string {
     ...(d.recommendations.length
       ? d.recommendations.map((r, i) => `${i + 1}. ${r.name} [${r.group === "security" ? "Security" : "Automation"} · ${r.tier === "recommended" ? "RECOMMENDED" : "worth exploring"}]\n    Why: ${r.reason}`)
       : ["No strong match from public evidence alone — a discovery conversation would be needed."]),
+    "",
+    `════ BEST-MATCHING PACKAGE (Business Automation / OR ONE) ════`,
+    d.automationLane
+      ? `${d.automationLane.name}${d.automationLane.tagline ? ` — ${d.automationLane.tagline}` : ""}\n    Why: ${d.automationLane.reason}`
+      : "No clear automation package from public evidence alone — discovery conversation needed.",
     "",
     `════ POSTURE & AUTOMATION AT A GLANCE ════`,
     `Cybersecurity posture: ${d.posture.summary}`,

@@ -59,6 +59,14 @@ export function OutboundDossierPdf({ d }: { d: Dossier }) {
           </View>
         )) : <Text>No strong match from public evidence alone - a discovery conversation would be needed.</Text>}
 
+        <Text style={s.h2}>Best-matching package (Business Automation / OR ONE)</Text>
+        {d.automationLane ? (
+          <View style={s.card} wrap={false}>
+            <Text style={s.bold}>{clean(d.automationLane.name)}{d.automationLane.tagline ? ` - ${clean(d.automationLane.tagline)}` : ""}</Text>
+            <Text>{clean(d.automationLane.reason)}</Text>
+          </View>
+        ) : <Text>No clear automation package from public evidence alone - a discovery conversation would be needed.</Text>}
+
         <Text style={s.h2}>Posture and automation at a glance</Text>
         <Text style={s.bold}>Cybersecurity posture: {d.posture.summary}</Text>
         {d.posture.highlights.map((h) => <Text key={h}>{h.startsWith("✗") ? "Gap: " : "Strength: "}{clean(h)}</Text>)}

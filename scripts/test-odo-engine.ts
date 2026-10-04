@@ -32,7 +32,8 @@ import { createReportText, REPORT_MODEL, REPORT_FALLBACK_MODEL } from "../app/li
 import { computeCost, addOpusUsage, EMPTY_USAGE } from "../app/lib/odo-cost";
 import { industryPackFor } from "../app/lib/odo-industry-depth";
 import { jobDescriptionFromTypes, reportableForOptions, type CompetitorProfile } from "../app/lib/odo-competitors";
-import { buildSnapshot, buildPosture, buildAutomationSignals, dossierAsText, extractContact, type Dossier } from "../app/lib/odo-outbound";
+import { buildSnapshot, buildPosture, buildAutomationSignals, dossierAsText, extractContact, toAutomationLane, type Dossier } from "../app/lib/odo-outbound";
+import { renderOutboundDocx } from "../app/lib/odo-outbound-docx";
 import { filterLeads } from "../app/lib/odo-outbound-leads";
 import type { Evidence } from "../app/lib/odo-ledger";
 import type { BusinessProfile } from "../app/lib/odo-business-profile";
@@ -523,6 +524,18 @@ async function main() {
       strengths: [], context: [], notDetermined: [], changes: null, aiCostUsd: 0.2,
     };
     check("unverified competitors are labelled in the text report", dossierAsText(pdfDossier).includes("UNVERIFIED"));
+
+    // 30. Package pick (OR ONE / BA bundle / Tailored) + Word file
+    const orOne = toAutomationLane({ kind: "or_one", reason: "broad need" });
+    check("OR ONE lane keeps the real name", orOne?.name === "OR ONE" && orOne.kind === "or_one");
+    const bundle = toAutomationLane({ kind: "bundle", bundle: { id: "finance", name: "Finance", tagline: "Know Your Numbers" }, matchedCodes: ["C13-S01"], reason: "r" });
+    check("bundle lane uses the BA bundle name + tagline", bundle?.name === "Business Automation: Finance" && bundle.tagline === "Know Your Numbers");
+    check("tailored lane named Tailored Automation", toAutomationLane({ kind: "tailored", matchedCodes: [], reason: "r" })?.name === "Tailored Automation");
+    check("no lane when nothing to recommend", toAutomationLane({ kind: "none" }) === null);
+    const withLane: Dossier = { ...pdfDossier, automationLane: bundle };
+    check("text report shows the package section", dossierAsText(withLane).includes("Business Automation: Finance"));
+    const docxBuf = await renderOutboundDocx(withLane);
+    check("Word file is a real .docx (zip)", docxBuf.length > 2000 && docxBuf[0] === 0x50 && docxBuf[1] === 0x4b);
   }
 
   console.log(`\n${passed} passed, ${failed} failed (${calls} scripted model calls)\n`);

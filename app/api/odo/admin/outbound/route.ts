@@ -11,14 +11,17 @@
 //
 //   GET  ?key=…&website=example.com
 //     Returns the stored dossiers for that website, newest first.
+//        &format=docx  → the latest dossier as a Word download.
+//   GET  ?key=…&list=1  → every company researched so far.
 //
 // Nothing here contacts the company. How and when this is used is
 // Mohammad's decision; ODO only provides the ability.
 
 import { after, NextRequest, NextResponse } from "next/server";
-import { claimOutboundRun, runOutbound, getOutboundHistory, dossierAsText } from "@/app/lib/odo-outbound";
+import { claimOutboundRun, runOutbound, getOutboundHistory, listOutboundIndex, dossierAsText } from "@/app/lib/odo-outbound";
 import { sendOdoOutboundDossierEmail } from "@/app/lib/odo-email";
 import { renderOutboundPdf } from "@/app/lib/odo-outbound-pdf";
+import { renderOutboundDocx } from "@/app/lib/odo-outbound-docx";
 import { checkWebsiteValidity } from "@/app/lib/odo-gate";
 
 export const maxDuration = 300;
@@ -50,7 +53,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       const hasChanges = Boolean(dossier.changes && (dossier.changes.newGaps.length || dossier.changes.resolvedGaps.length || dossier.changes.newStrengths.length || dossier.changes.lostStrengths.length));
       // PDF is a convenience copy — if it fails to render, the text email still goes out.
       const pdf = await renderOutboundPdf(dossier).catch((err) => { console.warn("[ODO Outbound] PDF render failed:", err); return null; });
-      const r = await sendOdoOutboundDossierEmail({ company, domain: dossier.domain, hasChanges, text: dossierAsText(dossier), pdf });
+      const docx = await renderOutboundDocx(dossier).catch((err) => { console.warn("[ODO Outbound] Word render failed:", err); return null; });
+      const r = await sendOdoOutboundDossierEmail({ company, domain: dossier.domain, hasChanges, text: dossierAsText(dossier), pdf, docx });
       if (r.state !== "sent") console.warn(`[ODO Outbound] Dossier email not sent (${r.state}).`);
     } catch (err) {
       console.error("[ODO Outbound] Run failed:", err);
@@ -62,8 +66,22 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   if (!authorized(req)) return NextResponse.json({ code: "unauthorized" }, { status: 401 });
+  // ?list=1 — every company researched so far (powers the "researched before" notice).
+  if (req.nextUrl.searchParams.get("list")) return NextResponse.json({ companies: await listOutboundIndex() });
   const website = req.nextUrl.searchParams.get("website") ?? "";
   if (!website) return NextResponse.json({ code: "validation_error", message: "website is required." }, { status: 400 });
   const history = await getOutboundHistory(website);
+  // ?format=docx — the latest stored dossier as a Word file download.
+  if (req.nextUrl.searchParams.get("format") === "docx") {
+    if (!history.length) return NextResponse.json({ code: "not_found", message: "No run on file for that website yet." }, { status: 404 });
+    const buf = await renderOutboundDocx(history[0]);
+    return new NextResponse(new Uint8Array(buf), {
+      headers: {
+        "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "Content-Disposition": `attachment; filename="ODO_Outbound_${history[0].domain.replace(/[^a-z0-9.-]/gi, "_")}.docx"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
   return NextResponse.json({ runs: history.length, dossiers: history });
 }

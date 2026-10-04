@@ -38,7 +38,8 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
     (REDESIGNED_ROUTES.has(pathname) || pathname.startsWith("/resources/"));
 
   // /scan is a standalone focused page — no nav, no footer, no ChatWidget
-  if (pathname === "/scan") {
+  // /ops/outbound is Mohammad's private tool — same standalone treatment.
+  if (pathname === "/scan" || pathname === "/ops/outbound") {
     return <>{children}</>;
   }
 

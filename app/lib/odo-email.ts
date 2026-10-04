@@ -255,12 +255,13 @@ export async function sendOdoAdminAbandonedEmail(params: {
 }
 
 /** Outbound mode (§37.9): the dossier hand-off to OCS. Nothing is ever sent to the company itself. */
-export async function sendOdoOutboundDossierEmail(params: { company: string; domain: string; hasChanges: boolean; text: string; pdf?: Buffer | null }): Promise<SendOdoAdminEmailResult> {
+export async function sendOdoOutboundDossierEmail(params: { company: string; domain: string; hasChanges: boolean; text: string; pdf?: Buffer | null; docx?: Buffer | null }): Promise<SendOdoAdminEmailResult> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.CONTACT_FROM_EMAIL;
   if (!apiKey) return { state: "skipped", reason: "RESEND_API_KEY is not configured." };
   if (!from) return { state: "skipped", reason: "CONTACT_FROM_EMAIL is not configured." };
   try {
+    const safeDomain = params.domain.replace(/[^a-z0-9.-]/gi, "_");
     const resend = new Resend(apiKey);
     const { data, error } = await resend.emails.send({
       from,
@@ -268,7 +269,10 @@ export async function sendOdoOutboundDossierEmail(params: { company: string; dom
       replyTo: from,
       subject: `ODO outbound dossier${params.hasChanges ? " (re-run, with changes)" : ""} — ${params.company} (${params.domain})`,
       text: params.text,
-      ...(params.pdf ? { attachments: [{ filename: `ODO_Outbound_${params.domain.replace(/[^a-z0-9.-]/gi, "_")}.pdf`, content: params.pdf }] } : {}),
+      attachments: [
+        ...(params.pdf ? [{ filename: `ODO_Outbound_${safeDomain}.pdf`, content: params.pdf }] : []),
+        ...(params.docx ? [{ filename: `ODO_Outbound_${safeDomain}.docx`, content: params.docx }] : []),
+      ],
     });
     if (error) return { state: "failed", error: `Resend error: ${error.message ?? JSON.stringify(error)}`.slice(0, 500) };
     if (!data?.id) return { state: "failed", error: "Resend returned no email id." };
