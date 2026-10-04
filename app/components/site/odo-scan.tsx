@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Script from "next/script";
+import { useRouter } from "next/navigation";
 import "./odo-scan.css";
 
 /*
@@ -259,7 +260,7 @@ function CooldownModal({ message, onClose }: { message: string; onClose: () => v
   );
 }
 
-function Field({ id, label, value, onChange, placeholder, type = "text", error }: { id: string; label: string; value: string; onChange: (v: string) => void; placeholder: string; type?: string; error?: string }) {
+function Field({ id, label, value, onChange, onCommit, placeholder, type = "text", error }: { id: string; label: string; value: string; onChange: (v: string) => void; onCommit?: (v: string) => void; placeholder: string; type?: string; error?: string }) {
   return (
     <label className="odo-scan__field" htmlFor={id}>
       <span className="odo-scan__field-label">{label}</span>
@@ -273,6 +274,8 @@ function Field({ id, label, value, onChange, placeholder, type = "text", error }
         aria-invalid={Boolean(error)}
         aria-describedby={error ? `${id}-error` : undefined}
         onChange={(event) => onChange(event.target.value)}
+        onBlur={onCommit ? (event) => onCommit(event.target.value) : undefined}
+        onKeyDown={onCommit ? (event) => { if (event.key === "Enter") onCommit((event.target as HTMLInputElement).value); } : undefined}
       />
       {error ? <span id={`${id}-error`} className="odo-scan__field-error">{error}</span> : null}
     </label>
@@ -589,6 +592,21 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     if (el) el.scrollTop = el.scrollHeight;
   }, [chat, optimistic, submitting, awaiting]);
 
+  // Private shortcut for ORAGROL staff: if the name box holds the admin
+  // passcode, go to the outbound tool. The check runs on the server — the
+  // passcode is never in this page's code. Anything else does nothing at all.
+  const router = useRouter();
+  const lastKnock = useRef("");
+  const adminKnock = (value: string) => {
+    const v = value.trim();
+    if (v.length < 8 || v === lastKnock.current) return;
+    lastKnock.current = v;
+    fetch("/api/odo/admin/outbound-auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ passcode: v }) })
+      .then((r) => r.json())
+      .then((d: { ok?: boolean }) => { if (d.ok) router.push(`/ops/outbound#${encodeURIComponent(v)}`); })
+      .catch(() => {});
+  };
+
   const updateField = (name: string, value: string) => {
     setForm((current) => ({ ...current, [name]: value }));
     setErrors((current) => ({ ...current, [name]: undefined }));
@@ -818,7 +836,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
               <p className="odo-scan__workspace-subtitle">{ODO_COPY.preChatNote}</p>
               <p className="odo-scan__intro">{ODO_COPY.intro}</p>
               <form id="odo-start-form" className="odo-scan__form" onSubmit={submitStart} noValidate>
-                <Field id="name" label="Your name" value={form.name} onChange={(value) => updateField("name", value)} placeholder="Full name" error={errors.name} />
+                <Field id="name" label="Your name" value={form.name} onChange={(value) => updateField("name", value)} onCommit={adminKnock} placeholder="Full name" error={errors.name} />
                 <Field id="email" label="Work email" value={form.email} onChange={(value) => updateField("email", value)} placeholder="you@company.com" type="email" error={errors.email} />
                 <Field id="company" label="Company name" value={form.company} onChange={(value) => updateField("company", value)} placeholder="Business name" error={errors.company} />
                 <Field id="website" label="Website" value={form.website} onChange={(value) => updateField("website", value)} placeholder="https://yourwebsite.com" type="url" error={errors.website} />

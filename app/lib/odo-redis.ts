@@ -393,3 +393,12 @@ export async function claimLeadHandoff(sessionId: string): Promise<boolean> {
   const ok = await redis.set(`${LEAD_CLAIM_PREFIX}${sessionId}`, Date.now(), { nx: true, ex: 7 * 24 * 60 * 60 });
   return ok === "OK";
 }
+
+/** Hidden admin passcode attempts per IP per day — a shared Redis ceiling so the passcode can't be brute-forced from the scan page's name box. Separate from the scan-start limit so guessing never eats a real visitor's quota. */
+export async function checkAdminAuthAttempts(ip: string, limit: number): Promise<{ ok: boolean; count: number }> {
+  const redis = getRedis();
+  const key = `odo:adminauth:${torontoDateKey()}:${ip}`;
+  const count = await redis.incr(key);
+  if (count === 1) await redis.expire(key, 24 * 60 * 60);
+  return { ok: count <= limit, count };
+}
