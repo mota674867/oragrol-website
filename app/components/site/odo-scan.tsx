@@ -796,8 +796,8 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
       />
       <header className="odo-scan__masthead">
         <span className="odo-scan__wordmark">ORAGROL GLOBAL</span>
+        <p className="odo-scan__language-note">To keep every finding accurate, the ORAGROL scan and its report are currently available in English only. Most of the public sources we draw on are published in English.</p>
         <div className="odo-scan__masthead-actions">
-          <button type="button" className="odo-scan__language" aria-label="Change language">EN <span>/</span> FR</button>
           <button type="button" className="odo-scan__close" aria-label="Close scan" onClick={() => { if (typeof window !== "undefined") window.history.back(); }}>×</button>
         </div>
       </header>
