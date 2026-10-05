@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ensureCyberHealthPropertySchema } from "../../../lib/hubspot";
+import { adminKeyOk } from "../../../lib/admin-auth";
 
 /**
  * GET /api/admin/cyber-health-bootstrap?secret=... — one-time setup
@@ -27,8 +28,7 @@ export async function GET(req: NextRequest) {
   if (!secret) {
     return NextResponse.json({ error: "ADMIN_ACTION_SECRET is not configured." }, { status: 500 });
   }
-  const provided = req.nextUrl.searchParams.get("secret");
-  if (provided !== secret) {
+  if (!(await adminKeyOk(req, "ADMIN_ACTION_SECRET", "secret"))) {
     return NextResponse.json({ error: "Invalid or missing secret." }, { status: 401 });
   }
 

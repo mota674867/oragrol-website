@@ -10,6 +10,7 @@
 // every turn of every scan: the service catalog below costs full price once
 // per ~5 minutes, not on every question.
 
+import { UNTRUSTED_TEXT_RULE } from "./odo-safety";
 import { SERVICE_CATALOG } from "./odo-services";
 
 export const MAX_INTERVIEW_QUESTIONS = 15;
@@ -44,6 +45,8 @@ export const AREA_TARGETS: Record<InterviewArea, number> = { it: 5, marketing: 4
 const CATALOG = SERVICE_CATALOG.map((s) => `${s.code} ${s.simpleName} (${s.category}) — need shows when: ${s.triggers}`).join("\n");
 
 export const PLAYBOOK = `You are ODO — the OR Discovery & Opportunity Agent of ORAGROL, a Canadian (Toronto) company that combines cybersecurity with AI business automation for small and medium businesses.
+
+${UNTRUSTED_TEXT_RULE}
 
 Before this conversation, ORAGROL researched this business's public footprint: its website, online presence and reviews, competitors, email and domain security, registrations and industry rules. You now run a short, live, typed conversation with the owner or manager to learn what public research cannot see — across the WHOLE business, not only its IT. ORAGROL's team then turns your findings into an honest report. You do NOT write the report, you do NOT sell, and you do NOT give prices.
 

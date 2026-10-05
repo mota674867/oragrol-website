@@ -41,6 +41,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import disposableDomains from "disposable-email-domains/index.json";
 import { normalizeDomain } from "./odo-dns";
 import { safeFetch } from "./odo-ssrf-guard";
+import { UNTRUSTED_TEXT_RULE } from "./odo-safety";
 
 // --- 1. Turnstile captcha ---
 
@@ -216,7 +217,7 @@ export async function checkIsRealBusiness(bodyText: string, companyName: string)
         model: GATE_MODEL,
         max_tokens: 150,
         system:
-          "You are a quick fraud/spam filter for a B2B lead form. Given a claimed company name and the visible text of its homepage, decide if this looks like a real, currently operating business (any size, any industry — a one-person shop is fine). Answer ONLY with compact JSON: {\"looksReal\": true|false, \"reason\": \"<one short sentence>\"}. Say false only for: placeholder/template text never replaced, a page unrelated to the claimed company, a page offering something illegal, or content suggesting this is a test/joke submission. When genuinely unsure, say true — this is a light filter, not a verdict.",
+          "You are a quick fraud/spam filter for a B2B lead form. Given a claimed company name and the visible text of its homepage, decide if this looks like a real, currently operating business (any size, any industry — a one-person shop is fine). Answer ONLY with compact JSON: {\"looksReal\": true|false, \"reason\": \"<one short sentence>\"}. Say false only for: placeholder/template text never replaced, a page unrelated to the claimed company, a page offering something illegal, or content suggesting this is a test/joke submission. When genuinely unsure, say true — this is a light filter, not a verdict. " + UNTRUSTED_TEXT_RULE,
         messages: [
           { role: "user", content: `Claimed company name: ${companyName}\n\nHomepage text (truncated):\n${bodyText.slice(0, 3000)}` },
         ],

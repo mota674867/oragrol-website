@@ -62,3 +62,16 @@ export async function addStrike(ip: string): Promise<number> {
     return 0;
   }
 }
+
+/** Shared Redis counter: true while `ip` is still under `limit` for this bucket within `windowSeconds`. Fails open on a Redis error. */
+export async function underLimit(bucket: string, ip: string, limit: number, windowSeconds: number): Promise<boolean> {
+  try {
+    const r = chatRedis();
+    const key = `odo:limit:${bucket}:${ipHash(ip)}`;
+    const n = await r.incr(key);
+    if (n === 1) await r.expire(key, windowSeconds);
+    return n <= limit;
+  } catch {
+    return true;
+  }
+}

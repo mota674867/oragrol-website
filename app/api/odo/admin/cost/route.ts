@@ -12,11 +12,10 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getLifetimeAiCost } from "@/app/lib/odo-redis";
+import { adminKeyOk } from "@/app/lib/admin-auth";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  const adminKey = process.env.ODO_ADMIN_KEY;
-  const suppliedKey = req.nextUrl.searchParams.get("key");
-  if (!adminKey || suppliedKey !== adminKey) {
+  if (!(await adminKeyOk(req, "ODO_ADMIN_KEY"))) {
     return NextResponse.json({ code: "unauthorized" }, { status: 401 });
   }
 

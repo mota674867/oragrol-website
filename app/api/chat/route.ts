@@ -9,7 +9,7 @@ import { checkChatIpDaily } from "../../lib/odo-redis";
 import { syncChatLeadToHubSpot } from "../../lib/hubspot";
 import { saveChatTurn, markChatEscalated, type ChatContact } from "../../lib/chat-session";
 import { scheduleChatSweep } from "../../lib/chat-qstash";
-import { isChatBlocked, getStrikes, addStrike, strikeOutcome, CHAT_CLOSED_REPLY, CHAT_BLOCKED_REPLY } from "../../lib/chat-strikes";
+import { isChatBlocked, getStrikes, addStrike, strikeOutcome, underLimit, CHAT_CLOSED_REPLY, CHAT_BLOCKED_REPLY } from "../../lib/chat-strikes";
 
 /**
  * POST /api/chat — ORAGROL chat widget backend
@@ -51,6 +51,8 @@ export async function POST(request: Request) {
   }
 
   if (parsed.data.mode === "escalate") {
+    // Alerts to the team are capped per IP per day, so nobody can flood the inbox or the lead list.
+    if (!(await underLimit("escalate", ip, 5, 24 * 60 * 60))) return NextResponse.json({ ok: true });
     return handleEscalate(parsed.data);
   }
   return handleReply(parsed.data, ip, new URL(request.url).origin);

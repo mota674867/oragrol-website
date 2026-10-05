@@ -19,6 +19,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { fetchTavily } from "./odo-research";
 import { normalizeDomain } from "./odo-dns";
+import { UNTRUSTED_TEXT_RULE } from "./odo-safety";
 
 const MODEL = "claude-sonnet-4-6";
 
@@ -77,6 +78,7 @@ export async function findSimilarBusinesses(p: {
       "You extract real businesses from web search results for a sales-research dossier.",
       `The target company is "${p.company}" (${p.domain}). Find businesses that offer SIMILAR services, preferably near ${p.city ?? p.region}.`,
       "RULES: use ONLY businesses actually named in the results below — never invent a business, a website or a service. Skip the target itself, directories, review sites, news articles and listicle pages themselves (but you may take the businesses a listicle names). `website` must be the business's own site and must be a URL that appears in the results; if it does not appear, use null. `whatTheyDo` is one short phrase taken from the results.",
+      UNTRUSTED_TEXT_RULE,
       `Return at most ${Math.min(8, p.need + 3)} businesses. Return ONLY JSON: {"businesses":[{"name":string,"website":string|null,"whatTheyDo":string}]}`,
     ].join("\n");
     const user = hits.map((h, i) => `[${i + 1}] ${h.title}\n${h.url}\n${(h.content || "").slice(0, 600)}`).join("\n\n");

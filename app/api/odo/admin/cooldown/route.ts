@@ -37,16 +37,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { checkCooldowns, clearCooldowns, listCooldownResetAudit } from "@/app/lib/odo-redis";
 import { SITE_URL } from "@/app/lib/site-config";
+import { adminKeyOk } from "@/app/lib/admin-auth";
 
 function unauthorized(): NextResponse {
   return NextResponse.json({ code: "unauthorized" }, { status: 401 });
 }
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  const adminKey = process.env.ODO_ADMIN_KEY;
   const params = req.nextUrl.searchParams;
-  const suppliedKey = params.get("key");
-  if (!adminKey || suppliedKey !== adminKey) return unauthorized();
+  if (!(await adminKeyOk(req, "ODO_ADMIN_KEY"))) return unauthorized();
 
   const email = params.get("email")?.trim() || null;
   const website = params.get("website")?.trim() || null;

@@ -24,16 +24,14 @@ import { renderOutboundPdf } from "@/app/lib/odo-outbound-pdf";
 import { renderColdEmailPdf } from "@/app/lib/odo-outbound-coldemail-pdf";
 import { renderOutboundDocx } from "@/app/lib/odo-outbound-docx";
 import { checkWebsiteValidity } from "@/app/lib/odo-gate";
+import { adminKeyOk } from "@/app/lib/admin-auth";
 
 export const maxDuration = 300;
 
-function authorized(req: NextRequest): boolean {
-  const adminKey = process.env.ODO_ADMIN_KEY;
-  return Boolean(adminKey) && req.nextUrl.searchParams.get("key") === adminKey;
-}
+const authorized = (req: NextRequest) => adminKeyOk(req, "ODO_ADMIN_KEY");
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  if (!authorized(req)) return NextResponse.json({ code: "unauthorized" }, { status: 401 });
+  if (!(await authorized(req))) return NextResponse.json({ code: "unauthorized" }, { status: 401 });
   let body: Record<string, unknown>;
   try { body = await req.json(); } catch { return NextResponse.json({ code: "invalid_json" }, { status: 400 }); }
   const company = String(body.company ?? "").trim().slice(0, 200);
@@ -67,7 +65,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 }
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  if (!authorized(req)) return NextResponse.json({ code: "unauthorized" }, { status: 401 });
+  if (!(await authorized(req))) return NextResponse.json({ code: "unauthorized" }, { status: 401 });
   // ?list=1 — every company researched so far (powers the "researched before" notice).
   if (req.nextUrl.searchParams.get("list")) return NextResponse.json({ companies: await listOutboundIndex() });
   const website = req.nextUrl.searchParams.get("website") ?? "";

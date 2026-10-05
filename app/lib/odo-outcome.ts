@@ -17,6 +17,7 @@ import { createReportText, type ReportUsage } from "./odo-report-model";
 import { ledgerAsText, type Evidence } from "./odo-ledger";
 import type { MatchingResult } from "./odo-matching";
 import { publicServiceLabels } from "./odo-public-names";
+import { UNTRUSTED_TEXT_RULE } from "./odo-safety";
 
 export type AutomationEstimate = {
   fteRangeLabel: string;
@@ -135,6 +136,7 @@ export async function buildOutcomeNarrative(
     "4. 'situationNow': 2-3 sentences on where the business stands today, in plain terms.",
     "5. 'securityOutlook': 2-4 sentences — what the business can realistically achieve by acting on the recommended items, and what kind of damage (fraud, downtime, breach costs, reputational harm) that helps avoid. If there is nothing material to recommend, say the posture looks solid and name what to keep doing.",
     "6. 'automationOpportunity': 2-3 sentences on what part of the business the evidence suggests is a good candidate for automation, and why (repeatable, manual, no judgment call needed) — or null if no automation opportunity was flagged. Do not mention cost savings, headcount, or dollar amounts here.",
+    UNTRUSTED_TEXT_RULE,
     "Return ONLY JSON: {\"situationNow\": string, \"securityOutlook\": string, \"automationOpportunity\": string | null}",
   ].join("\n");
 

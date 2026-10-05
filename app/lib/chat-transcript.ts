@@ -63,14 +63,11 @@ export async function sendTranscriptEmail(params: {
     const time = new Date(msg.timestamp).toLocaleTimeString('en-CA', {
       hour: '2-digit', minute: '2-digit', timeZone: 'America/Toronto',
     });
-    const imageHtml = msg.imageUrl
-      ? `<br/><img src="${msg.imageUrl}" alt="Uploaded image" style="max-width:300px;margin-top:6px;border-radius:4px;" />`
-      : '';
     return `
       <div style="margin-bottom:14px;">
         <div style="font-size:11px;color:#888;margin-bottom:3px;">${sender} · ${time}</div>
         <div style="background:${msg.role === 'user' ? '#f5f5f5' : '#0A0A0A'};color:${msg.role === 'user' ? '#111' : '#fff'};padding:10px 14px;border-radius:8px;font-size:13px;line-height:1.5;">
-          ${msg.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br/>')}${imageHtml}
+          ${msg.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br/>')}
         </div>
       </div>`;
   }).join('');

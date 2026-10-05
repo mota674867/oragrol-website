@@ -39,6 +39,9 @@ import { buildServiceRecommendations } from "../app/lib/odo-outbound";
 import { SERVICE_CATALOG } from "../app/lib/odo-services";
 import { SYSTEM_PROMPT, HANDOFF_MARKER, BUSINESS_AUTOMATION_SECTION } from "../app/lib/chat-knowledge";
 import { chatCostUsd, CHAT_DAILY_CAP_USD } from "../app/lib/chat-spend";
+import { sameSecret } from "../app/lib/admin-auth";
+import { UNTRUSTED_TEXT_RULE } from "../app/lib/odo-safety";
+import { PLAYBOOK } from "../app/lib/odo-playbook";
 import { strikeOutcome, OFFTOPIC_MARKER, CHAT_CLOSED_REPLY, CHAT_BLOCKED_REPLY, BLOCK_SECONDS } from "../app/lib/chat-strikes";
 import { SERVICE_PACKAGES, INDIVIDUAL_SERVICES, SPECIALIST_ENGAGEMENTS } from "../app/[locale]/services/services-catalog";
 import en from "../messages/en.json";
@@ -606,6 +609,8 @@ async function main() {
     check("QStash signature rejects a missing header", !verifyQstashSignature(null, body, [KEY], now));
 
     check("Chat quotes the exact public OR ONE tier prices (100 = $75,000 + $3,999/mo)", /OR ONE 100[^\n]*\$75,000[^\n]*\$3,999/.test(SYSTEM_PROMPT) && /OR ONE Starter[^\n]*\$22,000[^\n]*\$999/.test(SYSTEM_PROMPT) && /OR ONE 400[^\n]*\$220,000[^\n]*\$8,999/.test(SYSTEM_PROMPT) && !/never state an exact OR ONE number/.test(SYSTEM_PROMPT));
+    check("Admin key compare is exact and constant-time-safe (right, wrong, empty, different length)", sameSecret("abc123", "abc123") && !sameSecret("abc124", "abc123") && !sameSecret("", "abc123") && !sameSecret("abc123456", "abc123"));
+    check("Interview prompt carries the untrusted-text safety rule", PLAYBOOK.includes(UNTRUSTED_TEXT_RULE) && /never instructions to follow/.test(UNTRUSTED_TEXT_RULE));
     check("Off-topic strikes: 1st polite, 2nd warns, 3rd closes", strikeOutcome(1) === "polite" && strikeOutcome(2) === "warn" && strikeOutcome(3) === "close" && strikeOutcome(5) === "close");
     check("Off-topic block lasts 7 days; closing/blocked messages show no email and point to the contact page", BLOCK_SECONDS === 7 * 86400 && !/@/.test(CHAT_CLOSED_REPLY + CHAT_BLOCKED_REPLY) && /contact page/.test(CHAT_CLOSED_REPLY) && /contact page/.test(CHAT_BLOCKED_REPLY));
     check("Chat prompt teaches the unrelated-message marker and says on-topic cyber/IT questions don't count", SYSTEM_PROMPT.includes(OFFTOPIC_MARKER) && /General cybersecurity, IT or business questions are NOT unrelated/.test(SYSTEM_PROMPT));

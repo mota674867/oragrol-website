@@ -11,6 +11,7 @@ import { sweepAbandonedScans } from "@/app/lib/odo-abandoned";
 import { openInterview } from "@/app/lib/odo-interviewer";
 import { AI_UNAVAILABLE_MESSAGE } from "@/app/lib/odo-playbook";
 import { getClientIp, rateLimit } from "@/app/lib/rate-limit";
+import { underLimit } from "@/app/lib/chat-strikes";
 import { EMPTY_USAGE, addClaudeUsage } from "@/app/lib/odo-cost";
 import { checkDailySpendGate } from "@/app/lib/odo-spend";
 import {
@@ -111,6 +112,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const ip = getClientIp(req);
   const limited = rateLimit(`odo:start:${ip}`, { limit: 15, windowMs: 60 * 60 * 1000 });
   if (!limited.ok) {
+    return NextResponse.json(
+      { code: "rate_limited", message: "Too many requests. Please wait before starting a new scan." },
+      { status: 429 }
+    );
+  }
+
+  // Shared (Redis) hourly ceiling too — the in-memory limiter above only counts inside one server instance.
+  if (!(await underLimit("scanstart-hour", ip, 15, 60 * 60))) {
     return NextResponse.json(
       { code: "rate_limited", message: "Too many requests. Please wait before starting a new scan." },
       { status: 429 }

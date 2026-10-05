@@ -15,6 +15,7 @@ import { createReportText, type ReportUsage } from "./odo-report-model";
 import { ledgerAsText, type Evidence } from "./odo-ledger";
 import type { MatchingResult } from "./odo-matching";
 import { publicServiceLabel } from "./odo-public-names";
+import { UNTRUSTED_TEXT_RULE } from "./odo-safety";
 
 export type SwotPoint = { text: string; evidence: string[] };
 export type Swot = {
@@ -112,6 +113,7 @@ export async function buildSwot(
     "4. Opportunities describe what the business could gain by closing gaps or automating work — name ORAGROL services only from the provided list, by their simple name.",
     "5. If there are few gaps, say the business looks solid. Do not pad quadrants: 0–5 points each, only what the evidence supports.",
     "6. Plain English, short sentences, each point under 40 words. Summary: 2–4 sentences.",
+    UNTRUSTED_TEXT_RULE,
     "Return ONLY JSON: {\"summary\": string, \"strengths\": [{\"text\": string, \"evidence\": [ids]}], \"weaknesses\": [...], \"opportunities\": [...], \"threats\": [...]}",
   ].join("\n");
 
