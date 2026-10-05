@@ -45,6 +45,7 @@ export async function sendTranscriptEmail(params: {
   messages: Array<{ role: string; content: string; timestamp: number; imageUrl?: string }>;
   escalated: boolean;
   autoClosed?: boolean;
+  reference?: string;
 }) {
   const apiKey = process.env.RESEND_API_KEY;
   const fromEmail = process.env.CONTACT_FROM_EMAIL || 'ORAGROL <onboarding@resend.dev>';
@@ -74,29 +75,47 @@ export async function sendTranscriptEmail(params: {
       </div>`;
   }).join('');
 
-  const escalationNote = params.escalated
-    ? `<div style="background:#fff8e1;border:1px solid #ffc107;border-radius:8px;padding:12px 16px;margin-bottom:20px;font-size:13px;">Our team has been flagged and will follow up with you at <a href="mailto:info@orgro.ca">info@orgro.ca</a>.</div>`
-    : '';
+  const ref = (params.reference || '').replace(/[^A-Za-z0-9]/g, '').slice(-8).toUpperCase();
+  const intro = params.autoClosed
+    ? "Protecting your business starts with a clear, careful conversation, and we treat yours with the same care. After 15 minutes of inactivity we closed your session securely to keep your information safe. A complete copy of what was discussed is below for your records."
+    : "Protecting your business starts with a clear, careful conversation, and we treat yours with the same care. Your session has been closed securely, and a complete copy of what was discussed is below for your records.";
 
-  const html = `<!DOCTYPE html><html><body style="font-family:-apple-system,sans-serif;max-width:580px;margin:0 auto;padding:24px;color:#111;">
-    <div style="margin-bottom:20px;"><strong style="font-size:18px;">ORAGROL</strong></div>
-    <p style="font-size:14px;line-height:1.6;margin:0 0 6px;">Hello ${firstName},</p>
-    <p style="font-size:14px;line-height:1.6;margin:0 0 6px;">Thank you for chatting with ORAGROL today. ${params.autoClosed ? "Your chat was quiet for a little while, so we closed it for you and are sending a copy below for your records." : "Here is a copy of your conversation for your records."}</p>
-    <p style="font-size:14px;line-height:1.6;margin:0 0 16px;">If you have more questions, simply reply to this email or visit <a href="https://orgro.ca/contact" style="color:#018ABE;">orgro.ca/contact</a>. We would be glad to help.</p>
-    <p style="font-size:12px;color:#888;margin-bottom:20px;">Your conversation &middot; ${sessionDate}</p>
-    ${escalationNote}
-    ${transcriptHtml}
-    <hr style="border:none;border-top:1px solid #e5e5e5;margin:20px 0;" />
-    <p style="font-size:12px;color:#888;line-height:1.6;">
-      Want to explore our services? <a href="https://orgro.ca/services" style="color:#018ABE;">View here →</a><br/><br/>
-      <strong>Note:</strong> This conversation was handled by ORAGROL's AI assistant. Information provided is for general guidance only and may contain errors. Contact us at <a href="mailto:info@orgro.ca">info@orgro.ca</a> for professional advice.
-    </p>
-  </body></html>`;
+  const html = `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f2f0eb;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f2f0eb;padding:24px 12px;"><tr><td align="center">
+  <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#ffffff;border-radius:6px;overflow:hidden;font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;color:#111;">
+    <tr><td style="background:#0A0A0A;padding:26px 32px;">
+      <div style="font-size:20px;font-weight:700;letter-spacing:.32em;color:#ffffff;">ORAGROL</div>
+      <div style="font-size:11px;letter-spacing:.2em;color:#ef4d00;margin-top:8px;">SECURE CONVERSATION RECORD</div>
+    </td></tr>
+    <tr><td style="height:3px;background:#ef4d00;font-size:0;line-height:0;">&nbsp;</td></tr>
+    <tr><td style="padding:32px 32px 8px;">
+      <p style="font-size:16px;line-height:1.6;margin:0 0 14px;">Hello ${firstName},</p>
+      <p style="font-size:15px;line-height:1.7;margin:0 0 14px;color:#222;">Thank you for speaking with ORAGROL. ${intro}</p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:18px 0 6px;border:1px solid #e6e3dc;border-radius:6px;background:#faf9f6;"><tr><td style="padding:14px 18px;font-size:12px;line-height:1.8;color:#444;">
+        <strong style="color:#111;letter-spacing:.08em;">SESSION CLOSED SECURELY</strong><br/>
+        ${sessionDate}${ref ? `<br/>Reference: <span style="font-family:Consolas,Menlo,monospace;">${ref}</span>` : ''}<br/>
+        Kept securely for 30 days, then permanently deleted.
+      </td></tr></table>
+    </td></tr>
+    <tr><td style="padding:18px 32px 6px;">
+      <div style="font-size:11px;letter-spacing:.18em;color:#888;margin-bottom:14px;">YOUR CONVERSATION</div>
+      ${transcriptHtml}
+    </td></tr>
+    <tr><td style="padding:10px 32px 32px;">
+      <p style="font-size:15px;line-height:1.7;margin:0 0 16px;color:#222;">When you are ready for the next step, our team is here to help you protect and run your business with confidence.</p>
+      <a href="https://orgro.ca/contact" style="display:inline-block;background:#ef4d00;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:12px 26px;border-radius:4px;">Speak with our team</a>
+      <p style="font-size:13px;line-height:1.7;margin:18px 0 0;color:#444;">Not sure where to start? Our free business scan gives you a clear, personalised picture in minutes: <a href="https://orgro.ca/scan" style="color:#018ABE;">orgro.ca/scan</a></p>
+    </td></tr>
+    <tr><td style="background:#faf9f6;border-top:1px solid #e6e3dc;padding:20px 32px;">
+      <p style="font-size:11px;line-height:1.7;color:#888;margin:0;">This conversation was handled by ORAGROL's AI assistant. Information provided is general guidance only and may contain errors; please speak with our team for advice specific to your business.<br/><br/>ORAGROL Global Inc. &middot; Cybersecurity &middot; Business Automation &middot; OR ONE &middot; orgro.ca</p>
+    </td></tr>
+  </table>
+  </td></tr></table></body></html>`;
 
   await resend.emails.send({
     from: fromEmail,
     to: params.visitorEmail,
-    subject: `Your chat with ORAGROL — ${sessionDate}`,
+    subject: `Your ORAGROL conversation — a secure copy for your records`,
     html,
   });
 }
@@ -113,7 +132,7 @@ export async function sendChatTranscripts(p: {
   autoClosed: boolean;
 }) {
   if (p.sendToVisitor) {
-    await sendTranscriptEmail({ visitorName: p.visitorName, visitorEmail: p.visitorEmail, messages: p.messages, escalated: p.escalated, autoClosed: p.autoClosed })
+    await sendTranscriptEmail({ visitorName: p.visitorName, visitorEmail: p.visitorEmail, messages: p.messages, escalated: p.escalated, autoClosed: p.autoClosed, reference: p.sessionId })
       .catch((err) => console.error('[chat] Transcript email failed:', err));
   }
   await sendTeamCopy({ visitorName: p.visitorName, visitorEmail: p.visitorEmail, visitorCompany: p.visitorCompany, messages: p.messages, escalated: p.escalated, autoClosed: p.autoClosed })
