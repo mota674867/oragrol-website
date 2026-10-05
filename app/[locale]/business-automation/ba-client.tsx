@@ -106,6 +106,21 @@ function BusinessAutomationClient() {
   const buildFeeDisplay = (id: JobId) =>
     id === "tailored" ? t("jobs.tailored.kickerTag") : money(jobMeta[id].buildCAD, locale);
 
+  // Five-jobs selector (R1, 2026-10-06): monthly fee shown in the job list and, in the
+  // price column, split so the "/mo …" part can be set smaller than the amount.
+  const monthlyLabel = (id: JobId) => jobMeta[id].monthlyLabel[locale === "fr" ? "fr" : "en"];
+  const navPrice = (id: JobId) =>
+    id === "tailored"
+      ? t("jobs.tailored.kickerTag")
+      : id === "managed-it"
+        ? locale === "fr" ? "700 $/mois + par utilisateur" : "$700/mo + per user"
+        : monthlyLabel(id);
+  const monthlyParts = (id: JobId): [string, string] => {
+    const label = monthlyLabel(id);
+    const cut = label.indexOf("/");
+    return cut === -1 ? [label, ""] : [label.slice(0, cut), label.slice(cut)];
+  };
+
   const scopeItem = (id: JobId) => {
     const meta = jobMeta[id];
     const commercial = `${t("jobFacts.buildFee")} ${buildFeeDisplay(id)} / ${t("jobFacts.monthlyManagement")} ${meta.monthlyLabel[locale === "fr" ? "fr" : "en"]}`;
@@ -230,7 +245,7 @@ function BusinessAutomationClient() {
               >
                 <span>{jobMeta[id].index}</span>
                 <b>{t(`jobs.${id}.name`)}</b>
-                <small>{t(`jobs.${id}.short`)}</small>
+                <small>{navPrice(id)}</small>
               </button>
             ))}
           </nav>
@@ -273,17 +288,17 @@ function BusinessAutomationClient() {
                 <p>{t(`jobs.${activeId}.tools`)}</p>
               </div>
             </div>
-            <div className="job-commercial">
-              <div>
-                <span>{t("jobFacts.buildFee")}</span>
-                <strong>{buildFeeDisplay(activeId)}</strong>
-                <small>{t("jobFacts.buildFeeNote")}</small>
-              </div>
-              <div>
-                <span>{t("jobFacts.monthlyManagement")}</span>
-                <strong>{jobMeta[activeId].monthlyLabel[locale === "fr" ? "fr" : "en"]}</strong>
-                <small>{t("jobFacts.monthlyManagementNote")}</small>
-              </div>
+          </article>
+          <aside className="job-price">
+            <div>
+              <span>{t("jobFacts.buildFee")}</span>
+              <strong className={activeId === "tailored" ? "is-text" : undefined}>{buildFeeDisplay(activeId)}</strong>
+              <small>{t("jobFacts.buildFeeNote")}</small>
+            </div>
+            <div>
+              <span>{t("jobFacts.monthlyManagement")}</span>
+              <em className={activeId === "tailored" ? "is-text" : undefined}>{monthlyParts(activeId)[0]}{monthlyParts(activeId)[1] ? <small>{monthlyParts(activeId)[1]}</small> : null}</em>
+              <small>{t("jobFacts.monthlyManagementNote")}</small>
             </div>
             <button
               className={scope.has(`automation:${activeId}`) ? "scope-add added" : "scope-add"}
@@ -292,7 +307,7 @@ function BusinessAutomationClient() {
               {scope.has(`automation:${activeId}`) ? t("scopeAdd.added") : t("scopeAdd.add")}
               <span>↗︎</span>
             </button>
-          </article>
+          </aside>
           {/* Off-screen Details controls for the jobs not currently
               selected. Same real, functioning trigger+dialog as the
               visible one above — not duplicated text, an actual
