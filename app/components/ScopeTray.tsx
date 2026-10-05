@@ -406,7 +406,7 @@ export function ScopeTray({
                     {flow.status === "submitting" && flow.intent === "review_requested"
                       ? t("form.submittingLabel")
                       : t("form.submitButton")}{" "}
-                    <span aria-hidden="true">↗</span>
+                    <span aria-hidden="true">↗︎</span>
                   </button>
                 </div>
                 {!ready && items.length > 0 && (

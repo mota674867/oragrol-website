@@ -277,7 +277,7 @@ export default function ChatWidget(){
           <button onClick={dismissGreeting} aria-label="Dismiss">×</button>
           <small>ORAGROL</small>
           <p>Have a question? We can help you find the right next step.</p>
-          <a onClick={launch}>Start a conversation ↗</a>
+          <a onClick={launch}>Start a conversation ↗︎</a>
         </aside>
       )}
       <div className="or-chat-controls">

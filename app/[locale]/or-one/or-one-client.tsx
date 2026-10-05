@@ -397,7 +397,7 @@ function OrOneClient() {
         <div className="one-support">
           <p>{t("hero.support")}</p>
           <a href="#one-intro">
-            {t("hero.discover")} <span>↘</span>
+            {t("hero.discover")} <span>↘︎</span>
           </a>
         </div>
         <div className="one-bottom">

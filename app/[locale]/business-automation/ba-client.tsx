@@ -192,7 +192,7 @@ function BusinessAutomationClient() {
             <div className="ba-support">
               <p>{t("hero.support")}</p>
               <a href="#job-selector">
-                {t("hero.exploreLink")} <span>↘</span>
+                {t("hero.exploreLink")} <span>↘︎</span>
               </a>
             </div>
           </div>
@@ -290,7 +290,7 @@ function BusinessAutomationClient() {
               onClick={() => toggleScope(activeId)}
             >
               {scope.has(`automation:${activeId}`) ? t("scopeAdd.added") : t("scopeAdd.add")}
-              <span>↗</span>
+              <span>↗︎</span>
             </button>
           </article>
           {/* Off-screen Details controls for the jobs not currently

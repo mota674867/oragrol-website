@@ -377,7 +377,7 @@ export default async function ResourceDetailPage({ params }: PageProps) {
                 <h2>{T.nextAction}</h2>
               </div>
               <Link href={T.primaryCta.href}>
-                <span>{T.primaryCta.label}</span><span aria-hidden="true">↗</span>
+                <span>{T.primaryCta.label}</span><span aria-hidden="true">↗︎</span>
               </Link>
             </section>
           </article>
@@ -401,7 +401,7 @@ export default async function ResourceDetailPage({ params }: PageProps) {
                 <li key={source.label}>
                   {source.href ? (
                     <a href={source.href} target="_blank" rel="noreferrer">
-                      {source.label} ↗
+                      {source.label} ↗︎
                     </a>
                   ) : source.label}
                 </li>

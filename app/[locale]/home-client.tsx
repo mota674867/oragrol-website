@@ -34,7 +34,7 @@ const stageDefs=[
 // used by the pre-2026-09-08 orbit section 04 were removed entirely along
 // with that section — see home-section-04.tsx for the replacement.
 
-function Arrow(){return <span aria-hidden="true">↗</span>}
+function Arrow(){return <span aria-hidden="true">↗︎</span>}
 
 // `cybersecuritySection` is home-section-04's <HomeCybersecurity/>, rendered
 // server-side by app/[locale]/page.tsx (a Server Component) and passed down

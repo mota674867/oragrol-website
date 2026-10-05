@@ -295,7 +295,7 @@ function ResourcesPageClient() {
               <p>{r.summary}</p>
               <div className="res-card-action">
                 <span>{t("readAction")}</span>
-                <b>↗</b>
+                <b>↗︎</b>
               </div>
             </Link>
           ))}
@@ -325,7 +325,7 @@ function ResourcesPageClient() {
               <p>{r.summary}</p>
               <div className="res-card-action">
                 <span>{t("readAction")}</span>
-                <b>↗</b>
+                <b>↗︎</b>
               </div>
             </Link>
           ))}

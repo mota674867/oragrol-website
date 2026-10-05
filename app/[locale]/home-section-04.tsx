@@ -64,7 +64,7 @@ async function HomeCybersecurity() {
           </p>
           <Link href="/services#service-packages">
             <span>{t("packages.link")}</span>
-            <span aria-hidden="true">↗</span>
+            <span aria-hidden="true">↗︎</span>
           </Link>
         </article>
 
@@ -74,7 +74,7 @@ async function HomeCybersecurity() {
           <p className={s.description}>{t("alaCarte.description")}</p>
           <Link href="/services#individual-services">
             <span>{t("alaCarte.link")}</span>
-            <span aria-hidden="true">↗</span>
+            <span aria-hidden="true">↗︎</span>
           </Link>
         </article>
 
@@ -90,7 +90,7 @@ async function HomeCybersecurity() {
           <p className={s.description}>{t("specialist.description")}</p>
           <Link href="/contact">
             <span>{t("specialist.link")}</span>
-            <span aria-hidden="true">↗</span>
+            <span aria-hidden="true">↗︎</span>
           </Link>
         </article>
       </div>

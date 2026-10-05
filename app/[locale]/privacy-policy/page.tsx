@@ -100,7 +100,7 @@ function renderInline(text: string, isFr: boolean): ReactNode[] {
           href={href}
           {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
         >
-          {link[1]}{external ? " ↗" : ""}
+          {link[1]}{external ? " ↗︎" : ""}
         </a>
       );
     }

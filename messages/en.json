@@ -1227,7 +1227,7 @@
       "itemsLabel": "items",
       "estimatedTierLabel": "estimated tier",
       "notEstimated": "Not estimated",
-      "reviewInMyScope": "Review in My Scope ↗",
+      "reviewInMyScope": "Review in My Scope ↗︎",
       "clearSelection": "Clear selection",
       "categories": {
         "sales": {
@@ -2160,7 +2160,7 @@
       "title1": "Know where you stand.",
       "titleEmphasis": "Know what to do next.",
       "body": "Build a practical baseline across identity, email, devices, cloud, people, data and governance.",
-      "cta": "Begin assessment ↗"
+      "cta": "Begin assessment ↗︎"
     },
     "profile": {
       "eyebrow": "PRIVATE ASSESSMENT",
