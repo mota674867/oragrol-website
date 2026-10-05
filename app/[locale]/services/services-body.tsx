@@ -71,6 +71,10 @@ export type ServicesPageProps = {
 // touched. French Canadian currency convention puts the symbol after the
 // number with a space-grouped thousands separator (2 756 $), matching the
 // approved translation doc's own examples ("3 307 $/mois").
+// Packages are cumulative (each tier = previous tier + new services). "What's included"
+// shows them as layers: the services each tier adds (2026-10-06, Mohammad chose P1).
+const PACKAGE_LAYERS = SERVICE_PACKAGES.map((p, i) => ({ id: p.id, items: i === 0 ? [...p.services] : p.services.filter(name => !(SERVICE_PACKAGES[i - 1].services as readonly string[]).includes(name)) }));
+
 // À la carte display (2026-10-06, Mohammad chose "option C, compact, numbered 01–12"):
 // grouped by theme, four door-opener services shown as large dark featured tiles.
 // Order only affects this grid; catalog order elsewhere (scope, JSON-LD) is unchanged.
@@ -119,7 +123,11 @@ export default function ServicesPage({ onAddToScope, isInScope, onDiscussEngagem
       <div className="os-section-head"><p className="os-eyebrow">{t("packages.eyebrow")}</p><h2 id={`${uid}-packages`}>{t("packages.headline1")}<br/><span>{t("packages.headline2")}</span></h2><p>{t("packages.sub")}</p></div>
       <p className="os-price-note">{t("packages.priceNote")}</p>
       <div className="os-package-layout"><div className="os-selector" role="group" aria-label="Choose a cybersecurity package">{SERVICE_PACKAGES.map((p, i) => <button key={p.id} type="button" aria-pressed={selected === i} aria-controls={`${uid}-package-panel`} onClick={() => setSelected(i)}><span className="os-selector-top"><span>0{i + 1}</span><span>{t("packages.servicesCount", { n: p.services.length })}</span></span><span className="os-package-name">{p.name}</span><span className="os-selector-price">{money(p.price, locale)}<small>{t("money.moSuffix")}</small></span><span className="os-selector-value">{t(`packages.list.${p.id}.value`)}</span></button>)}</div>
-        <div id={`${uid}-package-panel`} className="os-package-panel" aria-live="polite" aria-atomic="true"><p className="os-eyebrow">{t("packages.includedServicesCount", { n: current.services.length })}</p><h3>{current.name}</h3><p className="os-package-value">{t(`packages.list.${current.id}.value`)}</p>{packagesDetailsContent[current.id] && <DetailsDialog category="CYBERSECURITY" onDark {...packagesDetailsContent[current.id]} action={{ label: addLabel(isInScope(selection)), onClick: () => onAddToScope(selection), disabled: isInScope(selection) }} />}<div className="os-package-summary"><div><p className="os-eyebrow">{t("packages.idealFit")}</p><p>{t(`packages.list.${current.id}.fit`)}</p></div><div><p className="os-eyebrow">{t("packages.monthlyRateLabel")}</p><p className="os-main-price">{money(current.price, locale)}<small>{t("money.moSuffix")}</small></p></div></div><p className="os-eyebrow">{t("packages.whatsIncluded")}</p><ul className="os-inclusions">{current.services.map(name => <li key={name}>{t(`serviceNames.${name}`)}</li>)}</ul><div className="os-package-bottom"><p>{t("packages.initialOption", { price: `${money(current.initialPrice, locale)}${t("money.moSuffix")}` })}</p><Action disabled={isInScope(selection)} perform={() => onAddToScope(selection)}>{addLabel(isInScope(selection))}</Action></div></div>
+        <div id={`${uid}-package-panel`} className="os-package-panel os-pk" aria-live="polite" aria-atomic="true">
+          <div className="os-pk-hd"><div><p className="os-eyebrow">0{selected + 1} / {t("packages.layersSummary", { n: current.services.length, layers: selected + 1 })}</p><h3>{current.name}</h3><p className="os-package-value">{t(`packages.list.${current.id}.value`)}</p><p className="os-pk-fit"><span>{t("packages.idealFit")}</span> {t(`packages.list.${current.id}.fit`)}</p>{packagesDetailsContent[current.id] && <DetailsDialog category="CYBERSECURITY" onDark {...packagesDetailsContent[current.id]} action={{ label: addLabel(isInScope(selection)), onClick: () => onAddToScope(selection), disabled: isInScope(selection) }} />}</div><div className="os-pk-price"><p className="os-eyebrow">{t("packages.monthlyRateLabel")}</p><p className="os-main-price">{money(current.price, locale)}<small>{t("money.moSuffix")}</small></p></div></div>
+          <p className="os-eyebrow os-pk-inc-label">{t("packages.whatsIncluded")}</p>
+          <div className="os-pk-layers">{PACKAGE_LAYERS.map((layer, i) => { const included = i <= selected; const isNew = i === selected && selected > 0; const next = i === selected + 1; const cls = included ? (isNew ? "os-pk-layer is-new" : "os-pk-layer") : "os-pk-layer is-off"; return <div key={layer.id} className={cls}><div className="os-pk-layer-name"><h4>{t(`packages.layers.${layer.id}`)}</h4><small>{included ? (isNew ? t("packages.layerNew", { pkg: current.name, n: layer.items.length }) : t("packages.layerIncluded", { n: layer.items.length })) : t("packages.layerIn", { pkg: SERVICE_PACKAGES[i].name, n: layer.items.length })}</small></div><ul className="os-pk-chips">{layer.items.map(name => <li key={name}>{t(`serviceNames.${name}`)}</li>)}</ul>{next ? <button type="button" className="os-pk-upgrade" onClick={() => setSelected(i)}>{t("packages.layerUpgrade", { pkg: SERVICE_PACKAGES[i].name, price: `${money(SERVICE_PACKAGES[i].price - current.price, locale)}${t("money.moSuffix")}` })}</button> : null}</div>; })}</div>
+          <div className="os-package-bottom os-pk-ft"><p>{t("packages.initialOption", { price: `${money(current.initialPrice, locale)}${t("money.moSuffix")}` })}</p><Action disabled={isInScope(selection)} perform={() => onAddToScope(selection)}>{addLabel(isInScope(selection))}</Action></div></div>
       </div>
       {SERVICE_PACKAGES.filter(p => p.id !== current.id).map(p => packagesDetailsContent[p.id] ? <span key={p.id} style={{ position: "absolute", width: "1px", height: "1px", padding: 0, margin: "-1px", overflow: "hidden", clipPath: "inset(50%)", whiteSpace: "nowrap", border: 0 }}><DetailsDialog category="CYBERSECURITY" onDark {...packagesDetailsContent[p.id]} action={{ label: addLabel(isInScope(packageSelection(p))), onClick: () => onAddToScope(packageSelection(p)), disabled: isInScope(packageSelection(p)) }} /></span> : null)}
     </section>
@@ -216,4 +224,70 @@ const styles = `
 .os-specialists .os-engagement-price-main{color:#ef4d00}
 .os-specialists .os-action button{background:#ef4d00;color:#111}
 .os-specialists .os-action button:hover:not(:disabled){background:#f2f0ea;color:#111}
-@media(min-width:1101px){.os-specialists .os-specialist-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.os-specialists .os-specialist-card h3{font-size:24px;max-width:72%}.os-specialists .os-engagement-price-main{font-size:20px}}`;
+@media(min-width:1101px){.os-specialists .os-specialist-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.os-specialists .os-specialist-card h3{font-size:24px;max-width:72%}.os-specialists .os-engagement-price-main{font-size:20px}}
+/* Packages "What's included" — P1 layered coverage (2026-10-06) */
+.os-packages .os-selector-value{display:none}
+.os-packages .os-selector button[aria-pressed="true"]{position:relative}
+.os-packages .os-selector button[aria-pressed="true"]::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--os-orange,#ef4d00)}
+.os-pk{padding-top:28px}
+.os-pk .os-pk-hd{display:grid;grid-template-columns:1fr auto;gap:30px;align-items:end;padding-bottom:20px;border-bottom:1px solid #34373a}
+.os-pk .os-pk-hd h3{font-size:clamp(46px,4.6vw,66px);font-weight:400;letter-spacing:-.05em;line-height:.92;margin:6px 0 10px}
+.os-pk .os-package-value{margin:0;color:#c9cccd}
+.os-pk .os-pk-fit{margin:8px 0 0;font-size:13px;line-height:1.5;color:#9fa3a6;max-width:560px}
+.os-pk .os-pk-fit span{font-size:10px;letter-spacing:.16em;margin-right:6px}
+.os-pk .os-pk-hd button[aria-describedby]{padding-left:0!important}
+.os-pk .os-pk-price{text-align:right}
+.os-pk .os-pk-price .os-main-price{font-size:clamp(34px,3.2vw,46px);letter-spacing:-.03em;color:#ef4d00;margin:4px 0 0}
+.os-pk .os-pk-price .os-main-price small{font-size:16px;color:#f2f0ea}
+.os-pk .os-pk-inc-label{margin:22px 0 10px}
+.os-pk-layers{display:grid;gap:8px}
+.os-pk-layer{display:grid;grid-template-columns:200px 1fr;gap:20px;padding:16px 18px;background:#1f2225;border-left:3px solid #3a3d40}
+.os-pk-layer.is-new{border-left-color:#ef4d00;background:#26221f}
+.os-pk-layer.is-off{background:transparent;border:1px dashed #3d4043}
+.os-pk-layer h4{margin:0;font-size:16px;font-weight:400;color:#f2f0ea}
+.os-pk-layer small{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#9fa3a6;margin-top:6px}
+.os-pk-layer.is-new small{color:#ef4d00}
+.os-pk-chips{display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;list-style:none;margin:0;padding:0}
+.os-pk-chips li{font-size:12.5px;padding:6px 11px;border:1px solid #45484b;border-radius:999px;color:#e6e4de;white-space:nowrap}
+.os-pk-layer.is-new .os-pk-chips li{border-color:rgba(239,77,0,.55)}
+.os-pk-layer.is-off .os-pk-chips li{color:#8a8e91;border-style:dashed}
+.os-pk-upgrade{grid-column:2;justify-self:start;background:transparent;border:0;padding:4px 0;color:#ef4d00;font:inherit;font-size:12.5px;cursor:pointer;text-align:left}
+.os-pk-upgrade:hover{text-decoration:underline;text-underline-offset:3px}
+.os-pk .os-pk-ft{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-top:22px;padding-top:18px;border-top:1px solid #34373a}
+.os-pk .os-pk-ft>p{margin:0;font-size:13px;color:#b9bcbe}
+.os-pk .os-pk-ft .os-action button{background:#ef4d00;color:#111;border:0;padding:13px 20px;min-height:0;font-size:13px;width:auto;white-space:nowrap}
+.os-pk .os-pk-ft .os-action button:hover:not(:disabled){background:#f2f0ea;color:#111}
+.os-pk .os-pk-ft .os-action button:disabled{opacity:.6}
+@media(max-width:700px){
+.os-packages .os-selector{display:grid;grid-template-columns:1fr 1fr}
+.os-pk .os-pk-hd{grid-template-columns:1fr;gap:16px}
+.os-pk .os-pk-price{text-align:left}
+.os-pk-layer{grid-template-columns:1fr;gap:10px}
+.os-pk-upgrade{grid-column:1}
+.os-pk .os-pk-ft{flex-direction:column;align-items:flex-start}
+.os-pk .os-pk-ft .os-action{width:100%}
+.os-pk .os-pk-ft .os-action button{width:100%;text-align:left}}
+
+/* P1 compact pass */
+.os-packages .os-package-layout{grid-template-columns:24% 76%}
+.os-packages .os-selector button{padding:16px 20px}
+.os-packages .os-package-name{font-size:23px;margin:6px 0 4px}
+.os-packages .os-selector-price{font-size:17px}
+.os-packages .os-package-panel.os-pk{padding:22px 0 22px 3%}
+.os-pk .os-pk-hd{padding-bottom:16px;gap:24px}
+.os-pk .os-pk-hd h3{font-size:clamp(40px,3.8vw,54px);margin:4px 0 6px}
+.os-pk .os-pk-fit{margin-top:6px;font-size:12.5px}
+.os-pk .os-pk-hd button[aria-describedby]{min-height:32px!important;margin-top:2px!important}
+.os-pk .os-pk-inc-label{margin:16px 0 8px}
+.os-pk-layers{gap:6px}
+.os-pk-layer{grid-template-columns:180px 1fr;gap:16px;padding:12px 16px}
+.os-pk-layer h4{font-size:15px}
+.os-pk-layer small{margin-top:4px}
+.os-pk-chips{gap:5px}
+.os-pk-chips li{font-size:12px;padding:4px 10px}
+.os-pk-upgrade{padding:2px 0;font-size:12px}
+.os-pk .os-pk-ft{margin-top:16px;padding-top:14px}
+.os-pk .os-pk-layer .os-pk-upgrade{font-size:13px;line-height:1.4}
+@media(max-width:1100px){.os-packages .os-package-layout{grid-template-columns:30% 70%}}
+@media(max-width:700px){.os-packages .os-package-panel.os-pk{padding:18px 0}.os-packages .os-selector button{padding:12px}.os-packages .os-package-name{font-size:18px}.os-packages .os-selector-price{font-size:16px}.os-pk-layer{grid-template-columns:1fr;gap:8px;padding:12px 14px}.os-pk-chips li{white-space:normal}}
+`;
