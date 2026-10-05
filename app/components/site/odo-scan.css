@@ -41,6 +41,7 @@
 }
 
 .odo-scan__masthead {
+  position: relative;
   display: flex;
   min-height: 80px;
   align-items: center;
@@ -57,13 +58,22 @@
 
 .odo-scan__masthead-actions { display: flex; gap: 26px; align-items: center; }
 .odo-scan__language-note {
-  max-width: 580px;
-  margin: 0 28px 0 auto;
+  /* Sits in the grey panel, text reading left to right, its left edge on the same line as "Start your business scan." */
+  --odo-w: min(100vw, 1728px);
+  --odo-gap: clamp(48px, 6vw, 106px);
+  --odo-col2: calc((100vw - var(--odo-w)) / 2 + var(--odo-w) * 0.044 + (var(--odo-w) * 0.912 - var(--odo-gap)) / 2 + var(--odo-gap));
+  position: absolute;
+  left: calc(var(--odo-col2) - 3.8vw);
+  right: 60px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+  max-width: 600px;
   color: var(--odo-off-white);
   opacity: 0.82;
-  font: 500 12.5px/1.55 "Manrope", system-ui, sans-serif;
-  letter-spacing: 0.01em;
-  text-align: right;
+  font: 500 12px/1.6 "Manrope", system-ui, sans-serif;
+  letter-spacing: 0;
+  text-align: left;
 }
 .odo-scan__language,
 .odo-scan__close {
@@ -414,7 +424,7 @@
 @media (max-width: 820px) {
   .odo-scan { background: var(--odo-black); }
   .odo-scan__masthead { margin: 0 22px; flex-wrap: wrap; }
-  .odo-scan__language-note { order: 3; flex: 0 0 100%; max-width: none; margin: 0; padding: 0 0 16px; text-align: left; }
+  .odo-scan__language-note { position: static; transform: none; order: 3; flex: 0 0 100%; max-width: none; margin: 0; padding: 0 0 16px; text-align: left; }
   .odo-scan__main { display: block; min-height: 0; padding: 52px 22px 0; }
   .odo-scan__editorial { max-width: none; padding-bottom: 48px; }
   .odo-scan h1 { max-width: 620px; font-size: clamp(46px, 10vw, 70px); }
