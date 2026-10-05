@@ -92,6 +92,8 @@ const bubble=(from:"visitor"|"oragrol"):React.CSSProperties=>({
   minWidth:0,
 });
 
+const CHAT_STATE_KEY="oragrol-chat-state-v1";
+
 export default function ChatWidget(){
   const [open,setOpen]=useState(false);
   const [greeting,setGreeting]=useState(false);
@@ -112,6 +114,31 @@ export default function ChatWidget(){
   const [closed,setClosed]=useState(false);
   const escalatedRef=useRef(false);
   const sessionIdRef=useRef("");
+
+  // Keep the conversation across page changes (e.g. after the visitor presses "Contact us") and reloads in the
+  // same tab: restore it on mount, save it whenever it changes. Cleared automatically when the tab closes.
+  useEffect(()=>{
+    try{
+      const raw=sessionStorage.getItem(CHAT_STATE_KEY);
+      if(!raw)return;
+      const st=JSON.parse(raw);
+      if(!st||!Array.isArray(st.messages)||!st.intakeDone||!st.contact||typeof st.sessionId!=="string")return;
+      sessionIdRef.current=st.sessionId;
+      handoffRef.current=!!st.handoff;
+      /* eslint-disable react-hooks/set-state-in-effect -- one-time restore from sessionStorage on mount */
+      setContact(st.contact);setIntakeDone(true);setClosed(!!st.closed);setMessages(st.messages);
+      /* eslint-enable react-hooks/set-state-in-effect */
+      messagesRef.current=st.messages;contactRef.current=st.contact;
+    }catch{/* storage unavailable or corrupt — start fresh */}
+  },[]);
+  useEffect(()=>{
+    if(!intakeDone||!contact)return;
+    try{
+      sessionStorage.setItem(CHAT_STATE_KEY,JSON.stringify({
+        messages:messages.filter(m=>m.kind!=="form").slice(-60),contact,intakeDone:true,closed,sessionId:sessionIdRef.current,handoff:handoffRef.current,
+      }));
+    }catch{/* ignore */}
+  },[messages,contact,intakeDone,closed]);
 
   useEffect(()=>{messagesRef.current=messages;},[messages]);
   useEffect(()=>{contactRef.current=contact;},[contact]);
