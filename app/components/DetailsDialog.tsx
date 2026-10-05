@@ -51,7 +51,8 @@ import { useEffect, useId, useRef } from "react";
 const IVORY = "#f4f1e9";
 const CHARCOAL = "#141717";
 const BURNT_ORANGE = "#db5227";
-const ACCENT_ON_LIGHT = "#a43e1d";
+const ACCENT_ON_LIGHT = "#963819"; // darkened from #a43e1d: meets 4.5:1 text contrast on the light cards
+const ACCENT_ON_DARK = "#ef6a3c"; // for the trigger label on dark panels (4.5:1+)
 const INSET_TINT = "#e9e1d3";
 const HAIRLINE = "#d8d0bd";
 
@@ -95,6 +96,7 @@ export function DetailsDialog({
   scope,
   action,
   labels = ENGLISH_DEFAULT_LABELS,
+  onDark = false,
 }: {
   category: string;
   itemLabel: string;
@@ -109,6 +111,8 @@ export function DetailsDialog({
   scope?: string;
   action?: DetailsAction;
   labels?: DetailsDialogLabels;
+  /** Trigger sits on a dark panel — use the lighter accent so the label stays readable. */
+  onDark?: boolean;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -146,7 +150,6 @@ export function DetailsDialog({
           ref={triggerRef}
           type="button"
           onClick={open}
-          aria-label={`${labels.viewDetailsFor} ${title}`}
           aria-describedby={tooltipId}
           title={labels.viewWhatsIncluded}
           style={{
@@ -160,7 +163,7 @@ export function DetailsDialog({
             border: "none",
             background: "transparent",
             cursor: "pointer",
-            color: ACCENT_ON_LIGHT,
+            color: onDark ? ACCENT_ON_DARK : ACCENT_ON_LIGHT,
             font: "inherit",
           }}
         >
@@ -183,6 +186,12 @@ export function DetailsDialog({
             i
           </span>
           <span style={{ fontSize: "14px", fontWeight: 600 }}>{labels.detailsButton}</span>
+          {/* Screen-reader-only: keeps the visible word "Details" first in the accessible name and adds which item it is for. */}
+          <span
+            style={{ position: "absolute", width: "1px", height: "1px", padding: 0, margin: "-1px", overflow: "hidden", clipPath: "inset(50%)", whiteSpace: "nowrap", border: 0 }}
+          >
+            {` — ${title}`}
+          </span>
         </button>
         {/* Screen-reader-only: the visible hover tooltip is the native
             title attribute above (the browser positions it itself,

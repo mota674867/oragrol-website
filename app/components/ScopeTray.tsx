@@ -264,7 +264,7 @@ export function ScopeTray({
         <b>{String(items.length).padStart(2, "0")}</b>
       </button>
       {open && <div className="scope-scrim" onClick={() => setOpen(false)} />}
-      <aside className={open ? "scope-tray open" : "scope-tray"} aria-hidden={!open}>
+      <aside className={open ? "scope-tray open" : "scope-tray"} aria-hidden={!open} inert={!open}>
         <div className="scope-or" aria-hidden="true">
           OR
         </div>
