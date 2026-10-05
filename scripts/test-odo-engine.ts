@@ -37,6 +37,11 @@ import { coldEmailObservations, coldEmailRecommendation } from "../app/lib/odo-o
 import { pageServiceName, publicServiceLabel, publicServiceLabels, PAGE_SERVICE_NAMES } from "../app/lib/odo-public-names";
 import { buildServiceRecommendations } from "../app/lib/odo-outbound";
 import { SERVICE_CATALOG } from "../app/lib/odo-services";
+import { SYSTEM_PROMPT, HANDOFF_MARKER, BUSINESS_AUTOMATION_SECTION } from "../app/lib/chat-knowledge";
+import { chatCostUsd, CHAT_DAILY_CAP_USD } from "../app/lib/chat-spend";
+import { SERVICE_PACKAGES, INDIVIDUAL_SERVICES, SPECIALIST_ENGAGEMENTS } from "../app/[locale]/services/services-catalog";
+import en from "../messages/en.json";
+import { readFileSync } from "fs";
 import { renderOutboundDocx } from "../app/lib/odo-outbound-docx";
 import { filterLeads } from "../app/lib/odo-outbound-leads";
 import type { Evidence } from "../app/lib/odo-ledger";
@@ -555,6 +560,20 @@ async function main() {
     const internal = SERVICE_CATALOG.filter((x) => pageServiceName(x.code) !== x.simpleName && x.simpleName !== x.officialName).map((x) => x.simpleName);
     check("no internal shorthand appears in outbound recommendations", recs.every((r) => !internal.includes(r.name) && !r.reason.includes("[E1]")));
     check("automation items are never listed individually in outbound", recs.every((r) => r.group === "security"));
+    // 32. Live chat knowledge follows the site
+    check("chat knows all 4 packages with live prices", SERVICE_PACKAGES.every((p) => SYSTEM_PROMPT.includes(p.name) && SYSTEM_PROMPT.includes(p.price.toLocaleString("en-CA"))));
+    check("chat knows every individual service and specialist engagement", INDIVIDUAL_SERVICES.every((x) => SYSTEM_PROMPT.includes(x.name)) && SPECIALIST_ENGAGEMENTS.every((x) => SYSTEM_PROMPT.includes(x.name)));
+    const faqItems = (en as unknown as { Faq: { groups: { items: { q: string }[] }[] } }).Faq.groups.flatMap((g) => g.items);
+    check(`chat carries every live FAQ question (${faqItems.length})`, faqItems.length >= 30 && faqItems.every((i) => SYSTEM_PROMPT.includes(i.q)));
+    check("chat offers ODO at /scan and has the hand-off marker", SYSTEM_PROMPT.includes("/scan") && SYSTEM_PROMPT.includes("OR Discovery & Opportunity Agent") && SYSTEM_PROMPT.includes(HANDOFF_MARKER));
+    check("old stale chat figures are gone", !SYSTEM_PROMPT.includes("Risk Check $4,500") && !SYSTEM_PROMPT.includes("42 services across 10"));
+    check("chat says English only", /English only/.test(SYSTEM_PROMPT));
+    const baSrc = readFileSync("app/[locale]/business-automation/ba-client.tsx", "utf8");
+    const builds = [...baSrc.matchAll(/buildCAD:\s*(\d+)/g)].map((m) => Number(m[1])).filter((n) => n > 0);
+    const monthly = [...baSrc.matchAll(/monthlyLabel:\s*\{\s*en:\s*"(\$[\d,]+)/g)].map((m) => m[1]);
+    check("chat's Business Automation numbers match ba-client.tsx", builds.length === 5 && builds.every((b) => BUSINESS_AUTOMATION_SECTION.includes("$" + b.toLocaleString("en-CA"))) && monthly.length === 5 && monthly.every((mm) => BUSINESS_AUTOMATION_SECTION.includes(mm)));
+    check("chat cost math: 10k in + 200 out ~ $0.033", Math.abs(chatCostUsd({ input: 10000, output: 200, cacheRead: 0, cacheWrite: 0 }) - 0.033) < 1e-9);
+    check("daily chat cap is $5", CHAT_DAILY_CAP_USD === 5);
     check("Word file is a real .docx (zip)", docxBuf.length > 2000 && docxBuf[0] === 0x50 && docxBuf[1] === 0x4b);
   }
 

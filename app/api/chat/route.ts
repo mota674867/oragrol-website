@@ -3,7 +3,9 @@ import Anthropic from "@anthropic-ai/sdk";
 import { Resend } from "resend";
 import { getClientIp, rateLimit } from "../../lib/rate-limit";
 import { chatRequestSchema } from "../../lib/chat-schema";
-import { SYSTEM_PROMPT } from "../../lib/chat-knowledge";
+import { SYSTEM_PROMPT, HANDOFF_MARKER } from "../../lib/chat-knowledge";
+import { chatCapReached, recordChatSpend, CHAT_CAP_REPLY } from "../../lib/chat-spend";
+import { checkChatIpDaily } from "../../lib/odo-redis";
 import { syncChatLeadToHubSpot } from "../../lib/hubspot";
 
 /**
@@ -48,7 +50,7 @@ export async function POST(request: Request) {
   if (parsed.data.mode === "escalate") {
     return handleEscalate(parsed.data);
   }
-  return handleReply(parsed.data);
+  return handleReply(parsed.data, ip);
 }
 
 function getBusinessHoursContext(): string {
@@ -64,7 +66,12 @@ function getBusinessHoursContext(): string {
     : `\n\nCURRENT TIME CONTEXT: It is currently ${etDay} ${etTime} ET — outside business hours (Mon–Fri 9am–6pm ET). No one is available to respond live right now. If a visitor needs a person, tell them to email info@orgro.ca or that the team will follow up next business day.`;
 }
 
-async function handleReply(data: { messages: { role: "visitor" | "oragrol"; text: string }[] }) {
+const MAX_VISITOR_CHARS = 1000;
+const HISTORY_MESSAGES = 12;
+const MAX_REPLY_TOKENS = 600;
+const IP_DAILY_MESSAGES = 60;
+
+async function handleReply(data: { messages: { role: "visitor" | "oragrol"; text: string }[] }, ip: string) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     console.error("[/api/chat] Missing ANTHROPIC_API_KEY");
@@ -74,26 +81,60 @@ async function handleReply(data: { messages: { role: "visitor" | "oragrol"; text
     );
   }
 
-  // Convert message history to Anthropic format
-  const messages: Anthropic.MessageParam[] = data.messages.map((m) => ({
+  const last = data.messages[data.messages.length - 1];
+  if (last.role === "visitor" && last.text.length > MAX_VISITOR_CHARS) {
+    return NextResponse.json({ ok: false, error: `Please keep each message under ${MAX_VISITOR_CHARS} characters.` }, { status: 400 });
+  }
+
+  // Daily per-IP ceiling (shared across serverless instances). Fails open on a Redis error.
+  try {
+    const daily = await checkChatIpDaily(ip, IP_DAILY_MESSAGES);
+    if (!daily.ok) {
+      return NextResponse.json({ ok: true, reply: CHAT_CAP_REPLY, handoff: true, capped: true });
+    }
+  } catch (err) {
+    console.error("[/api/chat] IP daily check failed — failing open:", err);
+  }
+
+  // $5/day ceiling on the whole chat: stop answering, point to contact, email Mohammad once.
+  if (await chatCapReached()) {
+    return NextResponse.json({ ok: true, reply: CHAT_CAP_REPLY, handoff: true, capped: true });
+  }
+
+  // Only the most recent turns go to the model, so cost stays flat in long chats.
+  const messages: Anthropic.MessageParam[] = data.messages.slice(-HISTORY_MESSAGES).map((m) => ({
     role: m.role === "visitor" ? "user" : "assistant",
     content: m.text,
   }));
+  // The API requires the conversation to start with a user turn.
+  while (messages.length > 1 && messages[0].role !== "user") messages.shift();
 
   try {
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 400,
-      system: SYSTEM_PROMPT + getBusinessHoursContext(),
+      max_tokens: MAX_REPLY_TOKENS,
+      temperature: 0.8,
+      system: [
+        // The big, stable knowledge block is cached (~90% cheaper on re-reads); the clock context after it changes every minute.
+        { type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } },
+        { type: "text", text: getBusinessHoursContext().trim() },
+      ],
       messages,
     });
 
-    const reply =
+    void recordChatSpend({
+      input: response.usage.input_tokens ?? 0,
+      output: response.usage.output_tokens ?? 0,
+      cacheRead: response.usage.cache_read_input_tokens ?? 0,
+      cacheWrite: response.usage.cache_creation_input_tokens ?? 0,
+    });
+
+    const raw =
       response.content[0]?.type === "text"
         ? response.content[0].text.trim()
         : null;
 
-    if (!reply) {
+    if (!raw) {
       console.error("[/api/chat] Anthropic response had no text content");
       return NextResponse.json(
         { ok: false, error: "Could not generate a reply. Please try again." },
@@ -101,7 +142,11 @@ async function handleReply(data: { messages: { role: "visitor" | "oragrol"; text
       );
     }
 
-    return NextResponse.json({ ok: true, reply });
+    // The hand-off marker is a hidden signal to the widget — never shown to the visitor.
+    const handoff = raw.includes(HANDOFF_MARKER);
+    const reply = raw.split(HANDOFF_MARKER).join("").trim();
+
+    return NextResponse.json({ ok: true, reply, handoff });
   } catch (err) {
     console.error("[/api/chat] Anthropic error:", err);
     return NextResponse.json(

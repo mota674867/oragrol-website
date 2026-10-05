@@ -402,3 +402,47 @@ export async function checkAdminAuthAttempts(ip: string, limit: number): Promise
   if (count === 1) await redis.expire(key, 24 * 60 * 60);
   return { ok: count <= limit, count };
 }
+
+// --- Live chat guards (Mohammad, 2026-10-05) ---------------------------------
+// $5/day ceiling on the website chat's AI spend, a per-IP daily message cap,
+// and a small per-day usage log (messages + tokens + cost) for the admin view.
+
+export async function recordChatUsage(costUsd: number, usage: { input: number; output: number; cacheRead: number; cacheWrite: number }): Promise<void> {
+  const redis = getRedis();
+  const day = torontoDateKey();
+  await redis.incrbyfloat(`chat:spend:${day}`, costUsd);
+  await redis.expire(`chat:spend:${day}`, 40 * 24 * 60 * 60);
+  const key = `chat:usage:${day}`;
+  await redis.hincrby(key, "messages", 1);
+  await redis.hincrby(key, "inputTokens", usage.input);
+  await redis.hincrby(key, "outputTokens", usage.output);
+  await redis.hincrby(key, "cacheReadTokens", usage.cacheRead);
+  await redis.hincrby(key, "cacheWriteTokens", usage.cacheWrite);
+  await redis.expire(key, 40 * 24 * 60 * 60);
+}
+
+export async function getChatSpend(): Promise<number> {
+  const val = await getRedis().get<number | string>(`chat:spend:${torontoDateKey()}`);
+  return val ? Number(val) : 0;
+}
+
+export async function getChatUsageDay(day: string): Promise<{ spendUsd: number; usage: Record<string, number> }> {
+  const redis = getRedis();
+  const spend = await redis.get<number | string>(`chat:spend:${day}`);
+  const usage = (await redis.hgetall<Record<string, number | string>>(`chat:usage:${day}`)) ?? {};
+  return { spendUsd: spend ? Number(spend) : 0, usage: Object.fromEntries(Object.entries(usage).map(([k, v]) => [k, Number(v)])) };
+}
+
+/** True only the first time on a given day — the "chat cap reached" email fires once per day. */
+export async function claimChatCapAlert(): Promise<boolean> {
+  const result = await getRedis().set(`chat:capalert:${torontoDateKey()}`, "1", { nx: true, ex: 2 * 24 * 60 * 60 });
+  return result === "OK";
+}
+
+export async function checkChatIpDaily(ip: string, limit: number): Promise<{ ok: boolean; count: number }> {
+  const redis = getRedis();
+  const key = `chat:ipday:${torontoDateKey()}:${ip}`;
+  const count = await redis.incr(key);
+  if (count === 1) await redis.expire(key, 24 * 60 * 60);
+  return { ok: count <= limit, count };
+}

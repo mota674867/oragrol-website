@@ -12,27 +12,53 @@ interface CloseRequest {
   visitorName: string;
   visitorEmail: string;
   visitorCompany?: string;
+  // The widget sends { from, text } (older callers sent { role, content }) — both are accepted and normalized below.
   messages: Array<{
-    role: string;
-    content: string;
-    timestamp: number;
+    role?: string;
+    content?: string;
+    from?: string;
+    text?: string;
+    timestamp?: number;
     imageUrl?: string;
   }>;
   escalated: boolean;
+  /** false when the visitor unticked "email me a copy" — ORAGROL still gets its own copy. */
+  sendToVisitor?: boolean;
+}
+
+type Msg = { role: string; content: string; timestamp: number; imageUrl?: string };
+
+function normalize(messages: CloseRequest['messages']): Msg[] {
+  return messages
+    .map((m) => ({
+      role: m.role === 'user' || m.from === 'visitor' ? 'user' : 'assistant',
+      content: String(m.content ?? m.text ?? ''),
+      timestamp: typeof m.timestamp === 'number' ? m.timestamp : Date.now(),
+      imageUrl: m.imageUrl,
+    }))
+    .filter((m) => m.content.trim().length > 0);
 }
 
 export async function POST(req: NextRequest) {
   try {
     const body: CloseRequest = await req.json();
-    const { visitorName, visitorEmail, visitorCompany, messages, escalated } = body;
+    const { visitorName, visitorEmail, visitorCompany, escalated } = body;
+    const messages = normalize(body.messages ?? []);
 
-    if (!visitorEmail || !visitorName || !messages?.length) {
+    if (!visitorEmail || !visitorName || !messages.length) {
       return NextResponse.json({ ok: false }, { status: 400 });
     }
 
-    // 1. Send transcript email to visitor
-    await sendTranscriptEmail({ visitorName, visitorEmail, messages, escalated }).catch(
-      err => console.error('[chat-close] Transcript email failed:', err)
+    // 1. Transcript to the visitor (exactly as chatted), unless they opted out of the copy.
+    if (body.sendToVisitor !== false) {
+      await sendTranscriptEmail({ visitorName, visitorEmail, messages, escalated }).catch(
+        err => console.error('[chat-close] Transcript email failed:', err)
+      );
+    }
+
+    // 1b. The same transcript to ORAGROL, with the visitor's details on top.
+    await sendTeamCopy({ visitorName, visitorEmail, visitorCompany, messages, escalated }).catch(
+      err => console.error('[chat-close] Team copy failed:', err)
     );
 
     // 2. Log to HubSpot (best-effort)
@@ -52,6 +78,39 @@ export async function POST(req: NextRequest) {
     console.error('[chat-close] Error:', error);
     return NextResponse.json({ ok: false }, { status: 500 });
   }
+}
+
+async function sendTeamCopy(params: {
+  visitorName: string;
+  visitorEmail: string;
+  visitorCompany?: string;
+  messages: Msg[];
+  escalated: boolean;
+}) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const to = process.env.CONTACT_TO_EMAIL;
+  const fromEmail = process.env.CONTACT_FROM_EMAIL || 'ORAGROL <onboarding@resend.dev>';
+  if (!apiKey || !to) return;
+  const esc = (v: string) => v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const rows = params.messages.map((m) => {
+    const who = m.role === 'user' ? esc(params.visitorName) : 'ORAGROL';
+    const time = new Date(m.timestamp).toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Toronto' });
+    return `<p style="margin:0 0 10px;"><strong>${who}</strong> <span style="color:#888;font-size:11px;">${time}</span><br/>${esc(m.content).replace(/\n/g, '<br/>')}</p>`;
+  }).join('');
+  const html = `<div style="font-family:-apple-system,sans-serif;max-width:640px;color:#111;">
+    <p><strong>Live chat transcript</strong>${params.escalated ? ' — <span style="color:#c00;">escalated to the team</span>' : ''}</p>
+    <p style="background:#f5f5f5;padding:10px 14px;border-radius:6px;font-size:13px;">
+      <strong>Name:</strong> ${esc(params.visitorName)}<br/>
+      <strong>Email:</strong> ${esc(params.visitorEmail)}<br/>
+      <strong>Company:</strong> ${params.visitorCompany ? esc(params.visitorCompany) : '—'}
+    </p>${rows}</div>`;
+  await new Resend(apiKey).emails.send({
+    from: fromEmail,
+    to,
+    replyTo: params.visitorEmail,
+    subject: `[Chat transcript] ${params.visitorName}${params.visitorCompany ? ' — ' + params.visitorCompany : ''}`,
+    html,
+  });
 }
 
 async function sendTranscriptEmail(params: {
@@ -82,7 +141,7 @@ async function sendTranscriptEmail(params: {
       <div style="margin-bottom:14px;">
         <div style="font-size:11px;color:#888;margin-bottom:3px;">${sender} · ${time}</div>
         <div style="background:${msg.role === 'user' ? '#f5f5f5' : '#0A0A0A'};color:${msg.role === 'user' ? '#111' : '#fff'};padding:10px 14px;border-radius:8px;font-size:13px;line-height:1.5;">
-          ${msg.content.replace(/\n/g, '<br/>')}${imageHtml}
+          ${msg.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br/>')}${imageHtml}
         </div>
       </div>`;
   }).join('');

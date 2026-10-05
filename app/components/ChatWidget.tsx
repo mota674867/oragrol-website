@@ -14,6 +14,8 @@ const urgent=/breach|hacked|ransomware|compromised|attack|locked out|extort|acti
 const emailPattern=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ALLOWED_TYPES=["image/jpeg","image/jpg","image/png","image/webp"];
 const MAX_FILE_SIZE=5*1024*1024;
+const MAX_VISITOR_MESSAGES=25;
+const MAX_MESSAGE_CHARS=1000;
 
 function MsgText({text}:{text:string}){
   // Pre-process: convert markdown [label](url) to a placeholder, then split
@@ -95,9 +97,9 @@ export default function ChatWidget(){
   const [dismissed,setDismissed]=useState(false);
   const [value,setValue]=useState("");
   const [sending,setSending]=useState(false);
-  const [contact,setContact]=useState<{name:string;email:string}|null>(null);
+  const [contact,setContact]=useState<{name:string;email:string;company?:string;sendCopy:boolean}|null>(null);
   const [formValue,setFormValue]=useState({name:"",email:""});
-  const [intakeValue,setIntakeValue]=useState({name:"",email:"",company:""});
+  const [intakeValue,setIntakeValue]=useState({name:"",email:"",company:"",sendCopy:true});
   const [intakeDone,setIntakeDone]=useState(false);
   const [messages,setMessages]=useState<Message[]>([]);
   const [pendingFile,setPendingFile]=useState<{file:File;preview:string}|null>(null);
@@ -105,7 +107,9 @@ export default function ChatWidget(){
   const fileInputRef=useRef<HTMLInputElement>(null);
   const inactivityRef=useRef<ReturnType<typeof setTimeout>|undefined>(undefined);
   const messagesRef=useRef<Message[]>([]);
-  const contactRef=useRef<{name:string;email:string}|null>(null);
+  const contactRef=useRef<{name:string;email:string;company?:string;sendCopy:boolean}|null>(null);
+  const handoffRef=useRef(false);
+  const escalatedRef=useRef(false);
   const transcriptSentRef=useRef(false);
 
   useEffect(()=>{messagesRef.current=messages;},[messages]);
@@ -140,8 +144,10 @@ export default function ChatWidget(){
         sessionId:"chat_"+Date.now(),
         visitorName:c.name,
         visitorEmail:c.email,
-        messages:msgs.map(m=>({from:m.from,text:m.text,timestamp:Date.now()})),
-        escalated:false,
+        visitorCompany:c.company,
+        sendToVisitor:c.sendCopy,
+        messages:msgs.map(m=>({role:m.from==="visitor"?"user":"assistant",content:m.text,timestamp:Date.now()})),
+        escalated:escalatedRef.current,
       }),
       keepalive:true,
     }).catch(()=>{});
@@ -171,15 +177,16 @@ export default function ChatWidget(){
     const name=intakeValue.name.trim(),email=intakeValue.email.trim(),company=intakeValue.company.trim();
     if(!name||!emailPattern.test(email))return;
     setIntakeDone(true);
-    setContact({name,email});
+    setContact({name,email,company:company||undefined,sendCopy:intakeValue.sendCopy});
     fetch("/api/chat-lead",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,email,company}),keepalive:true}).catch(()=>{});
-    setMessages([{from:"oragrol",text:"Hi "+name.split(" ")[0]+"! I am ORAGROL's AI assistant. I can help you with our services, pricing, and any questions about how we work. What would you like to know?"}]);
+    setMessages([{from:"oragrol",text:"Hi "+name.split(" ")[0]+"! I am ORAGROL's AI assistant. Please note this chat is available in English only. I can help with our services, pricing, and how we work, or point you to our free business scan at /scan if you are not sure where to start. What would you like to know?"}]);
   };
 
   const runEscalate=async(name:string,email:string,reason:"urgent"|"human-requested")=>{
     setSending(true);
+    escalatedRef.current=true;
     try{
-      const transcript=messages.filter(m=>m.kind!=="form").map(m=>({role:m.from,text:m.text}));
+      const transcript=messagesRef.current.filter(m=>m.kind!=="form"&&m.text.trim().length>0).slice(-30).map(m=>({role:m.from,text:m.text}));
       const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"escalate",name,email,reason,transcript})});
       const json=await res.json().catch(()=>null);
       if(res.ok&&json?.ok){
@@ -208,8 +215,18 @@ export default function ChatWidget(){
       const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"reply",messages:payload})});
       const json=await res.json().catch(()=>null);
       if(res.ok&&json?.ok&&json.reply){
-        setMessages([...history,{from:"oragrol",text:json.reply}]);
+        const withReply:Message[]=[...history,{from:"oragrol",text:json.reply}];
+        setMessages(withReply);
+        messagesRef.current=withReply;
         resetInactivity();
+        // The AI could not answer (or the topic is for the team): send a REAL hand-off to ORAGROL, once per chat.
+        const c=contactRef.current;
+        if(json.handoff&&!json.capped&&c&&!handoffRef.current){
+          handoffRef.current=true;
+          void runEscalate(c.name,c.email,"human-requested");
+        }
+      }else if(res?.status===400&&json?.error){
+        setMessages(m=>[...m,{from:"oragrol",text:String(json.error)}]);
       }else{
         setMessages(m=>[...m,{from:"oragrol",text:"I could not reach the system right now. Please try again or email us at info@orgro.ca.",email:true}]);
       }
@@ -240,9 +257,15 @@ export default function ChatWidget(){
     }
     setValue("");
 
+    // Per-chat cap: keeps cost flat and stops runaway sessions.
+    if(messages.filter(m=>m.from==="visitor").length>=MAX_VISITOR_MESSAGES){
+      setMessages([...messages,{from:"visitor",text:msgText},{from:"oragrol",text:"We have reached the limit for this chat. Please continue by email at info@orgro.ca or through /contact, and our team will follow up. A copy of this conversation will be sent to you."}]);
+      return;
+    }
+
     // Only escalate for genuine security incidents — not "talk to person"
     if(urgent.test(msgText)){
-      const next:Message[]=[...messages,{from:"visitor",text:msgText},{from:"oragrol",text:"This sounds urgent. I have notified our team as a priority. Please share your name and email so we can follow up immediately."}];
+      const next:Message[]=[...messages,{from:"visitor",text:msgText},{from:"oragrol",text:"This sounds urgent. I am flagging it to our team as a priority now. Note this chat is not emergency incident response."}];
       if(contact){setMessages(next);runEscalate(contact.name,contact.email,"urgent");}
       else{setMessages([...next,{from:"oragrol",text:"",kind:"form",reason:"urgent"}]);}
       return;
@@ -287,7 +310,7 @@ export default function ChatWidget(){
               <form onSubmit={submitIntake} style={{display:"flex",flexDirection:"column",gap:"10px"}}>
                 <p style={{fontSize:"13px",lineHeight:1.5,margin:"0 0 8px",color:"#111315"}}>
                   <strong>Before we start</strong><br/>
-                  We will send you a copy of this conversation when we are done.
+                  This chat is available in English only.
                 </p>
                 <input required placeholder="Your name *" value={intakeValue.name}
                   onChange={e=>setIntakeValue(s=>({...s,name:e.target.value}))}
@@ -298,6 +321,10 @@ export default function ChatWidget(){
                 <input placeholder="Company name (optional)" value={intakeValue.company}
                   onChange={e=>setIntakeValue(s=>({...s,company:e.target.value}))}
                   style={{border:"1px solid #aaa7a0",padding:"10px 12px",fontSize:"13px",background:"#fff",fontFamily:"inherit",outline:"none",color:"#111315"}}/>
+                <label style={{display:"flex",gap:"8px",alignItems:"center",fontSize:"12px",color:"#111315"}}>
+                  <input type="checkbox" checked={intakeValue.sendCopy} onChange={e=>setIntakeValue(s=>({...s,sendCopy:e.target.checked}))}/>
+                  Email me a copy of this conversation
+                </label>
                 <p style={{fontSize:"11px",color:"#666",margin:"4px 0",lineHeight:1.5}}>
                   This chat is handled by AI and may be recorded. By continuing you consent to data collection per our{" "}
                   <a href="/privacy" target="_blank" rel="noopener" style={{color:"#ef4d00"}}>Privacy Policy</a>.
@@ -356,7 +383,7 @@ export default function ChatWidget(){
                   title="Attach image — JPG, PNG or WEBP, max 5MB">📎</button>
                 <textarea value={value} onChange={e=>setValue(e.target.value)}
                   onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit(e as unknown as FormEvent);}}}
-                  placeholder="Write your question..."
+                  placeholder="Write your question..." maxLength={MAX_MESSAGE_CHARS}
                   style={{flex:1,resize:"none",border:"1px solid #aaa7a0",padding:"8px 10px",fontSize:"13px",fontFamily:"inherit",background:"#fff",outline:"none",minHeight:"40px",maxHeight:"100px",height:"40px"}}/>
                 <button type="submit" disabled={sending||(!value.trim()&&!pendingFile)}
                   style={{border:0,background:"#111315",color:"#fff",padding:"0 14px",cursor:"pointer",fontSize:"13px",fontWeight:600,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",minHeight:"40px",opacity:(sending||(!value.trim()&&!pendingFile))?0.5:1}}>
