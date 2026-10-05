@@ -27,3 +27,37 @@
   .home-hero .hero-sub{order:4;margin-top:22px}
   .home-hero .hero-choices{order:5}
 }
+
+/* 2026-10-06 compact home page (Mohammad: "compact the home page all to before CTA, match the other pages").
+   Every section before the pre-footer CTA was ~full-screen; now tighter, same rhythm as Services. Content unchanged. */
+@media(min-width:721px){
+  .home-hero{height:clamp(600px,44vw,680px);min-height:0;padding:4vh 5vw 0}
+  .home-hero h1{font-size:clamp(50px,5.6vw,96px)}
+  .hero-or{font-size:clamp(380px,40vw,640px)}
+  .reality{min-height:0;padding:64px 5vw 44px;row-gap:0}
+  .reality-line{margin-top:36px;padding-top:22px}
+  .capabilities{padding:64px 5vw}
+  .capability-stage{min-height:430px;margin-top:36px}
+  .capability-stage article{padding:36px}
+  .method{min-height:0;padding:64px 5vw 0}
+  .method-number{font-size:clamp(220px,24vw,400px)}
+  .method button{min-height:80px}
+  .method header p:last-child{margin-top:20px}
+  .method header{padding-bottom:36px}
+  .health-copy>p:last-of-type{margin-top:20px}
+  .cyber-health-home{min-height:0;padding:64px 5vw}
+  .health-score{min-height:380px}
+  .health-score>strong{font-size:clamp(130px,14vw,230px)}
+  .industries-wrap .or-industries-study{min-height:0}
+  .industries-wrap .or-industries-stage{height:clamp(620px,48vw,720px);min-height:0}
+  .industries-wrap .or-mass{font-size:min(73vw,calc(clamp(620px,48vw,720px) * 1.09))}
+}
+@media(max-width:720px){
+  .home-hero{min-height:0}
+  .reality,.cyber-health-home{padding:48px 20px}
+  .capabilities{padding:48px 20px}
+  .capability-stage article{min-height:360px}
+  .method{padding:48px 20px 0}
+  .method-number{margin:24px 0 6px}
+  .method header p:last-child,.health-copy>p:last-of-type{margin-top:14px}
+}

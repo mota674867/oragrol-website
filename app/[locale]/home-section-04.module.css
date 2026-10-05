@@ -171,3 +171,24 @@
     transition: none;
   }
 }
+
+/* 2026-10-06 compact home page — same rhythm as the other home sections. */
+@media (min-width: 541px) {
+  .section {
+    padding: 56px 5vw 40px;
+  }
+  .section h2 {
+    font-size: clamp(40px, 5.4cqw, 82px);
+  }
+  .count {
+    font-size: clamp(90px, 13cqw, 190px);
+    margin-bottom: 8px;
+  }
+  .section h3 {
+    font-size: clamp(22px, 2.8cqw, 40px);
+    min-height: 0;
+  }
+  .description {
+    min-height: 3em;
+  }
+}
