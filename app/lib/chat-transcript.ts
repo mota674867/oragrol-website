@@ -1,4 +1,4 @@
-// ORAGROL live chat — transcript emails + CRM log, shared by the manual close
+// ORAGROL live chat — transcript emails, shared by the manual close
 // route and the automatic 15-minutes-of-silence close (chat-session.ts).
 
 import { Resend } from 'resend';
@@ -101,54 +101,7 @@ export async function sendTranscriptEmail(params: {
   });
 }
 
-export async function logToHubSpot(params: {
-  visitorName: string;
-  visitorEmail: string;
-  visitorCompany?: string;
-  messages: Array<{ role: string; content: string; timestamp: number }>;
-  escalated: boolean;
-  sessionId: string;
-}) {
-  const token = process.env.HUBSPOT_ACCESS_TOKEN!;
-  const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
-
-  const searchRes = await fetch('https://api.hubapi.com/crm/v3/objects/contacts/search', {
-    method: 'POST', headers,
-    body: JSON.stringify({
-      filterGroups: [{ filters: [{ propertyName: 'email', operator: 'EQ', value: params.visitorEmail }] }],
-      properties: ['email'], limit: 1,
-    }),
-  });
-  const searchData = await searchRes.json();
-  let contactId: string;
-
-  if (searchData.results?.length > 0) {
-    contactId = searchData.results[0].id;
-  } else {
-    const [firstName, ...lastParts] = params.visitorName.split(' ');
-    const createRes = await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
-      method: 'POST', headers,
-      body: JSON.stringify({ properties: { email: params.visitorEmail, firstname: firstName, lastname: lastParts.join(' ') || '', company: params.visitorCompany || '', lead_source: 'Live Chat' } }),
-    });
-    const createData = await createRes.json();
-    contactId = createData.id;
-  }
-
-  if (!contactId) return;
-
-  const transcriptText = params.messages.map(m => `[${m.role === 'user' ? params.visitorName : 'ORAGROL AI'}]: ${m.content}`).join('\n\n');
-  const noteBody = `Live Chat — ${new Date().toLocaleDateString('en-CA', { timeZone: 'America/Toronto' })}\nSession: ${params.sessionId}\nEscalated: ${params.escalated ? 'Yes' : 'No'}\n\n${transcriptText}`;
-
-  await fetch('https://api.hubapi.com/crm/v3/objects/notes', {
-    method: 'POST', headers,
-    body: JSON.stringify({
-      properties: { hs_note_body: noteBody, hs_timestamp: Date.now() },
-      associations: [{ to: { id: contactId }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 202 }] }],
-    }),
-  });
-}
-
-/** Visitor copy (unless they opted out) + ORAGROL copy + best-effort CRM log — once per chat. */
+/** Visitor copy (unless they opted out) + ORAGROL copy — once per chat. HubSpot keeps only the lead (name, email, company), never the conversation. */
 export async function sendChatTranscripts(p: {
   sessionId: string;
   visitorName: string;
@@ -165,8 +118,4 @@ export async function sendChatTranscripts(p: {
   }
   await sendTeamCopy({ visitorName: p.visitorName, visitorEmail: p.visitorEmail, visitorCompany: p.visitorCompany, messages: p.messages, escalated: p.escalated, autoClosed: p.autoClosed })
     .catch((err) => console.error('[chat] Team copy failed:', err));
-  if (process.env.HUBSPOT_ACCESS_TOKEN) {
-    await logToHubSpot({ visitorName: p.visitorName, visitorEmail: p.visitorEmail, visitorCompany: p.visitorCompany, messages: p.messages, escalated: p.escalated, sessionId: p.sessionId })
-      .catch((err) => console.error('[chat] HubSpot log failed:', err));
-  }
 }

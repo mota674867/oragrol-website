@@ -5,7 +5,7 @@
 // Sends transcript email to visitor and logs to HubSpot.
 
 import { NextRequest, NextResponse } from 'next/server';
-import { sendTeamCopy, sendTranscriptEmail, logToHubSpot, type Msg } from '../../lib/chat-transcript';
+import { sendTeamCopy, sendTranscriptEmail, type Msg } from '../../lib/chat-transcript';
 
 interface CloseRequest {
   sessionId: string;
@@ -59,17 +59,6 @@ export async function POST(req: NextRequest) {
       err => console.error('[chat-close] Team copy failed:', err)
     );
 
-    // 2. Log to HubSpot (best-effort)
-    if (process.env.HUBSPOT_ACCESS_TOKEN) {
-      await logToHubSpot({
-        visitorName,
-        visitorEmail,
-        visitorCompany,
-        messages,
-        escalated,
-        sessionId: body.sessionId,
-      }).catch(err => console.error('[chat-close] HubSpot log failed:', err));
-    }
 
     return NextResponse.json({ ok: true });
   } catch (error) {

@@ -74,9 +74,10 @@ export async function syncChatLeadToHubSpot(params: {
     const noteBody = [
       `Lead source: ORAGROL Chat Widget`,
       `Reason flagged: ${params.reason === "urgent" ? "Urgent / possible incident" : "Requested a human"}`,
-      ``,
-      `Transcript:`,
-      ...params.transcript.map((m) => `  [${m.role === "visitor" ? "Visitor" : "ORAGROL"}] ${m.text}`),
+      // The conversation itself is never stored in HubSpot (only the lead) — the team has it by email.
+      ...(params.transcript.length
+        ? [``, `Transcript:`, ...params.transcript.map((m) => `  [${m.role === "visitor" ? "Visitor" : "ORAGROL"}] ${m.text}`)]
+        : []),
     ].join("\n");
 
     const noteRes = await fetch(`${HUBSPOT_API_BASE}/crm/v3/objects/notes`, {

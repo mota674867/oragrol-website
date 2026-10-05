@@ -230,7 +230,7 @@ async function handleEscalate(data: {
 
   // Best-effort HubSpot sync
   try {
-    await syncChatLeadToHubSpot({ name: data.name, email: data.email, reason: data.reason, transcript });
+    await syncChatLeadToHubSpot({ name: data.name, email: data.email, reason: data.reason, transcript: [] });
   } catch (err) {
     console.error("[/api/chat] HubSpot sync error:", err);
   }
