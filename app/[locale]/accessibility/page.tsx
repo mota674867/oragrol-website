@@ -78,7 +78,7 @@ function renderInline(text: string, isFr: boolean): ReactNode[] {
     if (link) {
       const external = /^https?:\/\//.test(link[2]);
       const href = external ? link[2] : isFr ? `/fr${link[2]}` : link[2];
-      return <a key={index} href={href} {...(external ? { target: "_blank", rel: "noreferrer" } : {})}>{link[1]}{external ? " ↗" : ""}</a>;
+      return <a key={index} href={href} {...(external ? { target: "_blank", rel: "noreferrer" } : {})}>{link[1]}{external ? " ↗︎" : ""}</a>;
     }
     return <Fragment key={index}>{part}</Fragment>;
   });
@@ -165,7 +165,7 @@ export default async function AccessibilityPage({
               <h2 id="accessibility-contact-heading">{content.contact.heading}</h2>
               <p>{content.contact.description}</p>
               <p className="accessibility-contact-card__location">{content.contact.location}</p>
-              <a href={contactHref}>{content.contact.linkLabel} <span aria-hidden="true">↗</span></a>
+              <a href={contactHref}>{content.contact.linkLabel} <span aria-hidden="true">↗︎</span></a>
             </section>
           </article>
         </div>

@@ -36,7 +36,7 @@ export function RevisedSignature() {
           <p>{t("body1")}</p>
           <p>{t("body2")}</p>
           <Link href="/contact#enquiry" className={s.signatureCta}>
-            {t("cta")} <span aria-hidden="true">↗</span>
+            {t("cta")} <span aria-hidden="true">↗︎</span>
           </Link>
         </div>
         <svg className={s.signatureMotif} viewBox="0 0 420 420" aria-hidden="true" focusable="false">

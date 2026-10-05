@@ -1227,7 +1227,7 @@
       "itemsLabel": "éléments",
       "estimatedTierLabel": "palier estimé",
       "notEstimated": "Non estimé",
-      "reviewInMyScope": "Consulter dans Ma portée ↗",
+      "reviewInMyScope": "Consulter dans Ma portée ↗︎",
       "clearSelection": "Effacer la sélection",
       "categories": {
         "sales": {
@@ -2160,7 +2160,7 @@
       "title1": "Sachez où vous en êtes.",
       "titleEmphasis": "Sachez quoi faire ensuite.",
       "body": "Établissez une base concrète couvrant l'identité, le courriel, les appareils, l'infonuagique, le personnel, les données et la gouvernance.",
-      "cta": "Commencer l'évaluation ↗"
+      "cta": "Commencer l'évaluation ↗︎"
     },
     "profile": {
       "eyebrow": "ÉVALUATION CONFIDENTIELLE",

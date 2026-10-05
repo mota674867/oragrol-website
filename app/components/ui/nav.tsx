@@ -79,7 +79,7 @@ export function NavBar({ logo, desktopContent, collapsedContent, persistentActio
 
     function check() {
       // GAP_BUFFER covers the two `gap-4` flex gaps around the
-      // desktop/collapsed slot (logo↔cluster, cluster↔persistentActions) —
+      // desktop/collapsed slot (logo↔︎cluster, cluster↔︎persistentActions) —
       // a known, deterministic value derived from the gap classes actually
       // used below (16px × 2 = 32px), not a guessed content-fit number.
       const GAP_BUFFER = 40;

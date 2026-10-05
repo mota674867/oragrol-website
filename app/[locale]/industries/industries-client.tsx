@@ -250,21 +250,21 @@ function IndustriesClient() {
                 {t("evidence.stat1.suffix")}
               </p>
               <a href="https://powerdmarc.com/canada-dmarc-adoption/">
-                {t("evidence.stat1Source")} ↗
+                {t("evidence.stat1Source")} ↗︎
               </a>
             </article>
             <article>
               <strong>{t("evidence.stat2.value")}</strong>
               <p>{t("evidence.stat2.prefix")}</p>
               <a href="https://www.rcmp.ca/en/federal-policing/cybercrime/cyber-features/business-email-compromise">
-                {t("evidence.stat2Source")} ↗
+                {t("evidence.stat2Source")} ↗︎
               </a>
             </article>
             <article>
               <strong>{t("evidence.stat3.value")}</strong>
               <p>{t("evidence.stat3.prefix")}</p>
               <a href="https://www.priv.gc.ca/en/privacy-topics/business-privacy/breaches-and-safeguards/privacy-breaches-at-your-business/gd_pb_201810/">
-                {t("evidence.stat3Source")} ↗
+                {t("evidence.stat3Source")} ↗︎
               </a>
             </article>
           </div>

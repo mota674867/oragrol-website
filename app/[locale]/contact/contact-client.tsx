@@ -172,7 +172,7 @@ function ContactPageClient() {
               <i>{conversation === o.name ? t("conversations.selectedLabel") : t("conversations.selectLabel")}</i>
               <h3>{t(`conversations.options.${i}.label`)}</h3>
               <p>{t(`conversations.options.${i}.summary`)}</p>
-              <b>↗</b>
+              <b>↗︎</b>
             </button>
           ))}
         </div>
@@ -288,7 +288,7 @@ function ContactPageClient() {
             <input required type="checkbox" /> {t("form.consentLabel")}
           </label>
           <button className="contact-submit" type="submit" disabled={submitting}>
-            {submitting ? t("form.sendingLabel") : t("form.submitButton")} <span>↗</span>
+            {submitting ? t("form.sendingLabel") : t("form.submitButton")} <span>↗︎</span>
           </button>
           {submitError && (
             <div className="contact-confirmation" role="alert">

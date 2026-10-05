@@ -90,15 +90,15 @@ export default function ServicesPage({ onAddToScope, isInScope, onDiscussEngagem
   const uid = useId();
   const current = SERVICE_PACKAGES[selected];
   const selection = packageSelection(current);
-  const addLabel = (added: boolean) => (added ? t("packages.addedToScope") : `${t("packages.addToScope")} ↗`);
-  const addLabelIndividual = (added: boolean) => (added ? t("individual.addedToScope") : `${t("individual.addToScope")} ↗`);
+  const addLabel = (added: boolean) => (added ? t("packages.addedToScope") : `${t("packages.addToScope")} ↗︎`);
+  const addLabelIndividual = (added: boolean) => (added ? t("individual.addedToScope") : `${t("individual.addToScope")} ↗︎`);
   return <div className="oragrol-services">
     <style>{styles}</style>
     <section className="os-hero" aria-labelledby={`${uid}-title`}>
       <div className="os-watermark" aria-hidden="true">OR</div>
       <div className="os-kicker"><span>{t("hero.kicker1")}</span><span>{t("hero.kicker2")}</span></div>
       <div className="os-headline"><h1 id={`${uid}-title`}>{t("hero.headline1")}<span className="os-orange">.</span><br/><span>{t("hero.headline2a")}<br/>{t("hero.headline2b")}</span></h1><p>{t("hero.sub1")}<br/><span>{t("hero.sub2")}</span></p></div>
-      <div className="os-hero-links">{[{ count: t("hero.packagesCount"), label: t("hero.packagesLabel"), detail: t("hero.packagesDetail"), href: "#service-packages" }, { count: t("hero.alaCarteCount"), label: t("hero.alaCarteLabel"), detail: t("hero.alaCarteDetail"), href: "#individual-services" }, { count: t("hero.specialistCount"), label: t("hero.specialistLabel"), detail: t("hero.specialistDetail"), href: "#specialist-engagements" }].map(item => <a key={item.href} href={item.href}><div><span className="os-orange">{item.count}</span><h2>{item.label}</h2><span aria-hidden="true">↘</span></div><p>{item.detail}</p></a>)}</div>
+      <div className="os-hero-links">{[{ count: t("hero.packagesCount"), label: t("hero.packagesLabel"), detail: t("hero.packagesDetail"), href: "#service-packages" }, { count: t("hero.alaCarteCount"), label: t("hero.alaCarteLabel"), detail: t("hero.alaCarteDetail"), href: "#individual-services" }, { count: t("hero.specialistCount"), label: t("hero.specialistLabel"), detail: t("hero.specialistDetail"), href: "#specialist-engagements" }].map(item => <a key={item.href} href={item.href}><div><span className="os-orange">{item.count}</span><h2>{item.label}</h2><span aria-hidden="true">↘︎</span></div><p>{item.detail}</p></a>)}</div>
       <div className="os-kicker os-hero-end"><span>{t("hero.footerKicker")}</span><a href="#services-clarity">{t("hero.footerCta")} ↓</a></div>
     </section>
 
@@ -125,7 +125,7 @@ export default function ServicesPage({ onAddToScope, isInScope, onDiscussEngagem
     <section className="os-specialists os-dark os-section" id="specialist-engagements" aria-labelledby={`${uid}-specialists`}>
       <div className="os-section-head"><p className="os-eyebrow">{t("specialists.eyebrow")}</p><h2 id={`${uid}-specialists`}>{t("specialists.headline1")}<br/><span>{t("specialists.headline2")}</span></h2><p>{t("specialists.sub")}</p></div>
       <p className="os-price-note">{t("specialists.priceNote")}</p>
-      <div className="os-specialist-grid">{SPECIALIST_ENGAGEMENTS.map((s, i) => <article className="os-specialist-card" key={s.code}><p className="os-eyebrow">0{i + 1} / {t("specialists.eyebrow").split("/ ")[1] ?? t("specialists.eyebrow")}</p><h3>{s.name}</h3><p className="os-description">{t(`specialists.list.${s.code}.line`)}</p>{specialistDetailsContent[s.code] && <DetailsDialog category="SPECIALIST ENGAGEMENT" onDark {...specialistDetailsContent[s.code]} action={{ label: `${t("specialists.discussEngagement")} ↗`, onClick: () => onDiscussEngagement({ code: s.code, name: s.name }) }} />}<div className="os-engagement-prices"><p className="os-engagement-price-main">{s.priceLine}</p>{s.secondaryPriceLine ? <p className="os-engagement-price-secondary">{s.secondaryPriceLine}</p> : null}</div><Action perform={() => onDiscussEngagement({ code: s.code, name: s.name })}>{t("specialists.discussEngagement")} ↗</Action></article>)}</div>
+      <div className="os-specialist-grid">{SPECIALIST_ENGAGEMENTS.map((s, i) => <article className="os-specialist-card" key={s.code}><p className="os-eyebrow">0{i + 1} / {t("specialists.eyebrow").split("/ ")[1] ?? t("specialists.eyebrow")}</p><h3>{s.name}</h3><p className="os-description">{t(`specialists.list.${s.code}.line`)}</p>{specialistDetailsContent[s.code] && <DetailsDialog category="SPECIALIST ENGAGEMENT" onDark {...specialistDetailsContent[s.code]} action={{ label: `${t("specialists.discussEngagement")} ↗︎`, onClick: () => onDiscussEngagement({ code: s.code, name: s.name }) }} />}<div className="os-engagement-prices"><p className="os-engagement-price-main">{s.priceLine}</p>{s.secondaryPriceLine ? <p className="os-engagement-price-secondary">{s.secondaryPriceLine}</p> : null}</div><Action perform={() => onDiscussEngagement({ code: s.code, name: s.name })}>{t("specialists.discussEngagement")} ↗︎</Action></article>)}</div>
     </section>
   </div>;
 }

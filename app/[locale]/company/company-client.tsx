@@ -112,7 +112,7 @@ function CompanyPageClient() {
             <span>{p.number}</span>
             <h3>{p.title}</h3>
             <p>{p.body}</p>
-            <Link href={pathHrefs[i]}>{p.linkLabel} ↗</Link>
+            <Link href={pathHrefs[i]}>{p.linkLabel} ↗︎</Link>
           </div>
         ))}
       </section>

@@ -88,11 +88,11 @@ export default function PreFooterCta({ page }: { page: CTAKey }) {
         <div className="oragrol-cta__actions">
           <Link className="oragrol-cta__primary" href="/cyber-health">
             <span>{t("getCyberHealthScore")}</span>
-            <span aria-hidden="true">↗</span>
+            <span aria-hidden="true">↗︎</span>
           </Link>
           <Link className="oragrol-cta__secondary" href={SECONDARY_HREF[page]}>
             <span>{t(`${page}.secondaryLabel`)}</span>
-            <span aria-hidden="true">↗</span>
+            <span aria-hidden="true">↗︎</span>
           </Link>
         </div>
       </div>
