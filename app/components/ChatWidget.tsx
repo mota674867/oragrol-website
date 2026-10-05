@@ -1,5 +1,6 @@
 "use client";
 import {FormEvent,useEffect,useRef,useState} from "react";
+import {Link} from "@/i18n/navigation";
 import "../chat-widget.css";
 
 type Message={
@@ -158,12 +159,12 @@ export default function ChatWidget(){
       const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"escalate",name,email,reason,transcript,sessionId:sessionIdRef.current||undefined})});
       const json=await res.json().catch(()=>null);
       if(res.ok&&json?.ok){
-        setMessages(m=>[...m,{from:"oragrol",text:"Got it. Our team has been notified and will follow up at "+email+" shortly. You can also reach us at info@orgro.ca."}]);
+        setMessages(m=>[...m,{from:"oragrol",text:"Got it. Our team has been notified and will follow up at "+email+" shortly. You can also use our contact page."}]);
       }else{
-        setMessages(m=>[...m,{from:"oragrol",text:"I was unable to notify the team right now. Please email us at info@orgro.ca.",email:true}]);
+        setMessages(m=>[...m,{from:"oragrol",text:"I was unable to notify the team right now. Please use our contact page.",email:true}]);
       }
     }catch{
-      setMessages(m=>[...m,{from:"oragrol",text:"I was unable to notify the team right now. Please email us at info@orgro.ca.",email:true}]);
+      setMessages(m=>[...m,{from:"oragrol",text:"I was unable to notify the team right now. Please use our contact page.",email:true}]);
     }finally{setSending(false);}
   };
 
@@ -195,10 +196,10 @@ export default function ChatWidget(){
       }else if(res?.status===400&&json?.error){
         setMessages(m=>[...m,{from:"oragrol",text:String(json.error)}]);
       }else{
-        setMessages(m=>[...m,{from:"oragrol",text:"I could not reach the system right now. Please try again or email us at info@orgro.ca.",email:true}]);
+        setMessages(m=>[...m,{from:"oragrol",text:"I could not reach the system right now. Please try again or use our contact page.",email:true}]);
       }
     }catch{
-      setMessages(m=>[...m,{from:"oragrol",text:"I could not reach the system right now. Please try again or email us at info@orgro.ca.",email:true}]);
+      setMessages(m=>[...m,{from:"oragrol",text:"I could not reach the system right now. Please try again or use our contact page.",email:true}]);
     }finally{setSending(false);}
   };
 
@@ -226,7 +227,7 @@ export default function ChatWidget(){
 
     // Per-chat cap: keeps cost flat and stops runaway sessions.
     if(messages.filter(m=>m.from==="visitor").length>=MAX_VISITOR_MESSAGES){
-      setMessages([...messages,{from:"visitor",text:msgText},{from:"oragrol",text:"We have reached the limit for this chat. Please continue by email at info@orgro.ca or through /contact, and our team will follow up. A copy of this conversation will be sent to you."}]);
+      setMessages([...messages,{from:"visitor",text:msgText},{from:"oragrol",text:"We have reached the limit for this chat. Please continue through our contact page, and our team will follow up. A copy of this conversation will be sent to you."}]);
       return;
     }
 
@@ -322,8 +323,8 @@ export default function ChatWidget(){
                     <p style={{fontSize:"11px",color:m.from==="oragrol"?"#ef4d00":"#999",margin:"0 0 4px",letterSpacing:".1em"}}>
                       {m.from==="oragrol"?"ORAGROL":"YOU"}
                     </p>
-                    <MsgText text={m.text}/>
-                    {m.email&&<a href="mailto:info@orgro.ca" style={{color:"#ef4d00",fontSize:"12px",display:"block",marginTop:"6px"}}>Email us directly ↗</a>}
+                    <MsgText text={m.from==="oragrol"?m.text.replace(/info@orgro\.ca/gi,"our contact page").replace(/(?<![(\w/])\/contact(?![\w-])/g,"our contact page"):m.text}/>
+                    {m.from==="oragrol"&&(m.email||/\/contact|contact page|info@orgro\.ca|notified/i.test(m.text))&&<Link href="/contact" style={{display:"inline-block",marginTop:"8px",background:"#ef4d00",color:"#fff",padding:"7px 14px",fontSize:"12px",textDecoration:"none",fontFamily:"inherit"}}>Contact us</Link>}
                   </div>
                 )
               )}
@@ -359,7 +360,7 @@ export default function ChatWidget(){
               </form>
               <input ref={fileInputRef} type="file" accept="image/jpeg,image/jpg,image/png,image/webp" style={{display:"none"}} onChange={handleFile}/>
               <p style={{fontSize:"10px",color:"#999",margin:0,textAlign:"center"}}>
-                AI assistant · May make mistakes · <a href="mailto:info@orgro.ca" style={{color:"#999"}}>info@orgro.ca</a>
+                AI assistant · May make mistakes · <Link href="/contact" style={{color:"#999"}}>Contact us</Link>
               </p>
             </div>
           )}

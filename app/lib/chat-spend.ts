@@ -19,7 +19,7 @@ export function chatCostUsd(u: ChatUsage): number {
 }
 
 export const CHAT_CAP_REPLY =
-  "Our chat has reached its limit for today. Please reach us through /contact or email info@orgro.ca and the team will get back to you. You can also run a free business scan at /scan anytime.";
+  "Our chat has reached its limit for today. Please reach us through /contact and the team will get back to you. You can also run a free business scan at /scan anytime.";
 
 /** True when today's chat spend has hit the cap. Sends the one-per-day alert email on the first breach. */
 export async function chatCapReached(): Promise<boolean> {
@@ -51,7 +51,7 @@ async function sendCapAlert(spent: number): Promise<void> {
     subject: "ORAGROL chat paused for today — daily AI cap reached",
     text:
       `The website chat has spent $${spent.toFixed(2)} today and hit its $${CHAT_DAILY_CAP_USD} daily cap, so it has stopped answering until tomorrow (Toronto time).\n\n` +
-      `Visitors now see a message pointing them to /contact and info@orgro.ca. Transcripts and lead capture keep working.\n\n` +
+      `Visitors now see a message pointing them to /contact. Transcripts and lead capture keep working.\n\n` +
       `If this looks like a bot or abuse rather than real interest, check the chat usage log.`,
   });
 }

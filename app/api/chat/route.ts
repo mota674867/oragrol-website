@@ -65,7 +65,7 @@ function getBusinessHoursContext(): string {
   const isBusinessHours = isWeekday && etHour >= 9 && etHour < 18;
   return isBusinessHours
     ? `\n\nCURRENT TIME CONTEXT: It is currently ${etDay} ${etTime} ET — business hours. A real person is available right now if needed.`
-    : `\n\nCURRENT TIME CONTEXT: It is currently ${etDay} ${etTime} ET — outside business hours (Mon–Fri 9am–6pm ET). No one is available to respond live right now. If a visitor needs a person, tell them to email info@orgro.ca or that the team will follow up next business day.`;
+    : `\n\nCURRENT TIME CONTEXT: It is currently ${etDay} ${etTime} ET — outside business hours (Mon–Fri 9am–6pm ET). No one is available to respond live right now. If a visitor needs a person, tell them to use the contact page (/contact) or that the team will follow up next business day.`;
 }
 
 const MAX_VISITOR_CHARS = 1000;
@@ -78,7 +78,7 @@ async function handleReply(data: { messages: { role: "visitor" | "oragrol"; text
   if (!apiKey) {
     console.error("[/api/chat] Missing ANTHROPIC_API_KEY");
     return NextResponse.json(
-      { ok: false, error: "Chat isn't fully configured yet. Please email us at info@orgro.ca." },
+      { ok: false, error: "Chat isn't fully configured yet. Please use our contact page." },
       { status: 500 },
     );
   }
