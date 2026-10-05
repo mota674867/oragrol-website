@@ -255,7 +255,7 @@ export async function sendOdoAdminAbandonedEmail(params: {
 }
 
 /** Outbound mode (§37.9): the dossier hand-off to OCS. Nothing is ever sent to the company itself. */
-export async function sendOdoOutboundDossierEmail(params: { company: string; domain: string; hasChanges: boolean; text: string; pdf?: Buffer | null; docx?: Buffer | null }): Promise<SendOdoAdminEmailResult> {
+export async function sendOdoOutboundDossierEmail(params: { company: string; domain: string; hasChanges: boolean; text: string; pdf?: Buffer | null; docx?: Buffer | null; coldEmailPdf?: Buffer | null }): Promise<SendOdoAdminEmailResult> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.CONTACT_FROM_EMAIL;
   if (!apiKey) return { state: "skipped", reason: "RESEND_API_KEY is not configured." };
@@ -272,6 +272,7 @@ export async function sendOdoOutboundDossierEmail(params: { company: string; dom
       attachments: [
         ...(params.pdf ? [{ filename: `ODO_Outbound_${safeDomain}.pdf`, content: params.pdf }] : []),
         ...(params.docx ? [{ filename: `ODO_Outbound_${safeDomain}.docx`, content: params.docx }] : []),
+        ...(params.coldEmailPdf ? [{ filename: `ColdEmail_${safeDomain}.pdf`, content: params.coldEmailPdf }] : []),
       ],
     });
     if (error) return { state: "failed", error: `Resend error: ${error.message ?? JSON.stringify(error)}`.slice(0, 500) };

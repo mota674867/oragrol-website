@@ -21,6 +21,7 @@ import { after, NextRequest, NextResponse } from "next/server";
 import { claimOutboundRun, runOutbound, getOutboundHistory, listOutboundIndex, dossierAsText } from "@/app/lib/odo-outbound";
 import { sendOdoOutboundDossierEmail } from "@/app/lib/odo-email";
 import { renderOutboundPdf } from "@/app/lib/odo-outbound-pdf";
+import { renderColdEmailPdf } from "@/app/lib/odo-outbound-coldemail-pdf";
 import { renderOutboundDocx } from "@/app/lib/odo-outbound-docx";
 import { checkWebsiteValidity } from "@/app/lib/odo-gate";
 
@@ -54,7 +55,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       // PDF is a convenience copy — if it fails to render, the text email still goes out.
       const pdf = await renderOutboundPdf(dossier).catch((err) => { console.warn("[ODO Outbound] PDF render failed:", err); return null; });
       const docx = await renderOutboundDocx(dossier).catch((err) => { console.warn("[ODO Outbound] Word render failed:", err); return null; });
-      const r = await sendOdoOutboundDossierEmail({ company, domain: dossier.domain, hasChanges, text: dossierAsText(dossier), pdf, docx });
+      const coldEmailPdf = await renderColdEmailPdf(dossier).catch((err) => { console.warn("[ODO Outbound] Cold-email PDF render failed:", err); return null; });
+      const r = await sendOdoOutboundDossierEmail({ company, domain: dossier.domain, hasChanges, text: dossierAsText(dossier), pdf, docx, coldEmailPdf });
       if (r.state !== "sent") console.warn(`[ODO Outbound] Dossier email not sent (${r.state}).`);
     } catch (err) {
       console.error("[ODO Outbound] Run failed:", err);

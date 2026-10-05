@@ -33,6 +33,7 @@ import { computeCost, addOpusUsage, EMPTY_USAGE } from "../app/lib/odo-cost";
 import { industryPackFor } from "../app/lib/odo-industry-depth";
 import { jobDescriptionFromTypes, reportableForOptions, type CompetitorProfile } from "../app/lib/odo-competitors";
 import { buildSnapshot, buildPosture, buildAutomationSignals, dossierAsText, extractContact, toAutomationLane, type Dossier } from "../app/lib/odo-outbound";
+import { coldEmailObservations, coldEmailRecommendation } from "../app/lib/odo-outbound-coldemail";
 import { renderOutboundDocx } from "../app/lib/odo-outbound-docx";
 import { filterLeads } from "../app/lib/odo-outbound-leads";
 import type { Evidence } from "../app/lib/odo-ledger";
@@ -535,6 +536,9 @@ async function main() {
     const withLane: Dossier = { ...pdfDossier, automationLane: bundle };
     check("text report shows the package section", dossierAsText(withLane).includes("Business Automation: Finance"));
     const docxBuf = await renderOutboundDocx(withLane);
+    const obsList = coldEmailObservations(withLane);
+    check("cold-email PDF uses only observed high-confidence gaps, glyph-clean", obsList.length === 1 && !obsList[0].includes("\u2717"));
+    check("cold-email PDF names the package pick, never competitors", coldEmailRecommendation(withLane)?.name === "Business Automation: Finance");
     check("Word file is a real .docx (zip)", docxBuf.length > 2000 && docxBuf[0] === 0x50 && docxBuf[1] === 0x4b);
   }
 
