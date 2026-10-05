@@ -353,3 +353,42 @@ footer{min-height:75svh;background:#0c0e0f;color:#eee;padding:4vw 3vw 22px;displ
   /* Industries evidence bar: label and "Open evidence drawer" were squeezed side by side. Stack them. */
   .ind-evidence summary{flex-direction:column;gap:10px;padding:22px 18px}
 }
+
+/* 2026-10-06 Industries hero — option I2 (centred, refined), compact.
+   Orange outline OR, numbered pillars, solid orange button. Content unchanged. */
+.ind-hero.ind-hero-clean{height:clamp(600px,44vw,680px);min-height:0;background:radial-gradient(circle at 50% 46%,#1c1f22 0,#111315 55%,#0c0e10 100%)}
+.ind-hero-clean:before{display:none}
+.ind-hero-clean .ind-centred-or{top:47%;transform:translate(-50%,-50%);font-size:clamp(360px,40vw,700px);line-height:.8;letter-spacing:-.1em;color:transparent;-webkit-text-stroke:1.5px rgba(239,77,0,.7);opacity:1}
+.ind-hero-clean .ind-hero-copy{gap:0}
+.ind-hero-clean .ind-hero-copy h1{font-size:clamp(46px,5vw,88px);line-height:.92;margin:22px 0 20px}
+.ind-hero-clean .ind-hero-copy h1 span{display:block;color:#8f9295;margin:0}
+.ind-hero-clean .ind-hero-copy>p:nth-of-type(2){font-size:clamp(15px,1.15vw,18px);max-width:640px;margin:0 auto 24px}
+.ind-hero-clean .ind-hero-pillars{margin:0}
+.ind-hero-clean .ind-hero-pillars span{font-size:10px;padding:0 22px;display:inline-flex;gap:10px}
+.ind-hero-clean .ind-hero-pillars b{color:#ef4d00;font-weight:400}
+.ind-hero-clean .ind-hero-line{display:block;width:1px;height:34px;margin:16px 0 14px;background:linear-gradient(#ef4d00,transparent)}
+.ind-hero-clean .ind-hero-copy a.ind-hero-cta{gap:44px;align-items:center;background:#ef4d00;color:#111;border:0;padding:14px 20px;font-size:13px}
+.ind-hero-clean .ind-hero-copy a.ind-hero-cta:hover{background:#f2f0ea}
+@media(max-width:560px){
+  .ind-hero.ind-hero-clean{height:auto;min-height:0;padding:64px 0 60px}
+  .ind-hero-clean .ind-centred-or{font-size:300px;top:42%}
+  .ind-hero-clean .ind-hero-copy h1{font-size:38px}
+  .ind-hero-clean .ind-hero-pillars span{padding:0 12px;font-size:9px;gap:6px}
+}
+
+/* 2026-10-06 compact heroes (Mohammad: "same compact size as the Services hero").
+   Was full-screen; now about the same height as Services, so the next section shows. */
+@media(min-width:701px){
+  .ba-hero{height:clamp(600px,44vw,680px);min-height:0}
+  .one-hero{height:clamp(600px,44vw,680px);min-height:0}
+  .one-hero .one-headline h1{font-size:clamp(54px,5.4vw,96px)}
+  .one-hero .one-orange-or{font-size:clamp(84px,7vw,120px)}
+  .res-hero{height:clamp(600px,44vw,680px);min-height:0}
+  .company-hero{height:clamp(600px,44vw,680px);min-height:0;padding-top:3vw;padding-bottom:3vw}
+  .company-hero .company-hero-copy h1{font-size:clamp(56px,6vw,100px);margin:24px 0}
+}
+@media(max-width:700px){
+  .ba-hero{min-height:0}
+  .res-hero{height:auto;min-height:0}
+  .company-hero{height:auto;min-height:0}
+}
