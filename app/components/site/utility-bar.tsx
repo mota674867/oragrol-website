@@ -150,7 +150,7 @@ export default function UtilityBar() {
           <Link
             href={pathname}
             locale={otherLocale}
-            style={{ color: "#666", textDecoration: "none" }}
+            style={{ color: "#8a8a8a", textDecoration: "none" }}
             aria-label={isFr ? "Switch to English" : "Passer en français"}
           >
             {otherLocale.toUpperCase()}

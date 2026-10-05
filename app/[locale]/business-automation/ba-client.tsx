@@ -244,6 +244,7 @@ function BusinessAutomationClient() {
             <h3>{t(`jobs.${activeId}.name`)}</h3>
             <p className="job-outcome">{t(`jobs.${activeId}.outcome`)}</p>
             <DetailsDialog
+              onDark
               category={t("hero.meta1")}
               itemLabel={t(`details.${activeId}.itemLabel`)}
               title={t(`details.${activeId}.title`)}

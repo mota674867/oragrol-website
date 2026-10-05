@@ -189,13 +189,25 @@
 }
 
 @media (max-width: 620px) {
-  .footer { padding: 30px 6% 18px; min-height: 0; }
-  .grid { grid-template-columns: 1fr; gap: 30px; }
+  .footer { padding: 26px 18px 16px; min-height: 0; }
+  /* Two columns for the link lists so the footer isn't one long vertical strip; newsletter full width. */
+  /* Sitemap on the left; Company and Legal stacked on the right; newsletter full width. Keeps the footer short. */
+  .grid { grid-template-columns: 1fr 1fr; grid-template-areas: "a b" "a c" "d d"; gap: 22px 18px; }
+  .grid > :nth-child(1) { grid-area: a; }
+  .grid > :nth-child(2) { grid-area: b; }
+  .grid > :nth-child(3) { grid-area: c; }
+  .grid > :nth-child(4) { grid-area: d; }
+  .heading { margin-bottom: 10px; padding-bottom: 7px; }
+  .links { gap: 5px; }
+  .socials { margin-top: 14px; }
+  .intro { margin-bottom: 12px; }
   .fields { gap: 14px; }
   .logoSlot { position: static; margin: 28px 0 0 auto; }
-  .watermarkClip { position: relative; inset: auto; height: 90px; margin-top: 14px; }
-  .watermark { position: absolute; left: 0; bottom: -.1em; font-size: 20vw; }
-  .meta { grid-template-columns: 1fr; gap: 12px; padding-top: 18px; }
+  .logoSlot:empty { display: none; }
+  .watermarkClip { position: relative; inset: auto; height: 56px; margin-top: 6px; }
+  .watermark { position: absolute; left: 0; bottom: -.1em; font-size: 17vw; }
+  .watermark .global { display: none; }
+  .meta { grid-template-columns: 1fr; gap: 6px; padding-top: 10px; }
   .tagline { text-align: left; }
 }
 
