@@ -117,11 +117,12 @@ function IndustriesClient() {
           </h1>
           <p>{t("hero.sub")}</p>
           <div className="ind-hero-pillars" aria-label={t("hero.pillarsAriaLabel")}>
-            <span>{t("hero.pillarProtect")}</span>
-            <span>{t("hero.pillarAutomate")}</span>
-            <span>{t("hero.pillarUnify")}</span>
+            <span><b aria-hidden="true">01</b>{t("hero.pillarProtect")}</span>
+            <span><b aria-hidden="true">02</b>{t("hero.pillarAutomate")}</span>
+            <span><b aria-hidden="true">03</b>{t("hero.pillarUnify")}</span>
           </div>
-          <a href="#industry-index">
+          <span className="ind-hero-line" aria-hidden="true" />
+          <a className="ind-hero-cta" href="#industry-index">
             {t("hero.chooseIndustry")} <span>↓</span>
           </a>
         </div>
