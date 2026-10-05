@@ -320,3 +320,36 @@ footer{min-height:75svh;background:#0c0e0f;color:#eee;padding:4vw 3vw 22px;displ
 .or-chat-form button{border:0;background:var(--orange);color:#111;padding:9px;font-size:11px;cursor:pointer;margin-top:2px}
 .or-chat-form button:disabled{opacity:.5;cursor:not-allowed}
 .or-chat-typing p{color:#8d9093;font-style:italic}
+
+/* 2026-10-06 mobile header fix: on tablet/phone the header had three items in a
+   two-column grid, so the search/actions wrapped onto a second row and the Menu
+   button floated mid-header. Match the homepage header: logo left, Menu + actions right. */
+@media(max-width:1100px){.site-header,.ba-header,.one-header,.industry-header{grid-template-columns:1fr auto auto;gap:18px}}
+@media(max-width:700px){.ba-header .scope-nav-button,.one-header .scope-nav-button,.industry-header .scope-nav-button{display:none}}
+
+/* 2026-10-06 mobile review fixes */
+/* Hidden scope tray kept its big drop shadow, which bled a grey band down the right edge of the page. */
+.scope-tray:not(.open){box-shadow:none}
+/* Contact header is dark: the search icon was dark-on-dark (invisible). */
+.contact-header .search span{border-color:#f2f0ea}
+.contact-header .search span:after{background:#f2f0ea}
+@media(max-width:1100px){
+  /* FAQ: Menu sat next to the logo; push it right beside Contact like the other pages. */
+  .faq-nav{gap:18px}
+  .faq-nav .wordmark{margin-right:auto}
+  .faq-nav .om-nav{justify-content:flex-end}
+}
+@media(max-width:700px){
+  /* OR ONE: the giant "ONE" artwork overlapped the intro box and the Discover link. Give it its own space below. */
+  .one-hero{height:auto;min-height:0}
+  .one-support{margin-bottom:190px}
+}
+@media(max-width:600px){
+  /* Company: the orange circle sat on top of the headline. Move it to the lower-right corner, behind nothing important. */
+  .company-hero{padding-bottom:120px}
+  .company-hero-mark{top:auto;bottom:-34vw;right:-34vw;width:88vw;transform:none;opacity:.5}
+}
+@media(max-width:700px){
+  /* Industries evidence bar: label and "Open evidence drawer" were squeezed side by side. Stack them. */
+  .ind-evidence summary{flex-direction:column;gap:10px;padding:22px 18px}
+}

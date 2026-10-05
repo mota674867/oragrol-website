@@ -118,6 +118,7 @@ export function RevisedPricing() {
               <p className={s.fit}>{t(`details.${key}.subtitle`)}</p>
               {content && (
                 <DetailsDialog
+                  onDark
                   category="OR ONE"
                   itemLabel={t(`details.${key}.itemLabel`)}
                   title={t(`details.${key}.title`)}

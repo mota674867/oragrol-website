@@ -190,11 +190,15 @@
 
 @media (max-width: 620px) {
   .footer { padding: 30px 6% 18px; min-height: 0; }
-  .grid { grid-template-columns: 1fr; gap: 30px; }
+  /* Two columns for the link lists so the footer isn't one long vertical strip; newsletter full width. */
+  .grid { grid-template-columns: 1fr 1fr; gap: 30px 22px; }
+  .newsletter { grid-column: 1 / -1; }
   .fields { gap: 14px; }
   .logoSlot { position: static; margin: 28px 0 0 auto; }
+  .logoSlot:empty { display: none; }
   .watermarkClip { position: relative; inset: auto; height: 90px; margin-top: 14px; }
-  .watermark { position: absolute; left: 0; bottom: -.1em; font-size: 20vw; }
+  .watermark { position: absolute; left: 0; bottom: -.1em; font-size: 17vw; }
+  .watermark .global { display: none; }
   .meta { grid-template-columns: 1fr; gap: 12px; padding-top: 18px; }
   .tagline { text-align: left; }
 }
