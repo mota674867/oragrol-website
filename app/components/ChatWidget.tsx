@@ -109,6 +109,7 @@ export default function ChatWidget(){
   const messagesRef=useRef<Message[]>([]);
   const contactRef=useRef<{name:string;email:string;company?:string;sendCopy:boolean}|null>(null);
   const handoffRef=useRef(false);
+  const [closed,setClosed]=useState(false);
   const escalatedRef=useRef(false);
   const sessionIdRef=useRef("");
 
@@ -181,6 +182,7 @@ export default function ChatWidget(){
         const withReply:Message[]=[...history,{from:"oragrol",text:json.reply}];
         setMessages(withReply);
         messagesRef.current=withReply;
+        if(json.closed)setClosed(true);
         // The AI could not answer (or the topic is for the team): send a REAL hand-off to ORAGROL, once per chat.
         const c=contactRef.current;
         if(json.handoff&&!json.capped&&c&&!handoffRef.current){
@@ -209,7 +211,7 @@ export default function ChatWidget(){
   const submit=(e:FormEvent)=>{
     e.preventDefault();
     const clean=value.trim();
-    if((!clean&&!pendingFile)||sending)return;
+    if((!clean&&!pendingFile)||sending||closed)return;
 
     let msgText=clean;
     if(pendingFile){
@@ -343,12 +345,12 @@ export default function ChatWidget(){
                 <button type="button" onClick={()=>fileInputRef.current?.click()}
                   style={{border:"1px solid #aaa7a0",background:"#f4f1ea",padding:"0 10px",cursor:"pointer",fontSize:"16px",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",minHeight:"40px"}}
                   title="Attach image — JPG, PNG or WEBP, max 5MB">📎</button>
-                <textarea value={value} onChange={e=>setValue(e.target.value)}
+                <textarea disabled={closed} value={value} onChange={e=>setValue(e.target.value)}
                   onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit(e as unknown as FormEvent);}}}
-                  placeholder="Write your question..." maxLength={MAX_MESSAGE_CHARS}
+                  placeholder={closed?"This chat is closed":"Write your question..."} maxLength={MAX_MESSAGE_CHARS}
                   style={{flex:1,resize:"none",border:"1px solid #aaa7a0",padding:"8px 10px",fontSize:"13px",fontFamily:"inherit",background:"#fff",outline:"none",minHeight:"40px",maxHeight:"100px",height:"40px"}}/>
-                <button type="submit" disabled={sending||(!value.trim()&&!pendingFile)}
-                  style={{border:0,background:"#111315",color:"#fff",padding:"0 14px",cursor:"pointer",fontSize:"13px",fontWeight:600,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",minHeight:"40px",opacity:(sending||(!value.trim()&&!pendingFile))?0.5:1}}>
+                <button type="submit" disabled={closed||sending||(!value.trim()&&!pendingFile)}
+                  style={{border:0,background:"#111315",color:"#fff",padding:"0 14px",cursor:"pointer",fontSize:"13px",fontWeight:600,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",minHeight:"40px",opacity:(closed||sending||(!value.trim()&&!pendingFile))?0.5:1}}>
                   Send
                 </button>
               </form>

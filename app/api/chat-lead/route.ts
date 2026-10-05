@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getClientIp } from '../../lib/rate-limit';
+import { isChatBlocked } from '../../lib/chat-strikes';
 
 export async function POST(req: NextRequest) {
   try {
     const { name, email, company } = await req.json();
     if (!email || !name) return NextResponse.json({ ok: false }, { status: 400 });
+    if (await isChatBlocked(getClientIp(req))) return NextResponse.json({ ok: true }); // blocked visitors never become leads
     if (!process.env.HUBSPOT_ACCESS_TOKEN) return NextResponse.json({ ok: true });
 
     const token = process.env.HUBSPOT_ACCESS_TOKEN;

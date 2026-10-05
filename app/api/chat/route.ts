@@ -3,12 +3,13 @@ import Anthropic from "@anthropic-ai/sdk";
 import { Resend } from "resend";
 import { getClientIp, rateLimit } from "../../lib/rate-limit";
 import { chatRequestSchema } from "../../lib/chat-schema";
-import { SYSTEM_PROMPT, HANDOFF_MARKER } from "../../lib/chat-knowledge";
+import { SYSTEM_PROMPT, HANDOFF_MARKER, OFFTOPIC_MARKER } from "../../lib/chat-knowledge";
 import { chatCapReached, recordChatSpend, CHAT_CAP_REPLY } from "../../lib/chat-spend";
 import { checkChatIpDaily } from "../../lib/odo-redis";
 import { syncChatLeadToHubSpot } from "../../lib/hubspot";
 import { saveChatTurn, markChatEscalated, type ChatContact } from "../../lib/chat-session";
 import { scheduleChatSweep } from "../../lib/chat-qstash";
+import { isChatBlocked, getStrikes, addStrike, strikeOutcome, CHAT_CLOSED_REPLY, CHAT_BLOCKED_REPLY } from "../../lib/chat-strikes";
 
 /**
  * POST /api/chat — ORAGROL chat widget backend
@@ -88,6 +89,11 @@ async function handleReply(data: { messages: { role: "visitor" | "oragrol"; text
     return NextResponse.json({ ok: false, error: `Please keep each message under ${MAX_VISITOR_CHARS} characters.` }, { status: 400 });
   }
 
+  // Visitors who sent repeated unrelated messages are blocked from the chat for 7 days (no AI call, no cost).
+  if (await isChatBlocked(ip)) {
+    return NextResponse.json({ ok: true, reply: CHAT_BLOCKED_REPLY, handoff: false, closed: true });
+  }
+
   // Daily per-IP ceiling (shared across serverless instances). Fails open on a Redis error.
   try {
     const daily = await checkChatIpDaily(ip, IP_DAILY_MESSAGES);
@@ -111,6 +117,8 @@ async function handleReply(data: { messages: { role: "visitor" | "oragrol"; text
   // The API requires the conversation to start with a user turn.
   while (messages.length > 1 && messages[0].role !== "user") messages.shift();
 
+  const strikesSoFar = await getStrikes(ip);
+
   try {
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-6",
@@ -119,7 +127,7 @@ async function handleReply(data: { messages: { role: "visitor" | "oragrol"; text
       system: [
         // The big, stable knowledge block is cached (~90% cheaper on re-reads); the clock context after it changes every minute.
         { type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } },
-        { type: "text", text: getBusinessHoursContext().trim() },
+        { type: "text", text: `${getBusinessHoursContext().trim()}\n\nOFF-TOPIC STRIKES SO FAR: ${strikesSoFar}` },
       ],
       messages,
     });
@@ -145,8 +153,19 @@ async function handleReply(data: { messages: { role: "visitor" | "oragrol"; text
     }
 
     // The hand-off marker is a hidden signal to the widget — never shown to the visitor.
-    const handoff = raw.includes(HANDOFF_MARKER);
-    const reply = raw.split(HANDOFF_MARKER).join("").trim();
+    let handoff = raw.includes(HANDOFF_MARKER);
+    let reply = raw.split(HANDOFF_MARKER).join("").split(OFFTOPIC_MARKER).join("").trim();
+
+    // Unrelated message: count a strike; the third closes the chat and blocks this IP for 7 days.
+    let closed = false;
+    if (raw.includes(OFFTOPIC_MARKER)) {
+      const count = await addStrike(ip);
+      if (strikeOutcome(count) === "close") {
+        closed = true;
+        handoff = false;
+        reply = CHAT_CLOSED_REPLY;
+      }
+    }
 
     // Save the chat server-side and set the 15-minutes-of-silence close. Never blocks or fails the reply.
     if (data.sessionId && data.contact) {
@@ -159,7 +178,7 @@ async function handleReply(data: { messages: { role: "visitor" | "oragrol"; text
       }
     }
 
-    return NextResponse.json({ ok: true, reply, handoff });
+    return NextResponse.json({ ok: true, reply, handoff, closed });
   } catch (err) {
     console.error("[/api/chat] Anthropic error:", err);
     return NextResponse.json(

@@ -39,6 +39,7 @@ import { buildServiceRecommendations } from "../app/lib/odo-outbound";
 import { SERVICE_CATALOG } from "../app/lib/odo-services";
 import { SYSTEM_PROMPT, HANDOFF_MARKER, BUSINESS_AUTOMATION_SECTION } from "../app/lib/chat-knowledge";
 import { chatCostUsd, CHAT_DAILY_CAP_USD } from "../app/lib/chat-spend";
+import { strikeOutcome, OFFTOPIC_MARKER, CHAT_CLOSED_REPLY, CHAT_BLOCKED_REPLY, BLOCK_SECONDS } from "../app/lib/chat-strikes";
 import { SERVICE_PACKAGES, INDIVIDUAL_SERVICES, SPECIALIST_ENGAGEMENTS } from "../app/[locale]/services/services-catalog";
 import en from "../messages/en.json";
 import { readFileSync } from "fs";
@@ -603,6 +604,10 @@ async function main() {
     check("QStash signature rejects a tampered body", !verifyQstashSignature(sign(body), body.replace("2", "3"), [KEY], now));
     check("QStash signature rejects the wrong key, expiry, and a different endpoint", !verifyQstashSignature(sign(body, {}, "bad"), body, [KEY], now) && !verifyQstashSignature(sign(body, { exp: 5 }), body, [KEY], now) && !verifyQstashSignature(sign(body, { sub: "https://orgro.ca/api/other" }), body, [KEY], now));
     check("QStash signature rejects a missing header", !verifyQstashSignature(null, body, [KEY], now));
+
+    check("Off-topic strikes: 1st polite, 2nd warns, 3rd closes", strikeOutcome(1) === "polite" && strikeOutcome(2) === "warn" && strikeOutcome(3) === "close" && strikeOutcome(5) === "close");
+    check("Off-topic block lasts 7 days; closing/blocked messages show no email and point to the contact page", BLOCK_SECONDS === 7 * 86400 && !/@/.test(CHAT_CLOSED_REPLY + CHAT_BLOCKED_REPLY) && /contact page/.test(CHAT_CLOSED_REPLY) && /contact page/.test(CHAT_BLOCKED_REPLY));
+    check("Chat prompt teaches the unrelated-message marker and says on-topic cyber/IT questions don't count", SYSTEM_PROMPT.includes(OFFTOPIC_MARKER) && /General cybersecurity, IT or business questions are NOT unrelated/.test(SYSTEM_PROMPT));
 
     check("Word file is a real .docx (zip)", docxBuf.length > 2000 && docxBuf[0] === 0x50 && docxBuf[1] === 0x4b);
   }
