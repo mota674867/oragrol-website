@@ -152,20 +152,14 @@ export default function ChatWidget(){
   };
 
   const runEscalate=async(name:string,email:string,reason:"urgent"|"human-requested")=>{
-    setSending(true);
     escalatedRef.current=true;
     try{
       const transcript=messagesRef.current.filter(m=>m.kind!=="form"&&m.text.trim().length>0).slice(-30).map(m=>({role:m.from,text:m.text}));
-      const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"escalate",name,email,reason,transcript,sessionId:sessionIdRef.current||undefined})});
-      const json=await res.json().catch(()=>null);
-      if(res.ok&&json?.ok){
-        setMessages(m=>[...m,{from:"oragrol",text:"Got it. Our team has been notified and will follow up at "+email+" shortly. You can also use our contact page."}]);
-      }else{
-        setMessages(m=>[...m,{from:"oragrol",text:"I was unable to notify the team right now. Please use our contact page.",email:true}]);
-      }
+      // Silent team alert only: the visitor is never told "we notified the team". Their only channel is the Contact button.
+      await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"escalate",name,email,reason,transcript,sessionId:sessionIdRef.current||undefined})});
     }catch{
-      setMessages(m=>[...m,{from:"oragrol",text:"I was unable to notify the team right now. Please use our contact page.",email:true}]);
-    }finally{setSending(false);}
+      // nothing to show the visitor
+    }
   };
 
   const submitForm=(e:FormEvent,reason:"urgent"|"human-requested")=>{
@@ -227,15 +221,15 @@ export default function ChatWidget(){
 
     // Per-chat cap: keeps cost flat and stops runaway sessions.
     if(messages.filter(m=>m.from==="visitor").length>=MAX_VISITOR_MESSAGES){
-      setMessages([...messages,{from:"visitor",text:msgText},{from:"oragrol",text:"We have reached the limit for this chat. Please continue through our contact page, and our team will follow up. A copy of this conversation will be sent to you."}]);
+      setMessages([...messages,{from:"visitor",text:msgText},{from:"oragrol",text:"We have reached the limit for this chat. Please continue through our contact page. A copy of this conversation will be sent to you."}]);
       return;
     }
 
     // Only escalate for genuine security incidents — not "talk to person"
     if(urgent.test(msgText)){
-      const next:Message[]=[...messages,{from:"visitor",text:msgText},{from:"oragrol",text:"This sounds urgent. I am flagging it to our team as a priority now. Note this chat is not emergency incident response."}];
-      if(contact){setMessages(next);runEscalate(contact.name,contact.email,"urgent");}
-      else{setMessages([...next,{from:"oragrol",text:"",kind:"form",reason:"urgent"}]);}
+      const next:Message[]=[...messages,{from:"visitor",text:msgText},{from:"oragrol",text:"This sounds urgent. Please note this chat is not emergency incident response. Please use our contact page right away."}];
+      setMessages(next);
+      if(contact)void runEscalate(contact.name,contact.email,"urgent");
       return;
     }
 

@@ -64,8 +64,8 @@ function getBusinessHoursContext(): string {
   const isWeekday = utcDay >= 1 && utcDay <= 5;
   const isBusinessHours = isWeekday && etHour >= 9 && etHour < 18;
   return isBusinessHours
-    ? `\n\nCURRENT TIME CONTEXT: It is currently ${etDay} ${etTime} ET — business hours. A real person is available right now if needed.`
-    : `\n\nCURRENT TIME CONTEXT: It is currently ${etDay} ${etTime} ET — outside business hours (Mon–Fri 9am–6pm ET). No one is available to respond live right now. If a visitor needs a person, tell them to use the contact page (/contact) or that the team will follow up next business day.`;
+    ? `\n\nCURRENT TIME CONTEXT: It is currently ${etDay} ${etTime} ET — business hours.`
+    : `\n\nCURRENT TIME CONTEXT: It is currently ${etDay} ${etTime} ET — outside business hours (Mon–Fri 9am–6pm ET).`;
 }
 
 const MAX_VISITOR_CHARS = 1000;
