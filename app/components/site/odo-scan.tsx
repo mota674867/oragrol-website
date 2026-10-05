@@ -436,6 +436,11 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
   // widget reset on a failed/expired check.
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileReady, setTurnstileReady] = useState(false);
+  // Speed: Cloudflare's captcha script is heavy (it dragged this page's mobile
+  // PageSpeed score to 71). Load it only once the visitor shows intent — first
+  // touch/click/key/scroll — or after 12s as a safety net. The verification
+  // check on submit is unchanged.
+  const [loadTurnstile, setLoadTurnstile] = useState(false);
   const turnstileContainerRef = useRef<HTMLDivElement | null>(null);
   const turnstileWidgetIdRef = useRef<string | null>(null);
   const pollRef = useRef<number | null>(null);
@@ -451,6 +456,18 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
   }, []);
 
   useEffect(() => () => stopUpdates(), [stopUpdates]);
+
+  useEffect(() => {
+    if (loadTurnstile) return;
+    const go = () => setLoadTurnstile(true);
+    const events = ["pointerdown", "keydown", "touchstart", "scroll", "focusin"] as const;
+    events.forEach((e) => window.addEventListener(e, go, { once: true, passive: true }));
+    const timer = window.setTimeout(go, 12000);
+    return () => {
+      events.forEach((e) => window.removeEventListener(e, go));
+      window.clearTimeout(timer);
+    };
+  }, [loadTurnstile]);
 
   useEffect(() => {
     if (!turnstileReady || phase !== "idle") return;
@@ -789,11 +806,13 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
 
   return (
     <main className="odo-scan" data-odo-scan data-phase={phase}>
-      <Script
-        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-        strategy="afterInteractive"
-        onLoad={() => setTurnstileReady(true)}
-      />
+      {loadTurnstile && (
+        <Script
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+          strategy="afterInteractive"
+          onLoad={() => setTurnstileReady(true)}
+        />
+      )}
       <header className="odo-scan__masthead">
         <span className="odo-scan__wordmark">ORAGROL GLOBAL</span>
         <p className="odo-scan__language-note">To keep every finding accurate, the ORAGROL scan and its report are currently available in English only. Most of the public sources we draw on are published in English.</p>
