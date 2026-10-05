@@ -605,6 +605,7 @@ async function main() {
     check("QStash signature rejects the wrong key, expiry, and a different endpoint", !verifyQstashSignature(sign(body, {}, "bad"), body, [KEY], now) && !verifyQstashSignature(sign(body, { exp: 5 }), body, [KEY], now) && !verifyQstashSignature(sign(body, { sub: "https://orgro.ca/api/other" }), body, [KEY], now));
     check("QStash signature rejects a missing header", !verifyQstashSignature(null, body, [KEY], now));
 
+    check("Chat quotes the exact public OR ONE tier prices (100 = $75,000 + $3,999/mo)", /OR ONE 100[^\n]*\$75,000[^\n]*\$3,999/.test(SYSTEM_PROMPT) && /OR ONE Starter[^\n]*\$22,000[^\n]*\$999/.test(SYSTEM_PROMPT) && /OR ONE 400[^\n]*\$220,000[^\n]*\$8,999/.test(SYSTEM_PROMPT) && !/never state an exact OR ONE number/.test(SYSTEM_PROMPT));
     check("Off-topic strikes: 1st polite, 2nd warns, 3rd closes", strikeOutcome(1) === "polite" && strikeOutcome(2) === "warn" && strikeOutcome(3) === "close" && strikeOutcome(5) === "close");
     check("Off-topic block lasts 7 days; closing/blocked messages show no email and point to the contact page", BLOCK_SECONDS === 7 * 86400 && !/@/.test(CHAT_CLOSED_REPLY + CHAT_BLOCKED_REPLY) && /contact page/.test(CHAT_CLOSED_REPLY) && /contact page/.test(CHAT_BLOCKED_REPLY));
     check("Chat prompt teaches the unrelated-message marker and says on-topic cyber/IT questions don't count", SYSTEM_PROMPT.includes(OFFTOPIC_MARKER) && /General cybersecurity, IT or business questions are NOT unrelated/.test(SYSTEM_PROMPT));

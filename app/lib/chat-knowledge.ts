@@ -12,13 +12,14 @@
  *                          ba-client.tsx by scripts/test-odo-engine.ts, so a
  *                          price change on the page fails a test instead of
  *                          silently contradicting the chat)
- *   - OR ONE ............. tier names only; investment is private scoping
+ *   - OR ONE ............. the 4 tiers with exact public build + monthly fees (app/lib/or-one-fees.ts, shared with the page)
  *   - ODO ................ the free scan at /scan
  *
  * Edit the FAQ or the Services data and the chat follows on the next deploy.
  */
 
 import en from "../../messages/en.json";
+import { OR_ONE_TIER_KEYS, OR_ONE_TIER_FEES } from "./or-one-fees";
 import { SERVICE_PACKAGES, INDIVIDUAL_SERVICES, SPECIALIST_ENGAGEMENTS } from "@/app/[locale]/services/services-catalog";
 
 /** The chat asks for a human hand-off by ending its reply with this marker; the API strips it and flags `handoff: true`. */
@@ -67,7 +68,22 @@ export const BUSINESS_AUTOMATION_SECTION = `BUSINESS AUTOMATION — 5 named pack
 - Marketing: $7,000 build + $4,500/mo — onboarding, retention, reactivation and revenue across the customer lifecycle.
 - Tailored Automation: privately scoped for needs that don't fit the five packages — pricing confirmed after scoping.`;
 
-export const OR_ONE_SECTION = `OR ONE — a custom, coordinated AI system spanning security, automation and operational intelligence, built around the client's specific business. Tiers: STARTER (from $22K, one category, a focused first system), 100 / 200 / 400 (larger scope, investment confirmed after private scoping). OR ONE has its own "OR Service Fee" (OSF) calculated during private scoping — never state an exact OR ONE number beyond the Starter "from $22K"; say the rest is confirmed after private scoping.`;
+type OrOneDetail = { title: string; subtitle: string; intro: string; pointsLabel: string; whoItSuits?: string };
+const cad = (n: number) => `$${n.toLocaleString("en-CA")}`;
+
+/** OR ONE tiers with the exact public build fee and base monthly OR Service Fee — same numbers the OR ONE page cards show. */
+export function orOneSection(): string {
+  const o = (en as unknown as { OrOne: { details: Record<string, OrOneDetail>; pricing: { note1: string; note2: string } } }).OrOne;
+  const tiers = OR_ONE_TIER_KEYS.map((k) => {
+    const d = o.details[k];
+    const f = OR_ONE_TIER_FEES[k];
+    return `- ${d.title} (${d.pointsLabel}) — ${d.subtitle} Build fee ${cad(f.build)} (one-time) plus a base monthly OR Service Fee of ${cad(f.monthly)}/month. ${d.intro}`;
+  }).join("\n");
+  return `OR ONE — a custom, coordinated AI system spanning security, automation and operational intelligence, built around the client's specific business. These are the PUBLIC tier prices on the OR ONE page (all fees in CAD) — quote them directly when asked:
+${tiers}
+${o.pricing.note1} ${o.pricing.note2} So give the tier price plainly, then add that the final scope and monthly fee are confirmed through private review, and that the free scan at /scan or the OR ONE page builder gives a preliminary tier.`;
+}
+export const OR_ONE_SECTION = orOneSection();
 
 export const ODO_SECTION = `ODO — ORAGROL's free business scan, at /scan. THIS IS THE ANSWER TO "WHERE DO I START?" / "WHAT DO I NEED?" / "WHAT WOULD YOU RECOMMEND FOR MY BUSINESS?".
 - ODO stands for OR Discovery & Opportunity Agent. It researches the visitor's business from public information first, then asks only what research can't see — a few questions (at most 15) answered in their own words.

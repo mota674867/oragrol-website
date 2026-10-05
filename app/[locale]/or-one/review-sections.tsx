@@ -3,6 +3,7 @@ import { useLocale, useTranslations } from "next-intl";
 import s from './review-sections.module.css';
 import { DetailsDialog, type DetailsDialogLabels } from "@/app/components/DetailsDialog";
 import { orOneDetailsContent } from "@/app/lib/or-one-details-content";
+import { OR_ONE_TIER_KEYS, OR_ONE_TIER_FEES } from "@/app/lib/or-one-fees";
 
 /**
  * Bilingual (D-086, Task #21): all five sections below now read from the
@@ -80,13 +81,8 @@ export function RevisedProcess() {
   );
 }
 
-const TIER_KEYS = ["STARTER", "100", "200", "400"] as const;
-const TIER_FEES: Record<(typeof TIER_KEYS)[number], { build: number; monthly: number }> = {
-  STARTER: { build: 22000, monthly: 999 },
-  "100": { build: 75000, monthly: 3999 },
-  "200": { build: 150000, monthly: 5999 },
-  "400": { build: 220000, monthly: 8999 },
-};
+const TIER_KEYS = OR_ONE_TIER_KEYS;
+const TIER_FEES = OR_ONE_TIER_FEES;
 
 export function RevisedPricing() {
   const t = useTranslations("OrOne");
