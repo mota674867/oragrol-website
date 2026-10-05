@@ -7,6 +7,8 @@ import { SYSTEM_PROMPT, HANDOFF_MARKER } from "../../lib/chat-knowledge";
 import { chatCapReached, recordChatSpend, CHAT_CAP_REPLY } from "../../lib/chat-spend";
 import { checkChatIpDaily } from "../../lib/odo-redis";
 import { syncChatLeadToHubSpot } from "../../lib/hubspot";
+import { saveChatTurn, markChatEscalated, type ChatContact } from "../../lib/chat-session";
+import { scheduleChatSweep } from "../../lib/chat-qstash";
 
 /**
  * POST /api/chat — ORAGROL chat widget backend
@@ -50,7 +52,7 @@ export async function POST(request: Request) {
   if (parsed.data.mode === "escalate") {
     return handleEscalate(parsed.data);
   }
-  return handleReply(parsed.data, ip);
+  return handleReply(parsed.data, ip, new URL(request.url).origin);
 }
 
 function getBusinessHoursContext(): string {
@@ -71,7 +73,7 @@ const HISTORY_MESSAGES = 12;
 const MAX_REPLY_TOKENS = 600;
 const IP_DAILY_MESSAGES = 60;
 
-async function handleReply(data: { messages: { role: "visitor" | "oragrol"; text: string }[] }, ip: string) {
+async function handleReply(data: { messages: { role: "visitor" | "oragrol"; text: string }[]; sessionId?: string; contact?: ChatContact }, ip: string, origin: string) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     console.error("[/api/chat] Missing ANTHROPIC_API_KEY");
@@ -146,6 +148,17 @@ async function handleReply(data: { messages: { role: "visitor" | "oragrol"; text
     const handoff = raw.includes(HANDOFF_MARKER);
     const reply = raw.split(HANDOFF_MARKER).join("").trim();
 
+    // Save the chat server-side and set the 15-minutes-of-silence close. Never blocks or fails the reply.
+    if (data.sessionId && data.contact) {
+      const { sessionId, contact } = data;
+      try {
+        const saved = await saveChatTurn({ sessionId, contact, requestMessages: data.messages, reply });
+        void scheduleChatSweep(origin, sessionId, saved.version);
+      } catch (err) {
+        console.error("[/api/chat] Saving the chat failed (the reply still goes out):", err);
+      }
+    }
+
     return NextResponse.json({ ok: true, reply, handoff });
   } catch (err) {
     console.error("[/api/chat] Anthropic error:", err);
@@ -159,6 +172,7 @@ async function handleReply(data: { messages: { role: "visitor" | "oragrol"; text
 async function handleEscalate(data: {
   name: string;
   email: string;
+  sessionId?: string;
   reason: "urgent" | "human-requested";
   transcript?: { role: "visitor" | "oragrol"; text: string }[];
 }) {
@@ -187,6 +201,8 @@ async function handleEscalate(data: {
   ]
     .filter(Boolean)
     .join("\n");
+
+  if (data.sessionId) await markChatEscalated(data.sessionId).catch(() => {});
 
   const resend = new Resend(apiKey);
   try {

@@ -20,6 +20,16 @@ const chatMessageSchema = z.object({
 export const chatReplySchema = z.object({
   mode: z.literal("reply"),
   messages: z.array(chatMessageSchema).min(1).max(30),
+  // Lets the server save the conversation and close it after 15 minutes of silence.
+  sessionId: z.string().regex(/^[A-Za-z0-9_-]{8,80}$/).optional(),
+  contact: z
+    .object({
+      name: z.string().trim().min(1).max(200),
+      email: z.string().trim().email().max(320),
+      company: z.string().trim().max(200).optional(),
+      sendCopy: z.boolean(),
+    })
+    .optional(),
 });
 
 export const chatEscalateSchema = z.object({
@@ -27,6 +37,7 @@ export const chatEscalateSchema = z.object({
   name: z.string().trim().min(1, "Enter your name.").max(200),
   email: z.string().trim().min(1, "Enter your email.").email("Enter a valid email address."),
   reason: z.enum(["urgent", "human-requested"]),
+  sessionId: z.string().regex(/^[A-Za-z0-9_-]{8,80}$/).optional(),
   // Last few turns of the conversation, for context in the alert email
   // and CRM note — not re-sent to the AI on this path.
   transcript: z.array(chatMessageSchema).max(30).optional(),

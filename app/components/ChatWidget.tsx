@@ -1,5 +1,5 @@
 "use client";
-import {FormEvent,useCallback,useEffect,useRef,useState} from "react";
+import {FormEvent,useEffect,useRef,useState} from "react";
 import "../chat-widget.css";
 
 type Message={
@@ -105,12 +105,11 @@ export default function ChatWidget(){
   const [pendingFile,setPendingFile]=useState<{file:File;preview:string}|null>(null);
   const logRef=useRef<HTMLDivElement>(null);
   const fileInputRef=useRef<HTMLInputElement>(null);
-  const inactivityRef=useRef<ReturnType<typeof setTimeout>|undefined>(undefined);
   const messagesRef=useRef<Message[]>([]);
   const contactRef=useRef<{name:string;email:string;company?:string;sendCopy:boolean}|null>(null);
   const handoffRef=useRef(false);
   const escalatedRef=useRef(false);
-  const transcriptSentRef=useRef(false);
+  const sessionIdRef=useRef("");
 
   useEffect(()=>{messagesRef.current=messages;},[messages]);
   useEffect(()=>{contactRef.current=contact;},[contact]);
@@ -132,51 +131,20 @@ export default function ChatWidget(){
     return()=>{clearTimeout(timer);removeEventListener("scroll",scroll);};
   },[]);
 
-  const fireClose=useCallback(()=>{
-    const c=contactRef.current;
-    const msgs=messagesRef.current.filter(m=>m.kind!=="form"&&(m.text||"").trim().length>0);
-    if(!c||msgs.length===0||transcriptSentRef.current)return;
-    transcriptSentRef.current=true;
-    fetch("/api/chat-close",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        sessionId:"chat_"+Date.now(),
-        visitorName:c.name,
-        visitorEmail:c.email,
-        visitorCompany:c.company,
-        sendToVisitor:c.sendCopy,
-        messages:msgs.map(m=>({role:m.from==="visitor"?"user":"assistant",content:m.text,timestamp:Date.now()})),
-        escalated:escalatedRef.current,
-      }),
-      keepalive:true,
-    }).catch(()=>{});
-  },[]);
-
-  // Inactivity timer — 3 min after last exchange, send transcript
-  const resetInactivity=useCallback(()=>{
-    clearTimeout(inactivityRef.current);
-    inactivityRef.current=setTimeout(fireClose,3*60*1000);
-  },[fireClose]);
-
-  // Also fire on tab hide/close
-  useEffect(()=>{
-    const h=()=>{if(document.visibilityState==="hidden")fireClose();};
-    document.addEventListener("visibilitychange",h);
-    return()=>document.removeEventListener("visibilitychange",h);
-  },[fireClose]);
-
+  // The server saves every answered turn and closes the chat itself after 15 minutes of silence,
+  // emailing the transcript (see lib/chat-session.ts). The browser no longer decides when a chat ends.
   const dismissGreeting=()=>{setGreeting(false);sessionStorage.setItem("oragrol-chat-greeting-dismissed","1");};
   const dismissChat=()=>{setOpen(false);setGreeting(false);setDismissed(true);sessionStorage.setItem("oragrol-chat-widget-dismissed","1");};
   const restoreChat=()=>{setDismissed(false);sessionStorage.removeItem("oragrol-chat-widget-dismissed");};
   const launch=()=>{setOpen(!open);if(!open)dismissGreeting();};
-  const closePanel=()=>{fireClose();setOpen(false);};
+  const closePanel=()=>{setOpen(false);};
 
   const submitIntake=(e:FormEvent)=>{
     e.preventDefault();
     const name=intakeValue.name.trim(),email=intakeValue.email.trim(),company=intakeValue.company.trim();
     if(!name||!emailPattern.test(email))return;
     setIntakeDone(true);
+    if(!sessionIdRef.current)sessionIdRef.current="chat_"+crypto.randomUUID().replace(/-/g,"");
     setContact({name,email,company:company||undefined,sendCopy:intakeValue.sendCopy});
     fetch("/api/chat-lead",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,email,company}),keepalive:true}).catch(()=>{});
     setMessages([{from:"oragrol",text:"Hi "+name.split(" ")[0]+"! I am ORAGROL's AI assistant. Please note this chat is available in English only. I can help with our services, pricing, and how we work, or point you to our free business scan at /scan if you are not sure where to start. What would you like to know?"}]);
@@ -187,7 +155,7 @@ export default function ChatWidget(){
     escalatedRef.current=true;
     try{
       const transcript=messagesRef.current.filter(m=>m.kind!=="form"&&m.text.trim().length>0).slice(-30).map(m=>({role:m.from,text:m.text}));
-      const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"escalate",name,email,reason,transcript})});
+      const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"escalate",name,email,reason,transcript,sessionId:sessionIdRef.current||undefined})});
       const json=await res.json().catch(()=>null);
       if(res.ok&&json?.ok){
         setMessages(m=>[...m,{from:"oragrol",text:"Got it. Our team has been notified and will follow up at "+email+" shortly. You can also reach us at info@orgro.ca."}]);
@@ -212,13 +180,12 @@ export default function ChatWidget(){
     setSending(true);
     try{
       const payload=history.filter(m=>m.kind!=="form").slice(-16).map(m=>({role:m.from,text:m.text}));
-      const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"reply",messages:payload})});
+      const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"reply",messages:payload,sessionId:sessionIdRef.current||undefined,contact:contactRef.current||undefined})});
       const json=await res.json().catch(()=>null);
       if(res.ok&&json?.ok&&json.reply){
         const withReply:Message[]=[...history,{from:"oragrol",text:json.reply}];
         setMessages(withReply);
         messagesRef.current=withReply;
-        resetInactivity();
         // The AI could not answer (or the topic is for the team): send a REAL hand-off to ORAGROL, once per chat.
         const c=contactRef.current;
         if(json.handoff&&!json.capped&&c&&!handoffRef.current){

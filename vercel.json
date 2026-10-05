@@ -1,3 +1,12 @@
 {
-  "crons": [{ "path": "/api/odo/cron/abandoned", "schedule": "0 13 * * *" }]
+  "crons": [
+    {
+      "path": "/api/odo/cron/abandoned",
+      "schedule": "0 13 * * *"
+    },
+    {
+      "path": "/api/chat-sweep",
+      "schedule": "30 13 * * *"
+    }
+  ]
 }

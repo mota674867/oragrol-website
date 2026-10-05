@@ -42,6 +42,9 @@ import { chatCostUsd, CHAT_DAILY_CAP_USD } from "../app/lib/chat-spend";
 import { SERVICE_PACKAGES, INDIVIDUAL_SERVICES, SPECIALIST_ENGAGEMENTS } from "../app/[locale]/services/services-catalog";
 import en from "../messages/en.json";
 import { readFileSync } from "fs";
+import { applyTurn, isDue, CHAT_IDLE_MS, type ChatSession } from "../app/lib/chat-session";
+import { verifyQstashSignature } from "../app/lib/chat-qstash";
+import { createHash, createHmac } from "node:crypto";
 import { renderOutboundDocx } from "../app/lib/odo-outbound-docx";
 import { filterLeads } from "../app/lib/odo-outbound-leads";
 import type { Evidence } from "../app/lib/odo-ledger";
@@ -574,6 +577,33 @@ async function main() {
     check("chat's Business Automation numbers match ba-client.tsx", builds.length === 5 && builds.every((b) => BUSINESS_AUTOMATION_SECTION.includes("$" + b.toLocaleString("en-CA"))) && monthly.length === 5 && monthly.every((mm) => BUSINESS_AUTOMATION_SECTION.includes(mm)));
     check("chat cost math: 10k in + 200 out ~ $0.033", Math.abs(chatCostUsd({ input: 10000, output: 200, cacheRead: 0, cacheWrite: 0 }) - 0.033) < 1e-9);
     check("daily chat cap is $5", CHAT_DAILY_CAP_USD === 5);
+    // 32. Chat saving + 15-minute silent close
+    const contact = { name: "Sam Lee", email: "sam@example.ca", company: "Lee Co", sendCopy: true };
+    const t0 = 1_000_000;
+    const first = applyTurn(null, { sessionId: "chat_abc12345", contact, requestMessages: [{ role: "oragrol", text: "Hi Sam" }, { role: "visitor", text: "What is Foundation?" }], reply: "Foundation is our entry package." }, t0);
+    check("first turn saves greeting, question and reply in order", first.messages.map((m) => m.content).join("|") === "Hi Sam|What is Foundation?|Foundation is our entry package." && first.version === 1);
+    const second = applyTurn(first, { sessionId: "chat_abc12345", contact, requestMessages: [{ role: "visitor", text: "And Advanced?" }], reply: "Advanced adds six services." }, t0 + 60_000);
+    check("next turn appends exactly the new visitor message + reply, version bumps", second.messages.length === 5 && second.version === 2 && second.messages[3].content === "And Advanced?");
+    check("not due before 15 minutes of silence", !isDue(second, t0 + 60_000 + CHAT_IDLE_MS - 1));
+    check("due at 15 minutes of silence", isDue(second, t0 + 60_000 + CHAT_IDLE_MS));
+    check("a chat already sent is never due again", !isDue({ ...second, sent: true } as ChatSession, t0 + 10 * CHAT_IDLE_MS));
+    const back = applyTurn({ ...second, sent: true, escalated: true }, { sessionId: "chat_abc12345", contact, requestMessages: [{ role: "visitor", text: "One more thing" }], reply: "Of course." }, t0 + 3_600_000);
+    check("returning after a sent transcript starts a fresh segment", back.segment === 1 && back.messages.length === 2 && !back.sent && !back.escalated);
+
+    const KEY = "test-signing-key";
+    const b64 = (x: Buffer | string) => Buffer.from(x).toString("base64url");
+    const sign = (body: string, over: Record<string, unknown> = {}, key = KEY) => {
+      const h = b64(JSON.stringify({ alg: "HS256", typ: "JWT" }));
+      const p = b64(JSON.stringify({ iss: "Upstash", sub: "https://orgro.ca/api/chat-sweep", exp: 2_000_000_000, nbf: 1, body: createHash("sha256").update(body).digest("base64url"), ...over }));
+      return `${h}.${p}.${createHmac("sha256", key).update(`${h}.${p}`).digest("base64url")}`;
+    };
+    const now = 1_700_000_000;
+    const body = JSON.stringify({ sessionId: "chat_abc12345", version: 2 });
+    check("QStash signature accepted (current or next key)", verifyQstashSignature(sign(body), body, ["other", KEY], now) && verifyQstashSignature(sign(body), body, [undefined, KEY], now));
+    check("QStash signature rejects a tampered body", !verifyQstashSignature(sign(body), body.replace("2", "3"), [KEY], now));
+    check("QStash signature rejects the wrong key, expiry, and a different endpoint", !verifyQstashSignature(sign(body, {}, "bad"), body, [KEY], now) && !verifyQstashSignature(sign(body, { exp: 5 }), body, [KEY], now) && !verifyQstashSignature(sign(body, { sub: "https://orgro.ca/api/other" }), body, [KEY], now));
+    check("QStash signature rejects a missing header", !verifyQstashSignature(null, body, [KEY], now));
+
     check("Word file is a real .docx (zip)", docxBuf.length > 2000 && docxBuf[0] === 0x50 && docxBuf[1] === 0x4b);
   }
 

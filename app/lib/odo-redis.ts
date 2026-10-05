@@ -446,3 +446,8 @@ export async function checkChatIpDaily(ip: string, limit: number): Promise<{ ok:
   if (count === 1) await redis.expire(key, 24 * 60 * 60);
   return { ok: count <= limit, count };
 }
+
+/** Shared Upstash client for the chat-session store (chat-session.ts). */
+export function chatRedis(): Redis {
+  return getRedis();
+}
