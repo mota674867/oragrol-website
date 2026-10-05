@@ -13,7 +13,9 @@ export async function scheduleChatSweep(origin: string, sessionId: string, versi
   const token = process.env.QSTASH_TOKEN;
   if (!token) return false;
   try {
-    const res = await fetch(`https://qstash.upstash.io/v2/publish/${origin}${SWEEP_PATH}`, {
+    // Newer Upstash accounts get a regional endpoint (shown as QSTASH_URL in the console); older ones use the default.
+    const base = (process.env.QSTASH_URL || "https://qstash.upstash.io").replace(/\/+$/, "");
+    const res = await fetch(`${base}/v2/publish/${origin}${SWEEP_PATH}`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", "Upstash-Delay": `${Math.round(CHAT_IDLE_MS / 1000)}s` },
       body: JSON.stringify({ sessionId, version }),
