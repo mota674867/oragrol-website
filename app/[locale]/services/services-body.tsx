@@ -106,11 +106,14 @@ export default function ServicesPage({ onAddToScope, isInScope, onDiscussEngagem
   const addLabelIndividual = (added: boolean) => (added ? t("individual.addedToScope") : `${t("individual.addToScope")} ↗︎`);
   return <div className="oragrol-services">
     <style>{styles}</style>
-    <section className="os-hero" aria-labelledby={`${uid}-title`}>
-      <div className="os-watermark" aria-hidden="true">OR</div>
+    <section className="os-hero os-hx" aria-labelledby={`${uid}-title`}>
       <div className="os-kicker"><span>{t("hero.kicker1")}</span><span>{t("hero.kicker2")}</span></div>
-      <div className="os-headline"><h1 id={`${uid}-title`}>{t("hero.headline1")}<span className="os-orange">.</span><br/><span>{t("hero.headline2a")}<br/>{t("hero.headline2b")}</span></h1><p>{t("hero.sub1")}<br/><span>{t("hero.sub2")}</span></p></div>
-      <div className="os-hero-links">{[{ count: t("hero.packagesCount"), label: t("hero.packagesLabel"), detail: t("hero.packagesDetail"), href: "#service-packages" }, { count: t("hero.alaCarteCount"), label: t("hero.alaCarteLabel"), detail: t("hero.alaCarteDetail"), href: "#individual-services" }, { count: t("hero.specialistCount"), label: t("hero.specialistLabel"), detail: t("hero.specialistDetail"), href: "#specialist-engagements" }].map(item => <a key={item.href} href={item.href}><div><span className="os-orange">{item.count}</span><h2>{item.label}</h2><span aria-hidden="true">↘︎</span></div><p>{item.detail}</p></a>)}</div>
+      <div className="os-hx-mid">
+        <h1 id={`${uid}-title`}>{t("hero.headline1").replace(/\.$/, "")}<span className="os-orange">.</span><span className="os-hx-g">{t("hero.headline2a")}<br/>{t("hero.headline2b")}</span></h1>
+        <div className="os-hx-art"><div className="os-watermark"><span className="os-hx-o"><span aria-hidden="true">O</span><p className="os-hx-total"><b>{SERVICE_PACKAGES.length + INDIVIDUAL_SERVICES.length + SPECIALIST_ENGAGEMENTS.length}</b><small>{t("hero.totalLabel")}</small></p></span><span aria-hidden="true">R</span></div></div>
+        <p className="os-hx-sub">{t("hero.sub1")}<br/><span>{t("hero.sub2")}</span></p>
+      </div>
+      <div className="os-hero-links os-hx-tiles">{[{ count: t("hero.packagesCount"), label: t("hero.packagesLabel"), detail: t("hero.packagesDetail"), href: "#service-packages" }, { count: t("hero.alaCarteCount"), label: t("hero.alaCarteLabel"), detail: t("hero.alaCarteDetail"), href: "#individual-services" }, { count: t("hero.specialistCount"), label: t("hero.specialistLabel"), detail: t("hero.specialistDetail"), href: "#specialist-engagements" }].map(item => <a key={item.href} href={item.href}><b>{item.count}</b><h2>{item.label}</h2><i aria-hidden="true">↘︎</i><p>{item.detail}</p></a>)}</div>
       <div className="os-kicker os-hero-end"><span>{t("hero.footerKicker")}</span><a href="#services-clarity">{t("hero.footerCta")} ↓</a></div>
     </section>
 
@@ -290,4 +293,42 @@ const styles = `
 .os-pk .os-pk-layer .os-pk-upgrade{font-size:13px;line-height:1.4}
 @media(max-width:1100px){.os-packages .os-package-layout{grid-template-columns:30% 70%}}
 @media(max-width:700px){.os-packages .os-package-panel.os-pk{padding:18px 0}.os-packages .os-selector button{padding:12px}.os-packages .os-package-name{font-size:18px}.os-packages .os-selector-price{font-size:16px}.os-pk-layer{grid-template-columns:1fr;gap:8px;padding:12px 14px}.os-pk-chips li{white-space:normal}}
+
+/* Services hero — H1 compact (2026-10-06): big OR with the total (20) inside the O, numbered tiles */
+.os-hero.os-hx{min-height:0;padding:26px 4% 20px;justify-content:flex-start}
+.os-hx .os-hx-mid{display:flex;flex-direction:column;gap:18px;padding:5vh 0 4vh}
+.os-hx h1{margin:0;font-size:clamp(52px,6.2vw,100px);font-weight:400;letter-spacing:-.055em;line-height:.9;color:#f2f2ef}
+.os-hx h1 span{margin-left:0}
+:lang(fr) .os-hx h1{font-size:clamp(44px,4.9vw,80px)}
+.os-hx h1 .os-orange{display:inline;color:#ef4d00}
+.os-hx h1 .os-hx-g{display:block;color:#9b9ea1}
+.os-hx .os-hx-sub{margin:0;max-width:440px;font-size:15px;line-height:1.6;color:#d6d8d9}
+.os-hx .os-hx-sub span{color:#9b9ea1}
+.os-hx .os-hx-art{position:absolute;inset:0;z-index:-1;pointer-events:none}
+.os-hx .os-watermark{right:-2vw;top:3%;font-size:clamp(340px,40vw,700px);line-height:.8;color:#1f2225;z-index:0}
+.os-hx .os-hx-o{position:relative;display:inline-block}
+.os-hx .os-hx-total{position:absolute;margin:0;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;letter-spacing:normal;line-height:1}
+.os-hx .os-hx-total b{display:block;font-size:clamp(100px,10vw,176px);font-weight:300;letter-spacing:-.07em;line-height:.85;color:#ef4d00}
+.os-hx .os-hx-total small{display:block;font-size:10px;letter-spacing:.2em;color:#b9bcbe;margin-top:8px;white-space:nowrap}
+.os-hx .os-hx-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;border:0}
+.os-hx .os-hx-tiles>a,.os-hx .os-hx-tiles>a:first-child,.os-hx .os-hx-tiles>a:last-child{display:grid;grid-template-columns:auto 1fr auto;column-gap:16px;align-items:end;padding:14px 18px;background:#1d2023;border:0;border-top:2px solid #34373a;transition:background .2s,border-color .2s}
+.os-hx .os-hx-tiles>a:hover{background:#26221f;border-top-color:#ef4d00}
+.os-hx .os-hx-tiles>a:hover h2{text-decoration:none;color:#ef4d00}
+.os-hx .os-hx-tiles b{grid-row:span 2;font-size:52px;font-weight:300;letter-spacing:-.06em;line-height:.8;color:#ef4d00}
+.os-hx .os-hx-tiles h2{margin:0;font-size:clamp(19px,1.7vw,24px);font-weight:400;letter-spacing:-.03em}
+.os-hx .os-hx-tiles i{grid-row:1;grid-column:3;font-style:normal;color:#9fa3a6}
+.os-hx .os-hx-tiles p{grid-column:2;margin:3px 0 0;font-size:13px;color:#9fa3a6}
+.os-hx .os-hero-end{padding-top:14px;margin-top:14px;border-top:1px solid #2e3134}
+@media(max-width:700px){
+.os-hero.os-hx{padding:22px 20px 18px}
+.os-hx .os-hx-mid{gap:12px;padding:26px 0 22px}
+.os-hx h1{font-size:clamp(34px,11vw,46px)}
+.os-hx .os-hx-art{position:relative;inset:auto;height:220px;z-index:0}
+.os-hx .os-watermark{font-size:250px;left:-10px;right:auto;top:0}
+.os-hx .os-hx-total b{font-size:76px}
+.os-hx .os-hx-total small{font-size:8px;letter-spacing:.16em}
+.os-hx .os-hx-tiles{grid-template-columns:1fr;gap:8px}
+.os-hx .os-hx-tiles>a,.os-hx .os-hx-tiles>a:first-child,.os-hx .os-hx-tiles>a:last-child{padding:12px 14px}
+.os-hx .os-hx-tiles b{font-size:42px}
+.os-hx .os-hx-tiles h2{font-size:20px}}
 `;
