@@ -379,7 +379,12 @@ footer{min-height:75svh;background:#0c0e0f;color:#eee;padding:4vw 3vw 22px;displ
 /* 2026-10-06 compact heroes (Mohammad: "same compact size as the Services hero").
    Was full-screen; now about the same height as Services, so the next section shows. */
 @media(min-width:701px){
-  .ba-hero{height:clamp(600px,44vw,680px);min-height:0}
+  /* Height follows the content (fixed height let the text and the orange 5 spill into the next section on 24" screens). */
+  .ba-hero{height:auto;min-height:clamp(600px,44vw,680px);overflow:hidden}
+  .ba-statement h1{font-size:clamp(56px,5.6vw,104px)}
+  .ba-support{margin-top:clamp(28px,4vh,48px)}
+  .ba-or{font-size:clamp(150px,16vw,300px)}
+  .ba-five{font-size:clamp(200px,21vw,360px)}
   .one-hero{height:clamp(600px,44vw,680px);min-height:0}
   .one-hero .one-headline h1{font-size:clamp(54px,5.4vw,96px)}
   .one-hero .one-orange-or{font-size:clamp(84px,7vw,120px)}
