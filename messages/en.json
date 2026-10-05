@@ -220,7 +220,7 @@
       "step3": "Choose the scope that fits"
     },
     "packages": {
-      "eyebrow": "04 / CHOOSE YOUR PROTECTION",
+      "eyebrow": "4 / CHOOSE YOUR PROTECTION",
       "headline1": "Four packages.",
       "headline2": "One clear starting point.",
       "sub": "Select a package to explore its fit and included services. Add your preferred scope for review.",
@@ -233,6 +233,17 @@
       "initialOption": "Initial three-month option: {price}. Then moves into a 12-month standard contract.",
       "addToScope": "Add to My Scope",
       "addedToScope": "Added to My Scope",
+      "layersSummary": "{n} SERVICES IN {layers, plural, one {# LAYER} other {# LAYERS}}",
+      "layerIncluded": "Included · {n}",
+      "layerNew": "New in {pkg} · +{n}",
+      "layerIn": "In {pkg} · {n} services",
+      "layerUpgrade": "Upgrade to {pkg} for {price} more →",
+      "layers": {
+        "foundation": "Core protection",
+        "advanced": "Visibility & access",
+        "comprehensive": "Cloud, apps & data",
+        "elite": "Response"
+      },
       "list": {
         "foundation": {
           "value": "Establish your core protection.",

@@ -220,7 +220,7 @@
       "step3": "Choisissez la portée qui vous convient"
     },
     "packages": {
-      "eyebrow": "04 / CHOISISSEZ VOTRE PROTECTION",
+      "eyebrow": "4 / CHOISISSEZ VOTRE PROTECTION",
       "headline1": "Quatre forfaits.",
       "headline2": "Un point de départ clair.",
       "sub": "Sélectionnez un forfait pour découvrir s'il vous convient et les services qu'il inclut. Ajoutez la portée souhaitée pour révision.",
@@ -233,6 +233,17 @@
       "initialOption": "Option initiale de trois mois : {price}. Passe ensuite à un contrat standard de 12 mois.",
       "addToScope": "Ajouter à ma portée",
       "addedToScope": "Ajouté à ma portée",
+      "layersSummary": "{n} SERVICES EN {layers, plural, one {# COUCHE} other {# COUCHES}}",
+      "layerIncluded": "Inclus · {n}",
+      "layerNew": "Nouveau dans {pkg} · +{n}",
+      "layerIn": "Dans {pkg} · {n} services",
+      "layerUpgrade": "Passez à {pkg} pour {price} de plus →",
+      "layers": {
+        "foundation": "Protection de base",
+        "advanced": "Visibilité et accès",
+        "comprehensive": "Infonuagique, applications et données",
+        "elite": "Intervention"
+      },
       "list": {
         "foundation": {
           "value": "Établissez votre protection de base.",
