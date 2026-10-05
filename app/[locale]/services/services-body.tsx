@@ -133,7 +133,7 @@ export default function ServicesPage({ onAddToScope, isInScope, onDiscussEngagem
     <section className="os-specialists os-dark os-section" id="specialist-engagements" aria-labelledby={`${uid}-specialists`}>
       <div className="os-section-head"><p className="os-eyebrow">{t("specialists.eyebrow")}</p><h2 id={`${uid}-specialists`}>{t("specialists.headline1")}<br/><span>{t("specialists.headline2")}</span></h2><p>{t("specialists.sub")}</p></div>
       <p className="os-price-note">{t("specialists.priceNote")}</p>
-      <div className="os-specialist-grid">{SPECIALIST_ENGAGEMENTS.map((s, i) => <article className="os-specialist-card" key={s.code}><p className="os-eyebrow">0{i + 1} / {t("specialists.eyebrow").split("/ ")[1] ?? t("specialists.eyebrow")}</p><h3>{s.name}</h3><p className="os-description">{t(`specialists.list.${s.code}.line`)}</p>{specialistDetailsContent[s.code] && <DetailsDialog category="SPECIALIST ENGAGEMENT" onDark {...specialistDetailsContent[s.code]} action={{ label: `${t("specialists.discussEngagement")} ↗︎`, onClick: () => onDiscussEngagement({ code: s.code, name: s.name }) }} />}<div className="os-engagement-prices"><p className="os-engagement-price-main">{s.priceLine}</p>{s.secondaryPriceLine ? <p className="os-engagement-price-secondary">{s.secondaryPriceLine}</p> : null}</div><Action perform={() => onDiscussEngagement({ code: s.code, name: s.name })}>{t("specialists.discussEngagement")} ↗︎</Action></article>)}</div>
+      <div className="os-specialist-grid">{SPECIALIST_ENGAGEMENTS.map((s, i) => <article className="os-specialist-card" key={s.code}><span className="os-sp-idx" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span><h3>{s.name}</h3><p className="os-description">{t(`specialists.list.${s.code}.line`)}</p>{specialistDetailsContent[s.code] && <DetailsDialog category="SPECIALIST ENGAGEMENT" onDark {...specialistDetailsContent[s.code]} action={{ label: `${t("specialists.discussEngagement")} ↗︎`, onClick: () => onDiscussEngagement({ code: s.code, name: s.name }) }} />}<div className="os-engagement-prices"><p className="os-engagement-price-main">{s.priceLine}</p>{s.secondaryPriceLine ? <p className="os-engagement-price-secondary">{s.secondaryPriceLine}</p> : null}</div><Action perform={() => onDiscussEngagement({ code: s.code, name: s.name })}>{t("specialists.discussEngagement")} ↗︎</Action></article>)}</div>
     </section>
   </div>;
 }
@@ -191,4 +191,29 @@ const styles = `
 .os-individual .os-service-card.is-feat h3{font-size:24px;margin-top:22px}
 .os-individual .is-feat .os-card-price{font-size:32px}
 .os-individual .os-service-card.is-feat::after{font-size:120px}}
-`;
+
+/* Specialist engagements — option 3, four compact dark tiles, numbered (2026-10-06) */
+.os-specialists .os-specialist-grid{border:0;gap:10px}
+.os-specialists .os-specialist-card,.os-specialists .os-specialist-card:nth-child(even){position:relative;overflow:hidden;border:0;padding:24px 26px 20px}
+.os-specialists .os-sp-idx{position:absolute;top:14px;right:22px;font-size:56px;font-weight:300;letter-spacing:-.06em;line-height:1;pointer-events:none}
+.os-specialists .os-specialist-card h3{font-size:28px;margin:6px 0 8px;max-width:80%}
+.os-specialists .os-specialist-card .os-description{font-size:14px;line-height:1.5;flex:1;margin:0 0 4px}
+.os-specialists .os-specialist-card>span[style] button{margin-top:0!important;min-height:34px!important;padding:2px 0!important}
+.os-specialists .os-engagement-prices{padding-top:12px;margin:6px 0 14px}
+.os-specialists .os-engagement-price-main{font-size:24px;line-height:1.25;letter-spacing:-.02em;margin:0}
+.os-specialists .os-engagement-price-secondary{font-size:12px;margin:4px 0 0}
+.os-specialists .os-action{position:relative;z-index:1}
+.os-specialists .os-action button{border:0;padding:12px 16px;min-height:0;font-size:13px;width:100%}
+@media(max-width:700px){.os-specialists .os-specialist-grid{grid-template-columns:1fr;gap:8px}
+.os-specialists .os-specialist-card,.os-specialists .os-specialist-card:nth-child(even){padding:20px 18px 16px}
+.os-specialists .os-sp-idx{font-size:42px;top:12px;right:14px}.os-specialists .os-specialist-card h3{font-size:23px;margin-top:22px}
+.os-specialists .os-engagement-price-main{font-size:20px}}
+
+.os-specialists .os-specialist-card{background:#202326}
+.os-specialists .os-specialist-card::after{content:"OR";position:absolute;right:-.06em;bottom:-.22em;font-size:170px;letter-spacing:-.1em;color:rgba(239,77,0,.11);line-height:1;pointer-events:none}
+.os-specialists .os-sp-idx{color:#ef4d00}
+.os-specialists .os-engagement-prices{border-top:1px solid #3a3d40}
+.os-specialists .os-engagement-price-main{color:#ef4d00}
+.os-specialists .os-action button{background:#ef4d00;color:#111}
+.os-specialists .os-action button:hover:not(:disabled){background:#f2f0ea;color:#111}
+@media(min-width:1101px){.os-specialists .os-specialist-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.os-specialists .os-specialist-card h3{font-size:24px;max-width:72%}.os-specialists .os-engagement-price-main{font-size:20px}}`;
