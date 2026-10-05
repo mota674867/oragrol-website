@@ -14,7 +14,6 @@ import { usePathname } from "@/i18n/navigation";
 import { SiteHeader } from "./site-header";
 import { SiteFooter } from "./site-footer";
 import { EmergencyCta } from "./emergency-cta";
-import ChatWidget from "../ChatWidget";
 
 /**
  * Routes rebuilt from the GPT V38 redesign ship their own full-bleed
@@ -37,7 +36,9 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
     pathname !== null &&
     (REDESIGNED_ROUTES.has(pathname) || pathname.startsWith("/resources/"));
 
-  // /scan is a standalone focused page — no nav, no footer, no ChatWidget
+  // /scan is a standalone focused page — no nav, no footer.
+  // The ONE chat widget lives in app/[locale]/layout.tsx so it exists on every page and keeps its state across navigation;
+  // do not render another ChatWidget here (two stacked widgets fought over the same saved chat).
   // /ops/outbound is Mohammad's private tool — same standalone treatment.
   if (pathname === "/scan" || pathname === "/ops/outbound") {
     return <>{children}</>;
@@ -45,10 +46,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
 
   if (isRedesigned) {
     return (
-      <>
-        {children}
-        <ChatWidget />
-      </>
+      <>{children}</>
     );
   }
 
