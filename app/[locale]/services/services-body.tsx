@@ -71,6 +71,14 @@ export type ServicesPageProps = {
 // touched. French Canadian currency convention puts the symbol after the
 // number with a space-grouped thousands separator (2 756 $), matching the
 // approved translation doc's own examples ("3 307 $/mois").
+// À la carte display (2026-10-06, Mohammad chose "option C, compact, numbered 01–12"):
+// grouped by theme, four door-opener services shown as large dark featured tiles.
+// Order only affects this grid; catalog order elsewhere (scope, JSON-LD) is unchanged.
+const ALC_ORDER = ["C01-S04", "C08-S03", "C09-S02", "C09-S03", "C09-S04", "C09-S01", "C05-S05", "C05-S03", "C06-S04", "C09-S05", "C07-S04", "C07-S05"];
+const ALC_FEATURED = new Set(["C01-S04", "C09-S01", "C05-S05", "C07-S05"]);
+const alcRank = (code: string) => { const i = ALC_ORDER.indexOf(code); return i === -1 ? 99 : i; };
+const ALC_SERVICES = [...INDIVIDUAL_SERVICES].sort((a, b) => alcRank(a.code) - alcRank(b.code));
+
 const money = (value: number, locale: string) =>
   locale === "fr" ? `${value.toLocaleString("fr-CA")} $` : `$${value.toLocaleString("en-CA")}`;
 
@@ -119,7 +127,7 @@ export default function ServicesPage({ onAddToScope, isInScope, onDiscussEngagem
     <section className="os-individual os-light os-section" id="individual-services" aria-labelledby={`${uid}-individual`}>
       <div className="os-section-head"><p className="os-eyebrow">{t("individual.eyebrow")}</p><h2 id={`${uid}-individual`}>{t("individual.headline1")}<br/>{t("individual.headline2")}</h2><p>{t("individual.sub")}</p></div>
       <p className="os-price-note">{t("individual.priceNote")}</p>
-      <div className="os-service-grid">{INDIVIDUAL_SERVICES.map(s => { const item = serviceSelection(s); const added = isInScope(item); return <article key={s.code} className="os-service-card"><p className="os-eyebrow">{s.billing === "monthly" ? t("individual.monthlyService") : t("individual.projectService")}</p><h3>{s.name}</h3><p className="os-description">{t(`individual.list.${s.code}.line`)}</p>{aLaCarteDetailsContent[s.code] && <DetailsDialog category="CYBERSECURITY" {...aLaCarteDetailsContent[s.code]} action={{ label: addLabelIndividual(added), onClick: () => onAddToScope(item), disabled: added }} />}<div className="os-card-price">{money(s.price, locale)}<small>{s.billing === "monthly" ? t("money.moSuffix") : s.billing === "per-application" ? t("money.appSuffix") : ""}</small></div><p className="os-billing">{s.billing === "monthly" ? t("individual.monthlyBilling") : s.billing === "per-application" ? t("individual.perApplicationBilling") : t("individual.oneTimeBilling")}</p><p className="os-standalone">{t("individual.availableStandalone")}</p><Action disabled={added} perform={() => onAddToScope(item)}>{addLabelIndividual(added)}</Action></article>; })}</div>
+      <div className="os-service-grid">{ALC_SERVICES.map((s, i) => { const item = serviceSelection(s); const added = isInScope(item); const feat = ALC_FEATURED.has(s.code); return <article key={s.code} className={feat ? "os-service-card is-feat" : "os-service-card"}><span className="os-alc-idx" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span><p className="os-eyebrow">{s.billing === "monthly" ? t("individual.monthlyService") : t("individual.projectService")}</p><h3>{s.name}</h3><p className="os-description">{t(`individual.list.${s.code}.line`)}</p>{aLaCarteDetailsContent[s.code] && <DetailsDialog category="CYBERSECURITY" onDark={feat} {...aLaCarteDetailsContent[s.code]} action={{ label: addLabelIndividual(added), onClick: () => onAddToScope(item), disabled: added }} />}<div className="os-card-price">{money(s.price, locale)}<small>{s.billing === "monthly" ? t("money.moSuffix") : s.billing === "per-application" ? t("money.appSuffix") : ""}</small></div><p className="os-billing">{s.billing === "monthly" ? t("individual.monthlyBilling") : s.billing === "per-application" ? t("individual.perApplicationBilling") : t("individual.oneTimeBilling")}</p><Action disabled={added} perform={() => onAddToScope(item)}>{addLabelIndividual(added)}</Action></article>; })}</div>
     </section>
 
     <section className="os-specialists os-dark os-section" id="specialist-engagements" aria-labelledby={`${uid}-specialists`}>
@@ -141,4 +149,46 @@ const styles = `
 @media(max-width:1100px){.os-section-head{grid-template-columns:1fr 2fr}.os-section-head>p:last-child{grid-column:2}.os-package-layout{grid-template-columns:35% 65%}.os-selector button{padding:20px 16px}.os-package-summary{grid-template-columns:1fr}.os-service-grid{grid-template-columns:1fr 1fr}.os-package-name{font-size:23px}.os-hero-links>a{padding:20px 16px}.os-section-head h2{font-size:42px}}
 @media(max-width:700px){.os-hero{padding:25px 22px;min-height:auto}.os-kicker{font-size:10px;letter-spacing:.08em}.os-kicker>span:last-child{text-align:right;max-width:110px}.os-headline{padding:50px 0 35px}.os-headline h1{font-size:clamp(27px,7.55vw,49px);letter-spacing:-.045em;overflow-wrap:normal}.os-watermark{font-size:380px;top:120px;right:-85px}.os-headline>p{font-size:16px}.os-hero-links{grid-template-columns:1fr}.os-hero-links>a,.os-hero-links>a:first-child,.os-hero-links>a:last-child{padding:19px 0;border:0;border-bottom:1px solid var(--os-line)}.os-hero-links>a:last-child{border-bottom:0}.os-hero-links h2{font-size:23px}.os-hero-end{font-size:10px}.os-clarity{padding:55px 22px;grid-template-columns:1fr;gap:20px}.os-clarity h2{font-size:50px}.os-clarity-copy{padding:0}.os-section{padding:55px 22px}.os-section-head{display:block;margin-bottom:25px}.os-section-head h2{font-size:41px;margin:18px 0}.os-section-head>p:last-child{max-width:none}.os-package-layout{display:block}.os-selector{display:grid;grid-template-columns:1fr 1fr;border:0}.os-selector button{border:1px solid var(--os-line);padding:17px 12px}.os-package-name{font-size:20px;overflow-wrap:anywhere}.os-selector-price{font-size:21px}.os-selector-top{font-size:10px}.os-selector-value{font-size:14px}.os-package-panel{padding:30px 0 0}.os-package-panel>h3{font-size:38px}.os-inclusions{grid-template-columns:1fr}.os-service-grid,.os-specialist-grid{grid-template-columns:1fr}.os-service-card{padding:25px}.os-specialist-card,.os-specialist-card:nth-child(even){padding:30px 0;border-left:0}.os-specialist-card h3{font-size:30px}}
 @media(prefers-reduced-motion:reduce){.oragrol-services{scroll-behavior:auto}}
+
+/* À la carte — option C, compact, numbered (2026-10-06) */
+.os-individual .os-service-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;border:0;grid-auto-flow:dense}
+.os-individual .os-service-card{background:#e8e6df;border:0;padding:20px 20px 16px;position:relative;overflow:hidden}
+.os-individual .os-alc-idx{position:absolute;top:12px;right:16px;font-size:44px;font-weight:300;letter-spacing:-.06em;line-height:1;color:#c4c1b8;pointer-events:none}
+.os-individual .os-service-card .os-eyebrow{font-size:9px;margin:0;color:#6a6e70}
+.os-individual .os-service-card h3{font-size:20px;margin:8px 0 6px;max-width:78%}
+.os-individual .os-service-card .os-description{font-size:13px;line-height:1.45;color:#55595c;margin-bottom:6px}
+.os-individual .os-service-card>span[style] button{margin-top:0!important;min-height:34px!important;padding:2px 0!important}
+.os-individual .os-card-price{font-size:26px;border-top:1px solid #bdbab1;padding-top:10px;margin-top:4px}
+.os-individual .os-card-price small{font-size:13px}
+.os-individual .os-billing{font-size:11px;color:#55595c;margin:1px 0 10px}
+.os-individual .os-standalone{display:none}
+.os-individual .os-action button{font-size:13px;padding:9px 0;min-height:38px}
+.os-individual .os-service-card.is-feat{grid-column:span 2;background:#141618;color:#f2f0ea;padding:24px 26px 20px}
+.os-individual .os-service-card.is-feat::after{content:"OR";position:absolute;right:-.06em;bottom:-.22em;font-size:170px;letter-spacing:-.1em;color:rgba(239,77,0,.13);line-height:1;pointer-events:none}
+.os-individual .is-feat .os-alc-idx{color:#ef4d00;font-size:56px;top:14px;right:22px}
+.os-individual .is-feat .os-eyebrow{color:#b9bcbe}
+.os-individual .os-service-card.is-feat h3{font-size:30px}
+.os-individual .os-service-card.is-feat .os-description,.os-individual .is-feat .os-billing{color:#b9bcbe}
+.os-individual .is-feat .os-card-price{font-size:40px;color:#ef4d00;border-color:#3a3d40}
+.os-individual .is-feat .os-card-price small{font-size:16px}
+.os-individual .is-feat .os-action{position:relative;z-index:1}
+.os-individual .is-feat .os-action button{background:#ef4d00;color:#111;border:0;padding:12px 16px}
+.os-individual .is-feat .os-action button:hover:not(:disabled){background:#f2f0ea;color:#111}
+@media(max-width:1100px){.os-individual .os-service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){
+.os-individual .os-service-grid{gap:8px}
+.os-individual .os-service-card{padding:16px 14px 12px}
+.os-individual .os-alc-idx{font-size:30px;top:10px;right:10px}
+.os-individual .os-service-card h3{font-size:16px;max-width:none;margin-top:26px}
+.os-individual .os-service-card .os-eyebrow{font-size:8px}
+.os-individual .os-service-card .os-description{font-size:12px}
+.os-individual .os-card-price{font-size:21px}
+.os-individual .os-card-price small{font-size:11px}
+.os-individual .os-billing{font-size:10px}
+.os-individual .os-action button{font-size:12px}
+.os-individual .os-service-card.is-feat{padding:20px 18px 16px}
+.os-individual .is-feat .os-alc-idx{font-size:42px}
+.os-individual .os-service-card.is-feat h3{font-size:24px;margin-top:22px}
+.os-individual .is-feat .os-card-price{font-size:32px}
+.os-individual .os-service-card.is-feat::after{font-size:120px}}
 `;
