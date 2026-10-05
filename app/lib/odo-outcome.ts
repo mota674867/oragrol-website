@@ -16,6 +16,7 @@
 import { createReportText, type ReportUsage } from "./odo-report-model";
 import { ledgerAsText, type Evidence } from "./odo-ledger";
 import type { MatchingResult } from "./odo-matching";
+import { publicServiceLabels } from "./odo-public-names";
 
 export type AutomationEstimate = {
   fteRangeLabel: string;
@@ -143,8 +144,8 @@ export async function buildOutcomeNarrative(
     "Evidence ledger:",
     ledgerAsText(clientLedger),
     "",
-    `Recommended security services (${recSecurity.length}): ${recSecurity.map((m) => m.simpleName).join(", ") || "(none)"}`,
-    `Flagged automation opportunities (${autoOpps.length}, excluding advisory-only discovery services): ${autoOpps.map((m) => m.simpleName).join(", ") || "(none)"}`,
+    `Recommended security services (${recSecurity.length}): ${publicServiceLabels(recSecurity.map((m) => m.code)).join(", ") || "(none)"}`,
+    `Flagged automation opportunities (${autoOpps.length}, excluding advisory-only discovery services): ${publicServiceLabels(autoOpps.map((m) => m.code)).join(", ") || "(none)"}`,
   ].join("\n");
 
   try {

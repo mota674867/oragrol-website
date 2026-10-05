@@ -50,7 +50,7 @@ export function OutboundDossierPdf({ d }: { d: Dossier }) {
         <Text>{clean(d.snapshot?.description ?? "Not enough site text to build a snapshot.")}</Text>
         {d.snapshot ? <Text style={[s.bold, { marginTop: 5 }]}>Primary focus: {clean(d.snapshot.focus)}</Text> : null}
 
-        <Text style={s.h2}>Best-matching ORAGROL services</Text>
+        <Text style={s.h2}>Best-matching ORAGROL security services</Text>
         {d.recommendations.length ? d.recommendations.map((r, i) => (
           <View key={r.name} style={s.card} wrap={false}>
             <Text style={s.bold}>{i + 1}. {r.name}</Text>

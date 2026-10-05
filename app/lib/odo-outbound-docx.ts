@@ -44,7 +44,7 @@ export function buildOutboundDocument(d: Dossier): Document {
         ])
       : [p("None found near this business.")]),
 
-    h("Best-matching ORAGROL services"),
+    h("Best-matching ORAGROL security services"),
     ...(d.recommendations.length
       ? d.recommendations.flatMap((r, i) => [
           p(`${i + 1}. ${r.name}  [${r.group === "security" ? "Security" : "Automation"} - ${r.tier === "recommended" ? "RECOMMENDED" : "worth exploring"}]`, { bold: true }),

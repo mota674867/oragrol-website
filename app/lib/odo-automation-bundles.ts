@@ -44,7 +44,7 @@ export const BUNDLE_BY_ID: Record<BundleId, AutomationBundle> = Object.fromEntri
 export const TAILORED_AUTOMATION = { name: "Tailored Automation", tagline: "Scoped to your exact requirement — priced after a short scoping conversation." };
 
 /** Deterministic rules-fallback: C11-* (discovery/strategy) and C12-S04 (OR ONE signal) are deliberately absent — never bundle-mapped. */
-const DEFAULT_BUNDLE_MAP: Partial<Record<string, BundleId>> = {
+export const DEFAULT_BUNDLE_MAP: Partial<Record<string, BundleId>> = {
   "C12-S01": "it", "C12-S02": "it", "C12-S03": "it", "C12-S05": "it",
   "C13-S01": "it", "C13-S03": "it",
   "C13-S02": "finance", "C13-S04": "finance", "C13-S05": "finance",

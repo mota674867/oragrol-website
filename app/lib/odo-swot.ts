@@ -14,6 +14,7 @@
 import { createReportText, type ReportUsage } from "./odo-report-model";
 import { ledgerAsText, type Evidence } from "./odo-ledger";
 import type { MatchingResult } from "./odo-matching";
+import { publicServiceLabel } from "./odo-public-names";
 
 export type SwotPoint = { text: string; evidence: string[] };
 export type Swot = {
@@ -72,7 +73,7 @@ export function rulesSwot(ledger: Evidence[], matching: MatchingResult, business
   const gaps = client.filter((e) => e.polarity === "gap").sort((a, b) => sevRank[a.severity] - sevRank[b.severity]);
   const weaknesses = gaps.filter((e) => e.tier === "observed").slice(0, 5).map((e) => ({ text: e.fact, evidence: [e.id] }));
   const opportunities = matching.flagged.slice(0, 5).map((m) => ({
-    text: `${m.simpleName}: ${m.tier === "recommended" ? "addresses" : "may address"} ${m.reason.replace(/\s*\[[AE]\d+\]/g, "").split(". ")[0].toLowerCase()}`,
+    text: `${publicServiceLabel(m.code)}: ${m.tier === "recommended" ? "addresses" : "may address"} ${m.reason.replace(/\s*\[[AE]\d+\]/g, "").split(". ")[0].toLowerCase()}`,
     evidence: m.evidenceIds.slice(0, 3),
   }));
   const threats = gaps
@@ -99,7 +100,7 @@ export async function buildSwot(
 
   const clientLedger = ledger.filter((e) => e.audience === "client");
   const flaggedText = matching.flagged.length
-    ? matching.flagged.map((m) => `- ${m.simpleName} (${m.tier === "recommended" ? "Recommended" : "Worth exploring"}) — evidence ${m.evidenceIds.join(", ")}`).join("\n")
+    ? matching.flagged.map((m) => `- ${publicServiceLabel(m.code)} (${m.tier === "recommended" ? "Recommended" : "Worth exploring"}) — evidence ${m.evidenceIds.join(", ")}`).join("\n")
     : "(none — no service cleared the bar; say so honestly)";
 
   const system = [

@@ -24,7 +24,9 @@
 // Runs are kept in Redis per domain (last 6), so a re-run can report changes.
 
 import { Redis } from "@upstash/redis";
-import { evaluateOrOneFlag } from "./odo-packages";
+import { evaluateOrOneFlag, recommendSecurityLane } from "./odo-packages";
+import { SERVICE_BY_CODE } from "./odo-services";
+import { pageServiceName } from "./odo-public-names";
 import { recommendAutomationLane, TAILORED_AUTOMATION, type AutomationRecommendation } from "./odo-automation-bundles";
 import { runParallelResearch, type ResearchFindings } from "./odo-research";
 import { buildLedger, type Evidence, type Area } from "./odo-ledger";
@@ -336,10 +338,11 @@ export async function runOutbound(company: string, website: string): Promise<Dos
 
     // Best-matching ORAGROL services, from the same evidence-gated matcher client scans use.
     const matching = await matchServices(ledger, { industry: findings.industry ?? null, businessSize: findings.businessSize ?? null });
-    const recommendations: Recommendation[] = matching.flagged
-      .filter((m): m is typeof m & { tier: "recommended" | "worth_exploring" } => m.tier !== "not_flagged")
-      .slice(0, 5)
-      .map((m) => ({ name: m.simpleName, group: m.group, tier: m.tier, reason: m.reason }));
+    const recommendations = buildServiceRecommendations(
+      matching.flagged
+        .filter((m): m is typeof m & { tier: "recommended" | "worth_exploring" } => m.tier !== "not_flagged")
+        .map((m) => ({ code: m.code, simpleName: m.simpleName, category: m.category, group: m.group, tier: m.tier, reason: m.reason })),
+    );
 
     const orOneFlag = evaluateOrOneFlag(matching.flagged.map((m) => ({ code: m.code, category: m.category, tier: m.tier as "recommended" | "worth_exploring" })));
     const lane = await recommendAutomationLane(
@@ -395,6 +398,29 @@ export async function runOutbound(company: string, website: string): Promise<Dos
   }
 }
 
+const stripTags = (t: string) => t.replace(/\s*\[[AE]\d+\]/g, "");
+
+/**
+ * Security recommendations a reader may see, exactly as the visitor scan builds them: ONE package pick
+ * (Foundation / Advanced / ...) plus any individual page services, all under their /services page names.
+ * Automation is never listed item by item — the automation lane carries it (OR ONE / BA bundle).
+ * Foundation fallback: a security finding with no page match is folded into Foundation, never named.
+ */
+export function buildServiceRecommendations(flagged: { code: string; simpleName: string; category: string; group: "security" | "automation"; tier: "recommended" | "worth_exploring"; reason: string }[]): Recommendation[] {
+  const lane = recommendSecurityLane(flagged, SERVICE_BY_CODE);
+  const out: Recommendation[] = [];
+  const rec = lane.recommendation;
+  if (rec.kind === "package" || rec.kind === "foundation_default") {
+    out.push({ name: `${rec.pkg.name} package`, group: "security", tier: "recommended", reason: stripTags(rec.reason) });
+  }
+  for (const o of lane.individualOffers) out.push({ name: o.officialName, group: "security", tier: o.tier, reason: stripTags(o.why) });
+  const unmatched = flagged.some((m) => m.group === "security" && m.code !== "C01-S01" && !pageServiceName(m.code));
+  if (unmatched && !out.some((r) => r.name === "Foundation package") && rec.kind !== "package") {
+    out.push({ name: "Foundation package", group: "security", tier: "recommended", reason: "Additional findings are covered by ORAGROL's entry-level security package." });
+  }
+  return out.slice(0, 5);
+}
+
 /** Maps the shared lane decision onto the dossier's own simple shape. Real product names only (OR ONE, the five BA bundles, Tailored Automation). */
 export function toAutomationLane(r: AutomationRecommendation): AutomationLane | null {
   if (r.kind === "or_one") return { kind: "or_one", name: "OR ONE", tagline: null, reason: r.reason };
@@ -428,7 +454,7 @@ export function dossierAsText(d: Dossier): string {
     `════ COMPETITORS (${d.competitors.length} found) ════`,
     ...(d.competitors.length ? d.competitors.map(competitorLine) : ["none found near this business"]),
     "",
-    `════ BEST-MATCHING ORAGROL SERVICES ════`,
+    `════ BEST-MATCHING ORAGROL SECURITY SERVICES ════`,
     ...(d.recommendations.length
       ? d.recommendations.map((r, i) => `${i + 1}. ${r.name} [${r.group === "security" ? "Security" : "Automation"} · ${r.tier === "recommended" ? "RECOMMENDED" : "worth exploring"}]\n    Why: ${r.reason}`)
       : ["No strong match from public evidence alone — a discovery conversation would be needed."]),

@@ -34,6 +34,9 @@ import { industryPackFor } from "../app/lib/odo-industry-depth";
 import { jobDescriptionFromTypes, reportableForOptions, type CompetitorProfile } from "../app/lib/odo-competitors";
 import { buildSnapshot, buildPosture, buildAutomationSignals, dossierAsText, extractContact, toAutomationLane, type Dossier } from "../app/lib/odo-outbound";
 import { coldEmailObservations, coldEmailRecommendation } from "../app/lib/odo-outbound-coldemail";
+import { pageServiceName, publicServiceLabel, publicServiceLabels, PAGE_SERVICE_NAMES } from "../app/lib/odo-public-names";
+import { buildServiceRecommendations } from "../app/lib/odo-outbound";
+import { SERVICE_CATALOG } from "../app/lib/odo-services";
 import { renderOutboundDocx } from "../app/lib/odo-outbound-docx";
 import { filterLeads } from "../app/lib/odo-outbound-leads";
 import type { Evidence } from "../app/lib/odo-ledger";
@@ -482,7 +485,7 @@ async function main() {
     const text = dossierAsText(fakeDossier);
     check("dossier text includes the Company Snapshot section", text.includes("COMPANY SNAPSHOT") && text.includes("Accounting & bookkeeping"));
     check("dossier text includes competitors with contact details", text.includes("Riverside Tax & Accounting") && text.includes("riversidetax.ca") && text.includes("416-555-0100") && text.includes("info@riversidetax.ca"));
-    check("dossier text names the best-matching ORAGROL services", text.includes("BEST-MATCHING ORAGROL SERVICES") && text.includes("Email protection setup") && text.includes("RECOMMENDED"));
+    check("dossier text names the best-matching ORAGROL services", text.includes("BEST-MATCHING ORAGROL SECURITY SERVICES") && text.includes("Email protection setup") && text.includes("RECOMMENDED"));
     check("dossier text includes posture & automation at a glance", text.includes("POSTURE & AUTOMATION AT A GLANCE") && text.includes("WEAK") && text.includes("HubSpot CRM"));
   }
 
@@ -539,6 +542,19 @@ async function main() {
     const obsList = coldEmailObservations(withLane);
     check("cold-email PDF uses only observed high-confidence gaps, glyph-clean", obsList.length === 1 && !obsList[0].includes("\u2717"));
     check("cold-email PDF names the package pick, never competitors", coldEmailRecommendation(withLane)?.name === "Business Automation: Finance");
+    // 31. Public names only
+    const secCodes = SERVICE_CATALOG.filter((x) => x.group === "security" && x.code !== "C01-S01");
+    check("every security code (C02-C10) has a name on the live Services page", secCodes.every((x) => { const n = pageServiceName(x.code); return n !== null && PAGE_SERVICE_NAMES.has(n); }));
+    check("C02-S01 reads 'Security Weakness Check', not 'Vuln Watch'", pageServiceName("C02-S01") === "Security Weakness Check");
+    check("C05-S05 reads the page name, not 'Trust Guard'", pageServiceName("C05-S05") === "Zero Trust Access Security");
+    check("automation items surface only as a BA bundle or OR ONE", SERVICE_CATALOG.filter((x) => x.group === "automation").every((x) => /^(Business Automation: (Sales|Customer Service|Finance|IT|Marketing)|OR ONE)$/.test(publicServiceLabel(x.code))));
+    check("labels are de-duplicated", publicServiceLabels(["C14-S01", "C14-S02", "C12-S01"]).length === 1);
+    const flaggedSample = ["C04-S02", "C05-S05", "C02-S01", "C12-S01"].map((code) => { const x = SERVICE_CATALOG.find((y) => y.code === code)!; return { code, simpleName: x.simpleName, category: x.category, group: x.group, tier: "recommended" as const, reason: "r [E1]" }; });
+    const recs = buildServiceRecommendations(flaggedSample);
+    check("outbound picks ONE security package, Foundation for a small spread", recs[0].name === "Foundation package");
+    const internal = SERVICE_CATALOG.filter((x) => pageServiceName(x.code) !== x.simpleName && x.simpleName !== x.officialName).map((x) => x.simpleName);
+    check("no internal shorthand appears in outbound recommendations", recs.every((r) => !internal.includes(r.name) && !r.reason.includes("[E1]")));
+    check("automation items are never listed individually in outbound", recs.every((r) => r.group === "security"));
     check("Word file is a real .docx (zip)", docxBuf.length > 2000 && docxBuf[0] === 0x50 && docxBuf[1] === 0x4b);
   }
 
