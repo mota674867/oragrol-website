@@ -98,23 +98,22 @@ async function zm77(path: string, method: "GET" | "POST", body?: Json): Promise<
   return { status: res.status, json: (await res.json().catch(() => ({}))) as Json };
 }
 
-async function renderPdfSha(report: OdoReport): Promise<string> {
+async function renderPdf(report: OdoReport): Promise<Buffer> {
   // Loaded only when a report is actually sent, so the heavy PDF code is not pulled in anywhere else.
   const [{ default: QRCode }, { renderToBuffer }, { OdoReportPdf }, { getCyberHealthReportPhotos }] = await Promise.all([
     import("qrcode"), import("@react-pdf/renderer"), import("./odo-report-pdf"), import("./cyber-health-photos"),
   ]);
   const qrDataUri = await QRCode.toDataURL(CONTACT_URL, { margin: 1, width: 200 }).catch(() => undefined);
   const { cover: coverImageUri, closing: closingImageUri } = getCyberHealthReportPhotos();
-  const buf = Buffer.from(await renderToBuffer(OdoReportPdf({ report, qrDataUri, coverImageUri, closingImageUri })));
-  return createHash("sha256").update(buf).digest("hex");
+  return Buffer.from(await renderToBuffer(OdoReportPdf({ report, qrDataUri, coverImageUri, closingImageUri })));
 }
 
-export async function submitToZm77(payload: Json): Promise<void> {
+export async function submitToZm77(payload: Json): Promise<string | null> {
   let attempt = 0;
   let r = await zm77("/v1/odo/cases", "POST", payload);
   while (r.status === 0 || r.status >= 500) { // not configured / network / server trouble: retry briefly, never block anything
-    if (r.status === 0 && (r.json as Json).skipped) { console.warn("[ODO] ZM77 not configured — skipping"); return; }
-    if (++attempt > 3) { console.error("[ODO] ZM77 send gave up after retries"); return; }
+    if (r.status === 0 && (r.json as Json).skipped) { console.warn("[ODO] ZM77 not configured — skipping"); return null; }
+    if (++attempt > 3) { console.error("[ODO] ZM77 send gave up after retries"); return null; }
     await new Promise((ok) => setTimeout(ok, 1500 * attempt));
     r = await zm77("/v1/odo/cases", "POST", payload).catch(() => ({ status: 0, json: {} }));
   }
@@ -125,14 +124,37 @@ export async function submitToZm77(payload: Json): Promise<void> {
     rounds++;
     r = await zm77(`/v1/odo/cases/${r.json.case_id}/revision`, "POST", { ...payload, resubmission: rounds });
   }
-  if (r.status >= 300) console.error("[ODO] ZM77 refused the report:", r.status, JSON.stringify(r.json).slice(0, 300));
-  else console.log("[ODO] ZM77 case", r.json.case_id, r.json.stage);
+  if (r.status >= 300) { console.error("[ODO] ZM77 refused the report:", r.status, JSON.stringify(r.json).slice(0, 300)); return null; }
+  console.log("[ODO] ZM77 case", r.json.case_id, r.json.stage);
+  return typeof r.json.case_id === "string" ? r.json.case_id : null;
+}
+
+/** Sends the exact PDF so Mohammad can open it from ZM77. ZM77 checks it against the fingerprint in the report. */
+export async function uploadPdf(caseId: string, pdf: Buffer): Promise<void> {
+  const base = process.env.ZM77_BASE_URL?.replace(/\/+$/, "");
+  const key = process.env.ZM77_ORS4_KEY;
+  if (!base || !key) return;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const res = await fetch(`${base}/v1/odo/cases/${caseId}/pdf`, {
+        method: "PUT", signal: AbortSignal.timeout(30000),
+        headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/pdf" },
+        body: new Uint8Array(pdf),
+      });
+      if (res.ok) return;
+      if (res.status < 500) { console.error("[ODO] ZM77 refused the PDF:", res.status); return; }
+    } catch { /* retry */ }
+    await new Promise((ok) => setTimeout(ok, 1500 * attempt));
+  }
+  console.error("[ODO] ZM77 PDF upload gave up after retries");
 }
 
 export async function sendReportToZm77(report: OdoReport, sessionId: string, visitor: Visitor): Promise<void> {
   try {
     if (!process.env.ZM77_BASE_URL || !process.env.ZM77_ORS4_KEY) return;
-    await submitToZm77(buildZm77Payload(report, sessionId, visitor, await renderPdfSha(report)));
+    const pdf = await renderPdf(report);
+    const caseId = await submitToZm77(buildZm77Payload(report, sessionId, visitor, createHash("sha256").update(pdf).digest("hex")));
+    if (caseId) await uploadPdf(caseId, pdf);
   } catch (err) { console.error("[ODO] ZM77 send failed:", err instanceof Error ? err.message : err); }
 }
 
