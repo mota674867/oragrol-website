@@ -12,6 +12,7 @@
 // Response: { status, chat, chat_version, awaiting, pending, progress, message? }
 
 import { after, NextRequest, NextResponse } from "next/server";
+import { countForZm77 } from "@/app/lib/odo-zm77";
 import { getSession, updateSession, acquireTurnLock, releaseTurnLock, recordLifetimeAiCost } from "@/app/lib/odo-redis";
 import { interviewContext, finalizeInsufficient, runEvaluation, reviewerTranscript, type BusinessProfile } from "@/app/lib/odo-pipeline";
 import { sendOdoUrgentAlertEmail } from "@/app/lib/odo-email";
@@ -132,6 +133,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     if (result.outcome === "failed") {
       // §37.2: no fixed-question fallback. Stop honestly, no cooldown.
       await updateSession(sessionId, { findings: nextFindings, status: "failed", phase: "failed", step: AI_UNAVAILABLE_MESSAGE });
+      await countForZm77("odo_failed");
       const cost = computeCost(usage);
       after(async () => {
         await recordLifetimeAiCost(usage, cost.totalCostUsd).catch(() => {});
@@ -175,6 +177,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   } catch (err) {
     console.error("[ODO] Interview turn crashed:", err);
     await updateSession(sessionId, { status: "failed", phase: "failed", step: AI_UNAVAILABLE_MESSAGE }).catch(() => {});
+    await countForZm77("odo_failed");
     return NextResponse.json({ status: "failed", message: AI_UNAVAILABLE_MESSAGE }, { status: 500 });
   } finally {
     await releaseTurnLock(sessionId).catch(() => {});

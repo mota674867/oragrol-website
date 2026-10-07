@@ -321,6 +321,15 @@ export async function recordDailySpend(costUsd: number): Promise<number> {
   return next;
 }
 
+/** Running daily count for one ZM77 number (odo-zm77.ts). Returns the new total for that day. */
+export async function bumpDailyMetric(day: string, metric: string, by: number): Promise<number> {
+  const redis = getRedis();
+  const key = `odo:zm77:metric:${day}:${metric}`;
+  const next = await redis.incrby(key, Math.round(by));
+  await redis.expire(key, 3 * 24 * 60 * 60);
+  return next;
+}
+
 export async function getDailySpend(): Promise<number> {
   const redis = getRedis();
   const val = await redis.get<number | string>(`${DAILY_SPEND_PREFIX}${torontoDateKey()}`);
