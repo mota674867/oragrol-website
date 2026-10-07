@@ -15,9 +15,10 @@ import { NONSENSE_STOP_REASON, type InterviewContext, type InterviewState, type 
 import { matchServices } from "./odo-matching";
 import { buildSwot } from "./odo-swot";
 import { buildOutcomeNarrative } from "./odo-outcome";
-import { buildReport, type OdoReport } from "./odo-report";
+import { buildReport } from "./odo-report";
 import type { ResearchFindings } from "./odo-research";
 import { attachReportPdfToHubSpot } from "./odo-hubspot-report";
+import { countForZm77, sendInsufficientToZm77, sendReportToZm77 } from "./odo-zm77";
 import { sendOdoAdminReportEmail, sendOdoAdminInsufficientEmail } from "./odo-email";
 import { EMPTY_USAGE, addJevUsage, addClaudeUsage, addOpusUsage, mergeUsage, computeCost, type AiUsageTotals } from "./odo-cost";
 import { REPORT_MODEL } from "./odo-report-model";
@@ -105,6 +106,11 @@ export async function finalizeInsufficient(
       body: JSON.stringify({ properties: { client_reference: "insufficient_data" } }),
     }).catch(() => {});
   }
+
+  // Copy to ZM77 (odo-zm77.ts): never blocks, never throws, does nothing until configured.
+  await countForZm77("odo_ai_spend_cents", Math.round(cost.totalCostUsd * 100));
+  const insufficientSession = await getSession(sessionId).catch(() => null);
+  if (insufficientSession) await sendInsufficientToZm77(sessionId, insufficientSession, state.ended?.reason ?? "insufficient");
 
   await sendOdoAdminInsufficientEmail({
     companyName: session.visitorCompany,
@@ -242,9 +248,10 @@ export async function runEvaluation(
     const full = await getSession(sessionId);
     if (full && condition === "complete") await markSessionComplete(full);
 
-    await notifyZM77(report).catch((err) => {
-      console.error("[ODO] ZM77 notification failed:", err);
-    });
+    // Copy to ZM77 (odo-zm77.ts): never blocks, never throws, does nothing until configured.
+    if (condition === "complete") await countForZm77("odo_completed");
+    await countForZm77("odo_ai_spend_cents", Math.round(aiCost.totalCostUsd * 100));
+    if (full) await sendReportToZm77(report, sessionId, full);
 
     // Stop-gap so Mohammad can actually see the finished PDF right away
     // (odo-email.ts) — ZM77 doesn't exist yet and the HubSpot
@@ -302,31 +309,6 @@ export async function runEvaluation(
   } catch (err) {
     console.error("[ODO] Evaluation failed:", err);
     await updateSession(sessionId, { status: "failed", step: "Evaluation failed. Our team has been notified." }).catch(() => {});
+    await countForZm77("odo_failed");
   }
-}
-
-/**
- * ZM77 is Mohammad's own review agent — not built yet. This stays a no-op
- * until ZM77_WEBHOOK_URL is configured (his call, his project). When it is,
- * the whole report goes over, including `internal` — ZM77/Mohammad's
- * review is exactly the audience that field exists for. Nothing here
- * changes the §28 approval gate: every report is still "draft_pending_review".
- */
-async function notifyZM77(report: OdoReport): Promise<void> {
-  const zm77Webhook = process.env.ZM77_WEBHOOK_URL;
-  if (!zm77Webhook) {
-    console.warn("[ODO] ZM77_WEBHOOK_URL not configured — skipping ZM77 notification");
-    return;
-  }
-  await fetch(zm77Webhook, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-ODO-Source": "oragrol-odo-v1" },
-    body: JSON.stringify({
-      source: "ODO",
-      event: "scan_complete",
-      requiresApproval: true,
-      report,
-    }),
-    signal: AbortSignal.timeout(10000),
-  });
 }

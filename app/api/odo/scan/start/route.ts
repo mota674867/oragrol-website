@@ -4,6 +4,7 @@
 // Returns session_id to the front-end immediately — research runs async.
 
 import { after, NextRequest, NextResponse } from "next/server";
+import { countForZm77 } from "@/app/lib/odo-zm77";
 import { checkCooldowns, createSession, getIncompleteSession, checkIpDailyLimit } from "@/app/lib/odo-redis";
 import { runParallelResearch, type ResearchFindings } from "@/app/lib/odo-research";
 import { interviewContext } from "@/app/lib/odo-pipeline";
@@ -335,6 +336,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     serviceMatches: [],
     hubspotContactId,
   });
+  await countForZm77("odo_started"); // number for the ZM77 daily report; never blocks
 
   // Add HubSpot note
   if (hubspotContactId) {
@@ -429,6 +431,7 @@ async function runResearchAsync(
         phase: "failed",
         step: AI_UNAVAILABLE_MESSAGE,
       });
+      await countForZm77("odo_failed");
       return;
     }
 
@@ -466,6 +469,7 @@ async function runResearchAsync(
       phase: "failed",
       step: "Research encountered an error. Our team has been notified.",
     }).catch(() => {});
+    await countForZm77("odo_failed");
   }
 }
 
