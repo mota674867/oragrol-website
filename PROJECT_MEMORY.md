@@ -3,6 +3,31 @@
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
 ---
+## Session: OR ONE page, four sections compacted (intro, "A clear path", "You stay in control", "Built once"), 2026-10-09
+
+**Request:** compact these four OR ONE sections with no content change.
+
+**Done (CSS only):**
+- `review-sections.module.css`:
+  - Shared `.section` padding went from 90px to `clamp(52px,4.5vw,76px)`, which also tightens these three module sections; pricing keeps its own override.
+  - `.heading` margin-bottom went from 55px to `clamp(26px,2.4vw,38px)`, and h2 from `clamp(36px,4.3vw,68px)` to `clamp(32px,3.3vw,52px)`.
+  - Step numbers went from 48 to 36px, with tighter step, control-row and management-card padding and type.
+  - On phones: section padding 48px 22px and h2 36px.
+- `gpt-pages.css` `.orone-intro`: dropped `min-height:78svh`, padding is now `clamp(56px,5vw,88px)`, h2 went from `clamp(64px,7vw,136px)` to `clamp(48px,5vw,96px)`, and margins are tighter. Phone h2 is 44px.
+
+**Verified:** Playwright on dev shows no errors and no horizontal scroll. Height changes at 1440 wide (and at 390):
+
+| Section | 1440 wide | 390 wide |
+|---|---|---|
+| intro | 702 to 397 | 748 to 580 |
+| process | 696 to 511 | 1509 to 1312 |
+| control | 787 to 613 | 1107 to 1001 |
+| management | 730 to 517 | 1325 to 1180 |
+
+**Next:** Mohammad to approve push.
+
+---
+
 ## Session: OR ONE page, "Know the investment" pricing section, premium "capacity staircase" redesign (this section only), 2026-10-08
 
 **Request:** a premium, compact visual redesign of the OR ONE pricing section with identical content. Mohammad rejected the first pass (a hairline panel, too generic), so it was redone around one bold idea.
