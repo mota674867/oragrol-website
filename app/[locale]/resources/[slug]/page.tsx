@@ -23,6 +23,7 @@ import {
   RESOURCE_ARTICLES_BY_SLUG,
   type ResourceArticle,
 } from "./ORAGROL_ResourceArticles";
+import { HeaderLogo } from "@/app/components/brand/header-logo";
 
 /**
  * Bilingual (D-086, Task #21, Phase 2i): `RESOURCE_ARTICLES_BY_SLUG`
@@ -285,10 +286,7 @@ export default async function ResourceDetailPage({ params }: PageProps) {
     <>
       <main className="resource-detail">
         <header className="industry-header resource-header">
-          <Link className="wordmark" href="/">
-            <span>ORAGROL</span>
-            <small>GLOBAL</small>
-          </Link>
+          <HeaderLogo />
           <nav>
             {nav.map((n) => (
               <Link

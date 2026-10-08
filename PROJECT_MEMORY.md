@@ -3,6 +3,24 @@
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
 ---
+## Session: new approved logo rolled out site-wide (preview only), 2026-10-09
+
+**Done:**
+- `Logo` and `HeaderLogo` components built with the handoff SVG geometry verbatim.
+- The logo replaces the text wordmarks and the old `OragrolLogo` in every page header, the /scan masthead, careers/talent/partnerships and the legacy SiteHeader/SiteFooter.
+- The footer icon sits in the right-side logo slot.
+- The favicon and app icons are from the zip, plus `app/manifest.ts`.
+- Old logo component and SVG deleted. See D-093, which also records the deviations Mohammad asked for: header and footer sizes unchanged, so the headers use the icon.
+
+**Verified:**
+- tsc is clean. Lint shows no new errors; the scan page's `<a href>` errors pre-exist.
+- Playwright on 19 routes at 1440 and 375: the logo renders, header heights equal the old ones, and there are no console errors.
+- The footer measures 622/743px before and after.
+
+**Next:** Mohammad reviews the Vercel preview, then merge.
+
+---
+
 ## Session: OR ONE page, four sections compacted (intro, "A clear path", "You stay in control", "Built once"), 2026-10-09
 
 **Request:** compact these four OR ONE sections with no content change.

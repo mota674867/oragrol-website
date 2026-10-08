@@ -14,6 +14,7 @@ import ServicesPage, {
 } from "./services-body";
 import "@/app/gpt-pages.css";
 import OdoDiscoveryPopup from "@/app/components/site/odo-popup";
+import { HeaderLogo } from "@/app/components/brand/header-logo";
 
 /**
  * Client body for /services (2026-09-08 rebuild). The header, ScopeTray,
@@ -145,10 +146,7 @@ function ServicesClient() {
     <UtilityBar />
     <main className="services-page">
       <header className="site-header">
-        <Link className="wordmark" href="/">
-          <span>ORAGROL</span>
-          <small>GLOBAL</small>
-        </Link>
+        <HeaderLogo />
         <OragrolMegaNav items={NAV_ITEMS} activePath={pathname} />
         <div className="header-actions">
           <button

@@ -3,8 +3,8 @@
 import { useLocale } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { Container, Grid, NavLink, Section, Text } from "../ui";
-import { OragrolLogo } from "../brand/oragrol-logo";
 import { LinkedInIcon, InstagramIcon } from "./social-icons";
+import { Logo } from "@/app/components/brand/logo";
 
 /**
  * SiteFooter — Step 4, restructured for the Footer overhaul (D-017).
@@ -17,12 +17,9 @@ import { LinkedInIcon, InstagramIcon } from "./social-icons";
  * real page — /resources, Step 10, built D-052; deliberately not padded
  * with invented links to look fuller), Legal (unchanged from before).
  *
- * Logo: reuses OragrolLogo (the same component SiteHeader uses), not a
- * hand-typed "ORAGROL" span + bare OragrolRing — a prior version of this
- * file recreated the wordmark separately, which drifted from the header
- * (wrong case, missing the "GLOBAL" subtitle, wrong ring-to-text gap).
- * OragrolLogo is the single source of truth for the full lockup; every
- * place the logo appears should import it, never re-approximate it.
+ * Logo: the approved Oragrol Global icon (app/components/brand/logo.tsx,
+ * 2026-10-09 handoff), dark-background tone, 64px. Never redraw the mark;
+ * always import Logo/HeaderLogo.
  *
  * Social icons: LinkedIn (supplied by Mohammad, 2026-08-13:
  * https://www.linkedin.com/company/oragrol-global/) and Instagram
@@ -92,14 +89,14 @@ export function SiteFooter() {
             {(pathname === "/" || pathname === "") ? (
               <a
                 href="#top"
-                className="inline-flex w-fit rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                aria-label="Oragrol Global home" className="inline-flex w-fit rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                 onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
               >
-                <OragrolLogo height={36} />
+                <Logo variant="icon" tone="dark-bg" height={64} decorative />
               </a>
             ) : (
-              <Link href="/" className="inline-flex w-fit rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
-                <OragrolLogo height={36} />
+              <Link href="/" aria-label="Oragrol Global home" className="inline-flex w-fit rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
+                <Logo variant="icon" tone="dark-bg" height={64} decorative />
               </Link>
             )}
             <Text size="sm" tone="secondary" className="max-w-sm">

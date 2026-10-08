@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Script from "next/script";
 import "./odo-scan.css";
+import { HeaderLogo } from "@/app/components/brand/header-logo";
 
 /*
  * ORAGROL ODO /scan — complete React handoff for Claude
@@ -814,7 +815,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
         />
       )}
       <header className="odo-scan__masthead">
-        <span className="odo-scan__wordmark">ORAGROL GLOBAL</span>
+        <HeaderLogo tone="dark-bg" className="odo-scan__wordmark" />
         <p className="odo-scan__language-note">To keep every finding accurate, the ORAGROL scan and its report are currently available in English only. Most of the public sources we draw on are published in English.</p>
         <div className="odo-scan__masthead-actions">
           <button type="button" className="odo-scan__close" aria-label="Close scan" onClick={() => { if (typeof window !== "undefined") window.history.back(); }}>×</button>

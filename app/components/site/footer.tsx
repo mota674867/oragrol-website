@@ -5,6 +5,7 @@ import { useLocale } from "next-intl";
 import { useId, useState } from "react";
 import type { CSSProperties, FormEvent, ReactNode } from "react";
 import styles from "./footer.module.css";
+import { Logo } from "../brand/logo";
 import { LinkedInIcon, InstagramIcon } from "./social-icons";
 import { submitNewsletter } from "../../lib/submit-newsletter";
 
@@ -196,7 +197,7 @@ export default function SiteFooter({
       </div>
 
       <div className={styles.logoSlot} style={logoStyle}>
-        {logo || (showLogoPlaceholder ? <div className={styles.logoPlaceholder}>LOGO<br />PENDING</div> : null)}
+        {logo || <Logo variant="icon" tone="dark-bg" height={64} />}
       </div>
 
       <div className={styles.watermarkClip} aria-hidden="true">

@@ -9,6 +9,7 @@ import OragrolMegaNav from "@/app/components/site/oragrol-mega-nav";
 import UtilityBar from "@/app/components/site/utility-bar";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
 import "@/app/gpt-pages.css";
+import { HeaderLogo } from "@/app/components/brand/header-logo";
 
 type Conversation =
   | "Cybersecurity Services"
@@ -117,10 +118,7 @@ function ContactPageClient() {
     <UtilityBar />
     <main className="contact-page">
       <header className="industry-header contact-header">
-        <Link className="wordmark" href="/">
-          <span>ORAGROL</span>
-          <small>GLOBAL</small>
-        </Link>
+        <HeaderLogo tone="dark-bg" />
         <OragrolMegaNav items={NAV_ITEMS} activePath={pathname} />
         <div>
           <a className="active" href="#enquiry">

@@ -29,6 +29,7 @@ import {
   type AccessibilityBlock,
   type AccessibilityStatementContent,
 } from "./ORAGROL_AccessibilityContent";
+import { HeaderLogo } from "@/app/components/brand/header-logo";
 
 export async function generateMetadata({
   params,
@@ -114,10 +115,7 @@ export default async function AccessibilityPage({
   return <>
     <main className="accessibility-page">
       <header className="industry-header accessibility-header">
-        <Link className="wordmark" href="/">
-          <span>ORAGROL</span>
-          <small>GLOBAL</small>
-        </Link>
+        <HeaderLogo />
         <OragrolMegaNav items={NAV_ITEMS} />
         <div>
           <button className="search" aria-label={isFr ? "Recherche" : "Search"}>

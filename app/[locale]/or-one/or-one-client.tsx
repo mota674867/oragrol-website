@@ -18,6 +18,7 @@ import {
 } from "./review-sections";
 import "@/app/gpt-pages.css";
 import OdoDiscoveryPopup from "@/app/components/site/odo-popup";
+import { HeaderLogo } from "@/app/components/brand/header-logo";
 type Risk = "Standard" | "Controlled" | "Critical";
 type Item = { name: string; points: number; risk: Risk };
 type Group = { name: string; benefit: string; items: Item[] };
@@ -351,10 +352,7 @@ function OrOneClient() {
     <UtilityBar />
     <main className="orone-full">
       <header className="one-header">
-        <Link className="one-wordmark" href="/">
-          <span>ORAGROL</span>
-          <small>GLOBAL</small>
-        </Link>
+        <HeaderLogo tone="dark-bg" />
         <OragrolMegaNav items={NAV_ITEMS} activePath={pathname} />
         <div className="one-actions">
           <button

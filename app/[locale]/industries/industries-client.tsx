@@ -8,6 +8,7 @@ import OragrolMegaNav from "@/app/components/site/oragrol-mega-nav";
 import UtilityBar from "@/app/components/site/utility-bar";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
 import "@/app/gpt-pages.css";
+import { HeaderLogo } from "@/app/components/brand/header-logo";
 
 /**
  * Bilingual (D-086, Task #21): rewired to consume the `Industries`
@@ -91,10 +92,7 @@ function IndustriesClient() {
     <UtilityBar />
     <main className="ind-premium-page">
       <header className="industry-header">
-        <Link className="wordmark" href="/">
-          <span>ORAGROL</span>
-          <small>GLOBAL</small>
-        </Link>
+        <HeaderLogo tone="dark-bg" />
         <OragrolMegaNav items={NAV_ITEMS} activePath={pathname} />
         <div>
           <Link href="/cyber-health">{t("nav.getCyberHealthScore")}</Link>

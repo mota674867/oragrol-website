@@ -5,6 +5,7 @@ import { useMemo, useRef, useState } from "react";
 import { categories, questions, sections, qualification } from "./assessment-data";
 import SiteFooter from "@/app/components/site/footer";
 import "@/app/gpt-pages.css";
+import { HeaderLogo } from "@/app/components/brand/header-logo";
 
 /**
  * Bilingual (D-086, Task #21): rewired to consume the `CyberHealth`
@@ -123,9 +124,7 @@ function CyberHealthClient() {
   };
   const header = (label: string) => (
     <header>
-      <Link href="/">
-        {t("header.wordmark")} <small>{t("header.wordmarkSmall")}</small>
-      </Link>
+      <HeaderLogo />
       <b>{label}</b>
     </header>
   );
@@ -332,9 +331,7 @@ function CyberHealthClient() {
   return (
     <main className="nch assess">
       <header>
-        <Link href="/">
-          {t("header.wordmark")} <small>{t("header.wordmarkSmall")}</small>
-        </Link>
+        <HeaderLogo />
         <div>
           <b>
             {answered} / {visibleQuestions.length}

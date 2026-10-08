@@ -11,6 +11,7 @@ import { NAV_ITEMS } from "@/app/components/site/nav-items";
 import { DetailsDialog, type DetailsDialogLabels } from "@/app/components/DetailsDialog";
 import "@/app/gpt-pages.css";
 import OdoDiscoveryPopup from "@/app/components/site/odo-popup";
+import { HeaderLogo } from "@/app/components/brand/header-logo";
 
 /**
  * Bilingual (D-086, Task #21): rewired to consume the `BusinessAutomation`
@@ -171,10 +172,7 @@ function BusinessAutomationClient() {
     <UtilityBar />
     <main className="ba-full-page ba-jobs-page">
       <header className="ba-header">
-        <Link className="wordmark" href="/">
-          <span>ORAGROL</span>
-          <small>GLOBAL</small>
-        </Link>
+        <HeaderLogo />
         <OragrolMegaNav items={NAV_ITEMS} activePath={pathname} />
         <div className="header-actions">
           <button className="scope-nav-button" onClick={() => setTrayOpen(true)}>

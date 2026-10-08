@@ -38,6 +38,7 @@ import {
   type PrivacyBlock,
   type PrivacyPolicyContent,
 } from "./ORAGROL_PrivacyPolicyContent";
+import { HeaderLogo } from "@/app/components/brand/header-logo";
 
 export async function generateMetadata({
   params,
@@ -174,10 +175,7 @@ export default async function PrivacyPolicyPage({
     <>
       <main className="privacy-page">
         <header className="industry-header privacy-header">
-          <Link className="wordmark" href="/">
-            <span>ORAGROL</span>
-            <small>GLOBAL</small>
-          </Link>
+          <HeaderLogo />
           <OragrolMegaNav items={NAV_ITEMS} />
           <div>
             <button className="search" aria-label={isFr ? "Recherche" : "Search"}>

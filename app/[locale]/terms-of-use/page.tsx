@@ -22,6 +22,7 @@ import { NAV_ITEMS } from "@/app/components/site/nav-items";
 import { languageAlternates } from "@/app/lib/seo";
 import "@/app/gpt-pages.css";
 import { getTermsOfUse, type TermsBlock, type TermsOfUseContent } from "./ORAGROL_TermsOfUseContent";
+import { HeaderLogo } from "@/app/components/brand/header-logo";
 
 export async function generateMetadata({
   params,
@@ -106,10 +107,7 @@ export default async function TermsOfUsePage({
   return <>
     <main className="terms-page">
       <header className="industry-header terms-header">
-        <Link className="wordmark" href="/">
-          <span>ORAGROL</span>
-          <small>GLOBAL</small>
-        </Link>
+        <HeaderLogo />
         <OragrolMegaNav items={NAV_ITEMS} />
         <div>
           <button className="search" aria-label={isFr ? "Recherche" : "Search"}>

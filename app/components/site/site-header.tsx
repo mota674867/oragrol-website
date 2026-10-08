@@ -6,9 +6,9 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { motion, useScroll, useTransform } from "motion/react";
 import { ButtonLink, MobileMenuTrigger, NavBar, NavLink } from "../ui";
 import { cn } from "../ui/cn";
-import { OragrolLogo } from "../brand/oragrol-logo";
 import { HeaderSearch } from "./header-search";
 import { NAV_DROPDOWNS, NavItemDropdown } from "./nav-dropdown";
+import { HeaderLogo } from "@/app/components/brand/header-logo";
 
 /**
  * SiteHeader — Step 4, refined in Header Refinement Pass 1, fixed in
@@ -258,9 +258,7 @@ export function SiteHeader() {
         <NavBar
           className="relative z-10 border-b border-border"
           logo={
-            <Link href="/" className="rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
-              <OragrolLogo height={36} />
-            </Link>
+            <HeaderLogo tone="dark-bg" />
           }
           desktopContent={
             <>

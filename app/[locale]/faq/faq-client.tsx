@@ -8,6 +8,7 @@ import OragrolMegaNav from "@/app/components/site/oragrol-mega-nav";
 import UtilityBar from "@/app/components/site/utility-bar";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
 import "@/app/gpt-pages.css";
+import { HeaderLogo } from "@/app/components/brand/header-logo";
 
 /**
  * Bilingual (D-086, Task #21): the 36-question `groups` array used to be a
@@ -41,10 +42,7 @@ function FAQPageClient() {
     <UtilityBar />
     <main className="faq-page">
       <header className="faq-nav">
-        <Link className="wordmark" href="/">
-          <span>ORAGROL</span>
-          <small>GLOBAL</small>
-        </Link>
+        <HeaderLogo />
         <OragrolMegaNav items={NAV_ITEMS} activePath={pathname} />
         <Link href="/contact">{t("nav.contactLink")}</Link>
       </header>

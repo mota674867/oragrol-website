@@ -202,7 +202,8 @@
   .socials { margin-top: 14px; }
   .intro { margin-bottom: 12px; }
   .fields { gap: 14px; }
-  .logoSlot { position: static; margin: 28px 0 0 auto; }
+  .logoSlot { position: absolute; right: 18px; bottom: 132px; width: 48px; margin: 0; } /* overlay, so the phone footer keeps its height */
+  .logoSlot svg { width: 48px; height: 48px; }
   .logoSlot:empty { display: none; }
   .watermarkClip { position: relative; inset: auto; height: 64px; margin-top: 6px; }
   .watermark { position: absolute; left: 0; bottom: .05em; font-size: 14vw; }

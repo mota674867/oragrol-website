@@ -3,6 +3,7 @@
 import { Link } from "@/i18n/navigation";
 import OragrolOpportunityPage from "@/app/components/site/oragrol-opportunity-page";
 import { submitOpportunity } from "@/app/lib/submit-opportunity";
+import { HeaderLogo } from "@/app/components/brand/header-logo";
 
 // Real vacancies only — see ORAGROL_Opportunity_Pages_Guide.md: with no
 // confirmed openings, the component shows an honest empty state rather
@@ -15,9 +16,7 @@ export default function CareersClient() {
     <OragrolOpportunityPage
       page="careers"
       logo={
-        <Link className="op-wordmark" href="/" aria-label="ORAGROL Global home">
-          ORAGROL<span>GLOBAL</span>
-        </Link>
+        <HeaderLogo tone="dark-bg" />
       }
       privacyUrl="/privacy-policy"
       termsUrl="/terms-of-use"
