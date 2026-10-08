@@ -3,6 +3,27 @@
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
 ---
+## Session: OR ONE page, "Know the investment" pricing section redesigned, premium and compact (this section only), 2026-10-08
+
+**Request:** Mohammad asked for a premium, compact visual redesign of the OR ONE pricing section, with the content kept identical.
+
+**Done:**
+- `RevisedPricing` markup in `app/[locale]/or-one/review-sections.tsx` got new pricing-only classes. A two-column heading (title left, sub right) fixes the sub-line overflow Mohammad saw on wide screens.
+- Cards sit in one hairline panel with a subtle gradient. A 2px orange top line slides in on hover and focus, with reduced-motion respected.
+- Points render as a pill and "Details" sits under it. The fees are a `<dl>` pinned to the card bottom (build fee large, monthly fee on one compact line), with tabular numbers.
+- Notes are in two columns.
+- Old pricing-only CSS rules (`.prices`, `.fit`, `.points`, `.fee`, `.monthly`, `.pricingNote`, `.pricing .heading*`) were removed from the module, since nothing else used them. Shared `.section`/`.heading`/`.eyebrow` rules and `DetailsDialog` are untouched.
+- Texts, fee numbers and message keys are unchanged.
+
+**Verified:**
+- `npx tsc --noEmit` and eslint on the file are clean.
+- Playwright on dev, no console errors. Section height went from 980 to 849px at 1440, from 996 to 865px at 2560, and from 2567 to 2028px at 390.
+- Details dialog opens in EN and FR, and the FR layout fits.
+
+**Next:** Mohammad to approve push.
+
+---
+
 ## Session — OR ONE page: "Build your team" builder section compacted (this section only) — 2026-10-08
 
 **Request:** Mohammad asked to compact the "Build your team. / See the shape of the system." builder section on the OR ONE page, without touching any content or any other part.
