@@ -3,6 +3,18 @@
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
 ---
+## Session — OR ONE page: "Build your team" builder section compacted (this section only) — 2026-10-08
+
+**Request:** Mohammad asked to compact the "Build your team. / See the shape of the system." builder section on the OR ONE page, without touching any content or any other part.
+
+**Done (CSS only, `app/gpt-pages.css`, builder selectors only):** `.team-builder` dropped its forced `min-height:120svh` and its padding went from `5vw` to `clamp(40px,3.5vw,72px)`. The `.builder-heading h2` size went from `clamp(58px,6.3vw,122px)` to `clamp(44px,4.2vw,84px)`, and `.builder-shell` margin-top from `5vw` to `clamp(28px,2.5vw,48px)`. A new builder-only phone rule sets the heading to 40px (from the shared 52px). No text, no markup, and no shared rules (`.tier-heading`, eyebrow styles) changed.
+
+**Verified:** Playwright against `npm run dev` (`/en/or-one`), no console errors. Section height went from 1136 to 983px at 1440 wide, from 1560 to 1026px at 2560, and from 1782 to 1743px at 390. Heading height went from 237 to 163px at 1440. Screenshots checked at all three widths: layout intact, nothing clipped.
+
+**Next:** Mohammad to approve push/deploy.
+
+---
+
 ## Session — ODO Section 33 research-source expansion: 7 new native modules built, wired, and verified; 4 assumed-free sources found infeasible and correctly left unwired — 2026-09-29
 
 **Context:** Continuing from the same day's earlier session (render-loop/serverless/Redis fixes), Mohammad said "better to complete the remaning ODO research source" — the Section 33 backlog. Audited the actual codebase (not just the master doc) and found ~10 `ResearchFindings` fields were permanent null stubs. Built and wired the real remaining sources; verified two of the master doc's own technical assumptions were wrong before building against them (see D-090); verified four more "free, no key" sources from the doc are not actually free-and-keyless (see D-091) and correctly did NOT build fabricated/broken integrations for them.
