@@ -1,3 +1,4 @@
+import type React from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import s from './review-sections.module.css';
@@ -83,6 +84,8 @@ export function RevisedProcess() {
 
 const TIER_KEYS = OR_ONE_TIER_KEYS;
 const TIER_FEES = OR_ONE_TIER_FEES;
+/** Point capacity per tier (same numbers as each tier's "Up to N Points" label); drives the visual capacity fill only. */
+const TIER_POINTS: Record<(typeof TIER_KEYS)[number], number> = { STARTER: 30, "100": 100, "200": 200, "400": 400 };
 
 export function RevisedPricing() {
   const t = useTranslations("OrOne");
@@ -97,59 +100,70 @@ export function RevisedPricing() {
     illustrativeExample: t("detailsLabels.illustrativeExample"),
   };
   return (
-    <section className={`${s.section} ${s.pricing}`}>
-      <div className={s.heading}>
-        <p className={s.eyebrow}>{t("pricing.eyebrow")}</p>
-        <h2>
-          {t("pricing.title1")}
-          <br />
-          <span>{t("pricing.titleEmphasis")}</span>
-        </h2>
-        <p>{t("pricing.sub")}</p>
+    <section className={`${s.section} ${s.pricing}`} aria-labelledby="or-one-pricing-heading">
+      <div className={s.pHead}>
+        <div>
+          <p className={`${s.eyebrow} ${s.pKicker}`}>{t("pricing.eyebrow")}</p>
+          <h2 id="or-one-pricing-heading">
+            {t("pricing.title1")}
+            <br />
+            <span>{t("pricing.titleEmphasis")}</span>
+          </h2>
+        </div>
+        <p className={s.pSub}>{t("pricing.sub")}</p>
       </div>
-      <div className={s.prices}>
+      <div className={s.pGrid}>
         {TIER_KEYS.map((key) => {
           const content = orOneDetailsContent[key];
           const fees = TIER_FEES[key];
           return (
-            <article key={key}>
-              <span className={s.eyebrow}>OR / ONE</span>
-              <h3>{key}</h3>
-              <p className={s.fit}>{t(`details.${key}.subtitle`)}</p>
-              {content && (
-                <DetailsDialog
-                  onDark
-                  category="OR ONE"
-                  itemLabel={t(`details.${key}.itemLabel`)}
-                  title={t(`details.${key}.title`)}
-                  subtitle={t(`details.${key}.subtitle`)}
-                  intro={t(`details.${key}.intro`)}
-                  inclusions={t.raw(`details.${key}.inclusions`) as string[]}
-                  controlHeading={t("detailsLabels.youStayInControl")}
-                  control={t(`details.${key}.control`)}
-                  whoItSuits={t(`details.${key}.whoItSuits`)}
-                  example={t(`details.${key}.example`)}
-                  scope={t(`details.${key}.scope`)}
-                  labels={detailsLabels}
-                />
-              )}
-              <p className={s.points}>{t(`details.${key}.pointsLabel`)}</p>
-              <div className={s.fee}>
-                <span>{t("pricing.buildFeeLabel")}</span>
-                <strong>{money(fees.build, locale)}</strong>
+            <article key={key} className={s.pCard}>
+              <span
+                className={s.pFill}
+                style={{ "--fill": TIER_POINTS[key] / 400 } as React.CSSProperties}
+                aria-hidden="true"
+              />
+              <span className={s.pEyebrow}>OR / ONE</span>
+              <h3 className={s.pName}>{key}</h3>
+              <p className={s.pFit}>{t(`details.${key}.subtitle`)}</p>
+              <div className={s.pMeta}>
+                <p className={s.pPoints}>{t(`details.${key}.pointsLabel`)}</p>
+                {content && (
+                  <DetailsDialog
+                    onDark
+                    category="OR ONE"
+                    itemLabel={t(`details.${key}.itemLabel`)}
+                    title={t(`details.${key}.title`)}
+                    subtitle={t(`details.${key}.subtitle`)}
+                    intro={t(`details.${key}.intro`)}
+                    inclusions={t.raw(`details.${key}.inclusions`) as string[]}
+                    controlHeading={t("detailsLabels.youStayInControl")}
+                    control={t(`details.${key}.control`)}
+                    whoItSuits={t(`details.${key}.whoItSuits`)}
+                    example={t(`details.${key}.example`)}
+                    scope={t(`details.${key}.scope`)}
+                    labels={detailsLabels}
+                  />
+                )}
               </div>
-              <div className={s.monthly}>
-                <span>{t("pricing.monthlyFeeLabel")}</span>
-                <strong>
-                  {money(fees.monthly, locale)}
-                  <small>{t("pricing.perMonthSuffix")}</small>
-                </strong>
-              </div>
+              <dl className={s.pFees}>
+                <div className={s.pBuild}>
+                  <dt>{t("pricing.buildFeeLabel")}</dt>
+                  <dd>{money(fees.build, locale)}</dd>
+                </div>
+                <div className={s.pMonthly}>
+                  <dt>{t("pricing.monthlyFeeLabel")}</dt>
+                  <dd>
+                    {money(fees.monthly, locale)}
+                    <small>{t("pricing.perMonthSuffix")}</small>
+                  </dd>
+                </div>
+              </dl>
             </article>
           );
         })}
       </div>
-      <div className={s.pricingNote}>
+      <div className={s.pNote}>
         <p>{t("pricing.note1")}</p>
         <p>{t("pricing.note2")}</p>
       </div>
