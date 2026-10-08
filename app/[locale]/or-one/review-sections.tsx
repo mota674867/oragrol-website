@@ -1,3 +1,4 @@
+import type React from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import s from './review-sections.module.css';
@@ -83,6 +84,8 @@ export function RevisedProcess() {
 
 const TIER_KEYS = OR_ONE_TIER_KEYS;
 const TIER_FEES = OR_ONE_TIER_FEES;
+/** Point capacity per tier (same numbers as each tier's "Up to N Points" label); drives the visual capacity fill only. */
+const TIER_POINTS: Record<(typeof TIER_KEYS)[number], number> = { STARTER: 30, "100": 100, "200": 200, "400": 400 };
 
 export function RevisedPricing() {
   const t = useTranslations("OrOne");
@@ -115,11 +118,16 @@ export function RevisedPricing() {
           const fees = TIER_FEES[key];
           return (
             <article key={key} className={s.pCard}>
+              <span
+                className={s.pFill}
+                style={{ "--fill": TIER_POINTS[key] / 400 } as React.CSSProperties}
+                aria-hidden="true"
+              />
               <span className={s.pEyebrow}>OR / ONE</span>
               <h3 className={s.pName}>{key}</h3>
               <p className={s.pFit}>{t(`details.${key}.subtitle`)}</p>
               <div className={s.pMeta}>
-                <span className={s.pPoints}>{t(`details.${key}.pointsLabel`)}</span>
+                <p className={s.pPoints}>{t(`details.${key}.pointsLabel`)}</p>
                 {content && (
                   <DetailsDialog
                     onDark
