@@ -11,7 +11,7 @@ import { Section } from "@/app/components/ui/section";
 export default async function NotFound() {
   const isFr = (await getLocale()) === "fr";
   return (
-    <Section environment="light">
+    <Section environment="dark">
       <Container size="md" className="flex min-h-[60vh] flex-col items-center justify-center py-24 text-center">
         <Caption tone="accent">404</Caption>
         <H1 className="mt-4">{isFr ? "Cette page n’existe pas." : "This page doesn’t exist."}</H1>
