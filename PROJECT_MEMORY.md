@@ -3,6 +3,10 @@
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
 ---
+## Session: header logo spacing fix + website go-live, 2026-10-09
+- Mohammad approved the website ("all approved") and asked for push; PDFs NOT approved, so the PDF logo commit was reverted (pdf-brand.tsx removed) before merging.
+- Header grid first column 112px -> max-content in gpt-pages.css + homepage-v3.css; HeaderLogo margin-inline-end 48px; 40px logo at 1024-1440px. Measured gap logo->menu >= 74px at 1280-1920 on /, /services, /contact; header heights unchanged; no horizontal overflow.
+
 ## Session: logo rollout v3 (horizontal header logo, grey footer icon, share image, 404, chat icon), 2026-10-09
 - Branch `brand-logo-replacement` (preview only, not merged). See D-094.
 - `logo.tsx`: added `variant="horizontal"` and `tone="watermark"`. `HeaderLogo` now renders the horizontal lockup (48/40px). Footer icon grey #282828 bottom-right, hidden on phones. Shared footer now on old-chrome routes; `site-footer.tsx` and `oragrol-ring.tsx` deleted.

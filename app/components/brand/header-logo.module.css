@@ -1,3 +1,8 @@
-.link{display:inline-flex;align-items:center;width:max-content;border-radius:4px;outline:none;color:inherit;text-decoration:none}
+/* Header logo (approved 2026-10-09). margin-inline-end guarantees at least
+   48px between the logo and the menu on every screen size (Mohammad,
+   2026-10-09: logo sat too close to the nav on a 14" laptop). */
+.link{display:inline-flex;align-items:center;width:max-content;flex-shrink:0;margin-inline-end:48px;border-radius:4px;outline:none;color:inherit;text-decoration:none}
 .link:focus-visible{outline:2px solid #EF4D00;outline-offset:4px}
+/* Laptops (13-14"): 40px instead of 48px. Large monitors keep 48px. */
+@media (min-width:1024px) and (max-width:1440px){.icon{height:40px;width:auto}}
 @media (max-width:767.98px){.icon{height:40px;width:auto}}
