@@ -8,6 +8,7 @@ import UtilityBar from "@/app/components/site/utility-bar";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
 import "@/app/gpt-pages.css";
 import { HeaderLogo } from "@/app/components/brand/header-logo";
+import Image from "next/image";
 
 /**
  * Bilingual (D-086, Task #21): rewired to consume the `Company`
@@ -42,6 +43,7 @@ function CompanyPageClient() {
   const pathHrefs = ["/services", "/business-automation", "/or-one"];
   const terms = t.raw("meaning.terms") as string[];
   const points = t.raw("operating.points") as string[];
+  const founderStats = t.raw("founder.stats") as { value: string; label: string }[];
 
   return (
     <>
@@ -117,14 +119,13 @@ function CompanyPageClient() {
 
       <section className="company-founder">
         <div className="founder-portrait">
-          <div>
-            <span>MCT</span>
-            <small>
-              {t("founder.portraitLabel")}
-              <br />
-              {t("founder.portraitPending")}
-            </small>
-          </div>
+          <Image
+            src="/images/company/founder-mohammad-chelouy-tabrizi.jpg"
+            alt={t("founder.portraitAlt")}
+            width={1200}
+            height={1490}
+            sizes="(max-width: 900px) 100vw, 40vw"
+          />
         </div>
         <article>
           <span>{t("founder.eyebrow")}</span>
@@ -132,10 +133,20 @@ function CompanyPageClient() {
           <h3>
             {t("founder.name")} <small>{t("founder.role")}</small>
           </h3>
-          <p>{t("founder.body1")}</p>
-          <p>{t("founder.body2")}</p>
-          <p>{t("founder.body3")}</p>
+          <p>{t("founder.bio")}</p>
+          <dl className="founder-stats">
+            {founderStats.map((s) => (
+              <div key={s.value}>
+                <dt>{s.value}</dt>
+                <dd>{s.label}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="founder-credentials">{t("founder.credentials")}</p>
           <blockquote>&ldquo;{t("founder.quote")}&rdquo;</blockquote>
+          <Link href="/contact" className="founder-cta">
+            {t("founder.cta")} <span aria-hidden="true">→</span>
+          </Link>
         </article>
       </section>
 

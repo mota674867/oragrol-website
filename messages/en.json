@@ -2126,16 +2126,29 @@
       }
     ],
     "founder": {
-      "portraitLabel": "Founder portrait",
-      "portraitPending": "Final image pending",
-      "eyebrow": "04 / Founder",
+      "eyebrow": "Founder",
       "title": "Built from operating experience.",
       "name": "Mohammad Chelouy Tabrizi",
-      "role": "Founder and CEO",
-      "body1": "Mohammad built his first cybersecurity company in Iran in 2012. Running a real security business and solving practical client problems shaped the business first philosophy behind ORAGROL Global.",
-      "body2": "Across more than fifteen years, his work has extended through cybersecurity, regional market development, partnerships and international operations. His academic background includes software engineering, an MBA and a PhD in Management.",
-      "body3": "He founded ORAGROL Global in Ontario in 2025 to give Canadian businesses practical cybersecurity and intelligent operating capability without forcing them to assemble the solution from disconnected providers.",
-      "quote": "Technology should make a business clearer, stronger and more capable. If it only adds complexity, it has not solved the right problem."
+      "role": "Founder & CEO",
+      "quote": "If technology only adds complexity, it hasn’t solved the right problem.",
+      "portraitAlt": "Mohammad Chelouy Tabrizi, Founder and CEO of ORAGROL Global",
+      "bio": "Mohammad has built and run cybersecurity businesses since 2012. He founded ORAGROL Global to give Canadian businesses practical security and intelligent automation as one coordinated system, not a stack of disconnected providers.",
+      "stats": [
+        {
+          "value": "2012",
+          "label": "First cybersecurity company"
+        },
+        {
+          "value": "15+",
+          "label": "Years running security operations"
+        },
+        {
+          "value": "2025",
+          "label": "ORAGROL Global founded in Ontario"
+        }
+      ],
+      "credentials": "PhD in Management · MBA · Software Engineering",
+      "cta": "Book a conversation with Mohammad"
     },
     "operating": {
       "eyebrow": "05 / How we operate",

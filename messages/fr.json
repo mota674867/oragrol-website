@@ -2126,16 +2126,29 @@
       }
     ],
     "founder": {
-      "portraitLabel": "Portrait du fondateur",
-      "portraitPending": "Image finale en attente",
-      "eyebrow": "04 / Fondateur",
+      "eyebrow": "Fondateur",
       "title": "Fondé sur l'expérience opérationnelle.",
       "name": "Mohammad Chelouy Tabrizi",
       "role": "Fondateur et chef de la direction",
-      "body1": "Mohammad a fondé sa première entreprise de cybersécurité en Iran en 2012. Diriger une véritable entreprise de sécurité et résoudre des problèmes concrets de clients ont façonné la philosophie « l'entreprise d'abord » derrière ORAGROL Global.",
-      "body2": "Sur plus de quinze ans, son travail s'est étendu à la cybersécurité, au développement de marchés régionaux, aux partenariats et aux opérations internationales. Sa formation académique comprend le génie logiciel, un MBA et un doctorat en gestion.",
-      "body3": "Il a fondé ORAGROL Global en Ontario en 2025 pour offrir aux entreprises canadiennes une cybersécurité pratique et une capacité d'exploitation intelligente, sans les obliger à assembler la solution à partir de fournisseurs déconnectés.",
-      "quote": "La technologie devrait rendre une entreprise plus claire, plus forte et plus capable. Si elle ne fait qu'ajouter de la complexité, elle n'a pas résolu le bon problème."
+      "quote": "Si la technologie ne fait qu’ajouter de la complexité, elle n’a pas résolu le bon problème.",
+      "portraitAlt": "Mohammad Chelouy Tabrizi, fondateur et chef de la direction d’ORAGROL Global",
+      "bio": "Mohammad bâtit et dirige des entreprises de cybersécurité depuis 2012. Il a fondé ORAGROL Global pour offrir aux entreprises canadiennes une sécurité pratique et une automatisation intelligente réunies dans un seul système coordonné, plutôt qu’un empilement de fournisseurs déconnectés.",
+      "stats": [
+        {
+          "value": "2012",
+          "label": "Première entreprise de cybersécurité"
+        },
+        {
+          "value": "15+",
+          "label": "Années à diriger des opérations de sécurité"
+        },
+        {
+          "value": "2025",
+          "label": "ORAGROL Global fondée en Ontario"
+        }
+      ],
+      "credentials": "Doctorat en gestion · MBA · Génie logiciel",
+      "cta": "Réserver un échange avec Mohammad"
     },
     "operating": {
       "eyebrow": "05 / Comment nous fonctionnons",
