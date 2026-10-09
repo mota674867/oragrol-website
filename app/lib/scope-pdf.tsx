@@ -1,5 +1,6 @@
 import React from "react";
 import { Document, Page, Text, View, StyleSheet, Link, Image } from "@react-pdf/renderer";
+import { PdfLogo } from "./pdf-brand";
 
 /**
  * My Scope PDF — per My_Scope_Final_Ready_For_Claude.md Section 3.
@@ -347,8 +348,7 @@ function ScopePdf({ data, contactQrSrc, sample }: ScopePdfProps) {
   const header = () => (
     <View style={s.header}>
       <View>
-        <Text style={s.wordmark}>ORAGROL</Text>
-        <Text style={s.wordmarkSub}>GLOBAL</Text>
+        <PdfLogo variant="horizontal" height={26} />
       </View>
       <Text style={s.headerTag}>MY SCOPE{sample ? " / SAMPLE" : ""}</Text>
     </View>

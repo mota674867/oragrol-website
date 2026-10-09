@@ -1,6 +1,7 @@
 import React from "react";
 import { Document, Page, Text, View, StyleSheet, Image, Link } from "@react-pdf/renderer";
 import { PROTECTION_LINE, type OdoReport, type ReportFinding, type ReportPriority } from "./odo-report";
+import { PdfLogo } from "./pdf-brand";
 
 /**
  * ODO discovery report — client-facing PDF.
@@ -379,7 +380,7 @@ export function OdoReportPdf({
   const runningHeader = () => (
     <View style={s.header} fixed>
       <View>
-        <Text style={s.wordmark}>ORAGROL <Text style={s.wordmarkSub}>  GLOBAL</Text></Text>
+        <PdfLogo variant="horizontal" height={20} />
       </View>
       <Text style={s.headerTag}>DISCOVERY REPORT{"\n"}{report.reference}</Text>
     </View>

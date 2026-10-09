@@ -1,5 +1,6 @@
 import React from "react";
 import { Document, Page, Text, View, StyleSheet, Link, Image } from "@react-pdf/renderer";
+import { PdfLogo } from "@/app/lib/pdf-brand";
 
 export type Severity = "Critical" | "High" | "Medium" | "Low";
 export type Finding = { title: string; severity: Severity; reportedGap: string; impact: string; action: string; categoryIds: string[] };
@@ -30,7 +31,7 @@ export type CyberHealthReportData = {
 };
 export type PdfReportProps = {
   data: CyberHealthReportData;
-  /** Approved logo only. Omit to use a plain typographic brand treatment. */
+  /** Deprecated: the approved vector logo (PdfLogo) is always used now. Kept so existing callers still type-check. */
   logoSrc?: string;
   /** PNG/data URL generated from https://orgro.ca/contact, never an AI-drawn QR. */
   contactQrSrc: string;
@@ -136,7 +137,7 @@ function CompactRow({ f }: { f: Finding }) {
 }
 
 /** Pure PDF document. Keep scoring, delivery, QR generation and CRM logic outside. */
-export default function CyberHealthPdfReport({ data: d, logoSrc, contactQrSrc, coverPhotoSrc, closingPhotoSrc }: PdfReportProps) {
+export default function CyberHealthPdfReport({ data: d, contactQrSrc, coverPhotoSrc, closingPhotoSrc }: PdfReportProps) {
   validate(d);
   if (!coverPhotoSrc || !closingPhotoSrc || !contactQrSrc) throw new Error("Provide both approved photo assets and the verified contact QR before rendering");
   const critical = d.findings.filter((f) => f.severity === "Critical");
@@ -149,7 +150,7 @@ export default function CyberHealthPdfReport({ data: d, logoSrc, contactQrSrc, c
   const mediumLowCount = d.findings.filter((f) => f.severity === "Medium" || f.severity === "Low").length;
   const useCompactMediumLow = mediumLowCount > COMPACT_THRESHOLD;
 
-  const header = (section: string) => <View style={s.header}><View>{logoSrc ? <Image src={logoSrc} style={s.logo} /> : <Text style={s.brand}>ORAGROL GLOBAL</Text>}</View><Text style={s.small}>{section.toUpperCase()}</Text></View>;
+  const header = (section: string) => <View style={s.header}><View><PdfLogo variant="horizontal" height={22} /></View><Text style={s.small}>{section.toUpperCase()}</Text></View>;
   // A fresh element per call — react-pdf's layout engine walks the tree
   // per Page, and reusing one JSX element instance as a child of six
   // different <Page>s (the previous bug) left the footer absent on every

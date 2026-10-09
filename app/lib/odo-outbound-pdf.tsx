@@ -1,6 +1,7 @@
 import React from "react";
 import { Document, Page, Text, View, StyleSheet, renderToBuffer } from "@react-pdf/renderer";
 import type { Dossier, DossierCompetitor, DossierFinding } from "./odo-outbound";
+import { PdfLogo } from "./pdf-brand";
 
 // Outbound dossier as a PDF — internal, for ORAGROL only (never a client
 // document). Rendered in-process with @react-pdf/renderer, so it costs
@@ -40,7 +41,8 @@ export function OutboundDossierPdf({ d }: { d: Dossier }) {
   return (
     <Document title={`ODO outbound dossier - ${d.company}`} author="ORAGROL">
       <Page size="A4" style={s.page}>
-        <Text style={s.kicker}>ORAGROL - ODO OUTBOUND DOSSIER (INTERNAL)</Text>
+        <View style={{ marginBottom: 10 }}><PdfLogo variant="horizontal" height={18} /></View>
+        <Text style={s.kicker}>ODO OUTBOUND DOSSIER (INTERNAL)</Text>
         <Text style={s.title}>{clean(d.company)}</Text>
         <Text style={s.meta}>{d.website} - Industry: {clean(d.industry ?? "unknown")} - Size: {d.businessSize ?? "unknown"}</Text>
         <Text style={s.meta}>Run {d.runAt.slice(0, 10)} - AI cost ${d.aiCostUsd.toFixed(4)}</Text>
