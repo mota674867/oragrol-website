@@ -27,3 +27,16 @@ export function languageAlternates(path: string): Record<string, string> {
 /** This site's two locales, re-exported here so page-level SEO code doesn't
  *  need a second import from i18n/routing just for this. */
 export const locales = routing.locales;
+
+/**
+ * Site-wide social share image (logo rollout, approved 2026-10-09): official
+ * vertical logo + site tagline, no domain on the image (orgro.ca is
+ * temporary). Every page's `openGraph` object must include it, because a
+ * page-level `openGraph` object replaces the layout's one entirely.
+ */
+export const SHARE_IMAGE = {
+  url: "/og/oragrol-share.png",
+  width: 1200,
+  height: 630,
+  alt: "Oragrol Global. Cybersecurity that acts. Automation that scales.",
+};

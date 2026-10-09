@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import FAQPageClient from "./faq-client";
-import { languageAlternates } from "@/app/lib/seo";
+import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
 
 /**
  * Bilingual (D-086, Task #21): converted from a static `metadata` export
@@ -27,6 +27,7 @@ export async function generateMetadata({
       languages: languageAlternates("/faq"),
     },
     openGraph: {
+      images: [SHARE_IMAGE],
       title: isFr ? "FAQ | ORAGROL Global" : "FAQ | ORAGROL Global",
       description: isFr
         ? "Services, achat, soutien et notre façon de travailler — expliqués sans jargon technique inutile."

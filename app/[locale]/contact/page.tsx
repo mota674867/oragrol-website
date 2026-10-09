@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import ContactPageClient from "./contact-client";
-import { languageAlternates } from "@/app/lib/seo";
+import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
 
 /**
  * Bilingual (D-086, Task #21): converted from a static `metadata` export
@@ -27,6 +27,7 @@ export async function generateMetadata({
       languages: languageAlternates("/contact"),
     },
     openGraph: {
+      images: [SHARE_IMAGE],
       title: isFr ? "Contact | ORAGROL Global" : "Contact | ORAGROL Global",
       description: isFr
         ? "Choisissez votre conversation — cybersécurité, automatisation d'affaires, OR ONE ou une demande générale — et commencez par une réponse réfléchie, pas un argumentaire de vente automatisé."

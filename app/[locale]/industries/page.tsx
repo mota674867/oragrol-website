@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import IndustriesClient from "./industries-client";
-import { languageAlternates } from "@/app/lib/seo";
+import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
 
 /**
  * Bilingual (D-086, Task #21): converted from a static `metadata` export
@@ -27,6 +27,7 @@ export async function generateMetadata({
       languages: languageAlternates("/industries"),
     },
     openGraph: {
+      images: [SHARE_IMAGE],
       title: isFr ? "Secteurs d'activité | ORAGROL Global" : "Industries | ORAGROL Global",
       description: isFr
         ? "Comment la cybersécurité, l'automatisation et OR ONE d'ORAGROL Global s'appliquent aux risques et priorités réels de votre secteur."

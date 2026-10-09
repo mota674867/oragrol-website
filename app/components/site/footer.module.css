@@ -110,20 +110,22 @@
 }
 
 .logoSlot {
+  /* Footer icon (approved 2026-10-09): single-colour watermark grey (#282828,
+     same as the big ORAGROL GLOBAL text), bottom-right in the area Mohammad
+     marked. Sized in vw so it scales with the watermark text. Decorative and
+     behind the footer content (z-index 1 < content 2). */
   position: absolute;
-  z-index: 2;
-  right: 6%;
-  bottom: 23%;
-  width: clamp(90px, 7.5vw, 140px);
-  aspect-ratio: 1;
+  z-index: 1;
+  right: 4.5%;
+  bottom: max(3.2vw, 80px); /* stays clear of the fixed chat button */
+  height: 15.4vw;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-end;
+  justify-content: flex-end;
   pointer-events: none;
 }
-.logoSlot > * { pointer-events: auto; }
 .logoSlot img,
-.logoSlot svg { max-width: 100%; height: auto; }
+.logoSlot svg { height: 100%; width: auto; }
 .logoPlaceholder {
   width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center;
@@ -183,7 +185,6 @@
   .footer { padding-top: 38px; }
   .grid { grid-template-columns: 1fr 1fr; row-gap: 34px; column-gap: 7%; }
   .fields { gap: 5%; }
-  .logoSlot { right: 5%; bottom: 15%; width: clamp(70px, 9vw, 100px); }
   .watermark { font-size: 15vw; }
   .meta { padding-top: 130px; }
 }
@@ -202,9 +203,7 @@
   .socials { margin-top: 14px; }
   .intro { margin-bottom: 12px; }
   .fields { gap: 14px; }
-  .logoSlot { position: absolute; right: 18px; bottom: 132px; width: 48px; margin: 0; } /* overlay, so the phone footer keeps its height */
-  .logoSlot svg { width: 48px; height: 48px; }
-  .logoSlot:empty { display: none; }
+  .logoSlot { display: none; } /* phones: no free space for the icon without covering the form, the watermark text or the fixed chat/My Scope buttons; the watermark text carries the brand here */
   .watermarkClip { position: relative; inset: auto; height: 64px; margin-top: 6px; }
   .watermark { position: absolute; left: 0; bottom: .05em; font-size: 14vw; }
   .meta { grid-template-columns: 1fr; gap: 6px; padding-top: 10px; }

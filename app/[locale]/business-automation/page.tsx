@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import BusinessAutomationClient from "./ba-client";
-import { languageAlternates } from "@/app/lib/seo";
+import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
 
 /**
  * Bilingual (D-086, Task #21): converted from a static `metadata`
@@ -29,6 +29,7 @@ export async function generateMetadata({
       languages: languageAlternates("/business-automation"),
     },
     openGraph: {
+      images: [SHARE_IMAGE],
       title: isFr
         ? "Business Automation | ORAGROL Global"
         : "Business Automation | ORAGROL Global",

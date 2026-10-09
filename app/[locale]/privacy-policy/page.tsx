@@ -31,7 +31,7 @@ import { Fragment, type ReactNode } from "react";
 import SiteFooter from "@/app/components/site/footer";
 import OragrolMegaNav from "@/app/components/site/oragrol-mega-nav";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
-import { languageAlternates } from "@/app/lib/seo";
+import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
 import "@/app/gpt-pages.css";
 import {
   getPrivacyPolicy,
@@ -60,6 +60,7 @@ export async function generateMetadata({
     },
     robots: { index: true, follow: true },
     openGraph: {
+      images: [SHARE_IMAGE],
       title: isFr ? "Politique de confidentialité | ORAGROL Global" : "Privacy Policy | ORAGROL Global",
       description: isFr
         ? "Comment ORAGROL Global recueille, utilise, conserve et protège les renseignements personnels."

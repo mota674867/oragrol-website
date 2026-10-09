@@ -197,7 +197,7 @@ export default function SiteFooter({
       </div>
 
       <div className={styles.logoSlot} style={logoStyle}>
-        {logo || <Logo variant="icon" tone="dark-bg" height={64} />}
+        {logo || <Logo variant="icon" tone="watermark" height={480} decorative />}
       </div>
 
       <div className={styles.watermarkClip} aria-hidden="true">

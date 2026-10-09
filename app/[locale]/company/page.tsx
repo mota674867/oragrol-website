@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import CompanyPageClient from "./company-client";
-import { languageAlternates } from "@/app/lib/seo";
+import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
 
 /**
  * Bilingual (D-086, Task #21): converted from a static `metadata`
@@ -28,6 +28,7 @@ export async function generateMetadata({
       languages: languageAlternates("/company"),
     },
     openGraph: {
+      images: [SHARE_IMAGE],
       title: isFr ? "Entreprise | ORAGROL Global" : "Company | ORAGROL Global",
       description: isFr
         ? "Conçu pour relier ce que les entreprises ne peuvent plus gérer séparément — cybersécurité, automatisation et réflexion opérationnelle, dirigé par le fondateur depuis l'Ontario, Canada."

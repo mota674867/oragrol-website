@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import CareersClient from "./careers-client";
-import { languageAlternates } from "@/app/lib/seo";
+import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
 
 /**
  * Bilingual (Phase 2k, ORAGROL_Careers_Talent_Partnerships_FR_Translation.md):
@@ -26,6 +26,7 @@ export async function generateMetadata({
       languages: languageAlternates("/careers"),
     },
     openGraph: {
+      images: [SHARE_IMAGE],
       title: isFr ? "Carrières | ORAGROL Global" : "Careers | ORAGROL Global",
       description: isFr
         ? "Bâtissez ce qui vient ensuite avec ORAGROL Global — emploi et travail de spécialiste rémunéré à la pièce en cybersécurité et automatisation d'entreprise."

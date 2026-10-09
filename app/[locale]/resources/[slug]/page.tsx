@@ -14,7 +14,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Fragment, type ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
-import { languageAlternates } from "@/app/lib/seo";
+import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
 import PreFooterCta from "@/app/components/site/pre-footer-cta";
 import SiteFooter from "@/app/components/site/footer";
 import "@/app/gpt-pages.css";
@@ -246,6 +246,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       languages: languageAlternates(`/resources/${slug}`),
     },
     openGraph: {
+      images: [SHARE_IMAGE],
       type: "article",
       title,
       description,

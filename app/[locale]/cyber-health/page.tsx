@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import CyberHealthClient from "./cyber-health-client";
-import { languageAlternates } from "@/app/lib/seo";
+import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
 
 /**
  * Bilingual (D-086, Task #21): converted from a static `metadata`
@@ -28,6 +28,7 @@ export async function generateMetadata({
       languages: languageAlternates("/cyber-health"),
     },
     openGraph: {
+      images: [SHARE_IMAGE],
       title: isFr
         ? "Évaluation Cyber Health | ORAGROL Global"
         : "Cyber Health Assessment | ORAGROL Global",

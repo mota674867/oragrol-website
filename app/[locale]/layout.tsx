@@ -8,6 +8,7 @@ import { SiteChrome } from "@/app/components/site/site-chrome";
 import { SITE_URL } from "@/app/lib/site-config";
 import { routing } from "@/i18n/routing";
 import ChatWidget from "@/app/components/ChatWidget";
+import { SHARE_IMAGE } from "@/app/lib/seo";
 
 // Design-token typefaces (D-068 visual-system migration — see
 // app/styles/tokens.css). Changing a typeface only requires editing the
@@ -46,6 +47,8 @@ const epilogue = Epilogue({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  openGraph: { images: [SHARE_IMAGE] },
+  twitter: { card: "summary_large_image", images: [SHARE_IMAGE.url] },
   title: {
     default: "ORAGROL Global | Cybersecurity, Automation & Coordinated Protection",
     template: "%s | ORAGROL Global",

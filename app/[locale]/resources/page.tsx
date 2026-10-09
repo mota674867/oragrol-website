@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import ResourcesPageClient from "./resources-client";
-import { languageAlternates } from "@/app/lib/seo";
+import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
 
 /**
  * Bilingual (D-086, Task #21, Phase 2i): converted from a static
@@ -28,6 +28,7 @@ export async function generateMetadata({
       languages: languageAlternates("/resources"),
     },
     openGraph: {
+      images: [SHARE_IMAGE],
       title: isFr ? "Ressources | ORAGROL Global" : "Resources | ORAGROL Global",
       description: isFr
         ? "Une intelligence pratique en cybersécurité pour les dirigeants d'entreprises canadiennes — claire, crédible et conçue pour passer à l'action."

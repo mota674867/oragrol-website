@@ -12,7 +12,7 @@
 // never got, before this fix).
 import { usePathname } from "@/i18n/navigation";
 import { SiteHeader } from "./site-header";
-import { SiteFooter } from "./site-footer";
+import SiteFooter from "./footer";
 import { EmergencyCta } from "./emergency-cta";
 
 /**

@@ -22,7 +22,7 @@ import { Fragment, type ReactNode } from "react";
 import SiteFooter from "@/app/components/site/footer";
 import OragrolMegaNav from "@/app/components/site/oragrol-mega-nav";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
-import { languageAlternates } from "@/app/lib/seo";
+import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
 import "@/app/gpt-pages.css";
 import {
   getAccessibilityStatement,
@@ -51,6 +51,7 @@ export async function generateMetadata({
     },
     robots: { index: true, follow: true },
     openGraph: {
+      images: [SHARE_IMAGE],
       title: isFr ? "Déclaration d'accessibilité | ORAGROL Global" : "Accessibility Statement | ORAGROL Global",
       description: isFr
         ? "L'engagement d'ORAGROL Global envers un site Web accessible et inclusif."

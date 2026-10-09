@@ -2,6 +2,7 @@
 import {FormEvent,useEffect,useRef,useState} from "react";
 import {Link} from "@/i18n/navigation";
 import "../chat-widget.css";
+import { Logo } from "./brand/logo";
 
 type Message={
   from:"visitor"|"oragrol";
@@ -268,7 +269,7 @@ export default function ChatWidget(){
     runReply(next);
   };
 
-  if(dismissed)return<div className="or-chat or-chat-collapsed"><button className="or-chat-restore" onClick={restoreChat} aria-label="Reopen ORAGROL chat"><span aria-hidden="true"/></button></div>;
+  if(dismissed)return<div className="or-chat or-chat-collapsed"><button className="or-chat-restore" onClick={restoreChat} aria-label="Reopen ORAGROL chat"><Logo variant="icon" tone="light-bg" height={24} decorative /></button></div>;
 
   return(
     <div className="or-chat">
@@ -283,7 +284,7 @@ export default function ChatWidget(){
       <div className="or-chat-controls">
         <button className="or-chat-cancel" onClick={dismissChat} aria-label="Hide chat">×</button>
         <button className="or-chat-launch" aria-label={open?"Close ORAGROL chat":"Open ORAGROL chat"} aria-expanded={open} onClick={launch}>
-          <span aria-hidden="true"/><b>{open?"Close":"Chat"}</b>
+          <Logo variant="icon" tone="light-bg" height={24} decorative /><b>{open?"Close":"Chat"}</b>
         </button>
       </div>
       {open&&(

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import TalentClient from "./talent-client";
-import { languageAlternates } from "@/app/lib/seo";
+import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
 
 /**
  * Bilingual (Phase 2k, ORAGROL_Careers_Talent_Partnerships_FR_Translation.md):
@@ -26,6 +26,7 @@ export async function generateMetadata({
       languages: languageAlternates("/talent"),
     },
     openGraph: {
+      images: [SHARE_IMAGE],
       title: isFr ? "Talent | ORAGROL Global" : "Talent | ORAGROL Global",
       description: isFr
         ? "Apportez votre expertise. Partagez ce qui vient ensuite — collaboration exploratoire avec ORAGROL Global, sans poste ou rôle de projet défini requis."

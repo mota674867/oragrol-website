@@ -3,6 +3,12 @@
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
 ---
+## Session: logo rollout v3 (horizontal header logo, grey footer icon, share image, 404, chat icon), 2026-10-09
+- Branch `brand-logo-replacement` (preview only, not merged). See D-094.
+- `logo.tsx`: added `variant="horizontal"` and `tone="watermark"`. `HeaderLogo` now renders the horizontal lockup (48/40px). Footer icon grey #282828 bottom-right, hidden on phones. Shared footer now on old-chrome routes; `site-footer.tsx` and `oragrol-ring.tsx` deleted.
+- `SHARE_IMAGE` on every page's openGraph + layout; `public/og/oragrol-share.png`. Branded 404 (`not-found.tsx` + `[...rest]`). Chat launcher shows the brand icon.
+- Verified: tsc clean; lint no new issues (pre-existing ChatWidget setState-in-effect error and two warnings remain); 23 routes + 2 bad URLs checked at 1440 and 375 via playwright-core: logo 167x48 / 140x40 everywhere, header heights unchanged, footer 622/743 unchanged, 404 returns 404 with header+footer; og:image + twitter:card summary_large_image on all checked pages. `npm run build` can't run in this sandbox (Google Fonts blocked) — Vercel preview build is the build check. NEEDS VERIFICATION on the preview: real fonts, LinkedIn Post Inspector.
+
 ## Session: new approved logo rolled out site-wide (preview only), 2026-10-09
 
 **Done:**

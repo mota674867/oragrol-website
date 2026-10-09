@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import ServicesClient from "./services-client";
 import { SITE_URL } from "@/app/lib/site-config";
-import { languageAlternates } from "@/app/lib/seo";
+import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
 import {
   SERVICE_PACKAGES,
   INDIVIDUAL_SERVICES,
@@ -43,6 +43,7 @@ export async function generateMetadata({
       languages: languageAlternates("/services"),
     },
     openGraph: {
+      images: [SHARE_IMAGE],
       title: isFr
         ? "Services de cybersécurité | ORAGROL Global"
         : "Cybersecurity Services | ORAGROL Global",

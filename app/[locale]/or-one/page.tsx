@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import OrOneClient from "./or-one-client";
-import { languageAlternates } from "@/app/lib/seo";
+import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
 
 /**
  * Bilingual (D-086, Task #21): converted from a static `metadata` export
@@ -27,6 +27,7 @@ export async function generateMetadata({
       languages: languageAlternates("/or-one"),
     },
     openGraph: {
+      images: [SHARE_IMAGE],
       title: isFr ? "OR ONE | ORAGROL Global" : "OR ONE | ORAGROL Global",
       description: isFr
         ? "Un système d'affaires coordonné reliant la sécurité, l'automatisation et l'intelligence opérationnelle — conçu autour de votre entreprise."

@@ -1,5 +1,5 @@
 import { Container, H2, Section, type SectionEnvironment, ButtonLink } from "../../ui";
-import { OragrolRing } from "../../brand/oragrol-ring";
+import { Logo } from "../../brand/logo";
 import { Reveal } from "../../motion/reveal";
 
 /**
@@ -26,7 +26,7 @@ export function FinalCta({ transitionFrom }: { transitionFrom?: SectionEnvironme
         aria-hidden="true"
         className="pointer-events-none absolute -right-32 top-1/2 -translate-y-1/2 opacity-[0.08]"
       >
-        <OragrolRing size={480} />
+        <Logo variant="icon" tone="dark-bg" height={480} decorative />
       </div>
 
       <Container size="lg" className="relative py-24 text-center md:py-32">

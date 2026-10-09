@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import PartnershipsClient from "./partnerships-client";
-import { languageAlternates } from "@/app/lib/seo";
+import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
 
 /**
  * Bilingual (Phase 2k, ORAGROL_Careers_Talent_Partnerships_FR_Translation.md):
@@ -26,6 +26,7 @@ export async function generateMetadata({
       languages: languageAlternates("/partnerships"),
     },
     openGraph: {
+      images: [SHARE_IMAGE],
       title: isFr ? "Partenariats | ORAGROL Global" : "Partnerships | ORAGROL Global",
       description: isFr
         ? "Des résultats plus solides, bâtis ensemble — explorez la collaboration, la croissance régionale ou l'investissement technologique avec ORAGROL Global."

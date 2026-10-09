@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { HowWeWorkHero } from "@/app/components/sections/how-we-work/hero";
 import { StageSequence } from "@/app/components/sections/how-we-work/stage-sequence";
 import { HowWeWorkClosingCta } from "@/app/components/sections/how-we-work/closing-cta";
-import { languageAlternates } from "@/app/lib/seo";
+import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
 
 // Full page copy supplied and built — no longer a visual-only prototype
 // (see DECISIONS.md D-035 for the hero-visual round, D-036 for this one)
@@ -36,6 +36,7 @@ export async function generateMetadata({
       languages: languageAlternates("/how-we-work"),
     },
     openGraph: {
+      images: [SHARE_IMAGE],
       title: isFr ? "Comment nous travaillons | ORAGROL Global" : "How We Work | ORAGROL Global",
       description: isFr
         ? "Une méthode claire, pas une boîte noire."

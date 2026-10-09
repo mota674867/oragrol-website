@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import HomeClient from "./home-client";
 import HomeCybersecurity from "./home-section-04";
 import { SITE_URL } from "@/app/lib/site-config";
-import { languageAlternates } from "@/app/lib/seo";
+import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
 
 // Locale-aware metadata (was a static `export const metadata`, which meant
 // the French render at /fr got English-only title/description/canonical —
@@ -31,6 +31,7 @@ export async function generateMetadata({
       languages: languageAlternates("/"),
     },
     openGraph: {
+      images: [SHARE_IMAGE],
       title: isFr
         ? "ORAGROL Global | Une cybersécurité qui agit. Une automatisation qui évolue."
         : "ORAGROL Global | Cybersecurity that acts. Automation that scales.",

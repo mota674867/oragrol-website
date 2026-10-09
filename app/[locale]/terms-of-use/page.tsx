@@ -19,7 +19,7 @@ import { Fragment, type ReactNode } from "react";
 import SiteFooter from "@/app/components/site/footer";
 import OragrolMegaNav from "@/app/components/site/oragrol-mega-nav";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
-import { languageAlternates } from "@/app/lib/seo";
+import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
 import "@/app/gpt-pages.css";
 import { getTermsOfUse, type TermsBlock, type TermsOfUseContent } from "./ORAGROL_TermsOfUseContent";
 import { HeaderLogo } from "@/app/components/brand/header-logo";
@@ -44,6 +44,7 @@ export async function generateMetadata({
     },
     robots: { index: true, follow: true },
     openGraph: {
+      images: [SHARE_IMAGE],
       title: isFr ? "Conditions d'utilisation | ORAGROL Global" : "Terms of Use | ORAGROL Global",
       description: isFr
         ? "Les conditions régissant l'accès et l'utilisation du site Web d'ORAGROL Global."
