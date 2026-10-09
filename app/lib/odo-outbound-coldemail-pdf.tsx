@@ -2,7 +2,6 @@ import React from "react";
 import { Document, Page, Text, View, StyleSheet, renderToBuffer } from "@react-pdf/renderer";
 import type { Dossier } from "./odo-outbound";
 import { clean, coldEmailObservations, coldEmailRecommendation } from "./odo-outbound-coldemail";
-import { PdfLogo } from "./pdf-brand";
 
 // One-page, prospect-safe PDF for cold-email use. Unlike the internal dossier
 // it carries NO competitor details, costs, unverified leads or internal notes:
@@ -30,7 +29,7 @@ export function ColdEmailPdf({ d }: { d: Dossier }) {
   return (
     <Document title={`A few observations for ${d.company}`} author="ORAGROL Global">
       <Page size="A4" style={s.page}>
-        <View style={{ marginBottom: 16 }}><PdfLogo variant="horizontal" height={22} /></View>
+        <Text style={s.brand}>ORAGROL GLOBAL - TORONTO</Text>
         <Text style={s.title}>A few observations for {clean(d.company)}</Text>
         <Text style={s.sub}>Based only on public information about {d.website}. Nothing was accessed, tested or changed on your systems.</Text>
 
