@@ -213,7 +213,7 @@ export function SiteHeader() {
                     <p className="text-xs font-semibold text-text-secondary uppercase tracking-widest">{isFr ? "Vos portails" : "Your portals"}</p>
                   </div>
                   <a
-                    href="https://app.oragrolglobal.com/or-one"
+                    href="https://app.orgro.ca/or-one"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block px-4 py-3 hover:bg-surface-1 transition-colors border-b border-border/50"
@@ -222,7 +222,7 @@ export function SiteHeader() {
                     <p className="text-xs text-text-secondary mt-0.5">{isFr ? "Agents IA, approbations et rapports" : "AI agents, approvals and reports"}</p>
                   </a>
                   <a
-                    href="https://app.oragrolglobal.com/services"
+                    href="https://app.orgro.ca/services"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block px-4 py-3 hover:bg-surface-1 transition-colors border-b border-border/50"
