@@ -85,7 +85,7 @@ export default function UtilityBar() {
               </div>
 
               <a
-                href="https://app.oragrolglobal.com/or-one"
+                href="https://app.orgro.ca/or-one"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ display: "block", padding: "12px 16px", borderBottom: "1px solid #1a1a1a", textDecoration: "none" }}
@@ -99,7 +99,7 @@ export default function UtilityBar() {
               </a>
 
               <a
-                href="https://app.oragrolglobal.com/services"
+                href="https://app.orgro.ca/services"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ display: "block", padding: "12px 16px", borderBottom: "1px solid #1a1a1a", textDecoration: "none" }}
