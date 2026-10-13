@@ -48,12 +48,12 @@ import { UNTRUSTED_TEXT_RULE } from "./odo-safety";
 const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
 export async function verifyTurnstile(token: string, remoteIp?: string): Promise<boolean> {
+  // Fail closed (approved 2026-10-13): if the check cannot run, the scan is refused.
+  // A missing secret key therefore blocks scans until it is set, in preview and production alike.
   const secret = process.env.TURNSTILE_SECRET_KEY;
   if (!secret) {
-    // Not configured — fail open so a missing env var in a preview/staging
-    // deploy never silently blocks every scan; production must set this.
-    console.error("[ODO Gate] TURNSTILE_SECRET_KEY not configured — captcha check skipped.");
-    return true;
+    console.error("[ODO Gate] TURNSTILE_SECRET_KEY not configured — captcha check refused (fail closed).");
+    return false;
   }
   if (!token) return false;
   try {
@@ -65,11 +65,12 @@ export async function verifyTurnstile(token: string, remoteIp?: string): Promise
       body,
       signal: AbortSignal.timeout(8000),
     });
+    if (!res.ok) return false;
     const data = (await res.json()) as { success: boolean };
     return data.success === true;
   } catch (err) {
-    console.error("[ODO Gate] Turnstile verification request failed — failing open:", err);
-    return true;
+    console.error("[ODO Gate] Turnstile verification request failed — refused (fail closed):", err);
+    return false;
   }
 }
 
