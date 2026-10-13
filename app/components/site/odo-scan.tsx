@@ -458,17 +458,25 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
 
   useEffect(() => () => stopUpdates(), [stopUpdates]);
 
+  // Load the CAPTCHA as soon as the form is near the screen (not on first touch), so it never appears late.
+  // Browsers without IntersectionObserver get it after 2 seconds instead.
   useEffect(() => {
     if (loadTurnstile) return;
-    const go = () => setLoadTurnstile(true);
-    const events = ["pointerdown", "keydown", "touchstart", "scroll", "focusin"] as const;
-    events.forEach((e) => window.addEventListener(e, go, { once: true, passive: true }));
-    const timer = window.setTimeout(go, 12000);
-    return () => {
-      events.forEach((e) => window.removeEventListener(e, go));
-      window.clearTimeout(timer);
-    };
-  }, [loadTurnstile]);
+    const el = turnstileContainerRef.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") {
+      const timer = window.setTimeout(() => setLoadTurnstile(true), 2000);
+      return () => window.clearTimeout(timer);
+    }
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        setLoadTurnstile(true);
+        observer.disconnect();
+      }
+    }, { rootMargin: "300px 0px" });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loadTurnstile, phase]);
 
   useEffect(() => {
     if (!turnstileReady || phase !== "idle") return;
