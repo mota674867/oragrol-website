@@ -150,6 +150,13 @@
 .odo-scan__intro { margin: -11px 0 25px; color: rgb(255 255 255 / 76%); font-size: 14px; line-height: 1.55; }
 
 .odo-scan__form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 28px; }
+/* Full-width rows: the Cloudflare box (about 300px+ wide) and the submit button must never share a row with a half-width column, or they overlap on laptop widths. */
+.odo-scan__form > .odo-scan__turnstile,
+.odo-scan__form > .odo-scan__submit,
+.odo-scan__form > .odo-scan__fine-print,
+.odo-scan__form > .odo-scan__inline-error,
+.odo-scan__form > .odo-scan__server-message { grid-column: 1 / -1; }
+.odo-scan__turnstile { min-height: 65px; max-width: 100%; overflow: hidden; }
 .odo-scan__field { display: block; min-width: 0; }
 .odo-scan__field-label { display: block; margin-bottom: 8px; color: #fff; font-size: 14px; font-weight: 600; }
 .odo-scan__field input,
