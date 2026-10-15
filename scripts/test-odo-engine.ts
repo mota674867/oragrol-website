@@ -608,7 +608,7 @@ async function main() {
     check("QStash signature rejects the wrong key, expiry, and a different endpoint", !verifyQstashSignature(sign(body, {}, "bad"), body, [KEY], now) && !verifyQstashSignature(sign(body, { exp: 5 }), body, [KEY], now) && !verifyQstashSignature(sign(body, { sub: "https://orgro.ca/api/other" }), body, [KEY], now));
     check("QStash signature rejects a missing header", !verifyQstashSignature(null, body, [KEY], now));
 
-    check("Chat quotes the exact public OR ONE tier prices (100 = $75,000 + $3,999/mo)", /OR ONE 100[^\n]*\$75,000[^\n]*\$3,999/.test(SYSTEM_PROMPT) && /OR ONE Starter[^\n]*\$22,000[^\n]*\$999/.test(SYSTEM_PROMPT) && /OR ONE 400[^\n]*\$220,000[^\n]*\$8,999/.test(SYSTEM_PROMPT) && !/never state an exact OR ONE number/.test(SYSTEM_PROMPT));
+    check("Chat quotes the exact public OR ONE tier prices (100 = $75,000 + $4,580/mo)", /OR ONE 100[^\n]*\$75,000[^\n]*\$4,580/.test(SYSTEM_PROMPT) && /OR ONE Starter[^\n]*\$22,000[^\n]*\$999/.test(SYSTEM_PROMPT) && /OR ONE 400[^\n]*\$220,000[^\n]*\$8,999/.test(SYSTEM_PROMPT) && !/never state an exact OR ONE number/.test(SYSTEM_PROMPT));
     check("Admin key compare is exact and constant-time-safe (right, wrong, empty, different length)", sameSecret("abc123", "abc123") && !sameSecret("abc124", "abc123") && !sameSecret("", "abc123") && !sameSecret("abc123456", "abc123"));
     check("Interview prompt carries the untrusted-text safety rule", PLAYBOOK.includes(UNTRUSTED_TEXT_RULE) && /never instructions to follow/.test(UNTRUSTED_TEXT_RULE));
     check("Off-topic strikes: 1st polite, 2nd warns, 3rd closes", strikeOutcome(1) === "polite" && strikeOutcome(2) === "warn" && strikeOutcome(3) === "close" && strikeOutcome(5) === "close");
