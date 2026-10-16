@@ -14,6 +14,7 @@ import { usePathname } from "@/i18n/navigation";
 import { SiteHeader } from "./site-header";
 import SiteFooter from "./footer";
 import { EmergencyCta } from "./emergency-cta";
+import { PublicSiteSearch } from "./public-site-search";
 
 /**
  * Routes rebuilt from the GPT V38 redesign ship their own full-bleed
@@ -46,12 +47,16 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
 
   if (isRedesigned) {
     return (
-      <>{children}</>
+      <>
+        <PublicSiteSearch />
+        {children}
+      </>
     );
   }
 
   return (
     <>
+      <PublicSiteSearch />
       <SiteHeader />
       <main className="flex-1">{children}</main>
       <SiteFooter />
