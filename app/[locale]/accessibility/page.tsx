@@ -256,9 +256,9 @@ const ACCESSIBILITY_STYLES = `
   @media (max-width: 700px) {
     .accessibility-shell { padding-inline: 20px; }
     .accessibility-hero { min-height: 430px; padding-top: 27px; }
-    .accessibility-hero__layout { position: relative; grid-template-columns: 1fr; min-height: 350px; }
+    .accessibility-hero__layout { position: relative; grid-template-columns: minmax(0, 1fr); min-height: 350px; }
     .accessibility-hero__content { position: relative; z-index: 1; }
-    .accessibility-hero h1 { font-size: clamp(56px, 17vw, 78px); }
+    .accessibility-hero h1 { overflow-wrap: anywhere; font-size: clamp(56px, 17vw, 78px); }
     .accessibility-hero__number { position: absolute; right: 0; top: 25px; opacity: .7; font-size: 150px; }
     .accessibility-dates { display: grid; gap: 10px; margin-top: 28px; }
     .accessibility-layout { display: block; padding-top: 34px; padding-bottom: 54px; }

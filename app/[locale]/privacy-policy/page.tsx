@@ -584,7 +584,7 @@ const PRIVACY_STYLES = `
 
     .privacy-hero__layout {
       position: relative;
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
       min-height: 350px;
     }
 
@@ -594,6 +594,7 @@ const PRIVACY_STYLES = `
     }
 
     .privacy-hero h1 {
+      overflow-wrap: anywhere;
       font-size: clamp(56px, 17vw, 78px);
     }
 

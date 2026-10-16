@@ -24,6 +24,8 @@ import {
   type ResourceArticle,
 } from "./ORAGROL_ResourceArticles";
 import { HeaderLogo } from "@/app/components/brand/header-logo";
+import OragrolMegaNav from "@/app/components/site/oragrol-mega-nav";
+import { NAV_ITEMS } from "@/app/components/site/nav-items";
 
 /**
  * Bilingual (D-086, Task #21, Phase 2i): `RESOURCE_ARTICLES_BY_SLUG`
@@ -50,17 +52,6 @@ type BodyBlock =
   | { type: "paragraph"; text: string }
   | { type: "unordered-list"; items: string[] }
   | { type: "ordered-list"; items: string[] };
-
-// Same six links as the standard nav on Resources/Company/Industries/
-// Contact/Privacy Policy.
-const nav = [
-  "Services",
-  "Business Automation",
-  "OR ONE",
-  "Industries",
-  "Resources",
-  "Company",
-];
 
 function slugify(value: string) {
   return value
@@ -288,29 +279,7 @@ export default async function ResourceDetailPage({ params }: PageProps) {
       <main className="resource-detail">
         <header className="industry-header resource-header">
           <HeaderLogo />
-          <nav>
-            {nav.map((n) => (
-              <Link
-                className={n === "Resources" ? "active" : ""}
-                href={
-                  n === "Services"
-                    ? "/services"
-                    : n === "Business Automation"
-                      ? "/business-automation"
-                      : n === "OR ONE"
-                        ? "/or-one"
-                        : n === "Industries"
-                          ? "/industries"
-                          : n === "Resources"
-                            ? "/resources"
-                            : "/company"
-                }
-                key={n}
-              >
-                {n}
-              </Link>
-            ))}
-          </nav>
+          <OragrolMegaNav items={NAV_ITEMS} activePath="/resources" />
           <div>
             <Link href="/resources#resource-library">
               {isFr ? "Retour aux ressources" : "Back to Resources"}
