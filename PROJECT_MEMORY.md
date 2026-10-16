@@ -2,6 +2,13 @@
 
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
+## Session: site search icon live on every public page (branch add-public-search), 2026-10-16
+- Search dialog (PublicSiteSearch, mounted in SiteChrome) now answers every aria-label Search/Recherche/Rechercher button. Keyword-only, no AI, index of 102 public pages/articles/services (excludes scan, ops/outbound, chat, admin, API).
+- header-search.tsx reduced to a plain trigger (its own dead dialog removed). FAQ header gained a search icon. Escape closes in one press (was two: first press cleared the text).
+- FAQ header fits at 360/390/430 phone widths: logo margin removed under 760px, gap 8px under 400px (gpt-pages.css). Pre-existing: /resources/[slug] article page overflows horizontally on phones (its own nav), not caused by search, not fixed here.
+- Verified: 12 search unit tests pass; tsc clean; browser check on 18 public page families at 390px and 1440px: icon opens dialog, "mfa" returns results, Escape closes. npm run build fails only because sandbox cannot reach Google Fonts (next/font), not a code error.
+- Open: careers, talent, partnerships and cyber-health have no search icon. They are standalone pages by decision (see D-096); awaiting Mohammad's call. Not pushed.
+
 ---
 ## Session: founder section on Company page (photo + dark + new content), 2026-10-09
 - Branch `founder-section` (preview only). See D-095. Files: company-client.tsx, gpt-pages.css (founder rules), messages/en.json + fr.json (Company.founder), public/images/company/founder-mohammad-chelouy-tabrizi.jpg.

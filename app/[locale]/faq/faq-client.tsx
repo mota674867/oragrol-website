@@ -9,6 +9,8 @@ import UtilityBar from "@/app/components/site/utility-bar";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
 import "@/app/gpt-pages.css";
 import { HeaderLogo } from "@/app/components/brand/header-logo";
+import { Search } from "lucide-react";
+import searchStyles from "@/app/components/site/public-site-search.module.css";
 
 /**
  * Bilingual (D-086, Task #21): the 36-question `groups` array used to be a
@@ -44,6 +46,9 @@ function FAQPageClient() {
       <header className="faq-nav">
         <HeaderLogo />
         <OragrolMegaNav items={NAV_ITEMS} activePath={pathname} />
+        <button type="button" aria-label="Search" aria-haspopup="dialog" className={searchStyles.trigger}>
+          <Search size={20} strokeWidth={1.8} aria-hidden="true" />
+        </button>
         <Link href="/contact">{t("nav.contactLink")}</Link>
       </header>
       <section className="faq-hero">

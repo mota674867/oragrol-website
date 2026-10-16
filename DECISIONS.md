@@ -1179,3 +1179,9 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Decision (approved by Mohammad):** the "MCT / final image pending" placeholder is replaced by his approved 4:5 black-and-white portrait (`public/images/company/founder-mohammad-chelouy-tabrizi.jpg`, small grey Oragrol icon top-left, no text on the photo). Section background is black (#0a0a0a). Eyebrow is "Founder" (no "04 /").
 - **Content:** three bio paragraphs cut to one two-sentence bio; added a 2012 / 15+ / 2025 proof row, one credentials line, a shortened quote and a "Book a conversation with Mohammad" link to /contact. The country name was removed from the public bio at Mohammad's request ("better to close the info"). Every fact comes from his own original copy; nothing new. EN + FR updated.
 
+
+### D-096 — Site search icon on every public page; keyword-only, no AI (2026-10-16, pending push)
+- **Decision:** one site-wide search dialog (`PublicSiteSearch`) answers every search icon (English and French labels). It searches a prebuilt index of 102 public pages, articles and services (`public/site-search-index.json`). It is keyword-only: no AI answers, no chat, no live API. Excluded on purpose: scan, ops/outbound, chat, admin, API, style guide.
+- **Icon placement:** added to the FAQ header, which has a full nav. Old placeholder `HeaderSearch` is now only a trigger, not its own dialog.
+- **Still open (not decided):** `/careers`, `/talent`, `/partnerships` and `/cyber-health` are standalone pages with no nav, by decision (see the 2026-10-09 footer/standalone entries). They have no search icon. Adding one changes that standalone design, so it needs Mohammad's approval.
+- **Known issue, not caused by search:** `/resources/[slug]` article pages overflow horizontally on phones because of their own nav.

@@ -29,4 +29,8 @@
 .result:hover { background: color-mix(in srgb, var(--text-primary) 7%, transparent); }
 .result:focus-visible, .close:focus-visible, .clear:focus-visible, .retry:focus-visible, .more:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 2px; }
 .more { display: block; margin: 16px auto 0; }
+/* Icon-only trigger used by pages whose header has no search button yet. */
+.trigger { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; flex-shrink: 0; padding: 0; color: inherit; background: transparent; border: 0; border-radius: 8px; cursor: pointer; }
+.trigger:hover { background: color-mix(in srgb, currentColor 8%, transparent); }
+.trigger:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 @media (max-width: 600px) { .dialog { margin-top: 20px; max-height: calc(100dvh - 40px); } .panel { padding: 18px; } .heading h2 { font-size: 20px; } }

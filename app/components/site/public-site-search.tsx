@@ -7,8 +7,10 @@ import styles from './public-site-search.module.css';
 const subscribe = () => () => {};
 const clientSnapshot = () => true;
 const serverSnapshot = () => false;
+/** Every search icon on the site: English label plus the French labels used by bilingual pages. */
+const SEARCH_TRIGGER = 'button[aria-label="Search"], button[aria-label="Recherche"], button[aria-label="Rechercher"]';
 
-/** One search controller for the existing aria-label="Search" NAV buttons. */
+/** One search controller for every site search icon (see SEARCH_TRIGGER). */
 export function PublicSiteSearch() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -25,7 +27,7 @@ export function PublicSiteSearch() {
 
   useEffect(() => {
     const activate = (event: MouseEvent) => {
-      const target = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('button[aria-label="Search"]') : null;
+      const target = event.target instanceof Element ? event.target.closest<HTMLButtonElement>(SEARCH_TRIGGER) : null;
       if (!target || target.disabled || target.closest('[role="dialog"], dialog')) return;
       event.preventDefault();
       event.stopPropagation();
@@ -70,7 +72,7 @@ export function PublicSiteSearch() {
     <dialog id={`${id}-dialog`} ref={dialog} className={styles.dialog} aria-labelledby={`${id}-title`}
       onCancel={event => { event.preventDefault(); close(); }}
       onKeyDown={event => {
-        if (event.key === 'Escape') { event.stopPropagation(); return; }
+        if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); close(); return; }
         if (event.key !== 'Tab') return;
         const controls = Array.from(event.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), a[href]'))
           .filter(element => element.getClientRects().length > 0);
