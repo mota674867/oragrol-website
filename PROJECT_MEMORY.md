@@ -2,12 +2,6 @@
 
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
-## Session: home hero photo column, 2026-10-19
-- Added black and white Toronto photo column to the home hero (D-097). Files: home-client.tsx (one div), homepage-v3.css (new block at end), public/images/home/hero-toronto.jpg.
-- Verified: tsc clean; lint no new issues; playwright-core at 1920, 1440, 1280, 1100 (photo shown, man visible above the dark OR ONE card, headline readable) and 900, 390 (photo hidden, hero unchanged, no horizontal overflow).
-- Pushed to main at Mohammad's request ("push it").
-
----
 ## Session: site search icon live on every public page (branch add-public-search), 2026-10-16
 - Search dialog (PublicSiteSearch, mounted in SiteChrome) now answers every aria-label Search/Recherche/Rechercher button. Keyword-only, no AI, index of 102 public pages/articles/services (excludes scan, ops/outbound, chat, admin, API).
 - header-search.tsx reduced to a plain trigger (its own dead dialog removed). FAQ header gained a search icon. Escape closes in one press (was two: first press cleared the text).
