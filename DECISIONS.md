@@ -1185,3 +1185,8 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Icon placement:** added to the FAQ header, which has a full nav. Old placeholder `HeaderSearch` is now only a trigger, not its own dialog.
 - **Still open (not decided):** `/careers`, `/talent`, `/partnerships` and `/cyber-health` are standalone pages with no nav, by decision (see the 2026-10-09 footer/standalone entries). They have no search icon. Adding one changes that standalone design, so it needs Mohammad's approval.
 - **Known issue, not caused by search:** `/resources/[slug]` article pages overflow horizontally on phones because of their own nav.
+
+### D-097 — Home hero gets a black and white Toronto photo column (2026-10-19)
+- **Context:** Mohammad asked where photos would lift the site to a premium look; the hero was first. Approved mockup: the catalogue cover photo (TD Centre, Toronto, TD Canada Trust sign retouched out) as a tall column on the right.
+- **Decision:** `.hero-photo` column, width 27vw, pinned right, from the top of the hero down to the top of the entry cards. Entry cards become `1fr 1fr 27vw` so the photo edge and the "OR ONE" card edge share one line; that card turns dark (#15181b) so the column flows into the dark section below. Orange OR moved to left:61% with mix-blend-mode multiply so the R sits on the photo. Shown from 1025px up; below that the hero is unchanged (photo column too narrow to read).
+- **Asset:** `public/images/home/hero-toronto.jpg` (1080px wide, ~250 KB). Same photo as the 2026/27 catalogue cover. Licence to be confirmed by Mohammad.
