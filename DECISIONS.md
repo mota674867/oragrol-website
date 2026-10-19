@@ -1193,3 +1193,8 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Logo:** the approved geometry is read from `app/components/brand/logo.tsx` (constants now exported) through `app/lib/pdf-brand.tsx`. Nothing is redrawn.
 - **Deviation:** Helvetica is used because react-pdf does not load the dashboard's Inter woff2. The mockups use Inter.
 - **Supersedes:** the earlier ODO layout (dark panels, cover photo, 7-page structure per the 2026-10-01 go-ahead note) and the Cyber Health 6-page photo layout.
+
+### D-099 — Client scan reports keep lower-priority confirmed gaps, marked "worth exploring" (2026-10-19)
+- **Decision (Mohammad, 2026-10-19, option A):** a service appears in a client report only when that service has its own confirmed gap (observed research fact or a clear visitor answer). Real but lower-priority gaps stay in the report under "worth exploring". Guessed or inferred-only matches never appear.
+- **Supersedes the wording in the ODO Engine Redesign Decisions (2026-10-02), §37.4** ("guessed worth_exploring tier comes out of the client report entirely"). The 2026-10-03 change already implemented this, and the code is unchanged.
+- **Still open:** the scan's report wording for this tier must be reviewed before any client sees it.
