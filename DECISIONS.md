@@ -1185,3 +1185,11 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Icon placement:** added to the FAQ header, which has a full nav. Old placeholder `HeaderSearch` is now only a trigger, not its own dialog.
 - **Still open (not decided):** `/careers`, `/talent`, `/partnerships` and `/cyber-health` are standalone pages with no nav, by decision (see the 2026-10-09 footer/standalone entries). They have no search icon. Adding one changes that standalone design, so it needs Mohammad's approval.
 - **Known issue, not caused by search:** `/resources/[slug]` article pages overflow horizontally on phones because of their own nav.
+
+### D-098 — ODO and Cyber Health client PDFs rebuilt to the dashboard PDF style (2026-10-19)
+- **Decision (approved by Mohammad, 2026-10-19):** both live client reports now follow the approved dashboard PDF mockups. US Letter, white paper, graphite ink, teal section numbers, running header (approved full logo, "Confidential" block), icon-only background watermark, "Page X of Y" footer, QR contact block on the last page.
+- **Structure:** ODO = 01 Summary, 02 Local comparison, 03 Inside this report, 04 What we found, 05 SWOT, 06 What we recommend, 07 What this means, appendix A–D. Cyber Health = 01 Summary, 02 Inside, 03 Score & coverage, 04 Priority findings (+ risk guide A), 05 Quick wins, 06 Roadmap, 07 Continue (+ limitations A).
+- **Content:** every field the previous generators rendered is still rendered. The cover photos and dark panels are gone; the photo props remain optional so callers did not change. No $ or savings figure was added.
+- **Logo:** the approved geometry is read from `app/components/brand/logo.tsx` (constants now exported) through `app/lib/pdf-brand.tsx`. Nothing is redrawn.
+- **Deviation:** Helvetica is used because react-pdf does not load the dashboard's Inter woff2. The mockups use Inter.
+- **Supersedes:** the earlier ODO layout (dark panels, cover photo, 7-page structure per the 2026-10-01 go-ahead note) and the Cyber Health 6-page photo layout.

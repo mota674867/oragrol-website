@@ -2,6 +2,11 @@
 
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
+## Session: ODO and Cyber Health PDFs rebuilt to the approved dashboard style, 2026-10-19
+- Mohammad approved both mockups and asked for push. See D-098. Files: `app/lib/odo-report-pdf.tsx` (rewritten, same props), `app/[locale]/cyber-health/pdf-report.tsx` (rewritten, same props), `app/lib/pdf-brand.tsx` (new: logo and watermark), `app/components/brand/logo.tsx` (geometry constants exported, no visual change).
+- Verified: tsc clean; eslint 0 errors (2 existing-type alt-text warnings on Image, the same as before). Sample ODO renders 4 pages with the QR on page 4; sample Cyber Health renders 5 pages with the QR on page 5. Renders checked by eye at 70 dpi.
+- Not verified: a live `/api/odo/scan/report?format=pdf` run against a real session (no live session was used).
+
 ## Session: site search icon live on every public page (branch add-public-search), 2026-10-16
 - Search dialog (PublicSiteSearch, mounted in SiteChrome) now answers every aria-label Search/Recherche/Rechercher button. Keyword-only, no AI, index of 102 public pages/articles/services (excludes scan, ops/outbound, chat, admin, API).
 - header-search.tsx reduced to a plain trigger (its own dead dialog removed). FAQ header gained a search icon. Escape closes in one press (was two: first press cleared the text).
