@@ -12,7 +12,7 @@ import {
   addFollowUpJob,
   type ScopeJobRecord,
 } from "./scope-store";
-import ScopePdf, { scopePdfWouldOverflowTwoPages, type ScopePdfGroup } from "./scope-pdf";
+import ScopePdf, { scopePdfWouldOverflowMaxPages, type ScopePdfGroup } from "./scope-pdf";
 import { renderToBuffer } from "@react-pdf/renderer";
 import QRCode from "qrcode";
 import { sendScopeClientEmail, sendScopeInternalEmail } from "./scope-email";
@@ -88,7 +88,7 @@ async function runPdfGeneration(job: ScopeJobRecord, owner: string): Promise<voi
   // missing codes/items." Checked BEFORE rendering, not discovered
   // after — matches scope-pdf.tsx's own exported guard rather than
   // re-deriving the same logic here.
-  if (scopePdfWouldOverflowTwoPages(groups)) {
+  if (scopePdfWouldOverflowMaxPages(groups)) {
     // A genuine content-policy case per the PDF handoff, not a
     // transient failure — retrying won't change the outcome, so this
     // goes straight to manual attention rather than consuming the
@@ -96,7 +96,7 @@ async function runPdfGeneration(job: ScopeJobRecord, owner: string): Promise<voi
     await markReconciliationRequired(
       job.jobId,
       owner,
-      `Selection (${action.selections.length} items) exceeds the two-page compact layout's real capacity.`,
+      `Selection (${action.selections.length} items) exceeds the three-page layout's real capacity.`,
     );
     return;
   }
