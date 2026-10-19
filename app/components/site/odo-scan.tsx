@@ -870,7 +870,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
                 <a className="odo-scan__no-website" href="https://orgro.ca/contact">No website? Book a quick consultation instead →</a>
                 <label className="odo-scan__consent">
                   <input type="checkbox" checked={consent} onChange={(event) => { setConsent(event.target.checked); setErrors((current) => ({ ...current, consent: undefined })); }} />
-                  <span>{ODO_COPY.consent} <a href="/privacy">Privacy Policy</a></span>
+                  <span>{ODO_COPY.consent} <a href={locale === "fr" ? "/fr/privacy-policy" : "/privacy-policy"}>Privacy Policy</a></span>
                 </label>
                 {errors.consent ? <p className="odo-scan__inline-error" role="alert">{errors.consent}</p> : null}
                 {/* Cloudflare Turnstile — verified server-side before any paid research/AI call runs. */}

@@ -319,7 +319,7 @@ export default function ChatWidget(){
                 </label>
                 <p style={{fontSize:"11px",color:"#666",margin:"4px 0",lineHeight:1.5}}>
                   This chat is handled by AI and may be recorded. By continuing you consent to data collection per our{" "}
-                  <a href="/privacy" target="_blank" rel="noopener" style={{color:"#ef4d00"}}>Privacy Policy</a>.
+                  <a href="/privacy-policy" target="_blank" rel="noopener" style={{color:"#ef4d00"}}>Privacy Policy</a>.
                 </p>
                 <button type="submit" style={{border:0,background:"#ef4d00",color:"#fff",padding:"11px 16px",fontSize:"13px",fontWeight:600,cursor:"pointer",fontFamily:"inherit",borderRadius:"2px"}}>
                   Start chat
