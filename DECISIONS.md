@@ -1251,3 +1251,8 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Asset:** `public/images/industries/hero-meeting-rings.jpg` (2400px, ~600 KB, progressive).
 - **Revert:** delete the D-109 block at the end of `app/gpt-pages.css`; the previous dark radial hero comes back.
 - **TODO:** licence and model releases (six identifiable people) not verified. A cushion in the photo shows partial brand text ("net..."), barely legible under the scrim.
+
+### D-110 — Home Cyber Health: tablet / narrow-laptop widths use the stacked phone layout (2026-10-21)
+- **Problem (Mohammad):** between 721 and 1100px the side-by-side layout (D-103) put the 77 score block on top of the faces and the clipboard.
+- **Fix:** at 721-1100px the section is one column: text, then a photo band that carries the score (same as phones). Photo positioned 62% 22% so the score sits on the dark left and both people stay clear on the right. Desktop (1101px and up) and phones (720px and under) unchanged.
+- Appended block at the end of `app/[locale]/homepage-v3.css`; revert by deleting it.

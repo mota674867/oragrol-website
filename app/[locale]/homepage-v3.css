@@ -85,3 +85,12 @@
 .health-score>span,.health-score>small,.health-score p{color:#fff}
 .health-score p span{color:#cfcfcf}
 .health-score>div{border-top-color:rgba(255,255,255,.35)}
+
+/* D-110 Cyber Health, tablet / narrow laptop (721-1100px): the side-by-side layout put the 77 block on top
+   of the faces and the clipboard. Use the phone layout instead: text first, then a photo band carrying the score. */
+@media(min-width:721px) and (max-width:1100px){
+  .cyber-health-home{grid-template-columns:1fr;gap:32px;padding-bottom:0}
+  .cyber-health-home::before,.cyber-health-home::after{display:none}
+  .health-score{width:auto;justify-self:stretch;align-self:auto;margin:8px -5vw 0;min-height:460px;padding:32px 5vw;border:0;background:linear-gradient(180deg,rgba(0,0,0,.15) 30%,rgba(0,0,0,.7) 100%),#15181b url(/images/home/health-review-night.jpg) 62% 22%/cover no-repeat}
+  .health-score>strong{font-size:clamp(130px,16vw,200px)}
+}
