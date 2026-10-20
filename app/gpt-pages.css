@@ -497,3 +497,8 @@ footer{min-height:75svh;background:#0c0e0f;color:#eee;padding:4vw 3vw 22px;displ
 .existing-tools::after{content:"";position:absolute;top:0;right:0;bottom:0;width:48vw;background:#15181b url(/images/business-automation/tools-stay-woman-chair.jpg) 50% 30%/cover no-repeat;z-index:-1}
 .existing-tools>div:last-child>p{font-size:clamp(16px,1.2vw,21px)}
 @media(max-width:700px){.existing-tools{padding-right:18px;padding-bottom:0}.existing-tools::after{position:relative;display:block;width:auto;height:300px;margin:10px -18px 0}}
+
+/* D-109 Industries hero: black-and-white meeting photo behind the centred headline.
+   Dark scrim keeps the headline and the orange OR readable. Phones get a heavier scrim. */
+.ind-hero.ind-hero-clean{background:linear-gradient(180deg,rgba(17,19,21,.62),rgba(17,19,21,.78)),#111315 url(/images/industries/hero-meeting-rings.jpg) 50% 35%/cover no-repeat}
+@media(max-width:700px){.ind-hero.ind-hero-clean{background:linear-gradient(180deg,rgba(17,19,21,.74),rgba(17,19,21,.86)),#111315 url(/images/industries/hero-meeting-rings.jpg) 38% 40%/cover no-repeat}}

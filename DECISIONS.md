@@ -1244,3 +1244,10 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Same layout as D-105:** right 48vw panel, phone: photo below text. Only the image and its position (50% 30%) changed.
 - **Asset:** `public/images/business-automation/tools-stay-woman-chair.jpg` (2000px). Old `tools-stay-desk.jpg` deleted.
 - **TODO:** licence and model release not verified.
+
+### D-109 — Industries hero gets a black-and-white meeting photo behind the headline (2026-10-21)
+- **Decision (Mohammad, "push"), against my advice:** the hero stays centred, with the orange OR outline, but now sits on a B&W photo of a six-person meeting under ring-shaped pendant lights (Unsplash, supplied by him). A dark vertical scrim (62% to 78%) keeps the text readable; phones use a heavier one (74% to 86%).
+- **My reservations, recorded:** (1) the photo implies a team larger than a solo founder plus partners (same honesty concern as the Company page); (2) the faces run behind the headline, so it is busier than the plain dark hero it replaced; (3) at 1920 the small eyebrow and the 01/02/03 labels are dimmer over the photo.
+- **Asset:** `public/images/industries/hero-meeting-rings.jpg` (2400px, ~600 KB, progressive).
+- **Revert:** delete the D-109 block at the end of `app/gpt-pages.css`; the previous dark radial hero comes back.
+- **TODO:** licence and model releases (six identifiable people) not verified. A cushion in the photo shows partial brand text ("net..."), barely legible under the scrim.
