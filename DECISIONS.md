@@ -1198,3 +1198,11 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Decision (Mohammad, 2026-10-19, option A):** a service appears in a client report only when that service has its own confirmed gap (observed research fact or a clear visitor answer). Real but lower-priority gaps stay in the report under "worth exploring". Guessed or inferred-only matches never appear.
 - **Supersedes the wording in the ODO Engine Redesign Decisions (2026-10-02), §37.4** ("guessed worth_exploring tier comes out of the client report entirely"). The 2026-10-03 change already implemented this, and the code is unchanged.
 - **Still open:** the scan's report wording for this tier must be reviewed before any client sees it.
+
+### D-100 — Which lead sources go to HubSpot (2026-10-20)
+- **Decision (Mohammad, 2026-10-20):**
+  - **Must be linked to HubSpot:** Live chat, My Scope, ODO scan, Cyber Health. These are the main lead-generation tools.
+  - **Newsletter:** HubSpot, so subscribers are managed automatically (already live since the 2026-09 build, confirmed end to end).
+  - **Careers, Talent, Partnerships:** not linked to HubSpot for now. Submissions go to the inbox only. May be added later.
+- **Still open:** the four must-link sources are coded to HubSpot but were not confirmed live with a test lead. Verify each before relying on them.
+- **Known gap to fix:** Live chat returns "ok" to the visitor when the HubSpot token is missing, so a lost lead is silent. Needs an internal alert instead.
