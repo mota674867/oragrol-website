@@ -1261,3 +1261,9 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Cause:** `.home-nav` grid used a fixed 380px right column; logo + menu + 380px did not fit, so the page scrolled sideways (119px at 1101, 76 at 1150, 33 at 1200). Pre-existing, found while checking D-110.
 - **Fix:** at 1051-1300px the grid is `max-content minmax(0,1fr) max-content`, gap 18px. Other widths untouched.
 - **Verified:** overflow 0 at 1040/1051/1101/1150/1200/1300/1301/1440 in EN and FR.
+
+### D-112 — Home Cyber Health on phones: both people visible, score moved to the dark top-left (2026-10-21)
+- **Problem (Mohammad's phone screenshot):** at phone width the photo was cropped to the woman only (man cut off at the edge) and "/100" sat on her jacket.
+- **Fix (720px and under):** photo anchored right (100% 28%) so both people show; the photo has no spare space beside them at this shape, so the score moves to the dark area above the woman, top-left (77 at 96-128px, "/100" directly under it); the bar and labels stay at the bottom. Band min-height 480px. Tried first: score left-centre, which covered her face (rejected).
+- Also: at 721-1100px "/100" sits next to the 77 (small tidy-up to D-110).
+- Checked at 360/390/430/600/768 px: no overflow, nothing over faces.
