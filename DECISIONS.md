@@ -1273,3 +1273,9 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Decision:** prices cream (#f2f0ea), 01-04 muted grey, "OR" watermark near-invisible white, buttons outlined (turn solid orange on hover). The orange band below is now the single loud orange block, in line with the catalogue rule (orange as a solid shape, not as text). The small "Details" links stay orange (small, deliberate).
 - **Where:** edited the existing rules in `app/[locale]/services/services-body.tsx` (specialist block, no appended override). Checked 1920/1440/1024/768/390, FR 1440/390: no overflow.
 - **Note:** starting prices are shown on the website (their call); the catalogue stays price-free.
+
+### D-114 — Home Cyber Health on large monitors: score moved onto the dark monitor area (2026-10-21)
+- **Problem (Mohammad, 24-inch monitor):** from about 1600px up the 77 block sat on the woman and the clipboard.
+- **Fix:** `@media(min-width:1600px)`: score block anchored to the left of the photo (over the dark monitor area), width min(270px,15vw), 77 at clamp(96px,7.6vw,146px). Appended to `app/[locale]/homepage-v3.css`; revert by deleting the D-114 block.
+- **Laptop widths (under 1600px) deliberately untouched**, as asked (1280/1440/1536 unchanged; the 77 still touches the clipboard at 1440, approved earlier).
+- Checked at 1600/1680/1920/2560. At 1600 the 77 sits very close to her shoulder.
