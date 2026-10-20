@@ -1282,8 +1282,8 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 
 ### D-115 — Careers / Talent / Partnerships get a Close button and Esc = Back (2026-10-21)
 - **Problem (Mohammad):** these three pages are standalone (no site header or footer, by design), so once opened the only way out was the logo.
-- **Decision:** a visible "Close" button (top right, with an Esc hint on desktop, hint hidden on phones) in `app/components/site/oragrol-opportunity-page.tsx`; Esc does the same. Close goes back to the previous in-site page, or to home on a direct visit (new tab, bookmark, shared link). The standalone design is unchanged otherwise.
+- **Decision (updated same day at Mohammad's request):** just a round ✕ button at the top right, no "Close" word and no visible "Esc" hint; Esc still works silently (first version had the word and an Esc hint, rejected as too much) in `app/components/site/oragrol-opportunity-page.tsx`; Esc does the same. Close goes back to the previous in-site page, or to home on a direct visit (new tab, bookmark, shared link). The standalone design is unchanged otherwise.
 - **How "previous page" is known:** `site-chrome.tsx` stores the last in-site path in sessionStorage (`or-prev-path`, per tab, best effort). `history.length` was tried first and rejected: a fresh tab went "back" to a blank page.
 - **Esc safety:** ignored while typing in a field that already has text, so a half-written application is never thrown away. Esc on empty fields, radios and the page itself closes.
-- **Strings:** `Opportunity.closePage`, `Opportunity.closeAria` in `messages/en.json` and `messages/fr.json` ("Fermer").
+- **Strings:** `Opportunity.closeAria` (screen-reader label) in `messages/en.json` and `messages/fr.json` ("Fermer").
 - **Verified (Playwright, EN and FR, all three pages):** Close from /services returns to /services; direct visit Close and Esc go to / (/fr); Esc while typing stays. 1440 and 390 screenshots checked.
