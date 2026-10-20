@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useId, useState } from "react";
+import React, { useCallback, useEffect, useId, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Link, usePathname } from "@/i18n/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 
 export type PageKind = "careers" | "talent" | "partnerships";
 export type Vacancy = { id: string; title: string; description?: string };
@@ -82,11 +82,35 @@ function OpportunityContent({ page, logo, privacyUrl, termsUrl, vacancies = [], 
   const isFr = locale === "fr";
   const otherLocale = isFr ? "en" : "fr";
   const pathname = usePathname();
+  const router = useRouter();
+
+  // Exit: these pages have no site header, so give a visible Close button and let Esc act as Back.
+  // Back goes to the previous in-site page when there is one (site-chrome.tsx records it); a direct visit goes home.
+  const exit = useCallback(() => {
+    let prev = "";
+    try { prev = sessionStorage.getItem("or-prev-path") || ""; } catch {}
+    if (prev && prev !== pathname) router.back();
+    else router.push("/");
+  }, [router, pathname]);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || e.defaultPrevented) return;
+      // Do not throw away a half-written application: ignore Esc while typing in a field that has text.
+      const el = e.target as HTMLElement | null;
+      if (el && (el.tagName === "TEXTAREA" || el.tagName === "INPUT") && (el as HTMLInputElement).type !== "radio" && (el as HTMLInputElement).value) return;
+      exit();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [exit]);
 
   return <main className="op-page">
     <style>{styles}</style>
     <div className="op-shell">
-      <div className="op-logo">{logo || <span className="op-wordmark">ORAGROL<span>GLOBAL</span></span>}</div>
+      <div className="op-top">
+        <div className="op-logo">{logo || <span className="op-wordmark">ORAGROL<span>GLOBAL</span></span>}</div>
+        <button type="button" className="op-close" onClick={exit} aria-label={t("closeAria")}><span aria-hidden="true">✕</span> {t("closePage")} <kbd aria-hidden="true">Esc</kbd></button>
+      </div>
       <header className="op-hero">
         <p className="op-eyebrow">{t(`pages.${page}.eyebrow`)}</p>
         <h1>{t(`pages.${page}.title`)}</h1>
@@ -230,5 +254,11 @@ const styles = `
 .op-categories{display:flex;gap:26px;flex-wrap:wrap;margin:44px 0 26px;padding:0;border:0;border-bottom:1px solid #333}.op-categories label{position:relative;display:block;padding:14px 0;color:#b8b7b2;cursor:pointer;font-size:15px;border-bottom:2px solid transparent}.op-categories label.op-selected{color:#f2f2ee;border-bottom-color:#ef4d00}.op-categories input{position:absolute;opacity:0;width:1px;height:1px}.op-categories label:focus-within{outline:2px solid #b8b7b2;outline-offset:5px}
 .op-context{margin-bottom:30px}.op-context h2{font-size:19px;font-weight:400;margin:0 0 6px}.op-context p{color:#b8b7b2;margin:6px 0;font-size:15px;max-width:850px}.op-specialties{list-style:none;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:28px 0}.op-specialties li{font-size:16px}.op-specialties span{display:block;font-size:14px;color:#b8b7b2;margin-top:4px}.op-vacancy{margin-top:18px}.op-vacancy h3{font-weight:400;font-size:17px;margin:0}
 .op-form-panel{background:#f2f2ee;color:#111315;border-radius:4px;padding:36px;max-width:100%;color-scheme:light}.op-form-panel h2{font-size:23px;font-weight:500;margin:0 0 10px}.op-fields{display:grid;grid-template-columns:1fr 1fr;gap:20px 24px;margin:23px 0}.op-field{display:block;min-width:0;font-size:14px}.op-field>span{display:block;margin-bottom:8px}.op-field input:not([type=file]),.op-field select,.op-field textarea{width:100%;min-width:0;border:1px solid #a5a5a0;border-radius:2px;background:transparent;color:#111315;font:inherit;font-size:16px;min-height:46px;padding:10px 12px}.op-field textarea{resize:vertical;line-height:1.6}.op-page :focus-visible{outline:2px solid #555;outline-offset:3px}.op-description{margin-top:10px}.op-counter{text-align:right;font-size:12px;color:#555;margin:5px 0 22px}.op-upload{display:block;width:100%;max-width:100%;font-size:14px;padding:15px;border:1px dashed #aaa;overflow-wrap:anywhere}.op-upload::file-selector-button{padding:9px 14px;background:transparent;border:1px solid #888;border-radius:2px;color:#111315;margin-right:12px;cursor:pointer}.op-form-note,.op-privacy{font-size:12px;line-height:1.6;color:#555;margin:10px 0}.op-file-list{font-size:12px;padding-left:20px;overflow-wrap:anywhere}.op-privacy{margin-top:22px}.op-privacy a{color:#111315;text-underline-offset:3px}.op-consent{display:flex;align-items:flex-start;gap:10px;font-size:12px;color:#555;margin:13px 0 20px}.op-consent input{margin-top:3px;accent-color:#111315;width:16px;height:16px;flex-shrink:0}.op-submit{width:100%;min-height:48px;background:#111315;color:#f2f2ee;border:1px solid #111315;border-radius:2px;font:inherit;font-size:15px;padding:12px 20px;cursor:pointer;margin-top:12px}.op-submit:hover:not(:disabled){background:#25282a}.op-submit:disabled{opacity:.5;cursor:not-allowed}.op-hold{font-size:13px;color:#555}.op-error{color:#9a2020;font-size:13px}.op-message{font-size:13px;margin-bottom:0}.op-legal{display:flex;justify-content:center;gap:28px;margin-top:30px;font-size:12px}.op-legal a{color:#b8b7b2;text-decoration:none}.op-legal a:hover{text-decoration:underline}.op-lang-current{color:#ef4d00}.op-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.op-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.op-top .op-logo{margin-bottom:40px}
+.op-close{display:inline-flex;align-items:center;gap:10px;background:transparent;color:#f2f2ee;border:1px solid #6f7377;border-radius:4px;padding:10px 14px;font:inherit;font-size:13px;line-height:1;cursor:pointer}
+.op-close:hover,.op-close:focus-visible{background:#f2f2ee;color:#111315;border-color:#f2f2ee;outline:none}
+.op-close kbd{font:inherit;font-size:10px;letter-spacing:.08em;opacity:.6;border:1px solid currentColor;border-radius:3px;padding:2px 5px}
+@media(max-width:700px){.op-close kbd{display:none}}
 @media(max-width:600px){.op-page{padding:25px 18px}.op-logo{margin-bottom:40px}.op-hero>p:last-child{font-size:16px}.op-categories{gap:0 20px;margin-top:30px}.op-categories label{font-size:14px;min-height:48px}.op-specialties{grid-template-columns:1fr}.op-form-panel{padding:24px 18px}.op-fields{grid-template-columns:1fr;gap:18px}.op-legal{gap:20px}.op-upload{padding:12px 8px;font-size:12px}.op-form-panel h2{font-size:21px}}
 `;

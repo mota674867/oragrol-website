@@ -10,6 +10,7 @@
 // that page's own chrome (confirmed via a live dev-server diff: the French
 // homepage was rendering a duplicate header and footer the English one
 // never got, before this fix).
+import { useEffect } from "react";
 import { usePathname } from "@/i18n/navigation";
 import { SiteHeader } from "./site-header";
 import SiteFooter from "./footer";
@@ -33,6 +34,18 @@ const REDESIGNED_ROUTES = new Set<string>(["/", "/services", "/business-automati
 
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+
+  // Remember the last in-site page, so the standalone Careers / Talent / Partnerships pages can offer a real
+  // "Close" that goes back there (and goes home on a direct visit). Per tab (sessionStorage), best effort.
+  useEffect(() => {
+    if (!pathname) return;
+    try {
+      const cur = sessionStorage.getItem("or-cur-path");
+      if (cur && cur !== pathname) sessionStorage.setItem("or-prev-path", cur);
+      sessionStorage.setItem("or-cur-path", pathname);
+    } catch {}
+  }, [pathname]);
+
   const isRedesigned =
     pathname !== null &&
     (REDESIGNED_ROUTES.has(pathname) || pathname.startsWith("/resources/"));
