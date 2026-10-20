@@ -1256,3 +1256,8 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Problem (Mohammad):** between 721 and 1100px the side-by-side layout (D-103) put the 77 score block on top of the faces and the clipboard.
 - **Fix:** at 721-1100px the section is one column: text, then a photo band that carries the score (same as phones). Photo positioned 62% 22% so the score sits on the dark left and both people stay clear on the right. Desktop (1101px and up) and phones (720px and under) unchanged.
 - Appended block at the end of `app/[locale]/homepage-v3.css`; revert by deleting it.
+
+### D-111 — Home header no longer overflows at 1051-1300px (2026-10-21)
+- **Cause:** `.home-nav` grid used a fixed 380px right column; logo + menu + 380px did not fit, so the page scrolled sideways (119px at 1101, 76 at 1150, 33 at 1200). Pre-existing, found while checking D-110.
+- **Fix:** at 1051-1300px the grid is `max-content minmax(0,1fr) max-content`, gap 18px. Other widths untouched.
+- **Verified:** overflow 0 at 1040/1051/1101/1150/1200/1300/1301/1440 in EN and FR.

@@ -94,3 +94,9 @@
   .health-score{width:auto;justify-self:stretch;align-self:auto;margin:8px -5vw 0;min-height:460px;padding:32px 5vw;border:0;background:linear-gradient(180deg,rgba(0,0,0,.15) 30%,rgba(0,0,0,.7) 100%),#15181b url(/images/home/health-review-night.jpg) 62% 22%/cover no-repeat}
   .health-score>strong{font-size:clamp(130px,16vw,200px)}
 }
+
+/* D-111 Home header at 1101-1300px: the right-hand column was a fixed 380px, so logo + menu + 380px did not fit
+   and the page scrolled sideways (119px at 1101). Size the right column to its content instead. */
+@media(min-width:1051px) and (max-width:1300px){
+  .home-nav{grid-template-columns:max-content minmax(0,1fr) max-content;gap:18px}
+}
