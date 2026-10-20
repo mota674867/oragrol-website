@@ -1238,3 +1238,9 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 ### D-107 — Chat widget: removed the "Have a question?" greeting popup (2026-10-20)
 - **Decision (Mohammad):** the card above the chat button ("Have a question? We can help you find the right next step. Start a conversation") is gone. It appeared after 15 s or 50% scroll. The Chat button and panel are unchanged.
 - Removed the greeting state, timer/scroll trigger and markup from `app/components/ChatWidget.tsx`. The `.or-chat-greeting` CSS is now unused.
+
+### D-108 — Business Automation photo replaced: woman at laptop by a window (2026-10-20)
+- **Why:** Mohammad found the night desk photo (D-105) fundamentally too dark and tightly framed. Replaced with a daylight shot (Unsplash, supplied by him): woman typing on a laptop in a leather chair by a window, facing the text. Black and white, shadows lifted, cropped above the book at the bottom.
+- **Same layout as D-105:** right 48vw panel, phone: photo below text. Only the image and its position (50% 30%) changed.
+- **Asset:** `public/images/business-automation/tools-stay-woman-chair.jpg` (2000px). Old `tools-stay-desk.jpg` deleted.
+- **TODO:** licence and model release not verified.
