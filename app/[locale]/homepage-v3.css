@@ -67,3 +67,21 @@
    outside) in one image. A dark left-to-right scrim keeps every line of text readable; text unchanged. */
 .reality{position:relative;isolation:isolate;background:var(--graphite) url(/images/home/reality-office-night.jpg) 60% 40%/cover no-repeat}
 .reality::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(21,24,27,.92) 0%,rgba(21,24,27,.74) 45%,rgba(21,24,27,.68) 100%)}
+
+/* 2026-10-20 Cyber Health section gets a photo (Mohammad's pick, D-103): two people reviewing a document
+   at night, black and white, filling the right side. The score sits directly on the photo (no white card),
+   white labels, orange 77 and bar unchanged. A soft dark shade at lower right keeps the white text readable.
+   Phones: the score block itself carries the photo, cropped to keep the woman clear of the 77. */
+.cyber-health-home{position:relative;isolation:isolate}
+@media(min-width:721px){
+  .cyber-health-home::after{content:"";position:absolute;top:0;right:0;bottom:0;width:46vw;background:#15181b url(/images/home/health-review-night.jpg) 100% 30%/cover no-repeat;z-index:-1}
+  .cyber-health-home::before{content:"";position:absolute;top:0;right:0;bottom:0;width:46vw;background:linear-gradient(200deg,rgba(0,0,0,0) 35%,rgba(0,0,0,.55) 75%);z-index:0;pointer-events:none}
+  .health-score{position:relative;z-index:1;justify-self:end;align-self:end;width:min(320px,24vw);min-height:300px;margin-bottom:-24px;background:transparent;border:0}
+  .health-score>strong{font-size:clamp(110px,11vw,180px)}
+}
+@media(max-width:720px){
+  .health-score{margin:8px -20px -48px;min-height:440px;padding:24px 20px;border:0;background:linear-gradient(180deg,rgba(0,0,0,.15) 30%,rgba(0,0,0,.7) 100%),#15181b url(/images/home/health-review-night.jpg) 42% 30%/cover no-repeat}
+}
+.health-score>span,.health-score>small,.health-score p{color:#fff}
+.health-score p span{color:#cfcfcf}
+.health-score>div{border-top-color:rgba(255,255,255,.35)}

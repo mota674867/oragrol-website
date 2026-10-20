@@ -1214,3 +1214,8 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Decision:** photo chosen by Mohammad from five he supplied: a lit office at night seen through the window from a dark street, black and white. It carries the section's own message (growth, and being on view from outside).
 - **How:** full-bleed background on `.reality`, positioned 60% 40%, with a dark left-to-right scrim (0.92 to 0.68) so the headline, both paragraphs and the orange line stay readable. Text and layout unchanged. Same on phones.
 - **Asset:** `public/images/home/reality-office-night.jpg` (2000px, ~120 KB). Licence: to be confirmed by Mohammad.
+
+### D-103 — Cyber Health section gets a photo; score sits on it without a card (2026-10-20)
+- **Decision (Mohammad):** photo of two people reviewing a document at night (Unsplash, Mohammad's pick), black and white, fills the right side of the section. The score (77/100, bar, labels) sits directly on the photo; the white card was removed at his request. Orange 77 and bar unchanged; labels white. A soft dark shade at lower right keeps the white text readable.
+- **Phones:** the score block carries the photo, cropped 42% 30% so the woman sits beside the 77 without overlap.
+- **Asset:** `public/images/home/health-review-night.jpg` (2000px, ~90 KB).

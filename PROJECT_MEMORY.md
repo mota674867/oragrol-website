@@ -3,6 +3,7 @@
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
 ## Session: home photos, 2026-10-19 to 2026-10-20
+- Cyber Health section: night review photo on the right, score on the photo with no card (D-103). Verified at 1920, 1440, 1024, 390; no horizontal overflow.
 - Hero photo column pushed then reverted (D-101). "The business reality" band now has a black and white night-office background photo (D-102). Files: homepage-v3.css (block at end), public/images/home/reality-office-night.jpg.
 - Verified: tsc clean; playwright-core at 1920, 1440, 1024, 390: photo loads, text readable, no horizontal overflow; /fr returns 200. Pushed to main at Mohammad's request.
 
