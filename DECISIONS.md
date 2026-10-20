@@ -1223,3 +1223,9 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 ### D-104 — How We Work page removed (2026-10-20)
 - **Decision (Mohammad):** `/how-we-work` deleted. It was still on the old design, not linked from the menu or footer, and its four stages already appear on the homepage ("Clarity first. Then coordinated action.").
 - **How:** route and `sections/how-we-work/` components deleted; permanent redirects `/how-we-work` → `/` and `/fr/how-we-work` → `/fr` in `next.config.ts`; removed from `sitemap.ts`; site search index rebuilt (101 destinations). Supersedes D-035/D-036 for this page. `messages/*.json` HowWeWork strings left in place, unused.
+
+### D-105 — Business Automation "Your tools stay" band gets a photo, split layout (2026-10-20)
+- **Decision (Mohammad, option B):** woman working at her desk at night (Unsplash), black and white, fills the right half (48vw) of `.existing-tools`. Text moves into one left column on the existing grey (headline, paragraph, tool line); copy unchanged. Option A (photo behind both text columns) rejected: the paragraph sat across her face.
+- **Phones:** text first, photo 300px below.
+- **Asset:** `public/images/business-automation/tools-stay-desk.jpg` (2000px, ~93 KB).
+- **Noted, not fixed:** `/fr/business-automation` already overflows horizontally by ~25px at 1440 (a hero span); present before this change.

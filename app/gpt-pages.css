@@ -489,3 +489,11 @@ footer{min-height:75svh;background:#0c0e0f;color:#eee;padding:4vw 3vw 22px;displ
 .founder-cta:hover{color:#ff6a26;border-color:#ff6a26}
 .founder-cta:focus-visible{outline:2px solid #ef4d00;outline-offset:4px}
 @media(max-width:600px){.founder-stats{grid-template-columns:1fr;gap:18px}.founder-stats>div{padding:0;border-left:0}}
+
+/* 2026-10-20 Business Automation "Your tools stay. The work moves." gets a photo (Mohammad chose option B, D-105):
+   woman working at her desk at night, black and white, filling the right half. All text moves into one
+   left column on the existing grey; copy unchanged. Phones: text first, photo below. */
+.existing-tools{position:relative;isolation:isolate;grid-template-columns:1fr;padding-right:52vw;gap:36px}
+.existing-tools::after{content:"";position:absolute;top:0;right:0;bottom:0;width:48vw;background:#15181b url(/images/business-automation/tools-stay-desk.jpg) 78% 40%/cover no-repeat;z-index:-1}
+.existing-tools>div:last-child>p{font-size:clamp(16px,1.2vw,21px)}
+@media(max-width:700px){.existing-tools{padding-right:18px;padding-bottom:0}.existing-tools::after{position:relative;display:block;width:auto;height:300px;margin:10px -18px 0}}
