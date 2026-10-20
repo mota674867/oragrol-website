@@ -24,3 +24,8 @@
 @media(max-width:1100px){.oragrol-cta{min-height:clamp(240px,30vw,280px)}.oragrol-cta__inner{grid-template-columns:1fr;gap:30px}.oragrol-cta__actions{justify-content:start}}
 @media(max-width:680px){.oragrol-cta{min-height:0}.oragrol-cta__inner{padding:40px 20px;gap:28px}.oragrol-cta__headline{font-size:clamp(26px,8vw,36px)}.oragrol-cta__actions{grid-template-columns:1fr;gap:18px}.oragrol-cta__primary,.oragrol-cta__secondary{width:100%;white-space:normal}}
 @media(prefers-reduced-motion:reduce){.oragrol-cta__primary,.oragrol-cta__secondary{transition:none}}
+
+/* 2026-10-20: longer French link text pushed the secondary link's arrow past the right edge at
+   1280-1440px (/fr/business-automation). Let the secondary link wrap inside its column instead. */
+.oragrol-cta__secondary{white-space:normal;min-width:0}
+.oragrol-cta__secondary>span[aria-hidden],.oragrol-cta__secondary>span:last-child{flex-shrink:0}

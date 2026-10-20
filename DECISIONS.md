@@ -1229,3 +1229,8 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Phones:** text first, photo 300px below.
 - **Asset:** `public/images/business-automation/tools-stay-desk.jpg` (2000px, ~93 KB).
 - **Noted, not fixed:** `/fr/business-automation` already overflows horizontally by ~25px at 1440 (a hero span); present before this change.
+
+### D-106 — French pages no longer overflow horizontally at 1280-1440px (2026-10-20)
+- **Cause:** the shared pre-footer CTA (`app/pre-footer-cta.css`) has a `white-space:nowrap` secondary link. The longer French text pushed its arrow ~25px past the right edge at 1280 and 1440 (found on `/fr/business-automation`; it is not a hero span as D-105 guessed).
+- **Fix:** `.oragrol-cta__secondary` may now wrap inside its column (`white-space:normal;min-width:0`), arrow does not shrink. No other CSS touched.
+- **Verified:** scrollWidth minus clientWidth is 0 at 1920/1440/1280/1024/390 on 9 pages in EN and FR; `npx tsc --noEmit` clean.
