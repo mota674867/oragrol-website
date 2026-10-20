@@ -1267,3 +1267,9 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Fix (720px and under):** photo anchored right (100% 28%) so both people show; the photo has no spare space beside them at this shape, so the score moves to the dark area above the woman, top-left (77 at 96-128px, "/100" directly under it); the bar and labels stay at the bottom. Band min-height 480px. Tried first: score left-centre, which covered her face (rejected).
 - Also: at 721-1100px "/100" sits next to the 77 (small tidy-up to D-110).
 - Checked at 360/390/430/600/768 px: no overflow, nothing over faces.
+
+### D-113 — Services "Specialist engagements" cards calmed, orange kept for the closing band (2026-10-21)
+- **Problem (Mohammad):** too much orange: four solid orange buttons, orange prices, orange 01-04 numbers, orange "OR" watermarks, then a full orange CTA band.
+- **Decision:** prices cream (#f2f0ea), 01-04 muted grey, "OR" watermark near-invisible white, buttons outlined (turn solid orange on hover). The orange band below is now the single loud orange block, in line with the catalogue rule (orange as a solid shape, not as text). The small "Details" links stay orange (small, deliberate).
+- **Where:** edited the existing rules in `app/[locale]/services/services-body.tsx` (specialist block, no appended override). Checked 1920/1440/1024/768/390, FR 1440/390: no overflow.
+- **Note:** starting prices are shown on the website (their call); the catalogue stays price-free.

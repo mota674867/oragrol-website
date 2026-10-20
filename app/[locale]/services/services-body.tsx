@@ -221,12 +221,12 @@ const styles = `
 .os-specialists .os-engagement-price-main{font-size:20px}}
 
 .os-specialists .os-specialist-card{background:#202326}
-.os-specialists .os-specialist-card::after{content:"OR";position:absolute;right:-.06em;bottom:-.22em;font-size:170px;letter-spacing:-.1em;color:rgba(239,77,0,.11);line-height:1;pointer-events:none}
-.os-specialists .os-sp-idx{color:#ef4d00}
+.os-specialists .os-specialist-card::after{content:"OR";position:absolute;right:-.06em;bottom:-.22em;font-size:170px;letter-spacing:-.1em;color:rgba(255,255,255,.035);line-height:1;pointer-events:none}
+.os-specialists .os-sp-idx{color:#5d6165}
 .os-specialists .os-engagement-prices{border-top:1px solid #3a3d40}
-.os-specialists .os-engagement-price-main{color:#ef4d00}
-.os-specialists .os-action button{background:#ef4d00;color:#111}
-.os-specialists .os-action button:hover:not(:disabled){background:#f2f0ea;color:#111}
+.os-specialists .os-engagement-price-main{color:#f2f0ea}
+.os-specialists .os-action button{background:transparent;color:#f2f0ea;border:1px solid #6f7377}
+.os-specialists .os-action button:hover:not(:disabled){background:#ef4d00;border-color:#ef4d00;color:#111}
 @media(min-width:1101px){.os-specialists .os-specialist-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.os-specialists .os-specialist-card h3{font-size:24px;max-width:72%}.os-specialists .os-engagement-price-main{font-size:20px}}
 /* Packages "What's included" — P1 layered coverage (2026-10-06) */
 .os-packages .os-selector-value{display:none}
