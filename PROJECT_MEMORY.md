@@ -3,6 +3,8 @@
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
 ## Session: home photos, 2026-10-19 to 2026-10-20
+- 2026-10-21 additions (all pushed, Vercel success): FR overflow at 1280-1440 fixed (D-106, pre-footer CTA secondary link wraps); chat greeting popup removed (D-107); Business Automation photo replaced with the woman-at-laptop-by-window photo (D-108); Industries hero now has a B&W meeting photo behind the headline, pushed at Mohammad's request against my advice (D-109, licence and six model releases unverified); Cyber Health tablet layout 721-1100px (D-110) and phone layout, both people visible and 77 top-left (D-112), Mohammad approved; home header overflow at 1051-1300px fixed (D-111).
+- Open: photo licences and model releases for the three new photos; the Industries photo implies a bigger team than a solo founder (see D-109 to revert); catalogue back cover, contact details, 16-page count.
 - Business Automation: desk photo on the right half of "Your tools stay" (D-105). Verified EN at 1920/1440/1024/390, FR at 1440; pre-existing FR overflow noted.
 - How We Work page deleted with redirects to home (D-104). Verified: tsc clean, search tests pass, /how-we-work and /fr/how-we-work return 308, sitemap no longer lists it.
 - Cyber Health section: night review photo on the right, score on the photo with no card (D-103). Verified at 1920, 1440, 1024, 390; no horizontal overflow.
