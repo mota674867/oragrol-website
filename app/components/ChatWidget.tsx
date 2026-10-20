@@ -97,7 +97,6 @@ const CHAT_STATE_KEY="oragrol-chat-state-v1";
 
 export default function ChatWidget(){
   const [open,setOpen]=useState(false);
-  const [greeting,setGreeting]=useState(false);
   const [dismissed,setDismissed]=useState(false);
   const [value,setValue]=useState("");
   const [sending,setSending]=useState(false);
@@ -150,23 +149,13 @@ export default function ChatWidget(){
 
   useEffect(()=>{
     if(sessionStorage.getItem("oragrol-chat-widget-dismissed")){setDismissed(true);return;}
-    if(sessionStorage.getItem("oragrol-chat-greeting-dismissed"))return;
-    const show=()=>setGreeting(true);
-    const timer=setTimeout(show,15000);
-    const scroll=()=>{
-      const depth=(scrollY+innerHeight)/document.documentElement.scrollHeight;
-      if(depth>=.5){clearTimeout(timer);show();removeEventListener("scroll",scroll);}
-    };
-    addEventListener("scroll",scroll,{passive:true});
-    return()=>{clearTimeout(timer);removeEventListener("scroll",scroll);};
   },[]);
 
   // The server saves every answered turn and closes the chat itself after 15 minutes of silence,
   // emailing the transcript (see lib/chat-session.ts). The browser no longer decides when a chat ends.
-  const dismissGreeting=()=>{setGreeting(false);sessionStorage.setItem("oragrol-chat-greeting-dismissed","1");};
-  const dismissChat=()=>{setOpen(false);setGreeting(false);setDismissed(true);sessionStorage.setItem("oragrol-chat-widget-dismissed","1");};
+  const dismissChat=()=>{setOpen(false);setDismissed(true);sessionStorage.setItem("oragrol-chat-widget-dismissed","1");};
   const restoreChat=()=>{setDismissed(false);sessionStorage.removeItem("oragrol-chat-widget-dismissed");};
-  const launch=()=>{setOpen(!open);if(!open)dismissGreeting();};
+  const launch=()=>setOpen(!open);
   const closePanel=()=>{setOpen(false);};
 
   const submitIntake=(e:FormEvent)=>{
@@ -273,14 +262,6 @@ export default function ChatWidget(){
 
   return(
     <div className="or-chat">
-      {greeting&&!open&&(
-        <aside className="or-chat-greeting">
-          <button onClick={dismissGreeting} aria-label="Dismiss">×</button>
-          <small>ORAGROL</small>
-          <p>Have a question? We can help you find the right next step.</p>
-          <a onClick={launch}>Start a conversation ↗︎</a>
-        </aside>
-      )}
       <div className="or-chat-controls">
         <button className="or-chat-cancel" onClick={dismissChat} aria-label="Hide chat">×</button>
         <button className="or-chat-launch" aria-label={open?"Close ORAGROL chat":"Open ORAGROL chat"} aria-expanded={open} onClick={launch}>

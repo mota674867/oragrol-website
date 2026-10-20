@@ -1234,3 +1234,7 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Cause:** the shared pre-footer CTA (`app/pre-footer-cta.css`) has a `white-space:nowrap` secondary link. The longer French text pushed its arrow ~25px past the right edge at 1280 and 1440 (found on `/fr/business-automation`; it is not a hero span as D-105 guessed).
 - **Fix:** `.oragrol-cta__secondary` may now wrap inside its column (`white-space:normal;min-width:0`), arrow does not shrink. No other CSS touched.
 - **Verified:** scrollWidth minus clientWidth is 0 at 1920/1440/1280/1024/390 on 9 pages in EN and FR; `npx tsc --noEmit` clean.
+
+### D-107 — Chat widget: removed the "Have a question?" greeting popup (2026-10-20)
+- **Decision (Mohammad):** the card above the chat button ("Have a question? We can help you find the right next step. Start a conversation") is gone. It appeared after 15 s or 50% scroll. The Chat button and panel are unchanged.
+- Removed the greeting state, timer/scroll trigger and markup from `app/components/ChatWidget.tsx`. The `.or-chat-greeting` CSS is now unused.
