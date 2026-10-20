@@ -1219,3 +1219,7 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Decision (Mohammad):** photo of two people reviewing a document at night (Unsplash, Mohammad's pick), black and white, fills the right side of the section. The score (77/100, bar, labels) sits directly on the photo; the white card was removed at his request. Orange 77 and bar unchanged; labels white. A soft dark shade at lower right keeps the white text readable.
 - **Phones:** the score block carries the photo, cropped 42% 30% so the woman sits beside the 77 without overlap.
 - **Asset:** `public/images/home/health-review-night.jpg` (2000px, ~90 KB).
+
+### D-104 — How We Work page removed (2026-10-20)
+- **Decision (Mohammad):** `/how-we-work` deleted. It was still on the old design, not linked from the menu or footer, and its four stages already appear on the homepage ("Clarity first. Then coordinated action.").
+- **How:** route and `sections/how-we-work/` components deleted; permanent redirects `/how-we-work` → `/` and `/fr/how-we-work` → `/fr` in `next.config.ts`; removed from `sitemap.ts`; site search index rebuilt (101 destinations). Supersedes D-035/D-036 for this page. `messages/*.json` HowWeWork strings left in place, unused.

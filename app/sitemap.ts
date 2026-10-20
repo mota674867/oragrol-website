@@ -5,7 +5,7 @@ import { SITE_URL } from "./lib/site-config";
  * Real, live, customer-facing pages that get a French version and an
  * hreflang pair in the sitemap. This list was built by directly checking
  * every route on the live site (not assumed from the footer nav alone —
- * how-we-work isn't footer-linked but is real; solutions/canada-coverage-
+ * how-we-work was removed 2026-10-20 (redirects to /); solutions/canada-coverage-
  * study/style-guide are real routes but excluded below on purpose).
  */
 const bilingualRoutes: { path: string; priority: number }[] = [
@@ -17,7 +17,6 @@ const bilingualRoutes: { path: string; priority: number }[] = [
   { path: "/cyber-health", priority: 0.8 },
   { path: "/resources", priority: 0.7 },
   { path: "/contact", priority: 0.7 },
-  { path: "/how-we-work", priority: 0.6 },
   { path: "/company", priority: 0.6 },
   { path: "/faq", priority: 0.6 },
   { path: "/careers", priority: 0.5 },

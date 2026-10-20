@@ -56,6 +56,10 @@ const nextConfig: NextConfig = {
         destination: "/services",
         permanent: true,
       },
+      // How We Work page removed 2026-10-20 (Mohammad): old design, not in the menu,
+      // its four stages are already on the homepage ("Clarity first" section).
+      { source: "/how-we-work", destination: "/", permanent: true },
+      { source: "/fr/how-we-work", destination: "/fr", permanent: true },
     ];
   },
 };
