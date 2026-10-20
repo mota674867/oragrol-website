@@ -62,8 +62,9 @@
   .method header p:last-child,.health-copy>p:last-of-type{margin-top:14px}
 }
 
-/* 2026-10-20 "The business reality" band gets a photo (Mohammad picked it, D-102): a lit office at night
-   seen from the dark street, in black and white. Growth (the team celebrating) and exposure (on view from
-   outside) in one image. A dark left-to-right scrim keeps every line of text readable; text unchanged. */
-.reality{position:relative;isolation:isolate;background:var(--graphite) url(/images/home/reality-office-night.jpg) 60% 40%/cover no-repeat}
+/* 2026-10-20 "The business reality" band gets a photo (Mohammad picked it, D-102): two lit office floors at night
+   seen from the street, in black and white (swapped 2026-10-20 from the night-office photo). Growth (a
+   floor of people at work) and exposure (all of it on view from outside) in one image. A dark left-to-right scrim keeps every line of text readable; text unchanged. */
+.reality{position:relative;isolation:isolate;background:var(--graphite) url(/images/home/reality-office-floors.jpg) 50% 30%/cover no-repeat}
+@media(max-width:720px){.reality{background-position:28% 50%}}
 .reality::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(21,24,27,.92) 0%,rgba(21,24,27,.74) 45%,rgba(21,24,27,.68) 100%)}
