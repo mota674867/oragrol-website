@@ -1206,3 +1206,11 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
   - **Careers, Talent, Partnerships:** not linked to HubSpot for now. Submissions go to the inbox only. May be added later.
 - **Still open:** the four must-link sources are coded to HubSpot but were not confirmed live with a test lead. Verify each before relying on them.
 - **Known gap to fix:** Live chat returns "ok" to the visitor when the HubSpot token is missing, so a lost lead is silent. Needs an internal alert instead.
+
+### D-101 — Home hero photo column tried and reverted (2026-10-19)
+- Black and white Toronto photo as a column beside the hero OR. Live briefly, then reverted at Mohammad's request: it read as a photo added beside the type, not part of it. Hero stays type-only.
+
+### D-102 — "The business reality" band gets a background photo (2026-10-20)
+- **Decision:** photo chosen by Mohammad from five he supplied: a lit office at night seen through the window from a dark street, black and white. It carries the section's own message (growth, and being on view from outside).
+- **How:** full-bleed background on `.reality`, positioned 60% 40%, with a dark left-to-right scrim (0.92 to 0.68) so the headline, both paragraphs and the orange line stay readable. Text and layout unchanged. Same on phones.
+- **Asset:** `public/images/home/reality-office-night.jpg` (2000px, ~120 KB). Licence: to be confirmed by Mohammad.
