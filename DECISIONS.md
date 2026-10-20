@@ -1213,5 +1213,4 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 ### D-102 — "The business reality" band gets a background photo (2026-10-20)
 - **Decision:** photo chosen by Mohammad from five he supplied: a lit office at night seen through the window from a dark street, black and white. It carries the section's own message (growth, and being on view from outside).
 - **How:** full-bleed background on `.reality`, positioned 60% 40%, with a dark left-to-right scrim (0.92 to 0.68) so the headline, both paragraphs and the orange line stay readable. Text and layout unchanged. Same on phones.
-- **Asset:** `public/images/home/reality-office-night.jpg` (2000px, ~120 KB). Source: Unsplash (Mohammad).
-- **Update (2026-10-20, same day):** photo swapped at Mohammad's pick to two lit office floors at night seen from the street (Unsplash), black and white, `public/images/home/reality-office-floors.jpg` (2400px, ~270 KB). Desktop 50% 30%; phones 28% 50% so a lit window with a person shows. The night-office photo was removed.
+- **Asset:** `public/images/home/reality-office-night.jpg` (2000px, ~120 KB). Licence: to be confirmed by Mohammad.

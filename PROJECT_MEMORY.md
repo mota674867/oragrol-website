@@ -5,7 +5,6 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 ## Session: home photos, 2026-10-19 to 2026-10-20
 - Hero photo column pushed then reverted (D-101). "The business reality" band now has a black and white night-office background photo (D-102). Files: homepage-v3.css (block at end), public/images/home/reality-office-night.jpg.
 - Verified: tsc clean; playwright-core at 1920, 1440, 1024, 390: photo loads, text readable, no horizontal overflow; /fr returns 200. Pushed to main at Mohammad's request.
-- Same day: photo swapped to two lit office floors (Unsplash, Mohammad's pick); phone crop 28% so a lit window with a person shows. Re-verified at 1920, 1440, 1024, 390.
 
 ---
 ## Session: ODO and Cyber Health PDFs rebuilt to the approved dashboard style, 2026-10-19
