@@ -1287,3 +1287,13 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Esc safety:** ignored while typing in a field that already has text, so a half-written application is never thrown away. Esc on empty fields, radios and the page itself closes.
 - **Strings:** `Opportunity.closeAria` (screen-reader label) in `messages/en.json` and `messages/fr.json` ("Fermer").
 - **Verified (Playwright, EN and FR, all three pages):** Close from /services returns to /services; direct visit Close and Esc go to / (/fr); Esc while typing stays. 1440 and 390 screenshots checked.
+
+### D-116 — Lead capture plan for all eight sources (2026-10-21)
+- **Decision (Mohammad, 2026-10-21):** the full plan is in `docs/LEAD_CAPTURE_PLAN.md`. It covers live chat, My Scope, ODO scan, Cyber Health, Contact page, Outbound, Newsletter, and Careers/Talent/Partnerships.
+- **Supersedes D-100 for two sources:**
+  - **Newsletter:** kept in Brevo only (name if given, email, sign-up date and source, status). No copy in HubSpot.
+  - **Careers, Talent, Partnerships:** now recorded in HubSpot as one group, with attachments kept under restricted access. Partnerships gets a ZM77 polite reply, approved by Mohammad, then Mohammad follows up personally.
+- **Contact page** is added to the must-link list.
+- **Outbound** (new): ZM77 drafts one introduction per company with one public finding and its source. Mohammad approves each. No follow-up emails. A form submission gets a ZM77-written confirmation, approved before sending.
+- **Retention:** attachments, client PDFs and similar files are deleted after 12 months unless the person asks us to keep them. Live chat transcripts are removed from HubSpot after 30 days.
+- **Still open:** HubSpot custom property limit, sender and recipient addresses, ODO scan record retention (6 months vs 10 years), careers and talent acknowledgements, and the Azure Blob connection. Full list in the plan document.
