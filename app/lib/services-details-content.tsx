@@ -132,7 +132,7 @@ export const packagesDetailsContent: Record<string, PackageDetailsContent> = {
       "Agreed response procedures define what can happen automatically and what requires review. Investigation and recovery needs outside the package are identified separately; specialist forensic engagements are not automatically included.",
     whoItSuits: "Businesses needing the broadest listed package with additional response coordination and data monitoring.",
     scope:
-      "Monitoring coverage, response availability, authorization and escalation targets are agreed before service begins. Do not publish an unverified response-time guarantee.",
+      "Monitoring coverage, response availability, authorization and escalation targets are agreed before service begins.",
   },
 };
 
@@ -187,7 +187,7 @@ export const specialistDetailsContent: Record<string, SpecialistDetailsContent> 
     control: "Your organization operates its controls and supplies accurate evidence. Preparation work does not guarantee a favorable audit opinion.",
     whoItSuits: "Businesses whose customers or stakeholders request independent assurance about scoped controls.",
     scope:
-      "Readiness work and audit-partner fees must remain clearly distinguished in the existing pricing presentation. Confirm the reporting period and partner responsibilities before engagement.",
+      "Readiness work and audit-partner fees are shown separately. The reporting period and partner responsibilities are confirmed before engagement.",
   },
   "C10-S03": {
     itemLabel: "SPECIALIST ENGAGEMENT",
@@ -204,7 +204,7 @@ export const specialistDetailsContent: Record<string, SpecialistDetailsContent> 
     ],
     controlHeading: "Your involvement",
     control:
-      "Supply accurate environment details and maintain required controls. Required validation documents and assessment approach are confirmed with the relevant payment stakeholders; do not describe this as a blanket legal license to process payments.",
+      "Supply accurate environment details and maintain required controls. Required validation documents and assessment approach are confirmed with the relevant payment stakeholders.",
     whoItSuits: "Businesses needing a QSA assessment of their card-payment environment.",
     scope: "Requirements and fees depend on the environment and validation scope, not merchant volume alone. No guaranteed compliance result.",
   },
@@ -223,10 +223,10 @@ export const specialistDetailsContent: Record<string, SpecialistDetailsContent> 
     ],
     controlHeading: "Your involvement",
     control:
-      "Authorize access and coordinate with relevant technical, legal and insurance contacts. Availability and mobilization are confirmed for the engagement; do not promise immediate attendance or court/insurer acceptance.",
+      "Authorize access and coordinate with relevant technical, legal and insurance contacts. Availability and mobilization are confirmed for the engagement.",
     whoItSuits: "Businesses needing specialist investigation and documented evidence after an incident.",
     scope:
-      "Per-incident engagement; any retainer is separately scoped. Confirm the credential supporting the existing word 'Certified' before publication; if unavailable, flag the title for owner review instead of inventing a credential.",
+      "Per-incident engagement; any retainer is separately scoped.",
   },
 };
 
