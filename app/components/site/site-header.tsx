@@ -94,7 +94,6 @@ import { HeaderLogo } from "@/app/components/brand/header-logo";
 const NAV_LINKS = [
   { label: "Services", href: "/services" },
   { label: "Business Automation", href: "/business-automation" },
-  { label: "Solutions", href: "/solutions" },
   { label: "Industries", href: "/industries" },
   { label: "Resources", href: "/resources" },
   { label: "Company", href: "/company" },

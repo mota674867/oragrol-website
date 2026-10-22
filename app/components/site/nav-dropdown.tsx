@@ -9,7 +9,6 @@ import { usePrefersReducedMotion } from "../motion/use-reduced-motion";
 import { INDUSTRIES, slugifyIndustryName } from "../sections/industries/industries-data";
 import { ARTICLES } from "../sections/resources/articles-data";
 import { getBusinessAutomationTier2, getServicesTier1 } from "../sections/services/services-data";
-import { getTiers } from "../sections/solutions/solutions-data";
 
 /**
  * NavItemDropdown — generalized nav mega-menu, extracted from the
@@ -165,27 +164,6 @@ const BUSINESS_AUTOMATION_DROPDOWN: NavDropdownConfig = {
   ],
 };
 
-// 2026-08-20: labels sourced from the real tier names (solutions-data.ts,
-// same reuse pattern as Services/Industries/Resources' dropdowns) —
-// replaces the old hardcoded "Level 01/02/03" placeholders, which would
-// otherwise silently go stale next to the page's now-real tier names.
-const SOLUTIONS_TIERS = getTiers();
-
-const SOLUTIONS_DROPDOWN: NavDropdownConfig = {
-  label: "Solutions",
-  href: "/solutions",
-  desktopPanelWidthClass: "w-64",
-  desktopLayoutClassName: "flex flex-col",
-  columns: [
-    {
-      items: [
-        ...SOLUTIONS_TIERS.map((tier, i) => ({ label: tier.name, href: `/solutions#tier-0${i + 1}` })),
-        { label: "Penetration Testing", href: "/solutions#pentest-addon" },
-      ],
-    },
-  ],
-};
-
 // Hrefs computed via the same `slugifyIndustryName` the explorer itself
 // uses (imported, not re-implemented) — can't drift out of sync with the
 // real anchor ids `industries-explorer.tsx` renders.
@@ -227,7 +205,6 @@ const RESOURCES_DROPDOWN: NavDropdownConfig = {
 export const NAV_DROPDOWNS: Record<string, NavDropdownConfig> = {
   "/services": SERVICES_DROPDOWN,
   "/business-automation": BUSINESS_AUTOMATION_DROPDOWN,
-  "/solutions": SOLUTIONS_DROPDOWN,
   "/industries": INDUSTRIES_DROPDOWN,
   "/resources": RESOURCES_DROPDOWN,
 };
