@@ -298,7 +298,7 @@ export const aLaCarteDetailsContent: Record<string, ALaCarteDetailsContent> = {
   },
   "C05-S03": {
     itemLabel: "À LA CARTE",
-    title: "Privileged Access Mgmt",
+    title: "Privileged Access Management (PAM)",
     subtitle: "Strengthen control of powerful accounts.",
     intro:
       "Apply agreed controls to privileged accounts and the access they enable. The service helps limit unnecessary privileges and monitor supported administrative activity. You receive visibility into covered accounts, exceptions and recommended corrective actions.",
