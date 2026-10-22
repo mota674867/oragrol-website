@@ -4,12 +4,11 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 
 ## Session: Industries page body redesign, 2026-10-22
 
-**Done (branch `industries-redesign`):** everything between the hero and the closing CTA replaced by one compact explorer (sticky index + industry panel + dark coordinated path + accordion); phone rail and vertical timeline. Same content and translation keys, plus `journey.unifyCta`. Decision D-120.
+**Done (branch `industries-redesign`):** new visuals for the three sections between hero and CTA (select an industry, one coordinated path + evidence bar, what leaders need to know). A first version merged them into one section; Mohammad rejected that, so they are separate again. Same content and keys, plus `journey.unifyCta`. Decision D-120.
 
-**Verified:** tsc clean, lint 0 errors; screenshots at 390, 820, 1280, 1440, 1920; no horizontal overflow; tab click, arrow keys, focus, sticky index, deep link, French page, mobile rail (page does not jump); no page errors.
+**Verified:** tsc clean, lint 0 errors; screenshots at 390, 1440, 1920; no horizontal overflow at 360 to 2560; tab click, arrow keys, focus, deep link, French page, mobile rail (page does not jump); no page errors.
 
 **Next:** Mohammad reviews the preview; old ind-* CSS cleanup later.
-
 ---
 
 ## Session: Security Checks fixed and lint errors cleared, 2026-10-22
