@@ -6,6 +6,92 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 
 ---
 
+## Current decisions index (added 2026-10-22)
+
+A quick map, built from each entry's own Status line. Read an entry before changing the thing it covers. Entries are never deleted.
+
+**Active or recent (no superseding entry):**
+- D-001: Header has no max-width; background is fully caller-owned
+- D-002: Header logo is an inlined SVG rebuild of the source file, not a direct file import
+- D-003: Pricing removed from the live site pending Solutions page (Step 6)
+- D-004: Hero stays a single-pass scroll-scrub; no auto-loop, no wrap-around
+- D-005: Hero's `scrollYProgress` forces off framer-motion's ViewTimeline acceleration
+- D-007: Services page: Lucide icons (not custom), hub page only for this pass
+- D-008: Per-page visual identity system: distinct motif per page, code-generated, same shared material
+- D-009: Visual Redesign Blueprint: approval-gated, Services-first rollout
+- D-010: Two independent audit defects fixed: mobile nav overlay, WCAG AA contrast
+- D-014: Design Correction shipped to all 8 capabilities; /services/prototype removed
+- D-015: Container widened site-wide; Services typography hierarchy + real hero
+- D-016: Container "fix" was real but insufficient; sidebar nav resolves it; stronger typography; hover motion (+ a rea
+- D-017: Footer overhaul, site-wide (separate commit per instruction)
+- D-018: Round 3: content-area headline moved into place, sidebar weight, panel shrunk; footer discrepancy investigated
+- D-019: Round 4: sidebar/label weight reduced, CTA consistency fixed; headline font-family bug investigated and NOT fo
+- D-020: Round 5: CTA-alignment structural fix; sidebar weight genuinely split by active/inactive state
+- D-023: Capability 04 approved and shipped; /services/prototype-v3 removed
+- D-025: Capability 05 approved and shipped; grid-stretch fix verified; /services/prototype-v4 removed
+- D-027: Capability 06 approved and shipped; /services/prototype-v5 removed
+- D-029: Capability 07 approved and shipped; /services/prototype-v6 removed
+- D-031: Capability 08 approved and shipped; all 8 capabilities now have individually-researched treatments; /services/
+- D-033: Capability 03 extended to the dashboard treatment as a new, confirmed decision; all Services prototype work co
+- D-040: Kinetic Grid approved and shipped, replacing D-008's isometric strata hero on Solutions; /solutions/prototype 
+- D-042: AiLoader repurposed to a generic transition, wired live into both Cyber Health CTAs; prototype route removed
+- D-044: Industries page built: sidebar/tabs ARIA-tabs pattern, all 9 industries, real Canadian-sourced content
+- D-063: Business Automation split into its own top-level page and nav item, separate from Services
+- D-064: Solutions page: real tier names/pricing/services replace "Level 01/02/03" placeholders (D-003 superseded for t
+- D-065: Business Automation packages: real Tier 2 pricing added as new sections on the existing page, not a separate r
+- D-067: Two follow-up fixes to D-066's header (hero overlap regression, wide-viewport gap) + a CTA copy fix; honest ac
+- D-068: Full visual-system migration: 6-color palette (Deep Ink/Deep Blue/Warm Off-White/Violet-Gray/Steel/Burnt Orang
+- D-069: Atmospheric section-to-section background transitions (global, reusable system)
+- D-070: Pricing-clipping "background fade damage" report: root cause was an unescaped Tailwind `calc()`, not the z-ind
+- D-072: Services page restructured into a 2-level Landing Page: editorial Hero+Overview panels above the untouched cat
+- D-073: Services Landing Page visual-correction pass: dark-first color balance, dominant cinematic hero, no repeated r
+- D-074: Hero logo/badge removed (nav already carries the logo); header-clearance regression caught and fixed
+- D-075: Hero visual replaced with the approved photographic asset; rights confirmed before implementing, source croppe
+- D-076: Hero background extended to a landscape canvas; in-session Adobe outpainting attempt hit a real infrastructure
+- D-077: Hero photo integrated as a true full-bleed cinematic background (no boxed layout, no visible frame)
+- D-078: Hero face repositioned to the right (desktop only): root-caused why `object-position` alone couldn't move it, 
+- D-082: Services hero face: replaced viewport-width-driven object-position tuning with a structural "master compositio
+- D-083: Two live-site bugs reported post-launch: "Services" nav link went to Home instead of Services on 7 of 9 redesi
+- D-084: Careers/Talent/Partnerships submissions: one shared `/api/opportunity` route instead of three separate per-pag
+- D-085: Newsletter signup: dual-write to Brevo (mandatory) + HubSpot (best-effort), and wired globally from inside `fo
+- D-086: Bilingual EN/FR build: `next-intl` wired with `localePrefix: "as-needed"` (English URLs untouched, French at `
+- D-087: Serverless background work after a response: always use Next.js `after()`, never a bare un-awaited promise
+- D-088: Upstash Redis: moved from Free tier to Pay As You Go after a full quota outage; recommended (not yet confirmed
+- D-089: ODO research registry expansion: 7 new native modules for Section 33 (Areas 4-9), $0 net new recurring cost
+- D-090: Two corrections to the master spec's assumptions, caught before writing broken code
+- D-091: Four "free, keyless" marketing/registry sources from the master spec are not actually free-and-keyless; none w
+- D-092: Fixed a live bug: the "OR ONE" service match was firing on every single scan regardless of the visitor's answe
+- D-094: Logo rollout v3: horizontal header logo, grey footer icon, share image, branded 404, chat icon (2026-10-09)
+- D-095: Company page founder section: real portrait, dark section, tighter content (2026-10-09)
+- D-096: Site search icon on every public page; keyword-only, no AI (2026-10-16, pending push)
+- D-098: ODO and Cyber Health client PDFs rebuilt to the dashboard PDF style (2026-10-19)
+- D-099: Client scan reports keep lower-priority confirmed gaps, marked "worth exploring" (2026-10-19)
+- D-101: Home hero photo column tried and reverted (2026-10-19)
+- D-102: "The business reality" band gets a background photo (2026-10-20)
+- D-103: Cyber Health section gets a photo; score sits on it without a card (2026-10-20)
+- D-104: How We Work page removed (2026-10-20)
+- D-105: Business Automation "Your tools stay" band gets a photo, split layout (2026-10-20)
+- D-106: French pages no longer overflow horizontally at 1280-1440px (2026-10-20)
+- D-107: Chat widget: removed the "Have a question?" greeting popup (2026-10-20)
+- D-108: Business Automation photo replaced: woman at laptop by a window (2026-10-20)
+- D-109: Industries hero gets a black-and-white meeting photo behind the headline (2026-10-21)
+- D-110: Home Cyber Health: tablet / narrow-laptop widths use the stacked phone layout (2026-10-21)
+- D-111: Home header no longer overflows at 1051-1300px (2026-10-21)
+- D-112: Home Cyber Health on phones: both people visible, score moved to the dark top-left (2026-10-21)
+- D-113: Services "Specialist engagements" cards calmed, orange kept for the closing band (2026-10-21)
+- D-114: Home Cyber Health on large monitors: score moved onto the dark monitor area (2026-10-21)
+- D-115: Careers / Talent / Partnerships get a Close button and Esc = Back (2026-10-21)
+- D-116: Lead capture plan for all eight sources (2026-10-21)
+- D-117: Cleanup Batch A: Solutions page and orphan code deleted (2026-10-22)
+
+**Shipped, but the old status text still says "awaiting review" or "prototype" (Mohammad has not closed them):**
+D-021, D-022, D-024, D-026, D-028, D-030, D-032, D-034, D-035, D-036, D-038, D-039, D-041, D-043, D-045, D-046, D-047, D-048, D-049, D-051, D-052, D-055, D-056, D-057, D-058, D-059, D-060
+
+**Superseded or closed (history only):**
+D-006, D-011, D-012, D-013, D-037, D-050, D-053, D-054, D-061, D-062, D-066, D-071, D-079, D-080, D-081, D-093, D-100
+
+---
+
 ### D-001 — Header has no max-width; background is fully caller-owned
 - **Date:** 2026-08-12 (backfilled — decided during Header Fix Pass 2/3, undated in source docs)
 - **Context:** Header Fix Pass 2 needed the header to blend into the full-bleed Hero image instead of sitting on a hard black bar, and to stay correctly aligned at large desktop widths. A finite `max-w-*` cap (tried at both 1280px/`max-w-7xl` and 1920px) kept breaking at whatever width was one step larger — confirmed by measuring the logo's x-position jumping from a consistent 48px to 368px once the cap engaged and centered the content instead of pinning it to the edge.
@@ -237,7 +323,7 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Decision — item 2, research first:** Searched `21st.dev` (`mcp__21st__search`, "security risk score dashboard card dark data visualization") — top result close to the ask was "Financial Score Cards" (id 5409, half-circle progress + strength badge). Pulled its real code via `get_component` and found it's built on a separate "liquid glass" component system (turbulence-displaced `backdrop-filter`, shadcn `Badge`/`Button` primitives, HSL "strength" colors) — none of which exist in this codebase, and this session's own earlier `ui-ux-pro-max` style-domain search had already flagged that exact "Liquid Glass" category as moderate-poor performance and a contrast risk, not a strong choice here. Also ran `ui-ux-pro-max`'s chart-domain search ("risk score gauge radial progress compliance"), which recommended a Gauge/Bullet chart with a numerical value + tier label beside it for "Performance vs. Target" data — exactly the shape of a risk score. Rather than import 21st's unrelated dependency tree, reused a pattern **already built and approved in this exact codebase**: Cyber Health's `OutputShape` illustrative report card (score figure, `RiskBadge` tier pill, category risk-bar breakdown) — genuinely a dashboard-style mockup with real data typography, matching the brief's own ask, just never applied to Services. Content values (78/100, "Medium" tier, all four category names/tiers/fill percentages) are copied EXACTLY from `OutputShape`'s own already-approved illustrative example, not new numbers — same content-governance precedent Cyber Health itself established, with the same "Illustrative example — not a real result" label carried over.
 - **Decision — build:** New `CapabilityDashboardVisual` (`capability-dashboard-visual.tsx`) — the score/badge/risk-breakdown content re-themed into Services' own dark `env-dark` elevated-panel shell (same border/radius/shadow-accent/`GlowEffect` language as `CapabilitySpotlightVisual`, for cohesion with the rows that keep the orb treatment), using only existing tokens/primitives (`RiskBadge`, `DataText`, `Caption`, `Text`, risk-tier colors) — no new dependencies. New `/services/prototype-v2` route (noindex, not linked from nav, same convention as D-013's original prototype route) shows the current treatment and this new one stacked with identical Capability 02 copy, so the visual treatment is the only variable. Does not modify or import from `live-services.tsx` — nothing live was touched. Rows 3-8 and `capability-spotlight.tsx` itself untouched.
 - **Verified overall:** `npx tsc --noEmit`, `npm run lint`, `npm run build` all clean (9 routes, `/services/prototype-v2` included); fully clean rebuild (stray node processes killed, `.next` cleared, fresh `npm run start`); zero horizontal overflow on `/services` and `/services/prototype-v2` at 390px; zero non-pre-existing console errors; full-page screenshots of both routes reviewed directly.
-- **Status:** Awaiting Mohammad's decision — approve Prototype B for rollout to Capability 02 (and possibly the analogous treatment for other data/assessment-shaped capabilities), keep the current treatment, or request a different direction. `/services/prototype-v2` stays until a decision is made, then gets deleted (D-014's own precedent for prototype routes).
+- **Status:** Awaiting Mohammad's decision — approve Prototype B for rollout to Capability 02 (and possibly the analogous treatment for other data/assessment-shaped capabilities), keep the current treatment, or request a different direction. `/services/prototype-v2` stays until a decision is made, then gets deleted (D-014's own precedent for prototype routes). Closed by D-034 (2026-08): Services signed off as complete.
 
 ---
 
@@ -251,7 +337,7 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Decision:** Built `CapabilityTrainingVisual` for Capability 04 (Security Awareness Training) — a module checklist (4 generic, non-proprietary training topics, each with a complete/in-progress/pending status icon) plus a single accent-colored completion ring with a centered percentage, replacing the orb's node-diagram + icon-badge + ghost-numeral formula entirely. The outer dark elevated-card container (rounded corners, border, `shadow-accent`, `GlowEffect`) is kept as the one through-line device across all 8 rows — reasoned as a judgment call, not asserted as the only right answer: a page with 8 unrelated card containers would read as inconsistent rather than premium, and "Dimensional Layering"'s own guidance is exactly elevation/shadow as the depth device, which this already uses. Flagged explicitly for Mohammad to confirm or override. Prototype shown at `/services/prototype-v2`-style route, `/services/prototype-v3` (noindex, not linked from nav), Capability 04's real copy on both variants so the visual treatment is the only variable. Capabilities 01-03 and 05-08, `capability-spotlight.tsx`, and `live-services.tsx` are all untouched — confirmed via DOM query that row 04 on the live `/services` page still renders its original orb panel.
 - **Content governance:** the 84% completion figure and all four module names are NEW illustrative values — flagged explicitly as such, since (unlike Capability 02's score card, which reused Cyber Health's already-approved 78/100) no training-completion example exists anywhere in the project docs to reuse. Module names are generic, universally-recognized security-awareness topics, not Oragrol-specific curriculum.
 - **Verified:** `npx tsc --noEmit`, `npm run lint`, `npm run build` all clean (10 routes); fully clean rebuild (stray node processes killed, `.next` cleared, fresh `npm run start`); zero horizontal overflow on `/services/prototype-v3` at 390px; zero non-pre-existing console errors; confirmed via DOM query that `/services` itself (row 04's `.env-dark` orb panel) is unaffected.
-- **Status:** Awaiting Mohammad's review — approve this direction for Capability 04 and proceed to 05-08 (each still needing its own suited treatment, not this same checklist-ring formula reused), request changes, or a different direction.
+- **Status:** Awaiting Mohammad's review — approve this direction for Capability 04 and proceed to 05-08 (each still needing its own suited treatment, not this same checklist-ring formula reused), request changes, or a different direction. Closed by D-034 (2026-08): Services signed off as complete.
 
 ---
 
@@ -276,7 +362,7 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Content governance:** the two example alert rows are new illustrative values (generic, non-client-specific), same category as D-022's training figures — no existing precedent to reuse for this specific data type, explicitly labeled "Illustrative example."
 - **Build:** `/services/prototype-v4` (noindex, not linked from nav) — shows the entire 4-card row twice (current vs. Capability-05-only swap) rather than a two-variant stack like D-021/D-022's routes, specifically so the in-context sibling-height question is visible, not hidden. Does not modify or import from `additional-capabilities.tsx`.
 - **Verified:** `npx tsc --noEmit`, `npm run lint`, `npm run build` all clean (10 routes); fully clean rebuild (stray node processes killed, `.next` cleared, fresh `npm run start`); zero horizontal overflow on `/services/prototype-v4` at 390px; zero non-pre-existing console errors; confirmed via DOM query that live `/services` Capability 05 card still renders the original `.h-14.w-14` orb mark with no alert-feed content.
-- **Status:** Awaiting Mohammad's review — approve for Capability 05 (and apply the flagged `items-start` grid fix on ship), request changes, or a different direction. Capabilities 06-08 remain, each needing their own individually-researched treatment.
+- **Status:** Awaiting Mohammad's review — approve for Capability 05 (and apply the flagged `items-start` grid fix on ship), request changes, or a different direction. Capabilities 06-08 remain, each needing their own individually-researched treatment. Closed by D-034 (2026-08): Services signed off as complete.
 
 ---
 
@@ -301,7 +387,7 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Content governance:** the four example findings (SQL Injection, Outdated TLS, Weak Passwords, Verbose Errors) are new illustrative values — generic, widely-recognized vulnerability classes (OWASP-style technical categories), not a named framework/standard and not client-specific, explicitly labeled illustrative. No real Oragrol engagement findings exist in any project doc to reuse.
 - **Build:** `/services/prototype-v5` (noindex, not linked from nav) — shows the whole 4-card row twice, Capability 05 already reflecting its shipped D-025 treatment in both so only Capability 06 differs between them. Does not modify or import from `additional-capabilities.tsx`.
 - **Verified:** `npx tsc --noEmit`, `npm run lint`, `npm run build` all clean (10 routes); fully clean rebuild after each fix (stray node processes killed, `.next` cleared, fresh `npm run start`); zero horizontal overflow on `/services/prototype-v5` at 390px; zero non-pre-existing console errors; confirmed via DOM query that live `/services` Capability 06 card is unaffected; final screenshot reviewed directly confirming legible text on all 4 example findings.
-- **Status:** Awaiting Mohammad's review. Capabilities 07-08 remain, each needing their own individually-researched treatment.
+- **Status:** Awaiting Mohammad's review. Capabilities 07-08 remain, each needing their own individually-researched treatment. Closed by D-034 (2026-08): Services signed off as complete.
 
 ---
 
@@ -325,7 +411,7 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Content governance:** "9 of 10" and the device-type mix are new illustrative values — a plausible generic small-fleet example, not a real Oragrol client's device count (none exists in any project doc). Explicitly labeled illustrative.
 - **Build:** `/services/prototype-v6` (noindex, not linked from nav) — whole 4-card row shown twice, Capabilities 05/06 already reflecting their shipped D-025/D-027 treatments in both so only Capability 07 differs. Does not modify or import from `additional-capabilities.tsx`.
 - **Self-verified before reporting (per instruction):** `npx tsc --noEmit`, `npm run lint`, `npm run build` all clean (10 routes); fully clean rebuild (stray node processes killed, `.next` cleared, fresh `npm run start`); zero horizontal overflow on `/services/prototype-v6` at 390px; zero non-pre-existing console errors; confirmed via DOM query that live `/services` Capability 07 card is unaffected; final full-page screenshot reviewed directly — pictogram legible, no truncation, no layout defects, confirming the fix pattern established in D-026 didn't need to be reapplied here.
-- **Status:** Awaiting Mohammad's review. Capability 08 (Incident Response) remains, needing its own individually-researched treatment.
+- **Status:** Awaiting Mohammad's review. Capability 08 (Incident Response) remains, needing its own individually-researched treatment. Closed by D-034 (2026-08): Services signed off as complete.
 
 ---
 
@@ -350,7 +436,7 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Shared-layout risk, checked and confirmed non-issue:** same shared grid as 05-07 (D-007 finalizing tier). This mark's height is comparable to Capability 07's pictogram, not taller — confirmed via the in-context whole-row screenshot, no new grid change needed.
 - **Build:** `/services/prototype-v7` (noindex, not linked from nav) — whole 4-card row shown twice, Capabilities 05/06/07 already reflecting their shipped D-025/D-027/D-029 treatments in both so only Capability 08 differs. Does not modify or import from `additional-capabilities.tsx`.
 - **Self-verified before reporting (per instruction):** `npx tsc --noEmit`, `npm run lint`, `npm run build` all clean (10 routes); fully clean rebuild (stray node processes killed, `.next` cleared, fresh `npm run start`); zero horizontal overflow on `/services/prototype-v7` at 390px; zero non-pre-existing console errors; confirmed via DOM query that live `/services` Capability 08 card is unaffected; final full-page screenshot reviewed directly — connecting line and numbered dots align correctly, all four phase labels legible, no truncation or layout defects found.
-- **Status:** Awaiting Mohammad's review. If approved, all 8 capabilities will have their own individually-researched treatment — Services' visual-shell redesign work (the thread running from D-013 through this round) would be complete pending his final sign-off.
+- **Status:** Awaiting Mohammad's review. If approved, all 8 capabilities will have their own individually-researched treatment — Services' visual-shell redesign work (the thread running from D-013 through this round) would be complete pending his final sign-off. Closed by D-034 (2026-08): Services signed off as complete.
 
 ---
 
@@ -404,7 +490,7 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **A verification miss caught and corrected within this same round:** an initial computed-style check used `document.querySelector('svg')`, which silently grabbed the site header's logo SVG (first in DOM order) instead of the diagram — reporting 0 paths/no marker and appearing to confirm a bug that didn't exist. Re-ran the check scoped to the actual diagram (`svg[viewBox="0 0 520 520"]`) and confirmed all 4 accent arcs, the arrowhead marker, and the spin animation are genuinely present and computing correctly. Reported here so the near-miss is on record, not silently corrected.
 - **Route built:** `/how-we-work`, `noindex`'d, containing ONLY the confirmed-safe "How We Work" page label, the hero visual, and the CTA button reading exactly "Talk to Oragrol" (per instruction) → `/contact` (same label/href pairing used everywhere else on the site). No headline, body copy, or further page sections — all pending the actual copy block.
 - **Verified:** `npx tsc --noEmit`, `npm run lint`, `npm run build` all clean (9 routes); fully clean rebuild (stray node processes killed, `.next` cleared, fresh `npm run start`); zero horizontal overflow at 1440/390px; zero non-pre-existing console errors; screenshots reviewed at 1440/390px plus a dedicated reduced-motion context; computed-style check (corrected mid-round, see above) confirms the diagram's arcs/marker/animation are real, not just visually assumed.
-- **Status:** Visual prototype complete and self-verified. Page content — BLOCKED pending the actual copy block from Mohammad. Do not proceed to build the rest of the page (headline, body sections, structure beyond the hero) without it.
+- **Status:** Visual prototype complete and self-verified. Page content — BLOCKED pending the actual copy block from Mohammad. Do not proceed to build the rest of the page (headline, body sections, structure beyond the hero) without it. Superseded by D-104 (2026-10-20): the How We Work page was removed.
 
 ---
 
@@ -416,7 +502,7 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **A real screenshot-methodology false alarm caught and correctly diagnosed, not misreported:** the first mobile full-page screenshot appeared to show the Stage Sequence section entirely blank — a serious-looking defect. Investigated via direct computed-style query on the "Understand" heading rather than assuming: `opacity: 1`, no hiding transform, correct position, fully visible. Root cause: the screenshot script's 400ms wait per scroll increment wasn't enough for the section's staggered `Reveal` animations (delay `i * 0.08` plus transition duration) to complete before capture — the exact same category of false alarm this project's own history already has one precedent for (Cyber Health's `Flow`, last step "faded" in an under-waited screenshot). Re-captured with a longer wait (900ms) and confirmed all 4 stages render correctly and legibly on mobile. Reported here rather than either silently re-capturing without mentioning the near-miss, or reporting the false blank section as if it were real.
 - **A judgment call flagged, not silently resolved:** `HowWeWorkCycleVisual`'s own short stage one-liners (from D-035, reused Home-teaser copy) now sit directly above the Stage Sequence's full paragraph versions of the same 4 stages — some content echo between the hero visual and the section immediately below it. Left the hero visual completely unchanged per "build the rest of the page around the hero visual already built" (not asked to revise it), but flagged this for Mohammad rather than silently deciding whether the repetition reads as intentional reinforcement (matching Services' sidebar-label + full-content-column precedent) or as redundant.
 - **Verified overall:** `npx tsc --noEmit`, `npm run lint`, `npm run build` all clean (9 routes); fully clean rebuild (stray node processes killed, `.next` cleared, fresh `npm run start`); zero horizontal overflow at 1440/390px; `noindex` removed from the route now that real content exists, matching every other built page.
-- **Status:** Step 8 (How We Work) content-complete, self-verified, awaiting Mohammad's review.
+- **Status:** Step 8 (How We Work) content-complete, self-verified, awaiting Mohammad's review. Superseded by D-104 (2026-10-20): the How We Work page was removed.
 
 ---
 
@@ -428,6 +514,7 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Decision — real fix, not a reference-matching patch:** restructured the `sm:` and up layout as CSS Grid (`sm:grid-cols-[1fr_auto_1fr]`) with the circle always explicitly placed in the center column (`sm:col-start-2`) — the same column the spine's `left-1/2` targets — and stage content placed in the left or right column depending on the stage, alone on its side, text-aligned toward the spine. This guarantees the circle sits on the spine by construction (grid track placement), not by incidental row sizing. Mobile (below `sm`) was already correct — single left-aligned column, no reversal applies there — and is untouched by this fix.
 - **Verified — the specific check requested:** Playwright, fresh production server, both required widths: at 1920px, all 4 circles' center-x exactly equals the spine's center-x (delta 0px, all four). At 390px, delta is 1px for all four (sub-pixel rounding, visually indistinguishable, well within tolerance). Screenshots at both widths reviewed directly and confirm the line visibly threading through every circle. `npx tsc --noEmit`, `npm run lint`, `npm run build` all clean (9 routes); fresh clean rebuild; zero horizontal overflow at 1920/390px.
 - **Follow-up worth noting, not actioned without being asked:** `home/how-we-work.tsx` (the Home page teaser) still has this same unfixed bug — out of scope for this instruction (which was about the How We Work page specifically), flagged for Mohammad in case he wants it fixed there too using the same technique.
+- **Status:** Superseded by D-104 (2026-10-20): the How We Work page was removed.
 
 ---
 
@@ -454,7 +541,7 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Two screenshot-timing false alarms caught and correctly diagnosed, not misreported:** both the first normal-motion and first reduced-motion full-page screenshots appeared to show the prototype's headline/subhead entirely missing — looked like a serious rendering defect. Same category of false alarm this project has now hit multiple times (Cyber Health's `Flow`, How We Work's Stage Sequence): the capture script took a single screenshot without scrolling through the page first, so the second (lower) hero's `Reveal` entrance animations never triggered before capture. Confirmed via direct computed-style query (`opacity: 1`, no hiding transform, correct position) before re-capturing with proper incremental scroll-through, which showed the content rendering correctly in both states.
 - **Prototype:** `/solutions/prototype` (noindex, not linked from nav) shows the current live hero (`SolutionsHero`, `StrataVisual`, unchanged) stacked above the new prototype (`SolutionsHeroKineticPrototype`, `KineticGrid`) with identical copy in both. `hero.tsx` and `StrataVisual` are completely untouched — confirmed via DOM query that the live `/solutions` page has no `<canvas>` element at all.
 - **Verified overall:** `npx tsc --noEmit`, `npm run lint`, `npm run build` all clean (10 routes); fully clean rebuild (stray node processes killed, `.next` cleared, fresh `npm run start`); zero horizontal overflow at 1920/390px.
-- **Status:** Prototype complete, all 5 required items verified with direct evidence. Awaiting Mohammad's approval before shipping to the live `/solutions` page.
+- **Status:** Prototype complete, all 5 required items verified with direct evidence. Awaiting Mohammad's approval before shipping to the live `/solutions` page. Superseded by D-117 (2026-10-22): the Solutions page and its data were deleted; /solutions redirects to /services.
 
 ---
 
@@ -463,7 +550,7 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Context:** Mohammad reviewed D-039's `/solutions/prototype` and gave explicit approval: "Approve the Kinetic Grid hero for Solutions. Ship it to the live /solutions page, replacing the strata visual." Logged here per his explicit instruction as an intentional, deliberate replacement of D-008's original hero decision — not a defect fix. D-008 itself (Solutions' "ascending stacked planes" motif, and the other 8 pages' own per-page visual directions) remains the record of what was originally decided and why; this entry documents that Solutions' specific piece of it has now been superseded by direct instruction.
 - **Decision:** `hero.tsx` now imports and renders `KineticGrid` in place of `StrataVisual`, wrapping the same unchanged Caption/H1/Text copy as its `children` (background-and-content pattern, not a separate visual block beside the text). `StrataVisual`'s own file is left in the codebase, unused — not deleted, in case this is ever reverted. `/solutions/prototype` and its prototype-only `SolutionsHeroKineticPrototype` component are both deleted, same lifecycle as every prior prototype route in this project.
 - **Verified — same rigor as the prototype round, re-run against the live page, not assumed to still hold:** `npx tsc --noEmit`, `npm run lint`, `npm run build` all clean (9 routes, `/solutions/prototype` confirmed 404); fully clean rebuild (stray node processes killed, `.next` cleared, fresh `npm run start`). Canvas scoping re-measured on the live page: 1920×520px on a 2530px-tall page (page height differs slightly from the prototype's 2380px since the prototype route had extra comparison-UI chrome around it — expected, not a regression). Background pixel re-sampled: exactly `rgb(10,10,10)`. Reduced-motion frame re-sampled twice 600ms apart on the live page: byte-identical, confirming no animation runs. Zero horizontal overflow at 1920/390px. Confirmed via DOM query that the live hero's section contains a `<canvas>` and no `<svg>` — no `StrataVisual` remnant. Full-page screenshot reviewed directly.
-- **Status:** Active. Solutions' hero is now `KineticGrid`. Two flags carried forward, unrelated to this change: `StrataVisual`'s file remains in the codebase unused (available for revert); SiteHeader's dark-environment-on-entry assumption (noted in `hero.tsx`'s own comment since D-006/Solutions Step 6) is still an open, not-yet-scheduled follow-up.
+- **Status:** Active. Solutions' hero is now `KineticGrid`. Two flags carried forward, unrelated to this change: `StrataVisual`'s file remains in the codebase unused (available for revert); SiteHeader's dark-environment-on-entry assumption (noted in `hero.tsx`'s own comment since D-006/Solutions Step 6) is still an open, not-yet-scheduled follow-up. Superseded by D-117 (2026-10-22): the Solutions page and its data were deleted; /solutions redirects to /services.
 
 ---
 
@@ -817,7 +904,7 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Decision — pricing confidence note:** `pricing_confidence_note` renders as small print (`Text`, muted, small) once, at the bottom of `PentestAddon` — the last pricing-bearing section on the page before Final CTA — covering tier + add-on + pentest pricing together rather than repeating a caveat after every section.
 - **A real consequence found and fixed, same class of issue as D-062/D-063's nav-dropdown fixes:** `nav-dropdown.tsx`'s `SOLUTIONS_DROPDOWN` hardcoded "Level 01"/"Level 02"/"Level 03" labels, which would have gone stale the moment the page itself started showing real tier names. Relinked to source from `solutions-data.ts` directly (`getTiers()`, same reuse pattern as Services/Industries/Resources' own dropdowns) instead of re-hardcoding new labels — can't drift out of sync again if the tier data changes.
 - **Verified:** `npx tsc --noEmit` / `npm run lint` / `npm run build` all clean, same route count. Live via Playwright: real tier names/prices confirmed, zero "Level 01" stale text, zero gross-margin text anywhere on the page, pricing confidence note and cumulative-tiers note both present, all 12 add-on cards render, Pentest section shows real price, nav dropdown resolves to the 3 real tier names + Penetration Testing, zero horizontal overflow. One methodology note, not a product bug: an initial `fullPage` screenshot taken without first scrolling through the page showed the Add-ons/Pentest sections as empty gaps — diagnosed correctly (before reporting anything as broken) as `whileInView` `Reveal`s frozen at their pre-animation state, the same known fullPage-without-scroll quirk this project has hit before (D-014/D-057) — a second screenshot with real incremental scroll first confirmed everything renders correctly.
-- **Status:** Active. Supersedes D-003 for the Solutions page specifically (Home's teaser and any other pricing-adjacent copy elsewhere on the site are unaffected, out of scope for this task).
+- **Status:** Active. Supersedes D-003 for the Solutions page specifically (Home's teaser and any other pricing-adjacent copy elsewhere on the site are unaffected, out of scope for this task). Superseded by D-117 (2026-10-22): the Solutions page and its data were deleted; /solutions redirects to /services.
 
 ---
 
@@ -1165,6 +1252,9 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Decision:** `app/components/brand/logo.tsx` holds the handoff geometry verbatim (verified byte-identical to the zip SVGs); `HeaderLogo` is used in all 17 redesigned page headers, cyber-health, careers/talent/partnerships, the /scan masthead and legacy `SiteHeader`. Favicon set from the zip (`app/icon.svg`, `app/favicon.ico`, `app/apple-icon.png`, `public/icon-192/512.png`) plus a minimal `app/manifest.ts`. `OragrolLogo` and `Oragrol_Logo_Final.svg` deleted (D-002 superseded).
 - **Deviation from the handoff, on Mohammad's instruction (2026-10-09):** "the size of header and footer should not change at all, only logo need to add; the footer uses only the icon." Header heights are unchanged (verified per page), so headers use the icon (48px desktop / 40px mobile) instead of the 112px full logo — the handoff's own rule forbids the full logo below 100px, and no header is that tall. No scroll-shrink behaviour: headers are not sticky. Footer: the icon (dark-bg, 64px; 48px on phones) sits in the footer's existing right-side `logoSlot` (the spot Mohammad marked), as an overlay so the footer height is unchanged (622px desktop / 743px phone, before and after); the "ORAGROL GLOBAL" background watermark text is kept.
 - **Flagged, not changed:** other oranges in use for branding (`#E86B1F`, `#FF681F`, `#DB5227`) alongside `#EF4D00`; `OragrolRing` decorative ring in three CTA sections still echoes the old mark; react-pdf report headers were not part of this pass.
+- **Status:** Superseded in part by D-094 (icon-only header and 64px dark footer icon replaced).
+
+---
 
 ### D-094 — Logo rollout v3: horizontal header logo, grey footer icon, share image, branded 404, chat icon (2026-10-09)
 - **Context:** Mohammad approved handoff v3 (`oragrol-logo-handoff.md` v3). Supersedes D-093's icon-only header and 64px dark footer icon.
@@ -1206,6 +1296,9 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
   - **Careers, Talent, Partnerships:** not linked to HubSpot for now. Submissions go to the inbox only. May be added later.
 - **Still open:** the four must-link sources are coded to HubSpot but were not confirmed live with a test lead. Verify each before relying on them.
 - **Known gap to fix:** Live chat returns "ok" to the visitor when the HubSpot token is missing, so a lost lead is silent. Needs an internal alert instead.
+- **Status:** Superseded in part by D-116 (Newsletter and Careers/Talent/Partnerships handling).
+
+---
 
 ### D-101 — Home hero photo column tried and reverted (2026-10-19)
 - Black and white Toronto photo as a column beside the hero OR. Live briefly, then reverted at Mohammad's request: it read as a photo added beside the type, not part of it. Hero stays type-only.
@@ -1297,3 +1390,12 @@ Format: one entry per decision, numbered sequentially, never delete — mark sup
 - **Outbound** (new): ZM77 drafts one introduction per company with one public finding and its source. Mohammad approves each. No follow-up emails. A form submission gets a ZM77-written confirmation, approved before sending.
 - **Retention:** attachments, client PDFs and similar files are deleted after 12 months unless the person asks us to keep them. Live chat transcripts are removed from HubSpot after 30 days.
 - **Still open:** HubSpot custom property limit, sender and recipient addresses, ODO scan record retention (6 months vs 10 years), careers and talent acknowledgements, and the Azure Blob connection. Full list in the plan document.
+### D-117 — Cleanup Batch A: Solutions page and orphan code deleted (2026-10-22)
+- **Decision (Mohammad, "approved Batch A"):** the retired Solutions page and everything only it used were deleted: `app/[locale]/solutions/`, `app/components/sections/solutions/`, `app/data/oragrol-solutions-data.json`, `app/data/oragrol-tier2-packages-data.json` (old tier and month-to-month prices that were never live), the legacy Cyber Health PDF, and 14 unused modules. The Solutions nav entries were removed. `/solutions` keeps its permanent redirect to `/services`. Site search index rebuilt (100 destinations).
+- **Kept on purpose:** `canada-coverage-study/page.tsx` (the homepage imports it; the audit had wrongly marked it dead) and the internal Ops outbound page.
+- **Branches:** all merged and old branches deleted on GitHub (only `main` remains); Dependabot update requests closed.
+- **Supersedes:** D-039, D-040, D-064 (Solutions page decisions). There was no earlier decision record for removing Solutions.
+- **Status:** Active (Batch A live on main as f490577).
+
+---
+

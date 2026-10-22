@@ -1,3 +1,5 @@
+> **SUPERSEDED (archived 2026-10-22). Do not use.** This file describes the site as of August 2026 and is wrong today: old colours and fonts, Solutions and How We Work pages that no longer exist, and EN/FR, FAQ and chat listed as pending although they are built. Current sources are listed in `docs/CURRENT_SOURCES.md`.
+
 # PROJECT_MASTER.md — Oragrol Global Website
 Merged master (v2) — replaces the standalone Roadmap and Implementation Brief as the single source of truth. Combines the Roadmap's confirmed build status and locked colors with the Brief's full scope. Confirmed: **9-page sitemap**, How We Work and Contact restored.
 

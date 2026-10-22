@@ -5,8 +5,9 @@ import { SITE_URL } from "./lib/site-config";
  * Real, live, customer-facing pages that get a French version and an
  * hreflang pair in the sitemap. This list was built by directly checking
  * every route on the live site (not assumed from the footer nav alone —
- * how-we-work was removed 2026-10-20 (redirects to /); solutions/canada-coverage-
- * study/style-guide are real routes but excluded below on purpose).
+ * how-we-work was removed 2026-10-20 (redirects to /); solutions redirects to
+ * /services; canada-coverage-study is a section shown inside the homepage and
+ * is excluded below on purpose).
  */
 const bilingualRoutes: { path: string; priority: number }[] = [
   { path: "/", priority: 1 },
@@ -37,9 +38,9 @@ const englishOnlyRoutes: { path: string; priority: number }[] = [
 ];
 
 // Deliberately excluded, not an oversight: /solutions (redirects to
-// /services, see next.config.ts), /canada-coverage-study (dead route,
-// resolves to a fallback), /style-guide (internal/disposable, marked as
-// such on the page itself — never meant to be indexed).
+// /services, see next.config.ts), /canada-coverage-study (a section
+// rendered inside the homepage, not listed as its own page). There is no
+// /style-guide route.
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();

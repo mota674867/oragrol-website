@@ -1,7 +1,7 @@
 /**
- * Resources — article content, copied verbatim from
- * ORAGROL_RESOURCES_ALL_ARTICLES_FINAL.md (the single source file for all
- * 6 articles). Every `text`/`items` string below is transcribed exactly
+ * Resources — article content. This file is now the single source. It was
+ * first copied verbatim from ORAGROL_RESOURCES_ALL_ARTICLES_FINAL.md (removed
+ * 2026-10-22, still in git history) for the first 6 articles. Every `text`/`items` string below is transcribed exactly
  * as written in the source — no rewording, embellishment, or added
  * claims, per that file's own "Content Rules" and this project's Honesty
  * Rule (CLAUDE.md §8). Verified byte-for-byte via a Node diff script
