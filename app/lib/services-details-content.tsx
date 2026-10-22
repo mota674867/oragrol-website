@@ -210,7 +210,7 @@ export const specialistDetailsContent: Record<string, SpecialistDetailsContent> 
   },
   "C10-S04": {
     itemLabel: "SPECIALIST ENGAGEMENT",
-    title: "Certified Forensic IR",
+    title: "Digital Forensics & Incident Response (DFIR)",
     subtitle: "Investigate an incident and preserve its evidence.",
     intro:
       "A scoped forensic engagement investigates the available evidence of a security incident and documents what can be established. Qualified specialists preserve and analyze relevant material, develop a timeline and record findings and limitations. You receive a reviewed report to support recovery and discussions with relevant advisers or insurers.",

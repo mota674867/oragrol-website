@@ -83,7 +83,7 @@ export const SPECIALIST_ENGAGEMENTS = [
   },
   {
     code: "C10-S04",
-    name: "Certified Forensic IR",
+    name: "Digital Forensics & Incident Response (DFIR)",
     line: "Specialist forensic investigation and incident response, with scope agreed for the incident.",
     priceLine: "From $12,000 per incident",
     secondaryPriceLine: "Optional retainer · separately scoped." as string | undefined,
