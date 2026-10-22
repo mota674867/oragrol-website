@@ -31,12 +31,12 @@ export const SERVICE_PACKAGES = [
 
 export const INDIVIDUAL_SERVICES = [
   { code: "C01-S04", name: "Virtual CISO", price: 3500, billing: "monthly", line: "Security leadership to guide priorities, decisions and oversight." },
-  { code: "C07-S04", name: "Secure Software Development", price: 600, billing: "monthly", line: "Bring security practices into your software delivery process." },
+  { code: "C07-S04", name: "Secure Software Development Lifecycle (SSDLC)", price: 600, billing: "monthly", line: "Bring security practices into your software delivery process." },
   { code: "C08-S03", name: "Data Privacy Management", price: 700, billing: "monthly", line: "Coordinate how personal information is handled and protected." },
   { code: "C09-S01", name: "AI Security Assessment", price: 4500, billing: "one-time", line: "Assess security risks in your AI use and identify practical next steps." },
   { code: "C09-S02", name: "AI Governance & Risk Mgmt", price: 900, billing: "monthly", line: "Define responsibilities and manage risks around business use of AI." },
   { code: "C05-S03", name: "Privileged Access Mgmt", price: 400, billing: "monthly", line: "Strengthen oversight of accounts with elevated permissions." },
-  { code: "C05-S05", name: "Zero Trust Access Security", price: 1000, billing: "monthly", line: "Apply identity and context checks to access decisions." },
+  { code: "C05-S05", name: "Zero Trust Network Access (ZTNA)", price: 1000, billing: "monthly", line: "Apply identity and context checks to access decisions." },
   { code: "C06-S04", name: "Cloud Network Security", price: 700, billing: "monthly", line: "Strengthen network controls across your cloud environment." },
   { code: "C09-S03", name: "AI Model Security", price: 700, billing: "monthly", line: "Address security risks affecting AI models and their use." },
   { code: "C09-S04", name: "AI Data Security & Privacy", price: 500, billing: "monthly", line: "Protect sensitive information used by AI systems and workflows." },

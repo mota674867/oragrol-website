@@ -258,7 +258,7 @@ export const aLaCarteDetailsContent: Record<string, ALaCarteDetailsContent> = {
   },
   "C07-S04": {
     itemLabel: "À LA CARTE",
-    title: "Secure Software Development",
+    title: "Secure Software Development Lifecycle (SSDLC)",
     subtitle: "Build security into your development workflow.",
     intro:
       "Integrate agreed security checks into the way your team develops and releases software. The service identifies relevant weaknesses during development and helps route findings to the people who can address them. You receive development-focused findings and guidance within the supported toolchain.",
@@ -308,7 +308,7 @@ export const aLaCarteDetailsContent: Record<string, ALaCarteDetailsContent> = {
   },
   "C05-S05": {
     itemLabel: "À LA CARTE",
-    title: "Zero Trust Access Security",
+    title: "Zero Trust Network Access (ZTNA)",
     subtitle: "Make access depend on verified context.",
     intro:
       "Strengthen access decisions using identity, device and other supported context signals. The service applies agreed access policies rather than relying solely on network location. You receive configured controls and visibility into relevant access exceptions.",
