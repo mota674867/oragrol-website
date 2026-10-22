@@ -95,7 +95,14 @@ function IndustriesClient() {
     if (!["ArrowDown", "ArrowUp", "ArrowRight", "ArrowLeft"].includes(e.key))
       return;
     e.preventDefault();
-    const d = e.key === "ArrowDown" || e.key === "ArrowRight" ? 1 : -1;
+    // Desktop shows the industries as a card grid: up/down move one row.
+    const rail = listRef.current;
+    const cols = rail && getComputedStyle(rail).display === "grid"
+      ? getComputedStyle(rail).gridTemplateColumns.split(" ").length
+      : 1;
+    const vertical = e.key === "ArrowDown" || e.key === "ArrowUp";
+    const step = vertical ? cols : 1;
+    const d = (e.key === "ArrowDown" || e.key === "ArrowRight" ? 1 : -1) * step;
     const next = (active + d + industryIds.length) % industryIds.length;
     setActive(next);
     document.getElementById(`industry-tab-${next}`)?.focus();
@@ -171,7 +178,7 @@ function IndustriesClient() {
                 >
                   <span className="indx-tab-num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
                   <span className="indx-tab-name">{t(`list.${id}.name`)}</span>
-                  <span className="indx-tab-arrow" aria-hidden="true">→</span>
+                  <span className="indx-tab-arrow" aria-hidden="true">↗</span>
                 </button>
               ))}
             </div>
@@ -290,7 +297,7 @@ function IndustriesClient() {
             <p>{t("fullProfile.sub")}</p>
           </div>
           <div className="indx-acc indx-fade" key={`a-${industryId}`}>
-            <details name="industry-detail" open>
+            <details name="industry-detail">
               <summary>{t("fullProfile.accordionRisk")}<span aria-hidden="true" /></summary>
               <p>{t(`list.${industryId}.detail.context`)}</p>
             </details>

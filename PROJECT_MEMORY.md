@@ -8,6 +8,8 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 
 **Verified:** tsc clean, lint 0 errors; screenshots at 390, 1440, 1920; no horizontal overflow at 360 to 2560; tab click, arrow keys, focus, deep link, French page, mobile rail (page does not jump); no page errors.
 
+**Card version:** Mohammad asked for premium cards and less scroll; sections now use cards, phone step cards swipe, accordion closed. Heights 1765 (1440), 1961 (1920), 2150 (phone).
+
 **Next:** Mohammad reviews the preview; old ind-* CSS cleanup later.
 ---
 

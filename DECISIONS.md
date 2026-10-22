@@ -1430,5 +1430,7 @@ D-006, D-011, D-012, D-013, D-037, D-050, D-053, D-054, D-061, D-062, D-066, D-0
 - **Size (hero end to CTA):** 2571 → 1987px at 1440, 2955 → 2261px at 1920, 3285 → 2669px on a 390px phone.
 - **Kept:** tab semantics (arrow keys move selection and focus), `#industry-tab-N` deep links, `#industry-index` and `#industry-journey` anchors.
 - **Follow-up:** the old `.ind-navigator`, `.ind-ring*`, `.ind-journey*`, `.ind-anchor`, `.ind-full-profile`, `.ind-accordions` rules in `app/gpt-pages.css` are now unused; remove later with care (they share minified lines with live hero rules).
+- **Card version (same day, Mohammad: "use a card, premium looks", "compact, no need too much scroll"):** section 1 is a 3x3 grid of industry cards (active card dark, orange number) beside a dark feature card; section 2 shows Protect / Automate / Unify as three raised dark cards with an orange top edge; the evidence bar is a light card strip; section 3 holds the accordion in one light card, all items closed. Arrow keys move one row in the card grid. Phones: industry cards and step cards are swipeable rows (next card peeks in).
+- **Size now (hero end to CTA):** 2571 → 1765px at 1440, 2955 → 1961px at 1920, 3285 → 2150px on a 390px phone.
 - **Status:** Built and verified on branch `industries-redesign`; awaiting Mohammad's preview review.
 ---
