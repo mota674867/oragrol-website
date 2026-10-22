@@ -1818,7 +1818,7 @@
       "downloadScopePdf": "Télécharger ma portée en PDF",
       "downloadScopeAlert": "Ouvrez Ma portée sur Services, Business Automation ou OR ONE pour télécharger le PDF de marque actuel.",
       "successHeading": "Merci.",
-      "successBody": "Votre demande a été envoyée à l'équipe d'ORAGROL Global pour examen. Nous visons à répondre dans un délai de deux jours ouvrables.",
+      "successBody": "Votre demande a été envoyée à l'équipe d'ORAGROL Global pour examen. Nous visons à répondre dans un délai de 24 heures.",
       "privacyNote": "Vos renseignements ne seront utilisés que pour examiner et répondre à votre demande."
     },
     "next": {
@@ -1847,7 +1847,7 @@
           "copy": "Nous définissons la voie recommandée avant tout engagement."
         }
       ],
-      "footer": "Nous visons à accuser réception des demandes admissibles dans un délai de deux jours ouvrables."
+      "footer": "Nous visons à accuser réception des demandes admissibles dans un délai de 24 heures."
     },
     "locations": {
       "eyebrow": "04 / ORAGROL Global",

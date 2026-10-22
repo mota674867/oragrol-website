@@ -20,8 +20,8 @@ export async function generateMetadata({
       ? "Contact | Commencez par une conversation claire"
       : "Contact | Start a Clear Conversation",
     description: isFr
-      ? "Commencez par une conversation claire sur la cybersécurité, l'automatisation d'affaires ou OR ONE. ORAGROL Global répond aux demandes admissibles dans un délai de deux jours ouvrables."
-      : "Start with a clear conversation about cybersecurity, business automation or OR ONE. ORAGROL Global responds to qualified enquiries within two business days.",
+      ? "Commencez par une conversation claire sur la cybersécurité, l'automatisation d'affaires ou OR ONE. ORAGROL Global répond aux demandes admissibles dans un délai de 24 heures."
+      : "Start with a clear conversation about cybersecurity, business automation or OR ONE. ORAGROL Global responds to qualified enquiries within 24 hours.",
     alternates: {
       canonical: canonicalPath,
       languages: languageAlternates("/contact"),

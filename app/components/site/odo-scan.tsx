@@ -120,7 +120,7 @@ export const ODO_BACKEND_CONTRACT = Object.freeze({
   redisCompletedExpiryDays: 90,
   researchStalenessDays: 30,
   durableMinimumMonths: 6,
-  contractedRetentionYears: 10,
+  contractedRetentionYears: 1,
   reportDeliverySlaHours: 24,
   consentVersion: "odo-v4-2026-09-25",
   approvalGate: "zm77_then_mohammad",

@@ -1818,7 +1818,7 @@
       "downloadScopePdf": "Download My Scope as PDF",
       "downloadScopeAlert": "Open My Scope on Services, Business Automation or OR ONE to download the current branded PDF.",
       "successHeading": "Thank you.",
-      "successBody": "Your enquiry has been sent to the ORAGROL Global team for review. We aim to respond within two business days.",
+      "successBody": "Your enquiry has been sent to the ORAGROL Global team for review. We aim to respond within 24 hours.",
       "privacyNote": "Your information will be used only to review and respond to your request."
     },
     "next": {
@@ -1847,7 +1847,7 @@
           "copy": "We define the recommended path before any commitment."
         }
       ],
-      "footer": "We aim to acknowledge qualified enquiries within two business days."
+      "footer": "We aim to acknowledge qualified enquiries within 24 hours."
     },
     "locations": {
       "eyebrow": "04 / ORAGROL Global",
