@@ -1,0 +1,337 @@
+/* Industries explorer (redesign 2026-10-22, D-120).
+   One compact section between the hero and the closing CTA: a sticky
+   industry index on the left, the selected industry's full story on the
+   right (operating reality, one coordinated path, leader detail).
+   Phones and tablets: the index becomes a horizontal rail above the panel.
+   Scoped to .indx so nothing else on the site is affected. */
+
+/* Sticky needs a non-scrolling ancestor; `clip` keeps the old
+   no-horizontal-overflow behaviour of `hidden` without breaking sticky. */
+.ind-premium-page { overflow: clip; }
+
+.indx {
+  --indx-ink: #111315;
+  --indx-ink-2: #1a1c1f;
+  --indx-paper: #ebe9e3;
+  --indx-paper-2: #e2dfd7;
+  --indx-line: rgba(17, 19, 21, 0.14);
+  --indx-muted: #55585c;
+  --indx-orange: #ef4d00;          /* on dark */
+  --indx-orange-on-light: #a43e1d; /* 5:1 on paper, small text */
+  --indx-gutter: clamp(20px, 4.4vw, 88px);
+  background: var(--indx-paper);
+  color: var(--indx-ink);
+  padding: clamp(56px, 6.5vw, 120px) 0 clamp(64px, 7vw, 128px);
+}
+.indx-inner {
+  width: min(1560px, 100% - 2 * var(--indx-gutter));
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: clamp(250px, 21vw, 340px) minmax(0, 1fr);
+  gap: clamp(36px, 4.6vw, 96px);
+  align-items: start;
+}
+
+/* ---------- index ---------- */
+.indx-index { position: sticky; top: clamp(20px, 3vw, 40px); min-width: 0; }
+.indx-eyebrow,
+.indx-path-label,
+.indx-step-label,
+.indx-sub {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.indx-eyebrow { color: var(--indx-muted); }
+.indx-index-title {
+  margin: 16px 0 28px;
+  font-size: clamp(30px, 2.5vw, 44px);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+.indx-list { display: flex; flex-direction: column; border-top: 1px solid var(--indx-line); }
+.indx-tab {
+  position: relative;
+  display: grid;
+  grid-template-columns: 30px 1fr 18px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 14px 13px 12px;
+  border: 0;
+  border-bottom: 1px solid var(--indx-line);
+  background: transparent;
+  color: var(--indx-ink);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.22s ease, color 0.22s ease, padding 0.22s ease;
+}
+.indx-tab-num { font-size: 11px; letter-spacing: 0.08em; color: var(--indx-muted); font-variant-numeric: tabular-nums; }
+.indx-tab-arrow { opacity: 0; transform: translateX(-6px); transition: opacity 0.22s ease, transform 0.22s ease; color: var(--indx-orange); }
+.indx-tab:hover { background: var(--indx-paper-2); }
+.indx-tab:hover .indx-tab-arrow { opacity: 0.6; transform: none; }
+.indx-tab.is-active { background: var(--indx-ink); color: #f1efe9; }
+.indx-tab.is-active .indx-tab-num { color: #a7a9ac; }
+.indx-tab.is-active .indx-tab-arrow { opacity: 1; transform: none; }
+.indx-tab:focus-visible { outline: 2px solid var(--indx-orange-on-light); outline-offset: -2px; }
+
+/* ---------- panel ---------- */
+.indx-panel { min-width: 0; outline: none; }
+.indx-panel:focus-visible { outline: 2px solid var(--indx-orange-on-light); outline-offset: 8px; }
+.indx-fade { animation: indx-in 0.42s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+@keyframes indx-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+.indx-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: clamp(28px, 3.5vw, 72px);
+  align-items: end;
+  padding-bottom: clamp(28px, 3vw, 44px);
+}
+.indx-sub { grid-column: 1 / -1; color: var(--indx-orange-on-light); }
+.indx-name {
+  margin: 14px 0 0;
+  font-size: clamp(40px, 4.4vw, 84px);
+  line-height: 0.95;
+  font-weight: 500;
+  letter-spacing: -0.05em;
+}
+.indx-reality h4 { margin: 0 0 10px; font-size: clamp(17px, 1.25vw, 21px); font-weight: 600; letter-spacing: -0.01em; }
+.indx-reality p { margin: 0; max-width: 62ch; font-size: clamp(15px, 1.05vw, 18px); line-height: 1.6; color: #2f3236; }
+
+/* one coordinated path (dark band) */
+.indx-path {
+  position: relative;
+  background: var(--indx-ink);
+  color: #f1efe9;
+  padding: clamp(26px, 2.6vw, 44px) clamp(22px, 2.6vw, 48px) clamp(30px, 2.8vw, 48px);
+}
+.indx-path-label { color: #a7a9ac; margin-bottom: clamp(22px, 2.2vw, 34px); }
+.indx-steps {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(22px, 2.6vw, 52px);
+}
+/* the connecting rail through the three nodes */
+.indx-steps::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  right: 6px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--indx-orange), rgba(239, 77, 0, 0.55) 55%, rgba(167, 169, 172, 0.45));
+}
+.indx-step { position: relative; min-width: 0; padding-top: 32px; }
+.indx-step + .indx-step { border-left: 1px solid rgba(241, 239, 233, 0.1); padding-left: clamp(18px, 2vw, 34px); }
+.indx-node {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--indx-ink);
+  border: 1.5px solid var(--indx-orange);
+}
+.indx-step + .indx-step .indx-node { left: clamp(18px, 2vw, 34px); }
+.indx-step:first-child .indx-node { background: var(--indx-orange); }
+.indx-step-label { color: var(--indx-orange); }
+.indx-step h5 {
+  margin: 10px 0 16px;
+  font-size: clamp(20px, 1.55vw, 27px);
+  line-height: 1.1;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+.indx-risks { list-style: none; margin: 0; padding: 0; }
+.indx-risks li {
+  position: relative;
+  padding: 0 0 0 16px;
+  margin: 0 0 9px;
+  font-size: 14.5px;
+  line-height: 1.45;
+  color: #d9d7d1;
+}
+.indx-risks li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 6px; height: 1px; background: var(--indx-orange); }
+.indx-note {
+  margin: 16px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid rgba(241, 239, 233, 0.12);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #a7a9ac;
+}
+.indx-jobs { margin: 0; }
+.indx-jobs > div + div { margin-top: 14px; }
+.indx-jobs dt { font-size: 14.5px; font-weight: 600; color: #f1efe9; }
+.indx-jobs dd { margin: 4px 0 0; font-size: 14.5px; line-height: 1.45; color: #d9d7d1; }
+.indx-unify { margin: 0; font-size: 14.5px; line-height: 1.5; color: #d9d7d1; }
+.indx-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--indx-orange);
+  color: var(--indx-orange);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.indx-link span { transition: transform 0.22s ease; }
+.indx-link:hover span { transform: translateX(4px); }
+.indx-link:focus-visible { outline: 2px solid var(--indx-orange); outline-offset: 4px; }
+
+/* evidence (Professional Services only) */
+.indx-evidence { border-bottom: 1px solid var(--indx-line); background: var(--indx-paper-2); }
+.indx-evidence summary {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px clamp(18px, 2vw, 28px);
+  cursor: pointer;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.indx-evidence summary::-webkit-details-marker { display: none; }
+.indx-evidence summary b { color: var(--indx-orange-on-light); font-weight: 600; white-space: nowrap; }
+.indx-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(18px, 2vw, 36px);
+  padding: 4px clamp(18px, 2vw, 28px) 18px;
+}
+.indx-stats strong { display: block; font-size: clamp(28px, 2.2vw, 38px); font-weight: 500; letter-spacing: -0.04em; }
+.indx-stats p { margin: 6px 0 8px; font-size: 13.5px; line-height: 1.5; color: #2f3236; }
+.indx-stats a { font-size: 12px; color: var(--indx-orange-on-light); }
+.indx-evidence-note { margin: 0; padding: 0 clamp(18px, 2vw, 28px) 16px; font-size: 12px; color: var(--indx-muted); }
+
+/* what leaders need to know */
+.indx-detail {
+  display: grid;
+  grid-template-columns: minmax(200px, 0.62fr) minmax(0, 1.38fr);
+  gap: clamp(24px, 3.5vw, 72px);
+  padding-top: clamp(30px, 3.2vw, 52px);
+}
+.indx-detail-head h4 {
+  margin: 0;
+  font-size: clamp(26px, 2.2vw, 40px);
+  line-height: 1.02;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+.indx-detail-head p { margin: 12px 0 0; font-size: 15px; line-height: 1.5; color: var(--indx-muted); }
+.indx-acc { border-top: 1px solid var(--indx-line); }
+.indx-acc details { border-bottom: 1px solid var(--indx-line); }
+.indx-acc summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 15px 0;
+  font-size: clamp(15px, 1.1vw, 18px);
+  font-weight: 500;
+  cursor: pointer;
+}
+.indx-acc summary::-webkit-details-marker { display: none; }
+.indx-acc summary:focus-visible { outline: 2px solid var(--indx-orange-on-light); outline-offset: 2px; }
+/* plus that turns into a minus */
+.indx-acc summary span { position: relative; flex: none; width: 14px; height: 14px; }
+.indx-acc summary span::before,
+.indx-acc summary span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1.5px;
+  background: var(--indx-orange-on-light);
+  transition: transform 0.25s ease;
+}
+.indx-acc summary span::after { transform: rotate(90deg); }
+.indx-acc details[open] summary span::after { transform: rotate(0deg); }
+.indx-acc details > p,
+.indx-acc details > ul { margin: 0 0 18px; max-width: 72ch; font-size: 15px; line-height: 1.6; color: #2f3236; }
+.indx-acc details > ul { padding-left: 18px; }
+.indx-acc details > ul li + li { margin-top: 6px; }
+.indx-scope { margin: 16px 0 0; font-size: 12.5px; line-height: 1.55; color: var(--indx-muted); }
+
+/* ---------- large monitors ---------- */
+@media (min-width: 1800px) {
+  .indx-tab { font-size: 16px; padding-block: 15px; }
+  .indx-risks li, .indx-jobs dt, .indx-jobs dd, .indx-unify { font-size: 15.5px; }
+  .indx-reality p, .indx-acc details > p, .indx-acc details > ul { font-size: 17px; }
+}
+
+/* ---------- laptops: keep the path readable in three columns ---------- */
+@media (max-width: 1240px) {
+  .indx-head { grid-template-columns: 1fr; row-gap: 18px; }
+  .indx-detail { grid-template-columns: 1fr; gap: 20px; }
+}
+
+/* ---------- tablets and phones: index becomes a rail ---------- */
+@media (max-width: 1023.98px) {
+  .indx-inner { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .indx-index { position: static; }
+  .indx-index-title { margin: 12px 0 18px; }
+  .indx-list {
+    flex-direction: row;
+    gap: 8px;
+    border: 0;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    margin-inline: calc(-1 * var(--indx-gutter));
+    padding-inline: var(--indx-gutter);
+    scroll-padding-inline: var(--indx-gutter);
+  }
+  .indx-list::-webkit-scrollbar { display: none; }
+  .indx-tab {
+    flex: none;
+    width: auto;
+    grid-template-columns: auto auto;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--indx-line);
+    border-radius: 999px;
+    font-size: 14px;
+    white-space: nowrap;
+    scroll-snap-align: start;
+  }
+  .indx-tab-arrow { display: none; }
+  .indx-tab.is-active { border-color: var(--indx-ink); }
+}
+@media (max-width: 860px) {
+  .indx-steps { grid-template-columns: 1fr; gap: 0; }
+  .indx-steps::before { top: 6px; bottom: 6px; left: 6px; right: auto; width: 1px; height: auto; background: linear-gradient(180deg, var(--indx-orange), rgba(167, 169, 172, 0.45)); }
+  .indx-step { padding: 0 0 28px 34px; }
+  .indx-step:last-child { padding-bottom: 0; }
+  .indx-step + .indx-step { border-left: 0; padding-left: 34px; }
+  .indx-step + .indx-step .indx-node { left: 0; }
+  .indx-step h5 { margin-top: 8px; }
+  .indx-stats { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .indx { padding: 52px 0 60px; }
+  .indx-name { font-size: 40px; }
+  .indx-path { margin-inline: calc(-1 * var(--indx-gutter)); padding-inline: var(--indx-gutter); }
+  .indx-evidence summary { flex-direction: column; gap: 6px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .indx-fade { animation: none; }
+  .indx-tab, .indx-tab-arrow, .indx-link span, .indx-acc summary span::before, .indx-acc summary span::after { transition: none; }
+}

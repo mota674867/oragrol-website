@@ -85,6 +85,7 @@ A quick map, built from each entry's own Status line. Read an entry before chang
 - D-117: Cleanup Batch A: Solutions page and orphan code deleted (2026-10-22)
 - D-118: Cleanup Batch C: README, env example, unused tool; example test kept on purpose (2026-10-22)
 - D-119: Security Checks workflow audits production packages only; 8 lint errors cleared (2026-10-22)
+- D-120: Industries page body redesigned into one compact explorer (2026-10-22)
 
 **Shipped, but the old status text still says "awaiting review" or "prototype" (Mohammad has not closed them):**
 D-021, D-022, D-024, D-026, D-028, D-030, D-032, D-034, D-035, D-036, D-038, D-039, D-041, D-043, D-045, D-046, D-047, D-048, D-049, D-051, D-052, D-055, D-056, D-057, D-058, D-059, D-060
@@ -1415,5 +1416,17 @@ D-006, D-011, D-012, D-013, D-037, D-050, D-053, D-054, D-061, D-062, D-066, D-0
 - **Lint fixes (8 errors):** `odo-popup.tsx` uses `next/link` for `/scan` (same URL as before, deliberately not the locale-aware Link, so no `/fr` prefix appears); one apostrophe escaped in `odo-scan.tsx`; the two restore-from-browser-storage effects (chat "dismissed" in `ChatWidget.tsx`, saved scan session in `odo-scan.tsx`) keep their behaviour and carry a targeted `eslint-disable` with the reason (initial state must match the server render). No behaviour change.
 - **Tested:** lint 0 errors, tsc clean; in a real browser the popup link renders and opens /scan (seen flag set), a saved scan session resumes (status/events requests fire), the chat "dismissed" restore reloads cleanly, no page errors.
 - **Status:** Active
+
+---
+
+### D-120 — Industries page body redesigned into one compact explorer (2026-10-22)
+- **Request (Mohammad):** fully redesign the Industries page from after the hero to the closing CTA; premium, compact, right on phone, laptop and large monitor; a GPT sample (sidebar list + photo + dark three-step band + accordion) was supplied as reference.
+- **Decision:** one section (`.indx`, `app/[locale]/industries/industries-explorer.css`) replaces the ring navigator, the ribbon journey, the evidence bar and the separate detail section. Left: sticky numbered industry index (active row dark with orange arrow). Right: sub-brand, industry name and "The operating reality"; a dark "One coordinated path" band with Protect / Automate / Unify on one connected rail; the evidence drawer (Professional Services only, as before); "What leaders need to know" accordion (first item open). Phones and tablets: the index becomes a horizontal pill rail that scrolls itself, never the page; the path becomes a vertical timeline.
+- **Taken from the sample:** list + panel layout, three-column dark path, accordion. **Not taken:** the per-industry photo (no licensed photos for nine industries exist in the repo, and stock people imply a client base we do not have yet; can be added later if Mohammad supplies nine licensed images).
+- **Content:** unchanged; same `Industries` translation keys in EN and FR. One new string: `journey.unifyCta` ("Explore OR ONE" / "Découvrir OR ONE", links to /or-one).
+- **Size:** body height 2571 → 1437px at 1440×900, 2955 → 1540px at 1920, 3285 → 2274px on a 390px phone.
+- **Kept:** hero, closing CTA, tab semantics (`role=tab`, arrow keys move selection and focus), deep links `#industry-tab-N` from the nav, `#industry-index` hero anchor.
+- **Follow-up:** the old `.ind-navigator`, `.ind-ring*`, `.ind-journey*`, `.ind-anchor`, `.ind-full-profile`, `.ind-accordions` rules in `app/gpt-pages.css` are now unused; remove them in a later cleanup (they share minified lines with live hero rules, so needs care).
+- **Status:** Built and verified on branch `industries-redesign`; awaiting Mohammad's preview review.
 
 ---

@@ -717,7 +717,8 @@
       "automateLabel": "02 / Automatiser",
       "automateHeading": "Automatisez les bonnes tâches.",
       "unifyLabel": "03 / Unifier",
-      "unifyHeading": "Sachez quand cela devient OR ONE."
+      "unifyHeading": "Sachez quand cela devient OR ONE.",
+      "unifyCta": "Découvrir OR ONE"
     },
     "evidence": {
       "labelPrefix": "Preuve phare / Comptabilité et tenue de livres",

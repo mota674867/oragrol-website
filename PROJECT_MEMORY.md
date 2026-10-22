@@ -2,6 +2,16 @@
 
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
+## Session: Industries page body redesign, 2026-10-22
+
+**Done (branch `industries-redesign`):** everything between the hero and the closing CTA replaced by one compact explorer (sticky index + industry panel + dark coordinated path + accordion); phone rail and vertical timeline. Same content and translation keys, plus `journey.unifyCta`. Decision D-120.
+
+**Verified:** tsc clean, lint 0 errors; screenshots at 390, 820, 1280, 1440, 1920; no horizontal overflow; tab click, arrow keys, focus, sticky index, deep link, French page, mobile rail (page does not jump); no page errors.
+
+**Next:** Mohammad reviews the preview; old ind-* CSS cleanup later.
+
+---
+
 ## Session: Security Checks fixed and lint errors cleared, 2026-10-22
 
 **Done (branch `fix-security-check-lint`):** the workflow failed at `npm audit` because of a dev-tool-only advisory with no patch (`braces`); it now audits production packages only (0 vulnerabilities). 8 lint errors cleared with no behaviour change. Decision D-119.
@@ -72,22 +82,4 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 - `logo.tsx`: added `variant="horizontal"` and `tone="watermark"`. `HeaderLogo` now renders the horizontal lockup (48/40px). Footer icon grey #282828 bottom-right, hidden on phones. Shared footer now on old-chrome routes; `site-footer.tsx` and `oragrol-ring.tsx` deleted.
 - `SHARE_IMAGE` on every page's openGraph + layout; `public/og/oragrol-share.png`. Branded 404 (`not-found.tsx` + `[...rest]`). Chat launcher shows the brand icon.
 - Verified: tsc clean; lint no new issues (pre-existing ChatWidget setState-in-effect error and two warnings remain); 23 routes + 2 bad URLs checked at 1440 and 375 via playwright-core: logo 167x48 / 140x40 everywhere, header heights unchanged, footer 622/743 unchanged, 404 returns 404 with header+footer; og:image + twitter:card summary_large_image on all checked pages. `npm run build` can't run in this sandbox (Google Fonts blocked) — Vercel preview build is the build check. NEEDS VERIFICATION on the preview: real fonts, LinkedIn Post Inspector.
-
-## Session: new approved logo rolled out site-wide (preview only), 2026-10-09
-
-**Done:**
-- `Logo` and `HeaderLogo` components built with the handoff SVG geometry verbatim.
-- The logo replaces the text wordmarks and the old `OragrolLogo` in every page header, the /scan masthead, careers/talent/partnerships and the legacy SiteHeader/SiteFooter.
-- The footer icon sits in the right-side logo slot.
-- The favicon and app icons are from the zip, plus `app/manifest.ts`.
-- Old logo component and SVG deleted. See D-093, which also records the deviations Mohammad asked for: header and footer sizes unchanged, so the headers use the icon.
-
-**Verified:**
-- tsc is clean. Lint shows no new errors; the scan page's `<a href>` errors pre-exist.
-- Playwright on 19 routes at 1440 and 375: the logo renders, header heights equal the old ones, and there are no console errors.
-- The footer measures 622/743px before and after.
-
-**Next:** Mohammad reviews the Vercel preview, then merge.
-
----
 

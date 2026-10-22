@@ -1,5 +1,5 @@
 "use client";
-import { KeyboardEvent, useEffect, useState } from "react";
+import { KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import PreFooterCta from "@/app/components/site/pre-footer-cta";
@@ -8,6 +8,7 @@ import OragrolMegaNav from "@/app/components/site/oragrol-mega-nav";
 import UtilityBar from "@/app/components/site/utility-bar";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
 import "@/app/gpt-pages.css";
+import "./industries-explorer.css";
 import { HeaderLogo } from "@/app/components/brand/header-logo";
 
 /**
@@ -61,6 +62,7 @@ function IndustriesClient() {
   const otherLocale = locale === "fr" ? "en" : "fr";
   const pathname = usePathname();
   const [active, setActive] = useState(0);
+  const listRef = useRef<HTMLDivElement>(null);
   const industryId = industryIds[active];
   const risks = t.raw(`list.${industryId}.risks`) as string[];
   const jobs = t.raw(`list.${industryId}.jobs`) as { jobKind: JobKind; why: string }[];
@@ -80,12 +82,23 @@ function IndustriesClient() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- see comment above
     if (index >= 0 && index < industryIds.length) setActive(index);
   }, []);
+  // On phones and tablets the industry list is a horizontal rail: keep the
+  // selected industry visible by scrolling the rail only (never the page).
+  useEffect(() => {
+    const rail = listRef.current;
+    if (!rail || rail.scrollWidth <= rail.clientWidth) return;
+    const tab = rail.children[active] as HTMLElement | undefined;
+    if (!tab) return;
+    rail.scrollTo({ left: tab.offsetLeft - (rail.clientWidth - tab.offsetWidth) / 2, behavior: "smooth" });
+  }, [active]);
   const move = (e: KeyboardEvent<HTMLDivElement>) => {
     if (!["ArrowDown", "ArrowUp", "ArrowRight", "ArrowLeft"].includes(e.key))
       return;
     e.preventDefault();
     const d = e.key === "ArrowDown" || e.key === "ArrowRight" ? 1 : -1;
-    setActive((active + d + industryIds.length) % industryIds.length);
+    const next = (active + d + industryIds.length) % industryIds.length;
+    setActive(next);
+    document.getElementById(`industry-tab-${next}`)?.focus();
   };
   return (
     <>
@@ -126,180 +139,164 @@ function IndustriesClient() {
         </div>
       </section>
 
-      <section className="ind-navigator" id="industry-index">
-        <div className="ind-ring-wrap">
-          <p>{t("navigator.eyebrow")}</p>
+      {/* Industry explorer (redesign 2026-10-22, D-120): one compact section
+          replaces the ring navigator, the ribbon journey, the evidence bar and
+          the separate detail section. Same content and translation keys. */}
+      <section className="indx" id="industry-index" aria-labelledby="indx-title">
+        <div className="indx-inner">
+          <nav className="indx-index" aria-labelledby="indx-title">
+            <p className="indx-eyebrow">{t("navigator.eyebrow")}</p>
+            <h2 id="indx-title" className="indx-index-title">{t("hero.chooseIndustry")}.</h2>
+            <div
+              className="indx-list"
+              role="tablist"
+              aria-label={t("navigator.ringAriaLabel")}
+              onKeyDown={move}
+              ref={listRef}
+            >
+              {industryIds.map((id, i) => (
+                <button
+                  id={`industry-tab-${i}`}
+                  role="tab"
+                  type="button"
+                  aria-selected={active === i}
+                  aria-controls="industry-journey"
+                  tabIndex={active === i ? 0 : -1}
+                  className={`indx-tab${active === i ? " is-active" : ""}`}
+                  onClick={() => setActive(i)}
+                  key={id}
+                >
+                  <span className="indx-tab-num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="indx-tab-name">{t(`list.${id}.name`)}</span>
+                  <span className="indx-tab-arrow" aria-hidden="true">→</span>
+                </button>
+              ))}
+            </div>
+          </nav>
+
           <div
-            className="ind-ring"
-            role="tablist"
-            aria-label={t("navigator.ringAriaLabel")}
-            onKeyDown={move}
+            className="indx-panel"
+            id="industry-journey"
+            role="tabpanel"
+            aria-labelledby={`industry-tab-${active}`}
+            tabIndex={0}
           >
-            {industryIds.map((id, i) => (
-              <button
-                id={`industry-tab-${i}`}
-                role="tab"
-                aria-selected={active === i}
-                aria-controls="industry-journey"
-                tabIndex={active === i ? 0 : -1}
-                className={`ind-node ind-node-${i + 1} ${active === i ? "active" : ""}`}
-                onClick={() => setActive(i)}
-                aria-label={t(`list.${id}.name`)}
-                key={id}
-              >
-                <i />
-                <span>{String(i + 1).padStart(2, "0")}</span>
-              </button>
-            ))}
-            <div className="ind-ring-centre">
-              <small>{t("navigator.selectedLabel")}</small>
-              <h2>{t(`list.${industryId}.name`)}</h2>
+            <div className="indx-fade" key={industryId}>
+              <header className="indx-head">
+                <p className="indx-sub">{t(`list.${industryId}.subBrand`)}</p>
+                <h3 className="indx-name">{t(`list.${industryId}.name`)}</h3>
+                <div className="indx-reality">
+                  <h4>{t("editorial.heading")}</h4>
+                  <p>{t(`list.${industryId}.overview`)}</p>
+                </div>
+              </header>
+
+              <div className="indx-path">
+                <p className="indx-path-label">{t("journey.eyebrow")}</p>
+                <ol className="indx-steps">
+                  <li className="indx-step">
+                    <span className="indx-node" aria-hidden="true" />
+                    <p className="indx-step-label">{t("journey.protectLabel")}</p>
+                    <h5>{t("journey.protectHeading")}</h5>
+                    <ul className="indx-risks">
+                      {risks.slice(0, 3).map((x) => <li key={x}>{x}</li>)}
+                    </ul>
+                    <p className="indx-note">{(t.raw(`list.${industryId}.priorities`) as string[]).slice(0, 2).join(" · ")}</p>
+                  </li>
+                  <li className="indx-step">
+                    <span className="indx-node" aria-hidden="true" />
+                    <p className="indx-step-label">{t("journey.automateLabel")}</p>
+                    <h5>{t("journey.automateHeading")}</h5>
+                    <dl className="indx-jobs">
+                      {jobs.map((job) => (
+                        <div key={job.jobKind}>
+                          <dt>{t(`jobShortNames.${job.jobKind}`)}</dt>
+                          <dd>{job.why}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </li>
+                  <li className="indx-step">
+                    <span className="indx-node" aria-hidden="true" />
+                    <p className="indx-step-label">{t("journey.unifyLabel")}</p>
+                    <h5>{t("journey.unifyHeading")}</h5>
+                    <p className="indx-unify">{t(`list.${industryId}.unify`)}</p>
+                    <Link className="indx-link" href="/or-one">
+                      {t("journey.unifyCta")} <span aria-hidden="true">→</span>
+                    </Link>
+                  </li>
+                </ol>
+              </div>
+
+              {active === 0 && (
+                <details className="indx-evidence">
+                  <summary>
+                    <span>{t("evidence.labelPrefix")}</span>
+                    <b>{t("evidence.openDrawer")}</b>
+                  </summary>
+                  <div className="indx-stats">
+                    <article>
+                      <strong>{t("evidence.stat1.value")}</strong>
+                      <p>
+                        {t("evidence.stat1.prefix")}
+                        <code>p=reject</code>
+                        {t("evidence.stat1.suffix")}
+                      </p>
+                      <a href="https://powerdmarc.com/canada-dmarc-adoption/" target="_blank" rel="noopener noreferrer">
+                        {t("evidence.stat1Source")} ↗︎
+                      </a>
+                    </article>
+                    <article>
+                      <strong>{t("evidence.stat2.value")}</strong>
+                      <p>{t("evidence.stat2.prefix")}</p>
+                      <a href="https://www.rcmp.ca/en/federal-policing/cybercrime/cyber-features/business-email-compromise" target="_blank" rel="noopener noreferrer">
+                        {t("evidence.stat2Source")} ↗︎
+                      </a>
+                    </article>
+                    <article>
+                      <strong>{t("evidence.stat3.value")}</strong>
+                      <p>{t("evidence.stat3.prefix")}</p>
+                      <a href="https://www.priv.gc.ca/en/privacy-topics/business-privacy/breaches-and-safeguards/privacy-breaches-at-your-business/gd_pb_201810/" target="_blank" rel="noopener noreferrer">
+                        {t("evidence.stat3Source")} ↗︎
+                      </a>
+                    </article>
+                  </div>
+                  <p className="indx-evidence-note">{t("evidence.disclaimer")}</p>
+                </details>
+              )}
+
+              <div className="indx-detail" aria-label={`${t(`list.${industryId}.name`)} ${t("fullProfile.detailsAriaSuffix")}`}>
+                <div className="indx-detail-head">
+                  <h4>{t("fullProfile.heading")}</h4>
+                  <p>{t("fullProfile.sub")}</p>
+                </div>
+                <div className="indx-acc">
+                  <details name="industry-detail" open>
+                    <summary>{t("fullProfile.accordionRisk")}<span aria-hidden="true" /></summary>
+                    <p>{t(`list.${industryId}.detail.context`)}</p>
+                  </details>
+                  <details name="industry-detail">
+                    <summary>{t("fullProfile.accordionProtect")}<span aria-hidden="true" /></summary>
+                    <ul>{detailProtect.map((item) => <li key={item}>{item}</li>)}</ul>
+                  </details>
+                  <details name="industry-detail">
+                    <summary>{t("fullProfile.accordionAutomate")}<span aria-hidden="true" /></summary>
+                    <ul>{detailAutomate.map((item) => <li key={item}>{item}</li>)}</ul>
+                  </details>
+                  <details name="industry-detail">
+                    <summary>{t("fullProfile.accordionUnify")}<span aria-hidden="true" /></summary>
+                    <p>{t(`list.${industryId}.unify`)}</p>
+                  </details>
+                  <details name="industry-detail">
+                    <summary>{t(`list.${industryId}.detail.question`)}<span aria-hidden="true" /></summary>
+                    <p>{t(`list.${industryId}.detail.answer`)}</p>
+                  </details>
+                  <p className="indx-scope">{t("fullProfile.scopeNote")}</p>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="ind-ring-key">
-            {industryIds.map((id, i) => (
-              <button
-                className={active === i ? "active" : ""}
-                onClick={() => setActive(i)}
-                key={id}
-              >
-                {String(i + 1).padStart(2, "0")} · {t(`list.${id}.name`)}
-              </button>
-            ))}
-          </div>
         </div>
-        <article className="ind-editorial">
-          <span>{t(`list.${industryId}.subBrand`)}</span>
-          <h2>{t("editorial.heading")}</h2>
-          <p>{t(`list.${industryId}.overview`)}</p>
-          <a href="#industry-journey">
-            {t("editorial.viewPath")} <b>↓</b>
-          </a>
-        </article>
-      </section>
-
-      <section
-        className="ind-journey"
-        id="industry-journey"
-        role="tabpanel"
-        aria-labelledby={`industry-tab-${active}`}
-        aria-live="polite"
-        key={industryId}
-      >
-        <div className="ind-journey-title">
-          <span>{t("journey.eyebrow")}</span>
-          <h2>{t(`list.${industryId}.name`)}</h2>
-        </div>
-        <svg
-          className="ind-ribbon"
-          viewBox="0 0 1600 760"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-        >
-          <defs>
-            <linearGradient id="journeyGradient" x1="0" x2="1">
-              <stop offset="0" stopColor="#c94a1a" />
-              <stop offset=".52" stopColor="#8b8d8f" />
-              <stop offset="1" stopColor="#3e4146" />
-            </linearGradient>
-          </defs>
-          <path
-            className="ind-ribbon-shadow"
-            d="M-40 570 C180 570 160 185 410 190 C650 195 610 620 845 615 C1080 610 1050 190 1290 185 C1450 182 1515 335 1640 335"
-          />
-          <path d="M-40 570 C180 570 160 185 410 190 C650 195 610 620 845 615 C1080 610 1050 190 1290 185 C1450 182 1515 335 1640 335" />
-        </svg>
-        <article className="ind-anchor ind-protect">
-          <span>{t("journey.protectLabel")}</span>
-          <h3>{t("journey.protectHeading")}</h3>
-          {risks.slice(0, 3).map((x) => (
-            <p key={x}>{x}</p>
-          ))}
-          <small>{(t.raw(`list.${industryId}.priorities`) as string[]).slice(0, 2).join(" · ")}</small>
-        </article>
-        <article className="ind-anchor ind-automate">
-          <span>{t("journey.automateLabel")}</span>
-          <h3>{t("journey.automateHeading")}</h3>
-          {jobs.map((job) => (
-            <div key={job.jobKind}>
-              <h4>{t(`jobShortNames.${job.jobKind}`)}</h4>
-              <p>{job.why}</p>
-            </div>
-          ))}
-        </article>
-        <article className="ind-anchor ind-unify">
-          <span>{t("journey.unifyLabel")}</span>
-          <h3>{t("journey.unifyHeading")}</h3>
-          <p>{t(`list.${industryId}.unify`)}</p>
-        </article>
-      </section>
-
-      {active === 0 && (
-        <details className="ind-evidence">
-          <summary>
-            <span>{t("evidence.labelPrefix")}</span>
-            <b>{t("evidence.openDrawer")}</b>
-          </summary>
-          <div>
-            <article>
-              <strong>{t("evidence.stat1.value")}</strong>
-              <p>
-                {t("evidence.stat1.prefix")}
-                <code>p=reject</code>
-                {t("evidence.stat1.suffix")}
-              </p>
-              <a href="https://powerdmarc.com/canada-dmarc-adoption/">
-                {t("evidence.stat1Source")} ↗︎
-              </a>
-            </article>
-            <article>
-              <strong>{t("evidence.stat2.value")}</strong>
-              <p>{t("evidence.stat2.prefix")}</p>
-              <a href="https://www.rcmp.ca/en/federal-policing/cybercrime/cyber-features/business-email-compromise">
-                {t("evidence.stat2Source")} ↗︎
-              </a>
-            </article>
-            <article>
-              <strong>{t("evidence.stat3.value")}</strong>
-              <p>{t("evidence.stat3.prefix")}</p>
-              <a href="https://www.priv.gc.ca/en/privacy-topics/business-privacy/breaches-and-safeguards/privacy-breaches-at-your-business/gd_pb_201810/">
-                {t("evidence.stat3Source")} ↗︎
-              </a>
-            </article>
-          </div>
-          <p>{t("evidence.disclaimer")}</p>
-        </details>
-      )}
-
-      <section className="ind-full-profile" aria-label={`${t(`list.${industryId}.name`)} ${t("fullProfile.detailsAriaSuffix")}`}>
-        <div className="ind-full-heading">
-          <span>{t("fullProfile.eyebrow")}</span>
-          <h2>{t("fullProfile.heading")}</h2>
-          <p>{t("fullProfile.sub")}</p>
-        </div>
-        <div className="ind-accordions">
-          <details name="industry-detail">
-            <summary>{t("fullProfile.accordionRisk")} <span>+</span></summary>
-            <p>{t(`list.${industryId}.detail.context`)}</p>
-          </details>
-          <details name="industry-detail">
-            <summary>{t("fullProfile.accordionProtect")} <span>+</span></summary>
-            <ul>{detailProtect.map((item)=><li key={item}>{item}</li>)}</ul>
-          </details>
-          <details name="industry-detail">
-            <summary>{t("fullProfile.accordionAutomate")} <span>+</span></summary>
-            <ul>{detailAutomate.map((item)=><li key={item}>{item}</li>)}</ul>
-          </details>
-          <details name="industry-detail">
-            <summary>{t("fullProfile.accordionUnify")} <span>+</span></summary>
-            <p>{t(`list.${industryId}.unify`)}</p>
-          </details>
-          <details name="industry-detail">
-            <summary>{t(`list.${industryId}.detail.question`)} <span>+</span></summary>
-            <p>{t(`list.${industryId}.detail.answer`)}</p>
-          </details>
-        </div>
-        <p className="ind-scope-note">{t("fullProfile.scopeNote")}</p>
       </section>
 
       <PreFooterCta page="industries" />
