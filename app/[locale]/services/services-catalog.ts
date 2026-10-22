@@ -86,10 +86,9 @@ export const SPECIALIST_ENGAGEMENTS = [
     name: "Certified Forensic IR",
     line: "Specialist forensic investigation and incident response, with scope agreed for the incident.",
     priceLine: "From $12,000 per incident",
-    secondaryPriceLine: "Optional retainer from $500/month · separately scoped." as string | undefined,
+    secondaryPriceLine: "Optional retainer · separately scoped." as string | undefined,
     prices: [
       { label: "Per incident", minPrice: 12000 },
-      { label: "Optional retainer · separately scoped", minPrice: 500 },
     ],
   },
 ] as const;

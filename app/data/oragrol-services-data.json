@@ -1229,7 +1229,7 @@
           "name": "Proof After Breach",
           "blurb": "Investigate a security incident and preserve its evidence.",
           "price": "From $12,000",
-          "unit": "per incident; optional retainer from $500/month",
+          "unit": "per incident; optional retainer, separately scoped",
           "problem": "After a security incident, you need qualified investigation, preserved evidence, and a defensible account of what can be established.",
           "what_we_do": "Qualified specialists preserve and analyze relevant material within the agreed scope, develop an incident timeline, and document findings, limitations, and response recommendations.",
           "deliverables": [
