@@ -31,7 +31,7 @@ const wordCount = (value: string) => (value.trim() ? value.trim().split(/\s+/u).
  * Bilingual (Phase 2k, ORAGROL_Careers_Talent_Partnerships_FR_Translation.md):
  * `categories` stays the canonical, ENGLISH source of truth -- these exact
  * strings are used as radio `value`s and compared throughout this file
- * (`category === "Certified Specialists"`, etc.) and as the submitted form
+ * (`category === "Specialists"`, etc.) and as the submitted form
  * category. Only the *displayed* label is translated, via `categoryLabel()`
  * below (t.raw(`pages.${page}.categories`), index-paired against this same
  * array, same pattern used for every other index-paired list in this
@@ -40,7 +40,7 @@ const wordCount = (value: string) => (value.trim() ? value.trim().split(/\s+/u).
  */
 const content = {
   careers: {
-    categories: ["Sales & Growth", "Certified Specialists", "Current Vacancies"],
+    categories: ["Sales & Growth", "Specialists", "Current Vacancies"],
   },
   talent: {
     categories: ["Share Your Expertise", "Propose an Idea"],
@@ -57,10 +57,10 @@ const content = {
  * index-paired against `Opportunity.specialties` in messages/*.json.
  */
 const specialties = [
-  ["Certified Penetration Tester", "OSCP / GPEN"],
+  ["Penetration Tester", "OSCP / GPEN"],
   ["SOC 2 Audit Partner", "CPA firm · AICPA SOC practice"],
   ["PCI-DSS QSA", "PCI SSC accredited"],
-  ["Certified Forensic Examiner", "GCFA / GCFE"],
+  ["Digital Forensics Examiner", "GCFA / GCFE"],
 ];
 
 /** One implementation for /careers, /talent and /partnerships. No site header/footer. */
@@ -123,7 +123,7 @@ function OpportunityContent({ page, logo, privacyUrl, termsUrl, vacancies = [], 
       </fieldset>
       <section className="op-context" aria-live="polite">
         {page === "careers" && category === "Sales & Growth" && <><h2>{categoryLabel(category)}</h2><p>{t("pages.careers.salesGrowth.body")}</p></>}
-        {page === "careers" && category === "Certified Specialists" && <><h2>{t("pages.careers.certifiedSpecialists.title")}</h2><p>{t("pages.careers.certifiedSpecialists.body")}</p><ul className="op-specialties">{specialties.map(([title], i) => <li key={title}>{t(`specialties.${i}.title`)}<span>{t(`specialties.${i}.credential`)}</span></li>)}</ul><p>{t("pages.careers.certifiedSpecialists.otherNote")}</p></>}
+        {page === "careers" && category === "Specialists" && <><h2>{t("pages.careers.certifiedSpecialists.title")}</h2><p>{t("pages.careers.certifiedSpecialists.body")}</p><ul className="op-specialties">{specialties.map(([title], i) => <li key={title}>{t(`specialties.${i}.title`)}<span>{t(`specialties.${i}.credential`)}</span></li>)}</ul><p>{t("pages.careers.certifiedSpecialists.otherNote")}</p></>}
         {page === "careers" && category === "Current Vacancies" && <><h2>{categoryLabel(category)}</h2><p>{vacancies.length ? t("pages.careers.currentVacancies.applyBelow") : t("pages.careers.currentVacancies.noneListed")}</p>{vacancies.map(job => <div className="op-vacancy" key={job.id}><h3>{job.title}</h3>{job.description && <p>{job.description}</p>}</div>)}</>}
         {page === "talent" && <><h2>{categoryLabel(category)}</h2><p>{category === "Propose an Idea" ? t("pages.talent.proposeIdea.body") : t("pages.talent.shareExpertise.body")}</p><p>{t("pages.talent.sharedNote")}</p></>}
         {page === "partnerships" && <><h2>{categoryLabel(category)}</h2><p>{category === "Business Collaboration" ? t("pages.partnerships.businessCollaboration.body") : category === "Regional or Branch" ? t("pages.partnerships.regionalOrBranch.body") : category === "Technology Investment" ? t("pages.partnerships.technologyInvestment.body") : t("pages.partnerships.otherOpportunity.body")}</p></>}
@@ -153,7 +153,7 @@ function ApplicationForm({ page, category, vacancies, privacyUrl, termsUrl, enab
   const [status, setStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
   const career = page === "careers";
-  const specialist = career && category === "Certified Specialists";
+  const specialist = career && category === "Specialists";
   const idea = page === "talent" && category === "Propose an Idea";
   const words = wordCount(description);
   const descriptionLabel = career

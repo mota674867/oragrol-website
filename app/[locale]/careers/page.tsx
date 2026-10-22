@@ -19,8 +19,8 @@ export async function generateMetadata({
   return {
     title: isFr ? "Carrières | ORAGROL Global" : "Careers | ORAGROL Global",
     description: isFr
-      ? "Joignez-vous à ORAGROL Global par un emploi ou un travail rémunéré à la pièce — postes en ventes et croissance, et spécialistes certifiés (tests d'intrusion, audit SOC 2, QSA PCI-DSS, criminalistique numérique)."
-      : "Join ORAGROL Global through employment or paid project-based specialist work — Sales & Growth roles, and certified specialists (penetration testing, SOC 2 audit, PCI-DSS QSA, digital forensics).",
+      ? "Joignez-vous à ORAGROL Global par un emploi ou un travail rémunéré à la pièce — postes en ventes et croissance, et spécialistes (tests d'intrusion, audit SOC 2, QSA PCI-DSS, criminalistique numérique)."
+      : "Join ORAGROL Global through employment or paid project-based specialist work — Sales & Growth roles, and specialists (penetration testing, SOC 2 audit, PCI-DSS QSA, digital forensics).",
     alternates: {
       canonical: canonicalPath,
       languages: languageAlternates("/careers"),

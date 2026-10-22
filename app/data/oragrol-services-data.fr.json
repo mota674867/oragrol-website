@@ -1153,18 +1153,18 @@
     },
     {
       "code": "C10",
-      "name": "Services de spécialistes certifiés",
+      "name": "Services de spécialistes",
       "tagline": "Des travaux menés par des spécialistes qualifiés pour les tests, les attestations, les évaluations et la réponse aux incidents.",
       "tier": "Tier 1 - Cybersecurity",
       "services": [
         {
           "code": "C10-S01",
           "name": "Test en conditions réelles",
-          "blurb": "Des spécialistes certifiés tentent de s'introduire dans vos systèmes, en toute sécurité.",
+          "blurb": "Des spécialistes tentent de s'introduire dans vos systèmes, en toute sécurité.",
           "price": "From $7,500",
           "unit": "par mandat",
           "problem": "Vous avez besoin de la preuve que vos défenses fonctionnent réellement, pas seulement d'une évaluation qui indique qu'elles pourraient comporter des failles.",
-          "what_we_do": "Un testeur certifié tente une exploitation autorisée dans le cadre d'une portée convenue, documente précisément ce qu'il a pu accomplir et vous remet un plan priorisé pour corriger les failles.",
+          "what_we_do": "Un testeur spécialisé tente une exploitation autorisée dans le cadre d'une portée convenue, documente précisément ce qu'il a pu accomplir et vous remet un plan priorisé pour corriger les failles.",
           "deliverables": [
             "Une entente de test signée",
             "Un rapport complet des constats, appuyé par des preuves",

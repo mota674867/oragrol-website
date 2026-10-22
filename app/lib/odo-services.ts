@@ -111,11 +111,11 @@ export const SERVICE_CATALOG: CatalogService[] = [
   C("C15-S03", "Onboard", "Customer Onboarding Automation", "Customer & Revenue Automation", A, "manual client onboarding process"),
   C("C15-S04", "Customer Pulse", "Customer Retention & Engagement", "Customer & Revenue Automation", A, "no retention/re-engagement process; churn or disengaged customers"),
   C("C15-S05", "Revenue Insight", "Revenue Intelligence & Optimization", "Customer & Revenue Automation", A, "revenue, pricing, or conversion decisions made without data analysis"),
-  // C10 — Certified Specialist Services (human-delivered, project/annual — not subscriptions)
-  C("C10-S01", "Real-World Test", "Penetration Testing", "Certified Specialist Services", S, "higher-maturity SMB handling sensitive data, facing enterprise/partner due-diligence review, or renewing cyber insurance with a pentest requirement; client has completed foundational security services and is ready for proof-based validation of real-world exposure", "project"),
-  C("C10-S02", "Audit-Ready", "SOC 2 Type II Attestation", "Certified Specialist Services", S, "client mentions a customer, partner, or investor requiring formal SOC 2 attestation — not just an internal policy or governance review", "project"),
-  C("C10-S03", "Payment-Ready", "PCI-DSS QSA Assessment", "Certified Specialist Services", S, "client processes, stores, or transmits payment card data; mentions a PCI-DSS requirement from a payment processor, acquirer, or bank", "project"),
-  C("C10-S04", "Proof After Breach", "Certified Forensic Incident Response", "Certified Specialist Services", S, "client describes an active or recent security incident/breach needing a legally and insurance-admissible investigation, or their cyber insurer requires certified forensic findings", "project"),
+  // C10 — Specialist Services (human-delivered, project/annual — not subscriptions)
+  C("C10-S01", "Real-World Test", "Penetration Testing", "Specialist Services", S, "higher-maturity SMB handling sensitive data, facing enterprise/partner due-diligence review, or renewing cyber insurance with a pentest requirement; client has completed foundational security services and is ready for proof-based validation of real-world exposure", "project"),
+  C("C10-S02", "Audit-Ready", "SOC 2 Type II Attestation", "Specialist Services", S, "client mentions a customer, partner, or investor requiring formal SOC 2 attestation — not just an internal policy or governance review", "project"),
+  C("C10-S03", "Payment-Ready", "PCI-DSS QSA Assessment", "Specialist Services", S, "client processes, stores, or transmits payment card data; mentions a PCI-DSS requirement from a payment processor, acquirer, or bank", "project"),
+  C("C10-S04", "Proof After Breach", "Digital Forensics & Incident Response (DFIR)", "Specialist Services", S, "client describes an active or recent security incident/breach needing a legally and insurance-admissible investigation, or their cyber insurer requires certified forensic findings", "project"),
 ];
 
 // FOUND 2026-10-02 — Mohammad, reviewing a live report: "from a services page

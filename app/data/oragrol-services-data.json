@@ -1153,18 +1153,18 @@
     },
     {
       "code": "C10",
-      "name": "Certified Specialist Services",
+      "name": "Specialist Services",
       "tagline": "Qualified specialist work for testing, attestation, assessment, and incident response.",
       "tier": "Tier 1 - Cybersecurity",
       "services": [
         {
           "code": "C10-S01",
           "name": "Real-World Test",
-          "blurb": "Certified specialists try to break in, safely.",
+          "blurb": "Specialists try to break in, safely.",
           "price": "From $7,500",
           "unit": "per engagement",
           "problem": "You need proof that your defenses actually work, not just an assessment that says they might have gaps.",
-          "what_we_do": "A certified human tester attempts authorized exploitation within an agreed scope, documents exactly what they were able to do, and gives you a prioritized plan to close it.",
+          "what_we_do": "A specialist human tester attempts authorized exploitation within an agreed scope, documents exactly what they were able to do, and gives you a prioritized plan to close it.",
           "deliverables": [
             "A signed testing agreement",
             "A full evidence-based findings report",

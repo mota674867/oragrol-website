@@ -2704,7 +2704,7 @@
     },
     "specialties": [
       {
-        "title": "Certified Penetration Tester",
+        "title": "Penetration Tester",
         "credential": "OSCP / GPEN"
       },
       {
@@ -2716,7 +2716,7 @@
         "credential": "PCI SSC accredited"
       },
       {
-        "title": "Certified Forensic Examiner",
+        "title": "Digital Forensics Examiner",
         "credential": "GCFA / GCFE"
       }
     ],
@@ -2727,14 +2727,14 @@
         "intro": "Join ORAGROL through employment or paid project-based work. Bring your expertise, initiative and commitment to meaningful outcomes.",
         "categories": [
           "Sales & Growth",
-          "Certified Specialists",
+          "Specialists",
           "Current Vacancies"
         ],
         "salesGrowth": {
           "body": "Applications are always open for people who can build relationships, develop opportunities and help businesses grow."
         },
         "certifiedSpecialists": {
-          "title": "Certified Specialists & Audit Partners",
+          "title": "Specialists & Audit Partners",
           "body": "Project-based opportunities for independent specialists and qualified firms.",
           "otherNote": "Other relevant expertise is welcome."
         },

@@ -53,7 +53,7 @@ export function cybersecuritySection(): string {
     pkgs,
     "INDIVIDUAL SERVICES (sold on their own, outside the packages):",
     indiv,
-    "SPECIALIST ENGAGEMENTS (certified specialists, by engagement, starting fees):",
+    "SPECIALIST ENGAGEMENTS (specialists, by engagement, starting fees):",
     spec,
     "Quote these prices when asked; they are public. Describe what an item is for in plain business language. Only name services that appear in this list — never invent a service name.",
   ].join("\n");

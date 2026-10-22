@@ -2704,7 +2704,7 @@
     },
     "specialties": [
       {
-        "title": "Testeur d'intrusion certifié",
+        "title": "Testeur d'intrusion",
         "credential": "OSCP / GPEN"
       },
       {
@@ -2716,7 +2716,7 @@
         "credential": "Accrédité par le PCI SSC"
       },
       {
-        "title": "Examinateur judiciaire certifié",
+        "title": "Examinateur en criminalistique numérique",
         "credential": "GCFA / GCFE"
       }
     ],
@@ -2727,14 +2727,14 @@
         "intro": "Joignez-vous à ORAGROL par un emploi ou un travail rémunéré à la pièce. Apportez votre expertise, votre initiative et votre engagement envers des résultats significatifs.",
         "categories": [
           "Ventes et croissance",
-          "Spécialistes certifiés",
+          "Spécialistes",
           "Postes actuellement vacants"
         ],
         "salesGrowth": {
           "body": "Les candidatures sont toujours ouvertes pour les personnes capables de bâtir des relations, de développer des occasions d'affaires et d'aider les entreprises à croître."
         },
         "certifiedSpecialists": {
-          "title": "Spécialistes certifiés et partenaires d'audit",
+          "title": "Spécialistes et partenaires d'audit",
           "body": "Des occasions à la pièce pour les spécialistes indépendants et les cabinets qualifiés.",
           "otherNote": "Toute autre expertise pertinente est la bienvenue."
         },

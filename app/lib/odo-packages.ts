@@ -63,7 +63,7 @@ const FREE_CODES = new Set(["C01-S01"]);
  * free = 12).
  */
 export const ALACARTE_ONLY_CODES: string[] = SERVICE_CATALOG
-  .filter((s) => s.group === "security" && s.category !== "Certified Specialist Services" && !FREE_CODES.has(s.code) && !ELITE_CODES.includes(s.code))
+  .filter((s) => s.group === "security" && s.category !== "Specialist Services" && !FREE_CODES.has(s.code) && !ELITE_CODES.includes(s.code))
   .map((s) => s.code);
 
 /** Minimum coverage of the client's flagged package-eligible gaps a package must hit to be worth bundling instead of defaulting to Foundation. */
@@ -124,11 +124,11 @@ export function recommendSecurityLane(flagged: FlaggedItem[], serviceByCode: Rec
   const alacarteOnlySet = new Set(ALACARTE_ONLY_CODES);
 
   const individualOffers: IndividualOffer[] = security
-    .filter((m) => m.category === "Certified Specialist Services" || alacarteOnlySet.has(m.code))
+    .filter((m) => m.category === "Specialist Services" || alacarteOnlySet.has(m.code))
     .map((m) => ({ code: m.code, simpleName: m.simpleName, officialName: serviceByCode[m.code]?.officialName ?? m.simpleName, category: m.category, billing: serviceByCode[m.code]?.billing ?? "recurring", tier: m.tier, why: m.reason }));
 
   const packageEligible = security
-    .filter((m) => m.tier === "recommended" && m.category !== "Certified Specialist Services" && !alacarteOnlySet.has(m.code))
+    .filter((m) => m.tier === "recommended" && m.category !== "Specialist Services" && !alacarteOnlySet.has(m.code))
     .map((m) => m.code);
 
   if (packageEligible.length === 0) {
