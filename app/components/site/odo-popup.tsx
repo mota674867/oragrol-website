@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link"; // deliberately next/link, not @/i18n/navigation: /scan stays the same URL as before (no /fr prefix)
 import "./odo-popup.css";
 
 const ALLOWED_PATHS = new Set(["/", "/services", "/business-automation", "/or-one"]);
@@ -192,9 +193,9 @@ export default function OdoDiscoveryPopup({ onEvent = (_e: OdoEvent) => {} }: { 
             <span>Personalized report</span>
             <span>No commitment</span>
           </div>
-          <a ref={ctaRef} className="odo-popup__primary" href="/scan" onClick={startScan}>
+          <Link ref={ctaRef} className="odo-popup__primary" href="/scan" onClick={startScan}>
             Start my free scan
-          </a>
+          </Link>
           <div className="odo-popup__actions">
             <button ref={learnRef} className="odo-popup__learn" type="button"
               aria-expanded={showHowItWorks} aria-controls="odo-how-it-works"

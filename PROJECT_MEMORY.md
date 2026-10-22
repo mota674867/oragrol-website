@@ -2,6 +2,16 @@
 
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
+## Session: Security Checks fixed and lint errors cleared, 2026-10-22
+
+**Done (branch `fix-security-check-lint`):** the workflow failed at `npm audit` because of a dev-tool-only advisory with no patch (`braces`); it now audits production packages only (0 vulnerabilities). 8 lint errors cleared with no behaviour change. Decision D-119.
+
+**Verified:** lint 0 errors, tsc clean, browser test of popup link, scan resume and chat dismissed-restore, no page errors. Full build left to the Vercel preview.
+
+**Next:** Mohammad checks the preview, then "merge".
+
+---
+
 ## Session: Batch C cleanup (README, env example, prettier), 2026-10-22
 
 **Done (branch `cleanup-batch-c`):** real README; `.env.local.example` now lists all settings the code reads (23 added, names only); unused `prettier` removed (package.json + lockfile, `npm ci --dry-run` clean). Decision D-118.
@@ -78,31 +88,6 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 - The footer measures 622/743px before and after.
 
 **Next:** Mohammad reviews the Vercel preview, then merge.
-
----
-
-## Session: OR ONE page, four sections compacted (intro, "A clear path", "You stay in control", "Built once"), 2026-10-09
-
-**Request:** compact these four OR ONE sections with no content change.
-
-**Done (CSS only):**
-- `review-sections.module.css`:
-  - Shared `.section` padding went from 90px to `clamp(52px,4.5vw,76px)`, which also tightens these three module sections; pricing keeps its own override.
-  - `.heading` margin-bottom went from 55px to `clamp(26px,2.4vw,38px)`, and h2 from `clamp(36px,4.3vw,68px)` to `clamp(32px,3.3vw,52px)`.
-  - Step numbers went from 48 to 36px, with tighter step, control-row and management-card padding and type.
-  - On phones: section padding 48px 22px and h2 36px.
-- `gpt-pages.css` `.orone-intro`: dropped `min-height:78svh`, padding is now `clamp(56px,5vw,88px)`, h2 went from `clamp(64px,7vw,136px)` to `clamp(48px,5vw,96px)`, and margins are tighter. Phone h2 is 44px.
-
-**Verified:** Playwright on dev shows no errors and no horizontal scroll. Height changes at 1440 wide (and at 390):
-
-| Section | 1440 wide | 390 wide |
-|---|---|---|
-| intro | 702 to 397 | 748 to 580 |
-| process | 696 to 511 | 1509 to 1312 |
-| control | 787 to 613 | 1107 to 1001 |
-| management | 730 to 517 | 1325 to 1180 |
-
-**Next:** Mohammad to approve push.
 
 ---
 

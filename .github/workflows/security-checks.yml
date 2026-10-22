@@ -16,8 +16,10 @@ jobs:
           node-version: lts/*
       - name: Install dependencies
         run: npm ci
-      - name: npm audit (fails on high/critical vulnerabilities)
-        run: npm audit --audit-level=high
+      # Production packages only (--omit=dev): the dev-tool chain eslint-config-next > braces has
+      # an advisory with no patched version, and none of it ships to the live site (D-119).
+      - name: npm audit (fails on high/critical vulnerabilities in production packages)
+        run: npm audit --omit=dev --audit-level=high
       - name: TypeScript check
         run: npx tsc --noEmit
       - name: Lint

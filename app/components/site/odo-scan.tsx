@@ -250,7 +250,7 @@ function CooldownModal({ message, onClose }: { message: string; onClose: () => v
         onClick={(event) => event.stopPropagation()}
       >
         <p className="odo-scan__section-kicker">ONE SCAN AT A TIME</p>
-        <h2 id="odo-cooldown-title">You've already got a scan on file</h2>
+        <h2 id="odo-cooldown-title">You&apos;ve already got a scan on file</h2>
         <p id="odo-cooldown-message">{message}</p>
         <button type="button" className="odo-scan__submit" onClick={onClose}>
           Got it <span aria-hidden="true">→</span>
@@ -605,8 +605,11 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
     if (typeof window === "undefined") return undefined;
     const savedSession = loadSession();
     if (!savedSession) return undefined;
+    // Resume a scan saved in this browser after hydration; initial state must match the server render.
+    /* eslint-disable react-hooks/set-state-in-effect */
     setSessionId(savedSession);
     setPhase("researching");
+    /* eslint-enable react-hooks/set-state-in-effect */
     startUpdates(savedSession, `${ODO_ROUTES.events}?session_id=${encodeURIComponent(savedSession)}`, ODO_ROUTES.status);
     return undefined;
   }, [startUpdates]);

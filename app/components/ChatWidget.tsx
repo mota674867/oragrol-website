@@ -148,6 +148,8 @@ export default function ChatWidget(){
   },[messages,sending]);
 
   useEffect(()=>{
+    // Restore the "dismissed" choice from the browser after hydration; initial state must match the server render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if(sessionStorage.getItem("oragrol-chat-widget-dismissed")){setDismissed(true);return;}
   },[]);
 
