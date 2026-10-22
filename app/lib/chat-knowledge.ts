@@ -41,7 +41,7 @@ export function faqSection(): string {
 export function cybersecuritySection(): string {
   const pkgs = SERVICE_PACKAGES.map(
     (p) =>
-      `- ${p.name} — ${money(p.price)}/month on a 12-month contract (initial three-month option ${money(p.initialPrice)}). ${p.value} Ideal for: ${p.fit} Includes ${p.services.length} services: ${p.services.join(", ")}.`,
+      `- ${p.name} — ${money(p.price)}/month on a 12-month contract. ${p.value} Ideal for: ${p.fit} Includes ${p.services.length} services: ${p.services.join(", ")}.`,
   ).join("\n");
   const indiv = INDIVIDUAL_SERVICES.map((s) => `- ${s.name} — ${money(s.price)}${billingLabel(s.billing)}. ${s.line}`).join("\n");
   const spec = SPECIALIST_ENGAGEMENTS.map(
