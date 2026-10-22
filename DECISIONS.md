@@ -83,6 +83,7 @@ A quick map, built from each entry's own Status line. Read an entry before chang
 - D-115: Careers / Talent / Partnerships get a Close button and Esc = Back (2026-10-21)
 - D-116: Lead capture plan for all eight sources (2026-10-21)
 - D-117: Cleanup Batch A: Solutions page and orphan code deleted (2026-10-22)
+- D-118: Cleanup Batch C: README, env example, unused tool; example test kept on purpose (2026-10-22)
 
 **Shipped, but the old status text still says "awaiting review" or "prototype" (Mohammad has not closed them):**
 D-021, D-022, D-024, D-026, D-028, D-030, D-032, D-034, D-035, D-036, D-038, D-039, D-041, D-043, D-045, D-046, D-047, D-048, D-049, D-051, D-052, D-055, D-056, D-057, D-058, D-059, D-060
@@ -1399,3 +1400,10 @@ D-006, D-011, D-012, D-013, D-037, D-050, D-053, D-054, D-061, D-062, D-066, D-0
 
 ---
 
+### D-118 — Cleanup Batch C: README, env example, unused tool; example test kept on purpose (2026-10-22)
+- **Decision (Mohammad, "start batch c"):** `README.md` replaced with a short real one; `.env.local.example` now lists every setting the code reads (23 added, names only, no values); the unused `prettier` dev tool removed (package.json and lockfile only).
+- **Kept on purpose:** `tests/example.spec.ts` stays for now. The GitHub workflow `.github/workflows/playwright.yml` runs `npx playwright test` on every push and passes only because this file exists; deleting it would make that check fail ("no tests found"). Remove the test and the workflow together when a real test suite or a decision to drop the workflow exists.
+- **Found, not fixed (outside this batch):** the "Security Checks" workflow fails on every push to main, and `npm run lint` reports 8 errors in `ChatWidget.tsx` and `odo-scan.tsx` (present before this batch). Both need their own review.
+- **Status:** Active
+
+---

@@ -4,6 +4,31 @@ Older session entries rotated out of `PROJECT_MEMORY.md` per `CLAUDE.md` §10 (k
 
 ---
 
+## Archived 2026-10-22 (Batch C rotation)
+
+## Session: OR ONE page, "Know the investment" pricing section, premium "capacity staircase" redesign (this section only), 2026-10-08
+
+**Request:** a premium, compact visual redesign of the OR ONE pricing section with identical content. Mohammad rejected the first pass (a hairline panel, too generic), so it was redone around one bold idea.
+
+**Design:**
+- Each tier card has a soft orange "capacity fill" rising from the bottom, sized to its point capacity: `TIER_POINTS` STARTER 30, 100, 200, 400 out of 400. The height is `14% + points/400 * 86%` so Starter stays visible. Across the four cards it reads as one ascending staircase.
+- A short glowing orange marker shows each level. It's hidden on phones, where it would touch the text.
+- The fill rises once on scroll via CSS `animation-timeline: view()`, with an `@supports` guard and reduced motion respected. Browsers without support show the final state.
+- Tier names and all figures use `--font-data` (IBM Plex Sans), per its token role. The headline stays in the page's family.
+- Title is left and sub right. The cards are an open grid with top and bottom rules. Fees are a `<dl>` pinned to the bottom, with tabular numbers.
+- Texts, fees and message keys are unchanged. Old pricing-only CSS was removed. Shared `.section`/`.heading`/`.eyebrow` and `DetailsDialog` are untouched.
+
+**Verified:**
+- tsc and eslint are clean. Playwright on dev shows no errors.
+- Section height went from 980 to 762px at 1440, from 996 to 814px at 2560, and from 2567 to 1844px at 390.
+- The Details dialog opens in EN and FR, and FR fits.
+
+**Next:** Mohammad to approve push.
+
+---
+
+---
+
 ## Archived 2026-10-22 (Batch B cleanup: sessions older than the newest 10)
 
 ## Session — OR ONE page: "Build your team" builder section compacted (this section only) — 2026-10-08
