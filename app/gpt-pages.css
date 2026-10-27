@@ -505,10 +505,10 @@ footer{min-height:75svh;background:#0c0e0f;color:#eee;padding:4vw 3vw 22px;displ
 
 /* Catalogue band on /resources (D-110): the printed cover shown as a physical booklet on the catalogue's own orange disc,
    graphite ground, CTA orange #ef4d00 (same as the pre-footer CTA) used only for the disc, the eyebrow and the primary button. */
-.res-catalogue{--burnt:#ef4d00;position:relative;overflow:hidden;background:#101214;color:#f1efe9;display:grid;grid-template-columns:minmax(260px,420px) minmax(0,1fr);gap:clamp(36px,6vw,110px);align-items:center;padding:clamp(40px,4vw,64px) 5vw;border-top:1px solid rgba(241,239,233,.08);border-bottom:1px solid rgba(241,239,233,.08)}
+.res-catalogue{--burnt:#ef4d00;position:relative;overflow:hidden;background:#101214;color:#f1efe9;display:grid;grid-template-columns:minmax(200px,300px) minmax(0,1fr);gap:clamp(28px,4vw,72px);align-items:center;padding:clamp(22px,2vw,30px) 5vw;border-top:1px solid rgba(241,239,233,.08);border-bottom:1px solid rgba(241,239,233,.08)}
 .res-catalogue::after{content:"";position:absolute;inset:0;background:radial-gradient(60% 120% at 18% 50%,rgba(239,77,0,.10),transparent 60%);pointer-events:none}
-.res-catalogue__stage{position:relative;height:clamp(250px,22vw,330px);display:grid;place-items:center;z-index:1}
-.res-catalogue__disc{position:absolute;width:clamp(170px,15vw,230px);aspect-ratio:1;border-radius:50%;background:var(--burnt);right:2%;top:2%}
+.res-catalogue__stage{position:relative;height:clamp(160px,12vw,200px);display:grid;place-items:center;z-index:1}
+.res-catalogue__disc{position:absolute;width:clamp(110px,9vw,140px);aspect-ratio:1;border-radius:50%;background:var(--burnt);right:2%;top:2%}
 .res-catalogue__cover,.res-catalogue__sheet{position:absolute;display:block;height:92%;width:auto;aspect-ratio:720/1018;border-radius:2px}
 .res-catalogue__cover{object-fit:cover;transform:rotate(-4deg) translateX(-6%);box-shadow:0 28px 50px -12px rgba(0,0,0,.75),0 6px 14px rgba(0,0,0,.4);transition:transform .45s cubic-bezier(.2,.7,.2,1)}
 .res-catalogue__sheet{background:#e9e5dc}
@@ -516,13 +516,13 @@ footer{min-height:75svh;background:#0c0e0f;color:#eee;padding:4vw 3vw 22px;displ
 .res-catalogue__sheet--mid{transform:rotate(.5deg) translateX(2%);box-shadow:0 18px 36px -14px rgba(0,0,0,.6)}
 .res-catalogue:hover .res-catalogue__cover{transform:rotate(-2deg) translate(-6%,-6px)}
 .res-catalogue__copy{position:relative;z-index:1;max-width:640px}
-.res-catalogue__eyebrow{margin:0 0 18px;color:var(--burnt);font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase}
-.res-catalogue h2{margin:0;font-family:var(--font-neue-haas-display,"Neue Haas Grotesk Display Pro"),"Helvetica Neue",Arial,sans-serif;font-size:clamp(36px,3.6vw,60px);font-weight:700;line-height:1;letter-spacing:-.035em}
-.res-catalogue__meta{margin:16px 0 0;color:rgba(241,239,233,.55);font-size:12px;letter-spacing:.14em;text-transform:uppercase}
-.res-catalogue__actions{margin-top:30px;display:flex;flex-wrap:wrap;gap:14px 30px;align-items:center}
-.res-catalogue__primary{display:inline-flex;align-items:center;gap:22px;min-height:54px;padding:0 24px;border-radius:5px;background:var(--burnt);color:#fff;font-size:16px;font-weight:700;text-decoration:none;transition:opacity .18s ease}
+.res-catalogue__eyebrow{margin:0 0 10px;color:var(--burnt);font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase}
+.res-catalogue h2{margin:0;font-family:var(--font-neue-haas-display,"Neue Haas Grotesk Display Pro"),"Helvetica Neue",Arial,sans-serif;font-size:clamp(28px,2.5vw,42px);font-weight:700;line-height:1;letter-spacing:-.035em}
+.res-catalogue__meta{margin:10px 0 0;color:rgba(241,239,233,.55);font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+.res-catalogue__actions{margin-top:18px;display:flex;flex-wrap:wrap;gap:14px 30px;align-items:center}
+.res-catalogue__primary{display:inline-flex;align-items:center;gap:22px;min-height:46px;padding:0 20px;border-radius:5px;background:var(--burnt);color:#fff;font-size:16px;font-weight:700;text-decoration:none;transition:opacity .18s ease}
 .res-catalogue__secondary{display:inline-flex;align-items:center;gap:10px;min-height:44px;color:#f1efe9;font-size:15px;font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
 .res-catalogue__primary:hover,.res-catalogue__secondary:hover{opacity:.8}
 .res-catalogue__primary:focus-visible,.res-catalogue__secondary:focus-visible{outline:2px solid #f1efe9;outline-offset:4px}
-@media(max-width:760px){.res-catalogue{grid-template-columns:1fr;gap:26px;padding:40px 18px}.res-catalogue__stage{height:230px}.res-catalogue__copy{text-align:left}.res-catalogue h2{font-size:36px}}
+@media(max-width:760px){.res-catalogue{grid-template-columns:104px minmax(0,1fr);gap:18px;padding:24px 18px}.res-catalogue__stage{height:140px;grid-row:1/4;align-self:center}.res-catalogue__eyebrow{align-self:end}.res-catalogue__meta{align-self:start}.res-catalogue__disc{width:76px}.res-catalogue h2{font-size:24px}.res-catalogue__eyebrow{font-size:10px;letter-spacing:.12em}.res-catalogue__meta{font-size:10px}.res-catalogue__actions{grid-column:1/-1;margin-top:4px;gap:10px 22px}.res-catalogue__copy{display:contents}.res-catalogue__copy>:not(.res-catalogue__actions){grid-column:2}}
 @media(prefers-reduced-motion:reduce){.res-catalogue__cover{transition:none}}
