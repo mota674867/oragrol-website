@@ -270,26 +270,25 @@ function ResourcesPageClient() {
         </div>
       </section>
 
-      <section className="res-simple-library res-catalogue" id="catalogue">
-        <header>
-          <div>
-            <span>{t("catalogue.label")}</span>
-            <h2>{t("catalogue.title")}</h2>
+      <section className="res-catalogue" id="catalogue" aria-labelledby="res-catalogue-title">
+        <div className="res-catalogue__stage" aria-hidden="true">
+          <span className="res-catalogue__disc" />
+          <span className="res-catalogue__sheet res-catalogue__sheet--back" />
+          <span className="res-catalogue__sheet res-catalogue__sheet--mid" />
+          <img className="res-catalogue__cover" src="/images/resources/catalogue-cover.webp" alt="" width={720} height={1018} loading="lazy" />
+        </div>
+        <div className="res-catalogue__copy">
+          <p className="res-catalogue__eyebrow">{t("catalogue.label")}</p>
+          <h2 id="res-catalogue-title">{t("catalogue.title")}</h2>
+          <p className="res-catalogue__meta">{t("catalogue.meta")}</p>
+          <div className="res-catalogue__actions">
+            <a className="res-catalogue__primary" href="/downloads/ORAGROL-Catalogue-2026-27.pdf" download>
+              {t("catalogue.action")} <span aria-hidden="true">↓</span>
+            </a>
+            <a className="res-catalogue__secondary" href="/downloads/ORAGROL-Catalogue-2026-27.pdf" target="_blank" rel="noopener">
+              {t("catalogue.view")} <span aria-hidden="true">↗</span>
+            </a>
           </div>
-        </header>
-        <div className="res-simple-grid">
-          <a className="res-simple-card" href="/downloads/ORAGROL-Catalogue-2026-27.pdf" download>
-            <div>
-              <span>{t("catalogue.cardType")}</span>
-              <span>PDF</span>
-            </div>
-            <h3>{t("catalogue.cardTitle")}</h3>
-            <p>{t("catalogue.cardSummary")}</p>
-            <div className="res-card-action">
-              <span>{t("catalogue.action")}</span>
-              <b>↓</b>
-            </div>
-          </a>
         </div>
       </section>
 

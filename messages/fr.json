@@ -2578,13 +2578,11 @@
       }
     ],
     "catalogue": {
-      "label": "Catalogue",
-      "title": "Le catalogue ORAGROL, 2026-27.",
-      "body": "Ce que nous faisons, pour qui, et comment se déroule un mandat, en 12 pages. PDF en anglais, 2,9 Mo.",
-      "cardType": "Catalogue",
-      "cardTitle": "Catalogue ORAGROL GLOBAL 2026–27",
-      "cardSummary": "Trois façons de commencer, les services qui les soutiennent, et ce que vous voyez chaque mois une fois que nous travaillons ensemble.",
-      "action": "Télécharger le PDF (anglais)"
+      "label": "Catalogue · édition 2026–27",
+      "title": "Le catalogue ORAGROL.",
+      "meta": "12 pages · PDF en anglais · 2,9 Mo",
+      "action": "Télécharger le catalogue",
+      "view": "Consulter en ligne"
     }
   },
   "HowWeWork": {
