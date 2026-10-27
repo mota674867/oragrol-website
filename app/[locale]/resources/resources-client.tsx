@@ -270,6 +270,30 @@ function ResourcesPageClient() {
         </div>
       </section>
 
+      <section className="res-simple-library res-catalogue" id="catalogue">
+        <header>
+          <div>
+            <span>{t("catalogue.label")}</span>
+            <h2>{t("catalogue.title")}</h2>
+          </div>
+          <p>{t("catalogue.body")}</p>
+        </header>
+        <div className="res-simple-grid">
+          <a className="res-simple-card" href="/downloads/ORAGROL-Catalogue-2026-27.pdf" download>
+            <div>
+              <span>{t("catalogue.cardType")}</span>
+              <span>PDF</span>
+            </div>
+            <h3>{t("catalogue.cardTitle")}</h3>
+            <p>{t("catalogue.cardSummary")}</p>
+            <div className="res-card-action">
+              <span>{t("catalogue.action")}</span>
+              <b>↓</b>
+            </div>
+          </a>
+        </div>
+      </section>
+
       <section className="res-simple-library" id="resource-library">
         <header>
           <div>

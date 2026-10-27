@@ -2576,7 +2576,16 @@
         "type": "Executive Guide",
         "summary": "Recognize when several workflows, departments and controls need one coordinated secure operating system."
       }
-    ]
+    ],
+    "catalogue": {
+      "label": "Catalogue",
+      "title": "The ORAGROL catalogue, 2026-27.",
+      "body": "What we do, who it is for and how an engagement works, in 12 pages. English PDF, 2.9 MB.",
+      "cardType": "Catalogue",
+      "cardTitle": "ORAGROL GLOBAL Catalogue 2026–27",
+      "cardSummary": "Three ways to start, the services behind them, and what you see every month once we are working together.",
+      "action": "Download PDF"
+    }
   },
   "HowWeWork": {
     "hero": {
