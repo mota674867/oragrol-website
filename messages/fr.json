@@ -2576,7 +2576,16 @@
         "type": "Guide pour dirigeants",
         "summary": "Reconnaissez le moment où plusieurs flux de travail, départements et contrôles ont besoin d'un seul système d'exploitation sécurisé et coordonné."
       }
-    ]
+    ],
+    "catalogue": {
+      "label": "Catalogue",
+      "title": "Le catalogue ORAGROL, 2026-27.",
+      "body": "Ce que nous faisons, pour qui, et comment se déroule un mandat, en 12 pages. PDF en anglais, 2,9 Mo.",
+      "cardType": "Catalogue",
+      "cardTitle": "Catalogue ORAGROL GLOBAL 2026–27",
+      "cardSummary": "Trois façons de commencer, les services qui les soutiennent, et ce que vous voyez chaque mois une fois que nous travaillons ensemble.",
+      "action": "Télécharger le PDF (anglais)"
+    }
   },
   "HowWeWork": {
     "hero": {

@@ -56,6 +56,7 @@ export type SiteFooterProps = {
   year?: number;
 };
 
+const CATALOGUE_PDF = "/downloads/ORAGROL-Catalogue-2026-27.pdf";
 const sitemapLinks: [string, string][] = [
   ["Home", "/"],
   ["Services", "/services"],
@@ -64,6 +65,7 @@ const sitemapLinks: [string, string][] = [
   ["Industries", "/industries"],
   ["Resources", "/resources"],
   ["Free Scan", "/scan"],
+  ["Catalogue (PDF)", CATALOGUE_PDF],
 ];
 
 // Careers, Talent and Partnerships shipped 2026-09-06 as standalone
@@ -94,6 +96,7 @@ const SOCIAL_LINKS = {
 };
 
 function NavLink({ label, href, isFr }: { label: string; href: string | null; isFr: boolean }) {
+  if (href === CATALOGUE_PDF) return <a href={href} download>{label}</a>;
   return href ? <Link href={href}>{label}</Link> : <span className={styles.pending} title={isFr ? "Bientôt disponible" : "Coming soon"}>{label}</span>;
 }
 
