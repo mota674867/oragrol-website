@@ -276,7 +276,6 @@ function ResourcesPageClient() {
             <span>{t("catalogue.label")}</span>
             <h2>{t("catalogue.title")}</h2>
           </div>
-          <p>{t("catalogue.body")}</p>
         </header>
         <div className="res-simple-grid">
           <a className="res-simple-card" href="/downloads/ORAGROL-Catalogue-2026-27.pdf" download>

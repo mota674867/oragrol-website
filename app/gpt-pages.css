@@ -502,3 +502,18 @@ footer{min-height:75svh;background:#0c0e0f;color:#eee;padding:4vw 3vw 22px;displ
    Dark scrim keeps the headline and the orange OR readable. Phones get a heavier scrim. */
 .ind-hero.ind-hero-clean{background:linear-gradient(180deg,rgba(17,19,21,.62),rgba(17,19,21,.78)),#111315 url(/images/industries/hero-meeting-rings.jpg) 50% 35%/cover no-repeat}
 @media(max-width:700px){.ind-hero.ind-hero-clean{background:linear-gradient(180deg,rgba(17,19,21,.74),rgba(17,19,21,.86)),#111315 url(/images/industries/hero-meeting-rings.jpg) 38% 40%/cover no-repeat}}
+
+/* Catalogue download band on /resources: compact (about half the height of a normal library block), solid orange card. */
+.res-catalogue{padding:28px 5vw 14px}
+.res-catalogue>header{margin-bottom:12px;gap:16px}
+.res-catalogue>header h2{font-size:clamp(26px,2.4vw,38px);font-weight:800;letter-spacing:-.01em;margin:4px 0 0}
+.res-catalogue>header p{font-size:13px;line-height:1.45}
+.res-catalogue .res-simple-grid{grid-template-columns:minmax(0,420px)}
+.res-catalogue .res-simple-card{min-height:0;padding:12px 16px;background:#db5227;color:#0a0c12;border-color:#db5227}
+.res-catalogue .res-simple-card:hover{background:#e85f33}
+.res-catalogue .res-simple-card span{color:#0a0c12;font-weight:700}
+.res-catalogue .res-simple-card h3{font-size:clamp(18px,1.3vw,22px);font-weight:800;margin:10px 0 4px;color:#0a0c12}
+.res-catalogue .res-simple-card>p{display:none}
+.res-catalogue .res-card-action{margin-top:8px;padding-top:8px;border-top-color:rgba(10,12,18,.45)}
+.res-catalogue .res-card-action span{font-weight:800;letter-spacing:.08em}
+.res-catalogue .res-card-action b{color:#0a0c12;font-weight:800}
