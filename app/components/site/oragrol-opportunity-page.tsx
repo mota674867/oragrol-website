@@ -5,7 +5,7 @@ import type { FormEvent, ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import TurnstileWidget from "@/app/components/TurnstileWidget";
-import { CERTIFICATIONS, CERT_NONE, DIAL_BY_ISO, countryOptions } from "@/app/lib/opportunity-options";
+import { CERTIFICATIONS, CERT_NONE, DIAL_BY_ISO, countryNameOptions, countryOptions, englishCountryName } from "@/app/lib/opportunity-options";
 
 export type PageKind = "careers" | "talent" | "partnerships";
 export type Vacancy = { id: string; title: string; description?: string };
@@ -152,6 +152,9 @@ function ApplicationForm({ page, category, vacancies, privacyUrl, termsUrl, enab
   const uid = useId();
   const locale = useLocale();
   const countries = useMemo(() => countryOptions(locale), [locale]);
+  const countryNames = useMemo(() => countryNameOptions(locale), [locale]);
+  const [countryIso, setCountryIso] = useState("");
+  const [phoneIso, setPhoneIso] = useState("");
   const [certs, setCerts] = useState<string[]>([]);
   const [applyingAs, setApplyingAs] = useState("Individual");
   const [files, setFiles] = useState<File[]>([]);
@@ -202,12 +205,14 @@ function ApplicationForm({ page, category, vacancies, privacyUrl, termsUrl, enab
     // The country picker submits the region; the server gets the calling code that goes with it.
     fields.phoneCountryCode = DIAL_BY_ISO[fields.phoneCountryIso] ?? "";
     delete fields.phoneCountryIso;
+    fields.country = englishCountryName(fields.countryIso);
+    delete fields.countryIso;
     if (specialist) fields.certifications = certs.join("; ");
     setStatus("pending"); setMessage("");
     try {
       await onSubmit({ page, category, fields, files, turnstileToken: humanToken });
       setStatus("success"); setMessage(t("successMessage"));
-      form.reset(); setDescription(""); setFiles([]); setCerts([]); setApplyingAs("Individual");
+      form.reset(); setCountryIso(""); setPhoneIso(""); setDescription(""); setFiles([]); setCerts([]); setApplyingAs("Individual");
     } catch {
       setStatus("error"); setMessage(t("errorGeneric"));
     } finally {
@@ -227,9 +232,9 @@ function ApplicationForm({ page, category, vacancies, privacyUrl, termsUrl, enab
         {career && category === "Current Vacancies" && <label className="op-field"><span>{t("fields.role")}</span><select name="role" defaultValue="" required><option value="" disabled>{t("fields.selectRole")}</option>{vacancies.map(job => <option key={job.id} value={job.id}>{job.title}</option>)}</select></label>}
         {field(t("fields.fullName"), "fullName", true, "text", "name")}
         {field(t("fields.email"), "email", true, "email", "email")}
-        {field(t("fields.country"), "country", true, "text", "country-name")}
+        <label className="op-field"><span>{t("fields.country")}</span><select name="countryIso" required value={countryIso} autoComplete="country" onChange={event => { setCountryIso(event.target.value); if (!phoneIso) setPhoneIso(event.target.value); }}><option value="" disabled>{t("fields.selectCountry")}</option>{countryNames.map(c => <option key={c.iso} value={c.iso}>{c.label}</option>)}</select></label>
         {field(t("fields.city"), "city", true, "text", "address-level2")}
-        <label className="op-field"><span>{t("fields.phoneCountryCode")}</span><select name="phoneCountryIso" required defaultValue="" autoComplete="country"><option value="" disabled>{t("fields.selectCountryCode")}</option>{countries.map(c => <option key={c.iso} value={c.iso}>{c.label}</option>)}</select></label>
+        <label className="op-field"><span>{t("fields.phoneCountryCode")}</span><select name="phoneCountryIso" required value={phoneIso} onChange={event => setPhoneIso(event.target.value)}><option value="" disabled>{t("fields.selectCountryCode")}</option>{countries.map(c => <option key={c.iso} value={c.iso}>{c.label}</option>)}</select></label>
         {field(t("fields.phoneNumber"), "phone", true, "tel", "tel-national")}
         {specialist && <fieldset className="op-certs"><legend>{t("fields.certifications")} <small>({t("fields.certificationsHint")})</small></legend><div className="op-certs-grid">{CERTIFICATIONS.map((value, i) => <label key={value}><input type="checkbox" checked={certs.includes(value)} onChange={event => toggleCert(value, event.target.checked)} /><span>{t(`certOptions.${i}`)}</span></label>)}</div></fieldset>}
         {page === "talent" && field(idea ? t("fields.ideaTitle") : t("fields.areaOfExpertise"), "subject")}

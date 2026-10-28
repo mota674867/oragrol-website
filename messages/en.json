@@ -2666,6 +2666,7 @@
       "phoneCountryCode": "Phone country code",
       "phoneNumber": "Phone number",
       "certifications": "Certifications or accreditation",
+      "selectCountry": "Select your country",
       "selectCountryCode": "Select country code",
       "certificationsHint": "Tick all that apply",
       "areaOfExpertise": "Area of expertise",
