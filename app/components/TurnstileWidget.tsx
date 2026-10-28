@@ -26,6 +26,8 @@ export default function TurnstileWidget({ onToken, action }: { onToken: (token: 
       widgetId = window.turnstile.render(ref.current, {
         sitekey: siteKey,
         action,
+        appearance: "interaction-only",
+        size: "flexible",
         callback: (token: string) => onToken(token),
         "expired-callback": () => onToken(""),
         "error-callback": () => onToken(""),
@@ -50,5 +52,5 @@ export default function TurnstileWidget({ onToken, action }: { onToken: (token: 
   }, [siteKey, action, onToken]);
 
   if (!siteKey) return null;
-  return <div ref={ref} className="turnstile-slot" />;
+  return <div ref={ref} className="turnstile-slot" style={{ width: "100%", maxWidth: 300, minHeight: 0, margin: "12px 0", overflow: "hidden" }} />;
 }
