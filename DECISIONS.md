@@ -86,6 +86,7 @@ A quick map, built from each entry's own Status line. Read an entry before chang
 - D-118: Cleanup Batch C: README, env example, unused tool; example test kept on purpose (2026-10-22)
 - D-119: Security Checks workflow audits production packages only; 8 lint errors cleared (2026-10-22)
 - D-120: Industries page body: the same three sections, new compact visuals (2026-10-22)
+- D-121: Public form limits are shared across server instances (Redis), with an in-memory fallback; careers/talent/partnerships form gets the bot check (2026-10-28)
 
 **Shipped, but the old status text still says "awaiting review" or "prototype" (Mohammad has not closed them):**
 D-021, D-022, D-024, D-026, D-028, D-030, D-032, D-034, D-035, D-036, D-038, D-039, D-041, D-043, D-045, D-046, D-047, D-048, D-049, D-051, D-052, D-055, D-056, D-057, D-058, D-059, D-060
@@ -1434,3 +1435,10 @@ D-006, D-011, D-012, D-013, D-037, D-050, D-053, D-054, D-061, D-062, D-066, D-0
 - **Size now (hero end to CTA):** 2571 → 1765px at 1440, 2955 → 1961px at 1920, 3285 → 2150px on a 390px phone.
 - **Status:** Built and verified on branch `industries-redesign`; awaiting Mohammad's preview review.
 ---
+
+### D-121 — Public form limits are shared across server instances (Redis), with an in-memory fallback; careers/talent/partnerships form gets the bot check (2026-10-28)
+
+- **Context:** `rate-limit.ts` counts per server instance, so a visitor spread across instances could exceed any stated limit. The chat, the ODO scan start and the escalate alert already had shared Redis limits and a $5/day chat spend cap; the contact, newsletter, Cyber Health, My Scope and careers/talent/partnerships routes did not. `/api/opportunity` also had no bot check and sends straight to the owner's inbox.
+- **Decision:** New `app/lib/rate-limit-shared.ts` (`rateLimitShared`): fixed-window counter in the existing Upstash Redis (INCR + PEXPIRE NX + PTTL in one MULTI, so a key can never be left without an expiry), key hashed so emails are never stored in plain text, 1.5 s timeout. On any Redis problem (unset, slow, quota error — see D-088) it falls back to the in-memory limiter, so forms keep working and stay limited. Applied to chat (burst limit), contact, newsletter, Cyber Health (IP and per-email), My Scope (IP and per-email) and opportunity. Same limits as before; only where they are counted changed. `/api/opportunity` now runs `passesHumanCheck`, and the form shows the Turnstile widget (one fresh token per attempt). The ODO popup cookie gets `Secure` on https.
+- **Left alone on purpose:** chat daily per-IP cap, $5/day chat ceiling, strike blocking and the ODO scan-start limit (already shared). CSP `unsafe-inline` removal (risk of breaking pages, low gain). Dashboard cookies are already httpOnly, Secure in production, SameSite=Lax.
+- **Watch for:** fixed windows allow up to 2x the limit across a window boundary. Redis outage means per-instance limits only until it returns. The Turnstile widget hostnames in Cloudflare must include any preview hostname that should pass the check.

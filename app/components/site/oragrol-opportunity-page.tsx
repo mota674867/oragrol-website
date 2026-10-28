@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useId, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
+import TurnstileWidget from "@/app/components/TurnstileWidget";
 
 export type PageKind = "careers" | "talent" | "partnerships";
 export type Vacancy = { id: string; title: string; description?: string };
@@ -12,6 +13,8 @@ export type ApplicationPayload = {
   category: string;
   fields: Record<string, string>;
   files: File[];
+  /** Cloudflare Turnstile token; the server checks it once TURNSTILE_SECRET_KEY is set. */
+  turnstileToken?: string;
 };
 export type OpportunityPageProps = {
   page: PageKind;
@@ -152,6 +155,10 @@ function ApplicationForm({ page, category, vacancies, privacyUrl, termsUrl, enab
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [humanToken, setHumanToken] = useState("");
+  const [humanKey, setHumanKey] = useState(0);
+  const humanRequired = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
+  const onHumanToken = useCallback((token: string) => setHumanToken(token), []);
   const career = page === "careers";
   const specialist = career && category === "Specialists";
   const idea = page === "talent" && category === "Propose an Idea";
@@ -179,11 +186,14 @@ function ApplicationForm({ page, category, vacancies, privacyUrl, termsUrl, enab
     new FormData(form).forEach((value, key) => { if (typeof value === "string") fields[key] = value.trim(); });
     setStatus("pending"); setMessage("");
     try {
-      await onSubmit({ page, category, fields, files });
+      await onSubmit({ page, category, fields, files, turnstileToken: humanToken });
       setStatus("success"); setMessage(t("successMessage"));
       form.reset(); setDescription(""); setFiles([]); setApplyingAs("Individual");
     } catch {
       setStatus("error"); setMessage(t("errorGeneric"));
+    } finally {
+      // A Turnstile token works once, so every attempt gets a fresh check.
+      setHumanToken(""); setHumanKey(k => k + 1);
     }
   }
 
@@ -228,7 +238,8 @@ function ApplicationForm({ page, category, vacancies, privacyUrl, termsUrl, enab
       {page !== "partnerships" && <label className="op-consent"><input type="checkbox" name="futureOpportunities" /><span>{career ? t("consentCareer") : t("consentOther")}</span></label>}
       {page === "partnerships" && <p className="op-form-note">{t("partnershipsDisclaimer")}</p>}
       {!enabled && <p className="op-hold" role="status">{t("submissionsNotOpen")}</p>}
-      <button className="op-submit" type="submit" disabled={!enabled || status === "pending" || words > 300 || Boolean(fileError) || (career && !files.length)}>{status === "pending" ? t("submitting") : career ? t("submitApplication") : page === "talent" ? t("sendIntroduction") : t("submitEnquiry")}</button>
+      <TurnstileWidget key={humanKey} onToken={onHumanToken} action="opportunity" />
+      <button className="op-submit" type="submit" disabled={!enabled || status === "pending" || (humanRequired && !humanToken) || words > 300 || Boolean(fileError) || (career && !files.length)}>{status === "pending" ? t("submitting") : career ? t("submitApplication") : page === "talent" ? t("sendIntroduction") : t("submitEnquiry")}</button>
       <p className={status === "error" ? "op-message op-error" : "op-message"} role="status" aria-live="polite">{message}</p>
       {/* termsUrl is rendered by the parent's .op-legal footer, not here -- kept as a prop for API symmetry with that block. */}
       <span className="op-sr" data-terms-url={termsUrl} />

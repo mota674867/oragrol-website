@@ -2,7 +2,8 @@ import { passesHumanCheck, HUMAN_CHECK_REFUSAL } from "../../lib/human-check";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { contactEnquirySchema, generalInquirySchema } from "../../lib/contact-schema";
-import { getClientIp, rateLimit } from "../../lib/rate-limit";
+import { getClientIp } from "../../lib/rate-limit";
+import { rateLimitShared } from "../../lib/rate-limit-shared";
 import { SITE_DOMAIN } from "../../lib/site-config";
 
 /**
@@ -60,7 +61,7 @@ function row(label: string, value: string | undefined) {
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
-  const limited = rateLimit(`contact:${ip}`, { limit: 5, windowMs: 10 * 60 * 1000 });
+  const limited = await rateLimitShared(`contact:${ip}`, { limit: 5, windowMs: 10 * 60 * 1000 });
   if (!limited.ok) {
     return NextResponse.json(
       { ok: false, error: "Too many requests. Please try again shortly." },

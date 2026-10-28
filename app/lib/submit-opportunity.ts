@@ -18,6 +18,7 @@ export async function submitOpportunity(payload: ApplicationPayload): Promise<vo
   form.set("category", payload.category);
   form.set("fields", JSON.stringify(payload.fields));
   payload.files.forEach((file) => form.append("documents", file));
+  if (payload.turnstileToken) form.set("turnstileToken", payload.turnstileToken);
 
   const res = await fetch("/api/opportunity", { method: "POST", body: form });
   const data: { ok: boolean; error?: string } = await res

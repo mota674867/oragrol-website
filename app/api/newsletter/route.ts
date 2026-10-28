@@ -1,7 +1,8 @@
 import { passesHumanCheck, HUMAN_CHECK_REFUSAL } from "../../lib/human-check";
 import { NextResponse } from "next/server";
 import { newsletterSchema } from "../../lib/newsletter-schema";
-import { getClientIp, rateLimit } from "../../lib/rate-limit";
+import { getClientIp } from "../../lib/rate-limit";
+import { rateLimitShared } from "../../lib/rate-limit-shared";
 import { syncNewsletterSubscriberToBrevo } from "../../lib/brevo";
 import { syncNewsletterSubscriberToHubSpot } from "../../lib/hubspot";
 
@@ -32,7 +33,7 @@ import { syncNewsletterSubscriberToHubSpot } from "../../lib/hubspot";
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
-  const limited = rateLimit(`newsletter:${ip}`, { limit: 5, windowMs: 10 * 60 * 1000 });
+  const limited = await rateLimitShared(`newsletter:${ip}`, { limit: 5, windowMs: 10 * 60 * 1000 });
   if (!limited.ok) {
     return NextResponse.json(
       { ok: false, error: "Too many requests. Please try again shortly." },

@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { opportunitySchema, opportunityPageSchema, PAGE_LABEL, type OpportunityPage } from "../../lib/opportunity-schema";
-import { getClientIp, rateLimit } from "../../lib/rate-limit";
+import { getClientIp } from "../../lib/rate-limit";
+import { rateLimitShared } from "../../lib/rate-limit-shared";
+import { passesHumanCheck, HUMAN_CHECK_REFUSAL } from "../../lib/human-check";
 import { SITE_DOMAIN } from "../../lib/site-config";
 
 /**
@@ -91,7 +93,7 @@ const SUBJECT_VERB: Record<OpportunityPage, string> = {
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
-  const limited = rateLimit(`opportunity:${ip}`, { limit: 5, windowMs: 10 * 60 * 1000 });
+  const limited = await rateLimitShared(`opportunity:${ip}`, { limit: 5, windowMs: 10 * 60 * 1000 });
   if (!limited.ok) {
     return NextResponse.json(
       { ok: false, error: "Too many requests. Please try again shortly." },
@@ -104,6 +106,10 @@ export async function POST(request: Request) {
     form = await request.formData();
   } catch {
     return NextResponse.json({ ok: false, error: "Invalid request." }, { status: 400 });
+  }
+
+  if (!(await passesHumanCheck(request, form.get("turnstileToken")))) {
+    return NextResponse.json({ ok: false, error: HUMAN_CHECK_REFUSAL }, { status: 403 });
   }
 
   const page = opportunityPageSchema.safeParse(form.get("page"));

@@ -3,7 +3,8 @@ import { scopeSubmissionSchema } from "../../lib/scope-schema";
 import { resolveSelections, UnresolvedSelectionError } from "../../lib/scope-resolve";
 import { createActionAtomically, hashPayload, createDownloadToken } from "../../lib/scope-store";
 import { publishJobRetry } from "../../lib/scope-qstash";
-import { rateLimit, getClientIp } from "../../lib/rate-limit";
+import { getClientIp } from "../../lib/rate-limit";
+import { rateLimitShared } from "../../lib/rate-limit-shared";
 import { passesHumanCheck, HUMAN_CHECK_REFUSAL } from "../../lib/human-check";
 
 /**
@@ -19,7 +20,7 @@ import { passesHumanCheck, HUMAN_CHECK_REFUSAL } from "../../lib/human-check";
  */
 
 export async function POST(req: NextRequest) {
-  const limitedIp = rateLimit(`scope:${getClientIp(req)}`, { limit: 5, windowMs: 30 * 60 * 1000 });
+  const limitedIp = await rateLimitShared(`scope:${getClientIp(req)}`, { limit: 5, windowMs: 30 * 60 * 1000 });
   if (!limitedIp.ok) {
     return NextResponse.json({ error: "Too many requests. Please try again shortly." }, { status: 429 });
   }
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
   }
   const input = parsed.data;
   // Best-effort per-address cap: five My Scope requests per email per day (in-memory, per instance).
-  const perEmail = rateLimit(`scope-email:${input.email.toLowerCase()}`, { limit: 5, windowMs: 24 * 60 * 60 * 1000 });
+  const perEmail = await rateLimitShared(`scope-email:${input.email.toLowerCase()}`, { limit: 5, windowMs: 24 * 60 * 60 * 1000 });
   if (!perEmail.ok) {
     return NextResponse.json({ error: "This email has reached today's limit. Please try again tomorrow." }, { status: 429 });
   }
