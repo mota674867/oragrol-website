@@ -223,6 +223,18 @@ export const PRIVACY_POLICY_EN: PrivacyPolicyContent = {
               "Automated chat replies on the website. Messages you type in the chat are sent to OpenAI"
             ],
             [
+              "Anthropic (Claude)",
+              "Writing the analysis and report text of the ODO business scan. Business details you submit to the scan are sent to Anthropic"
+            ],
+            [
+              "Tavily",
+              "Web research on the business you enter in the ODO scan"
+            ],
+            [
+              "Geoapify",
+              "Looking up nearby business places for the ODO scan, using your business location"
+            ],
+            [
               "Cloudflare Turnstile",
               "Bot check on forms, to prevent automated submissions"
             ]
@@ -592,6 +604,18 @@ export const PRIVACY_POLICY_FR: PrivacyPolicyContent = {
             [
               "OpenAI",
               "Réponses automatisées du clavardage sur le site Web. Les messages que vous saisissez dans le clavardage sont envoyés à OpenAI"
+            ],
+            [
+              "Anthropic (Claude)",
+              "Rédaction de l'analyse et du texte du rapport du balayage d'affaires ODO. Les renseignements sur l'entreprise que vous soumettez au balayage sont envoyés à Anthropic"
+            ],
+            [
+              "Tavily",
+              "Recherche Web sur l'entreprise que vous saisissez dans le balayage ODO"
+            ],
+            [
+              "Geoapify",
+              "Recherche de lieux d'affaires à proximité pour le balayage ODO, à partir de l'emplacement de votre entreprise"
             ],
             [
               "Cloudflare Turnstile",
