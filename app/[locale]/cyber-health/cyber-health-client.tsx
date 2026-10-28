@@ -2,6 +2,7 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useMemo, useRef, useState } from "react";
+import TurnstileWidget from "@/app/components/TurnstileWidget";
 import { categories, questions, sections, qualification } from "./assessment-data";
 import SiteFooter from "@/app/components/site/footer";
 import "@/app/gpt-pages.css";
@@ -99,6 +100,8 @@ function CyberHealthClient() {
     [qual, setQual] = useState<Record<string, string>>({});
   const [profile, setProfile] = useState<Profile>({ company: "", industry: "", province: "", employees: "", platform: "", name: "", email: "", phone: "" });
   const [reportStatus, setReportStatus] = useState<ReportStatus>("idle");
+  const [humanToken, setHumanToken] = useState("");
+  const humanRequired = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
   const [reportError, setReportError] = useState<string | null>(null);
   const lastSentPayload = useRef<string | null>(null);
   const visibleQuestions = useMemo(() => questions.filter((q) => (profile.platform === "Google Workspace" ? !q.id.match(/^Q08-[12]$/) : !q.id.includes("-GWS"))), [profile.platform]);
@@ -129,7 +132,7 @@ function CyberHealthClient() {
     </header>
   );
   const submitReport = async () => {
-    const payload = JSON.stringify({ profile, qualification: qual, answers });
+    const payload = JSON.stringify({ profile, qualification: qual, answers, turnstileToken: humanToken || undefined });
     if (reportStatus === "sent" && lastSentPayload.current === payload) return;
     setReportStatus("sending");
     setReportError(null);
@@ -388,8 +391,10 @@ function CyberHealthClient() {
                 {t("assessment.nextSection")}
               </button>
             ) : (
-              <button
-                disabled={!sectionComplete}
+              <>
+                <TurnstileWidget onToken={setHumanToken} />
+                <button
+                disabled={!sectionComplete || (humanRequired && !humanToken)}
                 onClick={() => {
                   go("result");
                   submitReport();
@@ -397,6 +402,7 @@ function CyberHealthClient() {
               >
                 {t("assessment.calculateScore")}
               </button>
+              </>
             )}
           </footer>
         </div>

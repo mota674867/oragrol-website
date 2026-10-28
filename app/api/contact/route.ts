@@ -1,3 +1,4 @@
+import { passesHumanCheck, HUMAN_CHECK_REFUSAL } from "../../lib/human-check";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { contactEnquirySchema, generalInquirySchema } from "../../lib/contact-schema";
@@ -72,6 +73,11 @@ export async function POST(request: Request) {
     body = await request.json();
   } catch {
     return NextResponse.json({ ok: false, error: "Invalid request." }, { status: 400 });
+  }
+
+  const humanOk = await passesHumanCheck(request, (body as { turnstileToken?: unknown } | null)?.turnstileToken);
+  if (!humanOk) {
+    return NextResponse.json({ ok: false, error: HUMAN_CHECK_REFUSAL }, { status: 403 });
   }
 
   const enquiry = contactEnquirySchema.safeParse(body);
