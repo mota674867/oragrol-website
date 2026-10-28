@@ -3,6 +3,8 @@ import { scopeSubmissionSchema } from "../../lib/scope-schema";
 import { resolveSelections, UnresolvedSelectionError } from "../../lib/scope-resolve";
 import { createActionAtomically, hashPayload, createDownloadToken } from "../../lib/scope-store";
 import { publishJobRetry } from "../../lib/scope-qstash";
+import { rateLimit, getClientIp } from "../../lib/rate-limit";
+import { passesHumanCheck, HUMAN_CHECK_REFUSAL } from "../../lib/human-check";
 
 /**
  * POST /api/scope — per My_Scope_Final_Ready_For_Claude.md Section A.
@@ -17,11 +19,21 @@ import { publishJobRetry } from "../../lib/scope-qstash";
  */
 
 export async function POST(req: NextRequest) {
+  const limitedIp = rateLimit(`scope:${getClientIp(req)}`, { limit: 5, windowMs: 30 * 60 * 1000 });
+  if (!limitedIp.ok) {
+    return NextResponse.json({ error: "Too many requests. Please try again shortly." }, { status: 429 });
+  }
+
   let body: unknown;
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+  }
+
+  const humanOk = await passesHumanCheck(req, (body as { turnstileToken?: unknown } | null)?.turnstileToken);
+  if (!humanOk) {
+    return NextResponse.json({ error: HUMAN_CHECK_REFUSAL }, { status: 403 });
   }
 
   const parsed = scopeSubmissionSchema.safeParse(body);
@@ -32,6 +44,11 @@ export async function POST(req: NextRequest) {
     );
   }
   const input = parsed.data;
+  // Best-effort per-address cap: five My Scope requests per email per day (in-memory, per instance).
+  const perEmail = rateLimit(`scope-email:${input.email.toLowerCase()}`, { limit: 5, windowMs: 24 * 60 * 60 * 1000 });
+  if (!perEmail.ok) {
+    return NextResponse.json({ error: "This email has reached today's limit. Please try again tomorrow." }, { status: 429 });
+  }
 
   let selections;
   try {

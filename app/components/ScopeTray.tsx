@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState, useEffect } from "react";
+import TurnstileWidget from "@/app/components/TurnstileWidget";
 import { useTranslations } from "next-intl";
 
 export type ScopeArea = "Cybersecurity" | "Automation" | "OR ONE";
@@ -100,6 +101,7 @@ async function submitScope(
   intent: "pdf_download" | "review_requested",
   items: ScopeItem[],
   client: ClientInfo,
+  turnstileToken: string,
 ): Promise<ScopeApiResponse> {
   const requestId = crypto.randomUUID();
   const res = await fetch("/api/scope", {
@@ -117,6 +119,7 @@ async function submitScope(
       selections: items.map(toSelectionPayload),
       sourcePath: window.location.pathname,
       disclosureVersion: DISCLOSURE_VERSION,
+      turnstileToken: turnstileToken || undefined,
       acknowledged: true, // this function is only ever called after the checkbox is confirmed checked — see the two handlers below
     }),
   });
@@ -198,10 +201,13 @@ export function ScopeTray({
     context: "",
   });
   const [acknowledged, setAcknowledged] = useState(false);
+  const [humanToken, setHumanToken] = useState("");
+  const [widgetKey, setWidgetKey] = useState(0);
+  const humanRequired = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
   const [flow, setFlow] = useState<FlowState>({ status: "idle" });
 
   const ready = isClientReady(client);
-  const canSubmit = ready && acknowledged && items.length > 0;
+  const canSubmit = ready && acknowledged && items.length > 0 && (!humanRequired || Boolean(humanToken));
 
   const grouped = useMemo(
     () =>
@@ -213,11 +219,19 @@ export function ScopeTray({
 
   const update = (name: keyof ClientInfo, value: string) => setClient((s) => ({ ...s, [name]: value }));
 
+  // A Turnstile token works once. After a failed attempt, clear it and show a fresh check.
+  useEffect(() => {
+    if (flow.status === "error") {
+      setHumanToken("");
+      setWidgetKey((k) => k + 1);
+    }
+  }, [flow.status]);
+
   const handleDownload = async () => {
     if (!canSubmit) return;
     setFlow({ status: "submitting", intent: "pdf_download" });
     try {
-      const { reference, downloadToken } = await submitScope("pdf_download", items, client);
+      const { reference, downloadToken } = await submitScope("pdf_download", items, client, humanToken);
       setFlow({ status: "preparing_pdf" });
       const blob = await pollForPdf(downloadToken, t("form.pdfTimeout"));
       triggerBrowserDownload(blob, reference);
@@ -233,7 +247,7 @@ export function ScopeTray({
     if (!canSubmit) return;
     setFlow({ status: "submitting", intent: "review_requested" });
     try {
-      const { reference, downloadToken } = await submitScope("review_requested", items, client);
+      const { reference, downloadToken } = await submitScope("review_requested", items, client, humanToken);
       setFlow({ status: "success", intent: "review_requested", reference, downloadToken });
       clear();
     } catch (err) {
@@ -394,6 +408,7 @@ export function ScopeTray({
 
                 {flow.status === "error" && <p className="scope-error">{flow.message}</p>}
 
+                <TurnstileWidget key={widgetKey} onToken={setHumanToken} />
                 <div className="scope-actions">
                   <button className="scope-download" type="button" disabled={!canSubmit || busy} onClick={handleDownload}>
                     {flow.status === "submitting" && flow.intent === "pdf_download"

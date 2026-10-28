@@ -211,12 +211,20 @@ export const PRIVACY_POLICY_EN: PrivacyPolicyContent = {
               "Website hosting, delivery, and infrastructure logs"
             ],
             [
-              "APITemplate.io",
-              "Generation of Cyber Health Score report documents"
+              "Resend",
+              "Transactional email: assessment reports, My Scope documents and enquiry notifications"
             ],
             [
-              "n8n",
-              "Workflow automation connecting approved business systems"
+              "Upstash",
+              "Background job queue, temporary report storage and rate limiting"
+            ],
+            [
+              "OpenAI",
+              "Automated chat replies on the website. Messages you type in the chat are sent to OpenAI"
+            ],
+            [
+              "Cloudflare Turnstile",
+              "Bot check on forms, to prevent automated submissions"
             ]
           ]
         },
@@ -574,12 +582,20 @@ export const PRIVACY_POLICY_FR: PrivacyPolicyContent = {
               "Hébergement du site Web, livraison et journaux d'infrastructure"
             ],
             [
-              "APITemplate.io",
-              "Génération des documents de rapport du Cyber Health Score"
+              "Resend",
+              "Courriels transactionnels : rapports d'évaluation, documents My Scope et notifications de demandes"
             ],
             [
-              "n8n",
-              "Automatisation des flux de travail reliant les systèmes d'affaires approuvés"
+              "Upstash",
+              "File d'attente des tâches en arrière-plan, stockage temporaire des rapports et limitation du débit"
+            ],
+            [
+              "OpenAI",
+              "Réponses automatisées du clavardage sur le site Web. Les messages que vous saisissez dans le clavardage sont envoyés à OpenAI"
+            ],
+            [
+              "Cloudflare Turnstile",
+              "Vérification anti-robot des formulaires, pour empêcher les envois automatisés"
             ]
           ]
         },

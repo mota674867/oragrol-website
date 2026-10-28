@@ -1,3 +1,4 @@
+import { passesHumanCheck, HUMAN_CHECK_REFUSAL } from "../../lib/human-check";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { NextResponse } from "next/server";
 import QRCode from "qrcode";
@@ -57,7 +58,7 @@ function escapeHtml(value: string) {
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
-  const limited = rateLimit(`cyber-health:${ip}`, { limit: 3, windowMs: 30 * 60 * 1000 });
+  const limited = rateLimit(`cyber-health:${ip}`, { limit: 6, windowMs: 30 * 60 * 1000 });
   if (!limited.ok) {
     return NextResponse.json(
       { ok: false, error: "Too many requests. Please try again shortly." },
@@ -72,12 +73,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Invalid request." }, { status: 400 });
   }
 
+  const humanOk = await passesHumanCheck(request, (body as { turnstileToken?: unknown } | null)?.turnstileToken);
+  if (!humanOk) {
+    return NextResponse.json({ ok: false, error: HUMAN_CHECK_REFUSAL }, { status: 403 });
+  }
+
   const parsed = cyberHealthSubmissionSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid submission." },
       { status: 400 },
     );
+  }
+
+  // Best-effort per-address cap: two reports per email per day (in-memory, per instance).
+  const perEmail = rateLimit(`cyber-email:${parsed.data.profile?.email ?? ""}`.toLowerCase(), { limit: 2, windowMs: 24 * 60 * 60 * 1000 });
+  if (!perEmail.ok) {
+    return NextResponse.json({ ok: false, error: "This email has reached today's limit. Please try again tomorrow." }, { status: 429 });
   }
 
   const apiKey = process.env.RESEND_API_KEY;

@@ -10,6 +10,7 @@ import UtilityBar from "@/app/components/site/utility-bar";
 import { NAV_ITEMS } from "@/app/components/site/nav-items";
 import "@/app/gpt-pages.css";
 import { HeaderLogo } from "@/app/components/brand/header-logo";
+import TurnstileWidget from "@/app/components/TurnstileWidget";
 
 type Conversation =
   | "Cybersecurity Services"
@@ -63,6 +64,7 @@ function ContactPageClient() {
   const [scope, setScope] = useState<ScopeItem[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [humanToken, setHumanToken] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
   // Hydrate from localStorage after mount (client-only; SSR/first paint
   // stays empty on purpose to avoid a hydration mismatch) — same pattern
@@ -93,6 +95,7 @@ function ContactPageClient() {
       contactMethod: String(form.get("contactMethod") || "") || undefined,
       preferredTime: String(form.get("preferredTime") || "") || undefined,
       scopeSummary,
+      turnstileToken: humanToken || undefined,
     };
     setSubmitting(true);
     try {
@@ -285,6 +288,7 @@ function ContactPageClient() {
           <label className="contact-consent">
             <input required type="checkbox" /> {t("form.consentLabel")}
           </label>
+          <TurnstileWidget onToken={setHumanToken} />
           <button className="contact-submit" type="submit" disabled={submitting}>
             {submitting ? t("form.sendingLabel") : t("form.submitButton")} <span>↗︎</span>
           </button>

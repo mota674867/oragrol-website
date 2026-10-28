@@ -7,7 +7,7 @@
  *
  * JSON, not multipart — no file uploads in this form.
  */
-export async function submitNewsletter(payload: { firstName: string; email: string; consent: true }): Promise<void> {
+export async function submitNewsletter(payload: { firstName: string; email: string; consent: true; turnstileToken?: string }): Promise<void> {
   const res = await fetch("/api/newsletter", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

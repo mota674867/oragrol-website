@@ -8,6 +8,7 @@ import styles from "./footer.module.css";
 import { Logo } from "../brand/logo";
 import { LinkedInIcon, InstagramIcon } from "./social-icons";
 import { submitNewsletter } from "../../lib/submit-newsletter";
+import TurnstileWidget from "../TurnstileWidget";
 
 /**
  * Shared site footer — one component, identical on every redesigned page.
@@ -43,7 +44,7 @@ import { submitNewsletter } from "../../lib/submit-newsletter";
  * Policy, ...) — these are page names, not sentence-level UI copy.
  */
 
-type NewsletterSubmission = { firstName: string; email: string; consent: true };
+type NewsletterSubmission = { firstName: string; email: string; consent: true; turnstileToken?: string };
 
 export type SiteFooterProps = {
   /** Independent slot: swap in the real logo whenever it's ready. */
@@ -112,6 +113,8 @@ export default function SiteFooter({
   const isFr = locale === "fr";
   const [status, setStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [humanToken, setHumanToken] = useState("");
+  const humanRequired = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -126,6 +129,7 @@ export default function SiteFooter({
         firstName: String(data.get("firstName") || "").trim(),
         email: String(data.get("email") || "").trim(),
         consent: true,
+        turnstileToken: humanToken || undefined,
       });
       setStatus("success");
       setMessage(isFr ? "Merci. Vous êtes maintenant abonné à l’infolettre mensuelle." : "Thank you. You’re subscribed to the monthly briefing.");
@@ -184,7 +188,8 @@ export default function SiteFooter({
                 <input name="email" placeholder={isFr ? "Courriel professionnel" : "Work email"} type="email" autoComplete="email" required />
               </label>
             </div>
-            <button type="submit" disabled={status === "pending"}>
+            <TurnstileWidget onToken={setHumanToken} />
+            <button type="submit" disabled={status === "pending" || (humanRequired && !humanToken)}>
               {status === "pending" ? (isFr ? "Inscription…" : "Joining…") : (isFr ? "S’abonner à l’infolettre" : "Join the Briefing")}<span aria-hidden="true">→</span>
             </button>
             <div className={styles.consent}>
