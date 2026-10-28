@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useCallback, useEffect, useId, useState } from "react";
+import React, { useCallback, useEffect, useId, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import TurnstileWidget from "@/app/components/TurnstileWidget";
+import { CERTIFICATIONS, CERT_NONE, DIAL_BY_ISO, countryOptions } from "@/app/lib/opportunity-options";
 
 export type PageKind = "careers" | "talent" | "partnerships";
 export type Vacancy = { id: string; title: string; description?: string };
@@ -149,6 +150,9 @@ function ApplicationForm({ page, category, vacancies, privacyUrl, termsUrl, enab
 }) {
   const t = useTranslations("Opportunity");
   const uid = useId();
+  const locale = useLocale();
+  const countries = useMemo(() => countryOptions(locale), [locale]);
+  const [certs, setCerts] = useState<string[]>([]);
   const [applyingAs, setApplyingAs] = useState("Individual");
   const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState("");
@@ -175,20 +179,35 @@ function ApplicationForm({ page, category, vacancies, privacyUrl, termsUrl, enab
     return <label className="op-field" key={name}><span>{label}{!required && ` (${t("optionalSuffix")})`}</span><input name={name} type={type} required={required} autoComplete={autoComplete} maxLength={200} /></label>;
   }
 
+  function toggleCert(value: string, checked: boolean) {
+    setCerts(prev => {
+      if (value === CERT_NONE) return checked ? [CERT_NONE] : [];
+      const rest = prev.filter(v => v !== CERT_NONE && v !== value);
+      return checked ? [...rest, value] : rest;
+    });
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!enabled || !onSubmit || status === "pending") return;
     if (words > 300 || fileError || (career && !files.length)) {
       setStatus("error"); setMessage(t("errorCheckDescription")); return;
     }
+    if (specialist && !certs.length) {
+      setStatus("error"); setMessage(t("errorCertifications")); return;
+    }
     const form = event.currentTarget;
     const fields: Record<string, string> = {};
     new FormData(form).forEach((value, key) => { if (typeof value === "string") fields[key] = value.trim(); });
+    // The country picker submits the region; the server gets the calling code that goes with it.
+    fields.phoneCountryCode = DIAL_BY_ISO[fields.phoneCountryIso] ?? "";
+    delete fields.phoneCountryIso;
+    if (specialist) fields.certifications = certs.join("; ");
     setStatus("pending"); setMessage("");
     try {
       await onSubmit({ page, category, fields, files, turnstileToken: humanToken });
       setStatus("success"); setMessage(t("successMessage"));
-      form.reset(); setDescription(""); setFiles([]); setApplyingAs("Individual");
+      form.reset(); setDescription(""); setFiles([]); setCerts([]); setApplyingAs("Individual");
     } catch {
       setStatus("error"); setMessage(t("errorGeneric"));
     } finally {
@@ -210,9 +229,9 @@ function ApplicationForm({ page, category, vacancies, privacyUrl, termsUrl, enab
         {field(t("fields.email"), "email", true, "email", "email")}
         {field(t("fields.country"), "country", true, "text", "country-name")}
         {field(t("fields.city"), "city", true, "text", "address-level2")}
-        <label className="op-field"><span>{t("fields.phoneCountryCode")}</span><input name="phoneCountryCode" type="tel" autoComplete="tel-country-code" placeholder="+1" pattern="\+[1-9][0-9]{0,3}" title="Enter + followed by your country calling code, for example +1." maxLength={5} required /></label>
+        <label className="op-field"><span>{t("fields.phoneCountryCode")}</span><select name="phoneCountryIso" required defaultValue="" autoComplete="country"><option value="" disabled>{t("fields.selectCountryCode")}</option>{countries.map(c => <option key={c.iso} value={c.iso}>{c.label}</option>)}</select></label>
         {field(t("fields.phoneNumber"), "phone", true, "tel", "tel-national")}
-        {specialist && field(t("fields.certifications"), "certifications")}
+        {specialist && <fieldset className="op-certs"><legend>{t("fields.certifications")} <small>({t("fields.certificationsHint")})</small></legend><div className="op-certs-grid">{CERTIFICATIONS.map((value, i) => <label key={value}><input type="checkbox" checked={certs.includes(value)} onChange={event => toggleCert(value, event.target.checked)} /><span>{t(`certOptions.${i}`)}</span></label>)}</div></fieldset>}
         {page === "talent" && field(idea ? t("fields.ideaTitle") : t("fields.areaOfExpertise"), "subject")}
         {page === "talent" && field(t("fields.categoryDiscipline"), "discipline")}
         {page === "partnerships" && category === "Regional or Branch" && field(t("fields.proposedRegion"), "proposedRegion")}
@@ -264,10 +283,10 @@ const styles = `
 .op-eyebrow{font-size:12px;letter-spacing:.14em;color:#b8b7b2;margin:0 0 15px}.op-hero h1{font-family:inherit;font-stretch:normal;font-size:clamp(34px,4.4vw,60px);font-weight:400;letter-spacing:-.035em;line-height:1.12;margin:0 0 20px;max-width:960px}.op-hero>p:last-child{font-size:18px;max-width:770px;color:#b8b7b2;margin:0}
 .op-categories{display:flex;gap:26px;flex-wrap:wrap;margin:44px 0 26px;padding:0;border:0;border-bottom:1px solid #333}.op-categories label{position:relative;display:block;padding:14px 0;color:#b8b7b2;cursor:pointer;font-size:15px;border-bottom:2px solid transparent}.op-categories label.op-selected{color:#f2f2ee;border-bottom-color:#ef4d00}.op-categories input{position:absolute;opacity:0;width:1px;height:1px}.op-categories label:focus-within{outline:2px solid #b8b7b2;outline-offset:5px}
 .op-context{margin-bottom:30px}.op-context h2{font-size:19px;font-weight:400;margin:0 0 6px}.op-context p{color:#b8b7b2;margin:6px 0;font-size:15px;max-width:850px}.op-specialties{list-style:none;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:28px 0}.op-specialties li{font-size:16px}.op-specialties span{display:block;font-size:14px;color:#b8b7b2;margin-top:4px}.op-vacancy{margin-top:18px}.op-vacancy h3{font-weight:400;font-size:17px;margin:0}
-.op-form-panel{background:#f2f2ee;color:#111315;border-radius:4px;padding:36px;max-width:100%;color-scheme:light}.op-form-panel h2{font-size:23px;font-weight:500;margin:0 0 10px}.op-fields{display:grid;grid-template-columns:1fr 1fr;gap:20px 24px;margin:23px 0}.op-field{display:block;min-width:0;font-size:14px}.op-field>span{display:block;margin-bottom:8px}.op-field input:not([type=file]),.op-field select,.op-field textarea{width:100%;min-width:0;border:1px solid #a5a5a0;border-radius:2px;background:transparent;color:#111315;font:inherit;font-size:16px;min-height:46px;padding:10px 12px}.op-field textarea{resize:vertical;line-height:1.6}.op-page :focus-visible{outline:2px solid #555;outline-offset:3px}.op-description{margin-top:10px}.op-counter{text-align:right;font-size:12px;color:#555;margin:5px 0 22px}.op-upload{display:block;width:100%;max-width:100%;font-size:14px;padding:15px;border:1px dashed #aaa;overflow-wrap:anywhere}.op-upload::file-selector-button{padding:9px 14px;background:transparent;border:1px solid #888;border-radius:2px;color:#111315;margin-right:12px;cursor:pointer}.op-form-note,.op-privacy{font-size:12px;line-height:1.6;color:#555;margin:10px 0}.op-file-list{font-size:12px;padding-left:20px;overflow-wrap:anywhere}.op-privacy{margin-top:22px}.op-privacy a{color:#111315;text-underline-offset:3px}.op-consent{display:flex;align-items:flex-start;gap:10px;font-size:12px;color:#555;margin:13px 0 20px}.op-consent input{margin-top:3px;accent-color:#111315;width:16px;height:16px;flex-shrink:0}.op-submit{width:100%;min-height:48px;background:#111315;color:#f2f2ee;border:1px solid #111315;border-radius:2px;font:inherit;font-size:15px;padding:12px 20px;cursor:pointer;margin-top:12px}.op-submit:hover:not(:disabled){background:#25282a}.op-submit:disabled{opacity:.5;cursor:not-allowed}.op-hold{font-size:13px;color:#555}.op-error{color:#9a2020;font-size:13px}.op-message{font-size:13px;margin-bottom:0}.op-legal{display:flex;justify-content:center;gap:28px;margin-top:30px;font-size:12px}.op-legal a{color:#b8b7b2;text-decoration:none}.op-legal a:hover{text-decoration:underline}.op-lang-current{color:#ef4d00}.op-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.op-form-panel{background:#f2f2ee;color:#111315;border-radius:4px;padding:36px;max-width:100%;color-scheme:light}.op-form-panel h2{font-size:23px;font-weight:500;margin:0 0 10px}.op-fields{display:grid;grid-template-columns:1fr 1fr;gap:20px 24px;margin:23px 0}.op-certs{grid-column:1/-1;border:0;padding:0;margin:0;min-width:0}.op-certs legend{padding:0;margin-bottom:10px;font-size:14px}.op-certs legend small{color:#555;font-size:12px}.op-certs-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px}.op-certs label{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.4}.op-certs input{margin-top:2px;accent-color:#111315;width:16px;height:16px;flex-shrink:0}.op-field{display:block;min-width:0;font-size:14px}.op-field>span{display:block;margin-bottom:8px}.op-field input:not([type=file]),.op-field select,.op-field textarea{width:100%;min-width:0;border:1px solid #a5a5a0;border-radius:2px;background:transparent;color:#111315;font:inherit;font-size:16px;min-height:46px;padding:10px 12px}.op-field textarea{resize:vertical;line-height:1.6}.op-page :focus-visible{outline:2px solid #555;outline-offset:3px}.op-description{margin-top:10px}.op-counter{text-align:right;font-size:12px;color:#555;margin:5px 0 22px}.op-upload{display:block;width:100%;max-width:100%;font-size:14px;padding:15px;border:1px dashed #aaa;overflow-wrap:anywhere}.op-upload::file-selector-button{padding:9px 14px;background:transparent;border:1px solid #888;border-radius:2px;color:#111315;margin-right:12px;cursor:pointer}.op-form-note,.op-privacy{font-size:12px;line-height:1.6;color:#555;margin:10px 0}.op-file-list{font-size:12px;padding-left:20px;overflow-wrap:anywhere}.op-privacy{margin-top:22px}.op-privacy a{color:#111315;text-underline-offset:3px}.op-consent{display:flex;align-items:flex-start;gap:10px;font-size:12px;color:#555;margin:13px 0 20px}.op-consent input{margin-top:3px;accent-color:#111315;width:16px;height:16px;flex-shrink:0}.op-submit{width:100%;min-height:48px;background:#111315;color:#f2f2ee;border:1px solid #111315;border-radius:2px;font:inherit;font-size:15px;padding:12px 20px;cursor:pointer;margin-top:12px}.op-submit:hover:not(:disabled){background:#25282a}.op-submit:disabled{opacity:.5;cursor:not-allowed}.op-hold{font-size:13px;color:#555}.op-error{color:#9a2020;font-size:13px}.op-message{font-size:13px;margin-bottom:0}.op-legal{display:flex;justify-content:center;gap:28px;margin-top:30px;font-size:12px}.op-legal a{color:#b8b7b2;text-decoration:none}.op-legal a:hover{text-decoration:underline}.op-lang-current{color:#ef4d00}.op-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .op-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
 .op-top .op-logo{margin-bottom:40px}
 .op-close{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;background:transparent;color:#f2f2ee;border:1px solid #6f7377;border-radius:50%;font:inherit;font-size:16px;line-height:1;cursor:pointer;flex:none}
 .op-close:hover,.op-close:focus-visible{background:#f2f2ee;color:#111315;border-color:#f2f2ee;outline:none}
-@media(max-width:600px){.op-page{padding:25px 18px}.op-logo{margin-bottom:40px}.op-hero>p:last-child{font-size:16px}.op-categories{gap:0 20px;margin-top:30px}.op-categories label{font-size:14px;min-height:48px}.op-specialties{grid-template-columns:1fr}.op-form-panel{padding:24px 18px}.op-fields{grid-template-columns:1fr;gap:18px}.op-legal{gap:20px}.op-upload{padding:12px 8px;font-size:12px}.op-form-panel h2{font-size:21px}}
+@media(max-width:600px){.op-page{padding:25px 18px}.op-logo{margin-bottom:40px}.op-hero>p:last-child{font-size:16px}.op-categories{gap:0 20px;margin-top:30px}.op-categories label{font-size:14px;min-height:48px}.op-specialties{grid-template-columns:1fr}.op-form-panel{padding:24px 18px}.op-fields{grid-template-columns:1fr;gap:18px}.op-certs-grid{grid-template-columns:1fr}.op-legal{gap:20px}.op-upload{padding:12px 8px;font-size:12px}.op-form-panel h2{font-size:21px}}
 `;

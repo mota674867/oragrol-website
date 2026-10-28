@@ -87,6 +87,7 @@ A quick map, built from each entry's own Status line. Read an entry before chang
 - D-119: Security Checks workflow audits production packages only; 8 lint errors cleared (2026-10-22)
 - D-120: Industries page body: the same three sections, new compact visuals (2026-10-22)
 - D-121: Public form limits are shared across server instances (Redis), with an in-memory fallback; careers/talent/partnerships form gets the bot check (2026-10-28)
+- D-122: Careers/talent/partnerships form: phone country code and certifications are picked from fixed lists, not typed (2026-10-28)
 
 **Shipped, but the old status text still says "awaiting review" or "prototype" (Mohammad has not closed them):**
 D-021, D-022, D-024, D-026, D-028, D-030, D-032, D-034, D-035, D-036, D-038, D-039, D-041, D-043, D-045, D-046, D-047, D-048, D-049, D-051, D-052, D-055, D-056, D-057, D-058, D-059, D-060
@@ -1442,3 +1443,10 @@ D-006, D-011, D-012, D-013, D-037, D-050, D-053, D-054, D-061, D-062, D-066, D-0
 - **Decision:** New `app/lib/rate-limit-shared.ts` (`rateLimitShared`): fixed-window counter in the existing Upstash Redis (INCR + PEXPIRE NX + PTTL in one MULTI, so a key can never be left without an expiry), key hashed so emails are never stored in plain text, 1.5 s timeout. On any Redis problem (unset, slow, quota error — see D-088) it falls back to the in-memory limiter, so forms keep working and stay limited. Applied to chat (burst limit), contact, newsletter, Cyber Health (IP and per-email), My Scope (IP and per-email) and opportunity. Same limits as before; only where they are counted changed. `/api/opportunity` now runs `passesHumanCheck`, and the form shows the Turnstile widget (one fresh token per attempt). The ODO popup cookie gets `Secure` on https.
 - **Left alone on purpose:** chat daily per-IP cap, $5/day chat ceiling, strike blocking and the ODO scan-start limit (already shared). CSP `unsafe-inline` removal (risk of breaking pages, low gain). Dashboard cookies are already httpOnly, Secure in production, SameSite=Lax.
 - **Watch for:** fixed windows allow up to 2x the limit across a window boundary. Redis outage means per-instance limits only until it returns. The Turnstile widget hostnames in Cloudflare must include any preview hostname that should pass the check.
+
+### D-122 — Careers/talent/partnerships form: phone country code and certifications are picked from fixed lists, not typed (2026-10-28)
+
+- **Context:** Mohammad tested the form on the preview: the phone country code was a free-text box and Specialists typed their certifications by hand. He asked for choices only.
+- **Decision:** `app/lib/opportunity-options.ts` holds both lists, used by the form and by the server. Phone code: a dropdown of 243 countries named in the visitor's language (EN/FR, via `Intl.DisplayNames`) with their calling code; the form sends the code, the server accepts only codes in the list. Certifications (Specialists only): tick-boxes (CISSP, CISM, CISA, CRISC, CCSP, CEH, OSCP, CompTIA Security+ and CySA+, GIAC, ISO/IEC 27001 Lead Implementer or Auditor, Microsoft, cloud and Cisco security certifications, "Other recognised certification", "No certification yet"); more than one can be ticked, "No certification yet" excludes the rest, at least one choice is required, and the server refuses anything outside the list. Translations are in `messages/*.json` (`Opportunity.certOptions`, same order as `CERTIFICATIONS`).
+- **Watch for:** the country-code table is entered by hand (spot-checked against 47 well-known countries, not against an official register). Countries that share +1 each have their own entry. The Country field is still free text.
+

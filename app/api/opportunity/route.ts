@@ -133,6 +133,7 @@ export async function POST(request: Request) {
     country: fields.country,
     city: fields.city,
     phoneCountryCode: fields.phoneCountryCode,
+    certifications: fields.certifications || undefined,
     phone: fields.phone,
     description: fields.description,
   });

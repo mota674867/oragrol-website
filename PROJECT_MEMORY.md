@@ -10,7 +10,9 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 
 **Verified:** tsc clean, eslint 0 errors on changed files; limiter logic tested against a stand-in Redis (limit, expiry, hashed keys, error, unset, 4 s hang all behave). **NEEDS VERIFICATION on the preview:** real Upstash accepts `PEXPIRE ... NX`; careers/talent/partnerships submit works end to end with the widget; the preview hostname is added to the Cloudflare widget or the check refuses.
 
-**Next:** Mohammad checks the preview, then approves merge.
+**Preview test:** Mohammad submitted the careers form on the preview ("Your submission has been received"), so the bot check and shared limit work there. He then asked for fixed choices: phone country code dropdown and certification tick-boxes (D-122), added to the same branch. Verified: tsc clean, eslint 0 errors, list and validator tests pass (243 countries named in EN and FR, 47 codes spot-checked, schema refuses free-typed values). NOT verified: how the form looks on the preview (no dev server or preview access from the sandbox).
+
+**Next:** Mohammad checks the updated preview (country dropdown, certification boxes, then a submit), then approves merge.
 
 ---
 
