@@ -67,6 +67,33 @@ export function validDialCode(value: string): boolean {
 
 export type CountryOption = { iso: string; dial: string; label: string };
 
+function regionNames(locale: string): Intl.DisplayNames | null {
+  try {
+    return new Intl.DisplayNames([locale], { type: "region" });
+  } catch {
+    return null;
+  }
+}
+
+/** The English name stored and emailed for a chosen region (the form shows the visitor's own language). */
+export function englishCountryName(iso: string): string {
+  return DIAL_BY_ISO[iso] ? (regionNames("en")?.of(iso) ?? iso) : "";
+}
+
+let englishNames: Set<string> | null = null;
+export function validCountryName(value: string): boolean {
+  englishNames ??= new Set(Object.keys(DIAL_BY_ISO).map(englishCountryName));
+  return englishNames.has(value);
+}
+
+/** Every country, named in the visitor's language and sorted by that name (for the Country picker). */
+export function countryNameOptions(locale: string): { iso: string; label: string }[] {
+  const names = regionNames(locale);
+  return Object.keys(DIAL_BY_ISO)
+    .map((iso) => ({ iso, label: names?.of(iso) ?? iso }))
+    .sort((a, b) => a.label.localeCompare(b.label, locale));
+}
+
 /** Every country with its calling code, named in the visitor's language and sorted by that name. */
 export function countryOptions(locale: string): CountryOption[] {
   let names: Intl.DisplayNames | null = null;

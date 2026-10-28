@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { validCertifications, validDialCode } from "./opportunity-options";
+import { validCertifications, validCountryName, validDialCode } from "./opportunity-options";
 
 /**
  * Server-side validation for the shared /careers, /talent and
@@ -32,7 +32,7 @@ export const opportunitySchema = z.object({
   category: z.string().trim().min(1, "Missing category.").max(100),
   fullName: z.string().trim().min(1, "Enter your name.").max(200),
   email: z.string().trim().min(1, "Enter your email.").email("Enter a valid email address."),
-  country: z.string().trim().min(1, "Enter your country.").max(100),
+  country: z.string().trim().min(1, "Choose your country.").max(100).refine(validCountryName, "Choose your country from the list."),
   city: z.string().trim().min(1, "Enter your city.").max(100),
   phoneCountryCode: z.string().trim().min(1, "Choose your phone country code.").max(6).refine(validDialCode, "Choose your phone country code from the list."),
   // Specialists pick from a fixed list; every other form variant leaves this out.

@@ -2,6 +2,16 @@
 
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
+## Session: Country dropdown on the careers/talent/partnerships form, 2026-10-28
+
+**Done (branch `form-country-picker`, pushed, not merged):** after PR #35 merged (commit 1ddc61b), Mohammad asked for Country to be a pick-list as well. Country is now a dropdown of the 243 regions (D-122 follow-up); picking it pre-selects the phone code. Server accepts only listed English names.
+
+**Verified:** tsc clean, eslint 0 errors on changed files; tests: all 243 names pass the server check, free-typed country refused, French names sorted. NOT verified: look on the preview.
+
+**Next:** Mohammad checks the preview, then approves merge.
+
+---
+
 ## Session: shared rate limits + bot check on careers/talent/partnerships, 2026-10-28
 
 **Done (branch `security-shared-limits`, pushed, not merged):** `app/lib/rate-limit-shared.ts` (Redis-backed, hashed keys, timeout, in-memory fallback) now backs the limits on chat, contact, newsletter, Cyber Health, My Scope and opportunity. `/api/opportunity` runs the Turnstile check; `oragrol-opportunity-page.tsx` shows the widget and the submit button waits for the token. ODO popup cookie is Secure on https. Decision D-121.
