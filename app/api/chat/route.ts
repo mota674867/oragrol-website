@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { Resend } from "resend";
-import { getClientIp, rateLimit } from "../../lib/rate-limit";
+import { getClientIp } from "../../lib/rate-limit";
+import { rateLimitShared } from "../../lib/rate-limit-shared";
 import { chatRequestSchema } from "../../lib/chat-schema";
 import { SYSTEM_PROMPT, HANDOFF_MARKER, OFFTOPIC_MARKER } from "../../lib/chat-knowledge";
 import { chatCapReached, recordChatSpend, CHAT_CAP_REPLY } from "../../lib/chat-spend";
@@ -27,7 +28,7 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
-  const limited = rateLimit(`chat:${ip}`, { limit: 20, windowMs: 10 * 60 * 1000 });
+  const limited = await rateLimitShared(`chat:${ip}`, { limit: 20, windowMs: 10 * 60 * 1000 });
   if (!limited.ok) {
     return NextResponse.json(
       { ok: false, error: "Too many messages. Please try again shortly." },

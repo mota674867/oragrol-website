@@ -6,7 +6,8 @@ import { Resend } from "resend";
 import { randomUUID } from "crypto";
 import CyberHealthPdfReport from "@/app/[locale]/cyber-health/pdf-report";
 import { buildPdfReportData } from "@/app/[locale]/cyber-health/pdf-report-adapter";
-import { getClientIp, rateLimit } from "../../lib/rate-limit";
+import { getClientIp } from "../../lib/rate-limit";
+import { rateLimitShared } from "../../lib/rate-limit-shared";
 import { buildCyberHealthReport } from "../../lib/cyber-health-report";
 import { getCyberHealthReportPhotos } from "../../lib/cyber-health-photos";
 import { cyberHealthSubmissionSchema } from "../../lib/cyber-health-schema";
@@ -58,7 +59,7 @@ function escapeHtml(value: string) {
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
-  const limited = rateLimit(`cyber-health:${ip}`, { limit: 6, windowMs: 30 * 60 * 1000 });
+  const limited = await rateLimitShared(`cyber-health:${ip}`, { limit: 6, windowMs: 30 * 60 * 1000 });
   if (!limited.ok) {
     return NextResponse.json(
       { ok: false, error: "Too many requests. Please try again shortly." },
@@ -87,7 +88,7 @@ export async function POST(request: Request) {
   }
 
   // Best-effort per-address cap: two reports per email per day (in-memory, per instance).
-  const perEmail = rateLimit(`cyber-email:${parsed.data.profile?.email ?? ""}`.toLowerCase(), { limit: 2, windowMs: 24 * 60 * 60 * 1000 });
+  const perEmail = await rateLimitShared(`cyber-email:${parsed.data.profile?.email ?? ""}`.toLowerCase(), { limit: 2, windowMs: 24 * 60 * 60 * 1000 });
   if (!perEmail.ok) {
     return NextResponse.json({ ok: false, error: "This email has reached today's limit. Please try again tomorrow." }, { status: 429 });
   }

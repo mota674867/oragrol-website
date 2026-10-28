@@ -30,7 +30,7 @@ function readCookie(name: string): boolean {
 
 function writeSessionCookie(name: string): void {
   if (typeof document === "undefined") return;
-  try { document.cookie = `${name}=1; Path=/; SameSite=Lax`; } catch { /* fallback to sessionStorage */ }
+  try { document.cookie = `${name}=1; Path=/; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`; } catch { /* fallback to sessionStorage */ }
 }
 
 function readSessionStorage(name: string): boolean {
