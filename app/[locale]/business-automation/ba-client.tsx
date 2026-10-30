@@ -54,15 +54,15 @@ const jobIds: JobId[] = [
 // formatted at render time per locale) and which job has DetailsDialog
 // content at all (all 6 do here).
 const jobMeta: Record<JobId, { index: string; buildCAD: number; monthlyLabel: { en: string; fr: string } }> = {
-  "sales-flow": { index: "01", buildCAD: 9500, monthlyLabel: { en: "$2,200/mo", fr: "2 200 $/mois" } },
-  "customer-support": { index: "02", buildCAD: 7000, monthlyLabel: { en: "$2,800/mo", fr: "2 800 $/mois" } },
-  "operational-intelligence": { index: "03", buildCAD: 7500, monthlyLabel: { en: "$3,500/mo", fr: "3 500 $/mois" } },
+  "sales-flow": { index: "01", buildCAD: 9500, monthlyLabel: { en: "From $2,200/mo", fr: "À partir de 2 200 $/mois" } },
+  "customer-support": { index: "02", buildCAD: 7000, monthlyLabel: { en: "From $2,800/mo", fr: "À partir de 2 800 $/mois" } },
+  "operational-intelligence": { index: "03", buildCAD: 7500, monthlyLabel: { en: "From $3,500/mo", fr: "À partir de 3 500 $/mois" } },
   "managed-it": {
     index: "04",
     buildCAD: 4000,
-    monthlyLabel: { en: "$700/mo base + $110/user/mo", fr: "700 $/mois de base + 110 $/utilisateur/mois" },
+    monthlyLabel: { en: "From $700/mo base + $110/user/mo", fr: "À partir de 700 $/mois de base + 110 $/utilisateur/mois" },
   },
-  "customer-growth": { index: "05", buildCAD: 7000, monthlyLabel: { en: "$4,500/mo", fr: "4 500 $/mois" } },
+  "customer-growth": { index: "05", buildCAD: 7000, monthlyLabel: { en: "From $4,500/mo", fr: "À partir de 4 500 $/mois" } },
   tailored: { index: "06", buildCAD: 0, monthlyLabel: { en: "Confirmed after scoping", fr: "Confirmé après l'établissement de la portée" } },
 };
 
@@ -114,7 +114,7 @@ function BusinessAutomationClient() {
     id === "tailored"
       ? t("jobs.tailored.kickerTag")
       : id === "managed-it"
-        ? locale === "fr" ? "700 $/mois + par utilisateur" : "$700/mo + per user"
+        ? locale === "fr" ? "À partir de 700 $/mois + par utilisateur" : "From $700/mo + per user"
         : monthlyLabel(id);
   const monthlyParts = (id: JobId): [string, string] => {
     const label = monthlyLabel(id);
