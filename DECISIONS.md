@@ -1451,3 +1451,8 @@ D-006, D-011, D-012, D-013, D-037, D-050, D-053, D-054, D-061, D-062, D-066, D-0
 - **Watch for:** the country-code table is entered by hand (spot-checked against 47 well-known countries, not against an official register). Countries that share +1 each have their own entry.
 - **Follow-up (same day, Mohammad's request):** Country is now a dropdown of the same 243 regions too (names in the visitor's language; the form sends the English name, and the server accepts only listed names). Choosing a country pre-selects the phone code if none is chosen yet. City stays free text.
 
+
+### D-123 — Public BA pages show only "From" before the monthly fee; bands, add-ons, vendors and exit terms stay out of public pages (2026-10-30)
+- **Decision (Mohammad):** the only public change is "From" (EN) / "À partir de" (FR) before the monthly fee on Sales, Customer Service, Finance, Marketing and IT. Volume bands, extra-person and extra-change fees, add-on prices, vendor lists, term and early-exit rules belong in the proposal, intake form and contract, not on the website.
+- **Price note** on `/business-automation` now reads "Prices are shown in Canadian dollars and are starting prices. Your proposal confirms the exact scope and fee." The old sentence about API usage and subscriptions was removed (NEEDS Mohammad's confirmation; the client-pays-vendor rule goes in the contract/proposal).
+- Build fees unchanged. Files: `ba-client.tsx` (jobMeta, IT nav price), `messages/en.json`, `messages/fr.json`.
