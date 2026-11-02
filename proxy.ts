@@ -11,6 +11,7 @@ export default createMiddleware(routing);
 export const config = {
   // Match every path except API routes, Next internals, and any path with
   // a file extension (robots.txt, sitemap.xml, favicon.ico, images, etc.)
+  // — and the private application forms (/apply/<code>): English only, outside the public site's layout and locale routing —
   // — those are handled by their own route handlers, not locale-routed.
-  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
+  matcher: ["/((?!api|apply|_next|_vercel|.*\\..*).*)"],
 };
