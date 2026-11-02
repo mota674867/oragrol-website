@@ -3,6 +3,7 @@
 import { FormEvent, useMemo, useState, useEffect } from "react";
 import TurnstileWidget from "@/app/components/TurnstileWidget";
 import { useTranslations } from "next-intl";
+import { BusyLabel } from "@/app/components/ui/busy-label";
 
 export type ScopeArea = "Cybersecurity" | "Automation" | "OR ONE";
 export type ScopeItem = {
@@ -411,16 +412,11 @@ export function ScopeTray({
                 <TurnstileWidget key={widgetKey} onToken={setHumanToken} />
                 <div className="scope-actions">
                   <button className="scope-download" type="button" disabled={!canSubmit || busy} onClick={handleDownload}>
-                    {flow.status === "submitting" && flow.intent === "pdf_download"
-                      ? t("form.submittingLabel")
-                      : flow.status === "preparing_pdf"
-                        ? t("form.preparingPdfLabel")
-                        : t("form.downloadButton")}
+                    <BusyLabel busy={flow.status === "preparing_pdf" || (flow.status === "submitting" && flow.intent === "pdf_download")}
+                      working={flow.status === "preparing_pdf" ? t("form.preparingPdfLabel") : t("form.submittingLabel")}>{t("form.downloadButton")}</BusyLabel>
                   </button>
                   <button className="scope-submit" type="submit" disabled={!canSubmit || busy}>
-                    {flow.status === "submitting" && flow.intent === "review_requested"
-                      ? t("form.submittingLabel")
-                      : t("form.submitButton")}{" "}
+                    <BusyLabel busy={flow.status === "submitting" && flow.intent === "review_requested"} working={t("form.submittingLabel")}>{t("form.submitButton")}</BusyLabel>{" "}
                     <span aria-hidden="true">↗︎</span>
                   </button>
                 </div>

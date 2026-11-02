@@ -9,6 +9,7 @@ import { Logo } from "../brand/logo";
 import { LinkedInIcon, InstagramIcon } from "./social-icons";
 import { submitNewsletter } from "../../lib/submit-newsletter";
 import TurnstileWidget from "../TurnstileWidget";
+import { BusyLabel } from "@/app/components/ui/busy-label";
 
 /**
  * Shared site footer — one component, identical on every redesigned page.
@@ -190,7 +191,7 @@ export default function SiteFooter({
             </div>
             <TurnstileWidget onToken={setHumanToken} />
             <button type="submit" disabled={status === "pending" || (humanRequired && !humanToken)}>
-              {status === "pending" ? (isFr ? "Inscription…" : "Joining…") : (isFr ? "S’abonner à l’infolettre" : "Join the Briefing")}<span aria-hidden="true">→</span>
+              <BusyLabel busy={status === "pending"} working={isFr ? "Inscription…" : "Joining…"}>{isFr ? "S’abonner à l’infolettre" : "Join the Briefing"}</BusyLabel><span aria-hidden="true">→</span>
             </button>
             <div className={styles.consent}>
               <input id={`${id}-consent`} name="consent" type="checkbox" required />

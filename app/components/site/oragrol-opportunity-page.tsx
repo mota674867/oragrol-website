@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import TurnstileWidget from "@/app/components/TurnstileWidget";
 import { CERTIFICATIONS, CERT_NONE, DIAL_BY_ISO, countryNameOptions, countryOptions, englishCountryName } from "@/app/lib/opportunity-options";
+import { BusyLabel } from "@/app/components/ui/busy-label";
 
 export type PageKind = "careers" | "talent" | "partnerships";
 export type Vacancy = { id: string; title: string; description?: string };
@@ -263,7 +264,7 @@ function ApplicationForm({ page, category, vacancies, privacyUrl, termsUrl, enab
       {page === "partnerships" && <p className="op-form-note">{t("partnershipsDisclaimer")}</p>}
       {!enabled && <p className="op-hold" role="status">{t("submissionsNotOpen")}</p>}
       <TurnstileWidget key={humanKey} onToken={onHumanToken} action="opportunity" />
-      <button className="op-submit" type="submit" disabled={!enabled || status === "pending" || (humanRequired && !humanToken) || words > 300 || Boolean(fileError) || (career && !files.length)}>{status === "pending" ? t("submitting") : career ? t("submitApplication") : page === "talent" ? t("sendIntroduction") : t("submitEnquiry")}</button>
+      <button className="op-submit" type="submit" disabled={!enabled || status === "pending" || (humanRequired && !humanToken) || words > 300 || Boolean(fileError) || (career && !files.length)}><BusyLabel busy={status === "pending"} working={t("submitting")}>{career ? t("submitApplication") : page === "talent" ? t("sendIntroduction") : t("submitEnquiry")}</BusyLabel></button>
       <p className={status === "error" ? "op-message op-error" : "op-message"} role="status" aria-live="polite">{message}</p>
       {/* termsUrl is rendered by the parent's .op-legal footer, not here -- kept as a prop for API symmetry with that block. */}
       <span className="op-sr" data-terms-url={termsUrl} />
