@@ -1462,3 +1462,8 @@ D-006, D-011, D-012, D-013, D-037, D-050, D-053, D-054, D-061, D-062, D-066, D-0
 - **Website:** only the fee is on the page. `app/lib/or-one-fees.ts` is the single source (page cards and the live chat both read it). The term and early-cancel rule are not shown on the public pages, so no copy changed. They go into the contract text (counsel) and the proposal.
 - **Other tiers unchanged:** build $22,000 / $75,000 / $150,000 / $220,000; base OSF 100 = $4,580, 200 = $5,999, 400 = $8,999.
 
+### D-125 — OR ONE launch fees: build 16,999 / 39,999 / 79,999 / 139,999; OR ONE 100 monthly 4,499 (2026-11-02)
+- **Decision (Mohammad):** build fees STARTER $16,999 (was 22,000), OR ONE 100 $39,999 (was 75,000), 200 $79,999 (was 150,000), 400 $139,999 (was 220,000). OR ONE 100 monthly $4,499 (was 4,580). Monthly STARTER $1,599, 200 $5,999, 400 $8,999 unchanged.
+- **Basis:** effort estimate (hours x CAD 160; NOT measured) and a market check; treated as launch prices, to be reviewed after the first 5 clients with a measured hours log. The 110-point overflow rule stays (+$750 build, +$50 monthly per point). Deposit, lump-sum discount, STARTER 12-month term and early-cancel terms unchanged in structure.
+- **Website:** only `app/lib/or-one-fees.ts` changes (page cards and live chat read it). Contract text is in Legal V5 (SOW-003 v2.0, draft).
+

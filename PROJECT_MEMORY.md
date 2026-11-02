@@ -2,6 +2,12 @@
 
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
+## Session: OR ONE launch fees, 2026-11-02
+
+**Done (branch `or-one-fees-launch`, committed, NOT pushed):** build fees 16,999 / 39,999 / 79,999 / 139,999; OR ONE 100 monthly 4,499 (D-125). File: `app/lib/or-one-fees.ts` only (single source for the OR ONE page cards and the live chat). No other copy mentions these prices (grep EN and FR).
+- Verified: tsc clean. Not browser-checked (Google Fonts blocked in the sandbox); Vercel preview is the build check.
+- **Next:** push and merge only on Mohammad's word.
+
 ## Session: OR ONE STARTER monthly fee to $1,599, 2026-11-02
 
 **Done (branch `starter-osf-1599`):** `app/lib/or-one-fees.ts` STARTER monthly 999 -> 1599 (OR ONE page card and live chat both read this file). See D-124. No other copy mentions the STARTER fee or term.
