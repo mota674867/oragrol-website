@@ -3,6 +3,7 @@ import {FormEvent,useEffect,useRef,useState} from "react";
 import {Link} from "@/i18n/navigation";
 import "../chat-widget.css";
 import { Logo } from "./brand/logo";
+import { BusyLabel } from "./ui/busy-label";
 
 type Message={
   from:"visitor"|"oragrol";
@@ -321,7 +322,7 @@ export default function ChatWidget(){
                       <input required type="email" placeholder="Your email" value={formValue.email} onChange={e=>setFormValue(s=>({...s,email:e.target.value}))}
                         style={{border:"1px solid #ccc",padding:"8px 10px",fontSize:"13px",fontFamily:"inherit",outline:"none"}}/>
                       <button disabled={sending} type="submit" style={{border:0,background:"#ef4d00",color:"#fff",padding:"9px 14px",fontSize:"13px",cursor:"pointer",fontFamily:"inherit"}}>
-                        Notify our team
+                        <BusyLabel busy={sending} working="Sending…">Notify our team</BusyLabel>
                       </button>
                     </form>
                   </div>

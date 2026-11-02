@@ -8,6 +8,7 @@
 // (see site-chrome.tsx). Escape (or the × button) returns to the home page.
 
 import { useEffect, useState } from "react";
+import { BusyLabel } from "../../../components/ui/busy-label";
 
 type Phase = "checking" | "denied" | "ready";
 type Past = { company: string; website: string; domain: string; lastRunAt: string; runs: number };
@@ -125,7 +126,7 @@ export default function OutboundTool() {
             </div>
           ) : (
             <div style={{ display: "flex", gap: 12, marginTop: 20, flexWrap: "wrap" }}>
-              <button type="submit" disabled={busy} style={{ ...btn, background: "#111", color: "#fff", border: 0 }}>{busy ? "Starting…" : "Run research"}</button>
+              <button type="submit" disabled={busy} style={{ ...btn, background: "#111", color: "#fff", border: 0 }}><BusyLabel busy={busy} working="Starting…">Run research</BusyLabel></button>
               <button type="button" onClick={check} style={{ ...btn, background: "#fff", color: "#111", border: "1px solid #111" }}>Check history</button>
             </div>
           )}
