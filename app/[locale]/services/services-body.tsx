@@ -10,6 +10,7 @@ import {
 } from "./services-catalog";
 import { DetailsDialog } from "@/app/components/DetailsDialog";
 import { packagesDetailsContent, specialistDetailsContent, aLaCarteDetailsContent } from "@/app/lib/services-details-content";
+import { BusyLabel } from "@/app/components/ui/busy-label";
 
 /**
  * Services page BODY only — rendered inside app/services/services-client.tsx,
@@ -92,7 +93,7 @@ const serviceSelection = (s: typeof INDIVIDUAL_SERVICES[number]): ServicesSelect
 function Action({ children, perform, disabled = false }: { children: React.ReactNode; perform: () => void | Promise<void>; disabled?: boolean }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  return <div className="os-action"><button type="button" disabled={disabled || busy} onClick={async () => { setBusy(true); setError(""); try { await perform(); } catch { setError("Unable to complete this action. Please try again."); } finally { setBusy(false); } }}>{busy ? "Please wait…" : children}</button>{error && <p role="alert">{error}</p>}</div>;
+  return <div className="os-action"><button type="button" disabled={disabled || busy} onClick={async () => { setBusy(true); setError(""); try { await perform(); } catch { setError("Unable to complete this action. Please try again."); } finally { setBusy(false); } }}><BusyLabel busy={busy} working="Please wait…">{children}</BusyLabel></button>{error && <p role="alert">{error}</p>}</div>;
 }
 
 export default function ServicesPage({ onAddToScope, isInScope, onDiscussEngagement }: ServicesPageProps) {

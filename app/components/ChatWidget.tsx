@@ -363,7 +363,7 @@ export default function ChatWidget(){
                   style={{flex:1,resize:"none",border:"1px solid #aaa7a0",padding:"8px 10px",fontSize:"13px",fontFamily:"inherit",background:"#fff",outline:"none",minHeight:"40px",maxHeight:"100px",height:"40px"}}/>
                 <button type="submit" disabled={closed||sending||(!value.trim()&&!pendingFile)}
                   style={{border:0,background:"#111315",color:"#fff",padding:"0 14px",cursor:"pointer",fontSize:"13px",fontWeight:600,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",minHeight:"40px",opacity:(closed||sending||(!value.trim()&&!pendingFile))?0.5:1}}>
-                  Send
+                  <BusyLabel busy={sending} working="Sending…">Send</BusyLabel>
                 </button>
               </form>
               <input ref={fileInputRef} type="file" accept="image/jpeg,image/jpg,image/png,image/webp" style={{display:"none"}} onChange={handleFile}/>
