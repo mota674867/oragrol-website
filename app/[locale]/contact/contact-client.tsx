@@ -11,6 +11,7 @@ import { NAV_ITEMS } from "@/app/components/site/nav-items";
 import "@/app/gpt-pages.css";
 import { HeaderLogo } from "@/app/components/brand/header-logo";
 import TurnstileWidget from "@/app/components/TurnstileWidget";
+import { BusyLabel } from "../../components/ui/busy-label";
 
 type Conversation =
   | "Cybersecurity Services"
@@ -290,7 +291,7 @@ function ContactPageClient() {
           </label>
           <TurnstileWidget onToken={setHumanToken} />
           <button className="contact-submit" type="submit" disabled={submitting}>
-            {submitting ? t("form.sendingLabel") : t("form.submitButton")} <span>↗︎</span>
+            <BusyLabel busy={submitting} working={t("form.sendingLabel")}>{t("form.submitButton")} <span>↗︎</span></BusyLabel>
           </button>
           {submitError && (
             <div className="contact-confirmation" role="alert">

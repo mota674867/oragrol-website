@@ -229,6 +229,15 @@ export function SiteHeader() {
                     <p className="text-xs font-semibold text-text-primary">{isFr ? "Tableau de bord Services" : "Services Dashboard"}</p>
                     <p className="text-xs text-text-secondary mt-0.5">{isFr ? "Statut de protection et rapports" : "Protection status and reports"}</p>
                   </a>
+                  <a
+                    href="https://app.orgro.ca/business-automation"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block px-4 py-3 hover:bg-surface-1 transition-colors border-b border-border/50"
+                  >
+                    <p className="text-xs font-semibold text-text-primary">{isFr ? "Tableau de bord Automatisation" : "Business Automation Dashboard"}</p>
+                    <p className="text-xs text-text-secondary mt-0.5">{isFr ? "Actions, approbations et suivi" : "Actions, approvals and follow-up"}</p>
+                  </a>
                   <Link
                     href="/contact"
                     className="block px-4 py-3 hover:bg-surface-1 transition-colors"

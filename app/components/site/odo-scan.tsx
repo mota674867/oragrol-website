@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Script from "next/script";
 import "./odo-scan.css";
 import { HeaderLogo } from "@/app/components/brand/header-logo";
+import { BusyLabel } from "../ui/busy-label";
 
 /*
  * ORAGROL ODO /scan — complete React handoff for Claude
@@ -880,7 +881,7 @@ export default function OdoScanPage({ locale = "en", onEvent = NOOP_EVENT_HANDLE
                 <div ref={turnstileContainerRef} className="odo-scan__turnstile" />
                 {errors.turnstile ? <p className="odo-scan__inline-error" role="alert">{errors.turnstile}</p> : null}
                 <button type="submit" className="odo-scan__submit" disabled={busy}>
-                  {busy ? "Preparing your scan…" : "Start my free scan"}<span aria-hidden="true">→</span>
+                  <BusyLabel busy={busy} working="Preparing your scan…">Start my free scan<span aria-hidden="true">→</span></BusyLabel>
                 </button>
                 <p className="odo-scan__fine-print">Free. No payment details required.</p>
                 {message ? <p className="odo-scan__server-message" role="alert">{message}</p> : null}
