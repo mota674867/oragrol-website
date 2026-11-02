@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { Logo } from "../../components/brand/logo";
+import { BrandLogo } from "../brand-logo";
+import { ThemeToggle } from "../theme-toggle";
 import {
   MAX_FLAGS_BEFORE_WARNING, NONE_TEXT, canDiscuss, catalogueReady, expand, firstIncomplete, isRequired, isVisible, optionsOf,
   pickedItems, pickedPoints, tierEstimate, validatePage,
@@ -180,7 +181,7 @@ export function ApplyForm({ code, token, form, catalogue, reference, expiresAt, 
   if (phase.kind === "closed") {
     return (
       <main className="ap-shell ap-center">
-        <Logo variant="horizontal" tone="light-bg" height={26} />
+        <BrandLogo />
         <h1 className="ap-h1">{phase.reason === "submitted" ? "This form has already been submitted" : "This link is no longer active"}</h1>
         <p className="ap-muted">{phase.reason === "submitted" ? "Your answers are locked. We will be in touch about the next step." : "Please contact the person at ORAGROL who sent it to you."}</p>
       </main>
@@ -258,8 +259,9 @@ export function ApplyForm({ code, token, form, catalogue, reference, expiresAt, 
 function Header({ reference }: { reference: string }) {
   return (
     <header className="ap-head">
-      <Logo variant="horizontal" tone="light-bg" height={26} />
+      <BrandLogo />
       <span className="ap-ref">Private form{reference ? ` · ${reference}` : ""}</span>
+      <ThemeToggle />
     </header>
   );
 }

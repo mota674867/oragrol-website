@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { Logo } from "../../components/brand/logo";
+import { BrandLogo } from "../brand-logo";
 import { rateLimitShared } from "../../lib/rate-limit-shared";
 import { getCatalogue } from "../../lib/apply/catalogue";
 import { withPrefill } from "../../lib/apply/engine";
@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 function Notice({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <main className="ap-shell ap-center">
-      <Logo variant="horizontal" tone="light-bg" height={26} />
+      <BrandLogo />
       <h1 className="ap-h1">{title}</h1>
       <p className="ap-muted">{children}</p>
     </main>

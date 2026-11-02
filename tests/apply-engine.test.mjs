@@ -365,3 +365,14 @@ test("the link code and OCS key are never in the browser's code, and the browser
   const route = await readFile(new URL("../app/api/apply/[action]/route.ts", import.meta.url), "utf8");
   assert.doesNotMatch(route, /console\.(log|info|warn|error)/, "the route never logs bodies or link codes");
 });
+
+test("the form looks like the dashboard: same font (Inter, self-hosted), same light and dark palettes, same switch; nothing from the public site's theme", async () => {
+  const css = await readFile(new URL("../app/apply/apply.css", import.meta.url), "utf8");
+  assert.match(css, /font-family: Inter/); assert.match(css, /\/fonts\/InterVariable\.woff2/);
+  for (const token of ["#F4F2ED", "#141719", "#00758F", "#DDD9CF", "#5d6063", "#4d5154", "#00d9ff", "#9af1ff"]) assert.ok(css.includes(token), `missing dashboard colour ${token}`);
+  const layout = await readFile(new URL("../app/apply/layout.tsx", import.meta.url), "utf8");
+  assert.doesNotMatch(layout, /globals\.css|next\/font|env-light/, "no site theme, no Google fonts on the private pages");
+  assert.match(layout, /og-theme/); assert.match(layout, /"light"/, "light by default, like the dashboard");
+  const fontFile = await readFile(new URL("../public/fonts/InterVariable.woff2", import.meta.url)); assert.ok(fontFile.length > 100_000);
+  await readFile(new URL("../public/fonts/Inter-LICENSE.txt", import.meta.url));
+});
