@@ -114,6 +114,22 @@ export default function UtilityBar() {
                 </p>
               </a>
 
+              <a
+                href="https://app.orgro.ca/business-automation"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ display: "block", padding: "12px 16px", borderBottom: "1px solid #1a1a1a", textDecoration: "none" }}
+                onMouseEnter={e => (e.currentTarget.style.background = "#1a1a1a")}
+                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+              >
+                <p style={{ fontSize: "12px", fontWeight: 600, color: "#e0e0e0", margin: "0 0 2px" }}>
+                  {isFr ? "Tableau de bord Automatisation" : "Business Automation Dashboard"}
+                </p>
+                <p style={{ fontSize: "10px", color: "#555", margin: 0 }}>
+                  {isFr ? "Actions, approbations et suivi" : "Actions, approvals and follow-up"}
+                </p>
+              </a>
+
               <div style={{ borderTop: "1px solid #1f1f1f", padding: "8px 16px 2px" }}>
                 <p style={{ fontSize: "9px", color: "#444", letterSpacing: ".12em", margin: 0, fontWeight: 600 }}>
                   {isFr ? "NOUVEAU CLIENT" : "NEW CLIENT"}
