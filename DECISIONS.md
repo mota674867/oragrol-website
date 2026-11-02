@@ -1456,3 +1456,9 @@ D-006, D-011, D-012, D-013, D-037, D-050, D-053, D-054, D-061, D-062, D-066, D-0
 - **Decision (Mohammad):** the only public change is "From" (EN) / "À partir de" (FR) before the monthly fee on Sales, Customer Service, Finance, Marketing and IT. Volume bands, extra-person and extra-change fees, add-on prices, vendor lists, term and early-exit rules belong in the proposal, intake form and contract, not on the website.
 - **Price note** on `/business-automation` now reads "Prices are shown in Canadian dollars and are starting prices. Your proposal confirms the exact scope and fee." The old sentence about API usage and subscriptions was removed (NEEDS Mohammad's confirmation; the client-pays-vendor rule goes in the contract/proposal).
 - Build fees unchanged. Files: `ba-client.tsx` (jobMeta, IT nav price), `messages/en.json`, `messages/fr.json`.
+
+### D-124 — OR ONE STARTER monthly fee is $1,599 (was $999); STARTER minimum term 12 months, early cancel = unpaid build + 3 months OSF (2026-11-02)
+- **Decision (Mohammad):** STARTER base monthly OR Service Fee $1,599 (it was cheaper per point than OR ONE 100, which made no sense). STARTER minimum contract term 12 months (was 6 in the old spec) and early cancellation = unpaid build balance + 3 months of OSF, same as the other tiers.
+- **Website:** only the fee is on the page. `app/lib/or-one-fees.ts` is the single source (page cards and the live chat both read it). The term and early-cancel rule are not shown on the public pages, so no copy changed. They go into the contract text (counsel) and the proposal.
+- **Other tiers unchanged:** build $22,000 / $75,000 / $150,000 / $220,000; base OSF 100 = $4,580, 200 = $5,999, 400 = $8,999.
+
