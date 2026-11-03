@@ -4,8 +4,9 @@
 // application's answers (passed in as `app`), so setup always matches what the client applied for. Nothing here asks for a
 // password, key or card number: tools connect through the vendor's own sign-in or the secure vault.
 //
-// Not yet wired: reading the application back from OCS, and where the page is shown (the plan puts it in the client's dashboard).
-// Until both are built these builders are not registered, so no setup form can open for a client.
+// Wired (2026-11-03): OCS hands over the application's answers when a setup link is opened (a setup invitation names its application), and
+// the website builds the form with these builders for each link (registry.ts buildSetup, handler.ts resolveForm). Like the application forms,
+// a setup stays "draft" until it is cleared to open, and a draft opens only where APPLY_ALLOW_DRAFT_FORMS=1.
 import type { Answers, Catalogue, Cond, Field, FormDefinition, PageSpec } from "../types";
 import { pickedItems } from "../engine.ts";
 
@@ -65,7 +66,7 @@ function companyFields(app: Answers, extra: Field[]): Field[] {
 const STEPS_INTRO = "Your setup after you sign. Pre-filled from your application. Confirm it, connect your tools and approve it before go-live. Business setup opens after the contract is signed. Nothing is built or connected before that. Never send a password, key or card number by email or chat: you connect each tool through the vendor's own secure sign-in screen, or by placing a key in ORAGROL's secure vault yourself. Go-live happens only when every step is done and every rule test passes.";
 const TEST_NOTE = "Before go-live ORAGROL tests every rule you set. All tests must pass with zero failures. You can open each result and tick it as reviewed. If a test fails, ORAGROL fixes it and runs it again. Go-live waits.";
 const FINAL_STATEMENTS: Field[] = [
-  check("final.rules", "My rules are correct, and I understand ORAGROL's automation follows them exactly.", "My rules are correct, and I understand ORAGROL's automation follows them exactly."),
+  check("final.rules", "My rules are correct, and I understand ORAGROL Automation follows them exactly.", "My rules are correct, and I understand ORAGROL Automation follows them exactly."),
   check("final.approvers", "My named approvers have accepted their roles.", "My named approvers have accepted their roles."),
   check("final.tools", "My tools are connected through my own accounts.", "My tools are connected through my own accounts."),
   check("final.tests", "I reviewed the rule test results.", "I reviewed the rule test results."),
@@ -120,7 +121,7 @@ export function orOneSetup(app: Answers, catalogue: Catalogue): FormDefinition {
         phone("admin_phone", "Admin phone", { group: "Connect your tools" }),
         choose("m.brand", "Logo, brand guide and photos", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(marketing) }),
         choose("m.price", "Price list and product or service list", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(sales || finance) }),
-        choose("m.claims", "Approved claims library: the facts ORAGROL's automation may state about you (services, prices, results)", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(sales || marketing) }),
+        choose("m.claims", "Approved claims library: the facts ORAGROL Automation may state about you (services, prices, results)", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(sales || marketing) }),
         choose("m.dnc", "Your do-not-contact list", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(sales || marketing || support) }),
         choose("m.templates", "Templates (quotes, emails, letters, contracts)", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(sales || has("hr") || has("legal")) }),
         choose("m.policies", "Policies and procedures (returns, HR, privacy, security)", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(support || has("hr") || has("legal") || has("it")) }),
@@ -132,14 +133,15 @@ export function orOneSetup(app: Answers, catalogue: Catalogue): FormDefinition {
     { kind: "fields", page: { id: "phone_ads", title: "06 Email, phone and ad accounts · 07 Review the rule test results",
       intro: "Only the parts that match your items appear. The costs below are yours, not ORAGROL's, and are shown on your sign-off sheet.",
       fields: [
-        choose("e.separate_domain", "Separate sending domain for outreach (cold email)", ["Yes", "No"], { group: "Cold email", showIf: when(sales) }),
-        text("e.dns", "Who edits your domain records (DNS)", { group: "Cold email", showIf: when(sales) }),
-        num("e.mailboxes", "Sending mailboxes you will add (number)", { group: "Cold email", showIf: when(sales) }),
-        text("p.number", "Phone number to use, or a new Canadian number", { group: "AI-answered calls", showIf: when(support) }),
-        text("p.person", "Who takes a call that needs a person", { group: "AI-answered calls", showIf: when(support) }),
-        text("a.account", "Ad platform and account ID (your own account)", { group: "Paid ads", showIf: when(marketing) }),
-        num("a.cap", "Monthly ad budget cap", { group: "Paid ads", showIf: when(marketing) }),
-        text("a.approver", "Who approves campaigns", { group: "Paid ads", showIf: when(marketing) }),
+        choose("e.separate_domain", "Separate sending domain for outreach (cold email)", ["Yes", "No"], { group: "Cold email (Sales)", showIf: when(sales) }),
+        text("e.dns", "Who edits your domain records (DNS)", { group: "Cold email (Sales)", showIf: when(sales) }),
+        num("e.mailboxes", "Sending mailboxes you will add (number)", { group: "Cold email (Sales)", showIf: when(sales) }),
+        text("p.number", "Phone number to use, or a new Canadian number", { group: "AI-answered calls (Customer Service)", showIf: when(support) }),
+        text("p.person", "Who takes a call that needs a person", { group: "AI-answered calls (Customer Service)", showIf: when(support) }),
+        long("p.notice", "Notice that calls are recorded and answered by AI (your wording)", { group: "AI-answered calls (Customer Service)", showIf: when(support) }),
+        text("a.account", "Ad platform and account ID (your own account)", { group: "Paid ads (Marketing)", showIf: when(marketing) }),
+        num("a.cap", "Monthly ad budget cap", { group: "Paid ads (Marketing)", showIf: when(marketing) }),
+        text("a.approver", "Who approves campaigns", { group: "Paid ads (Marketing)", showIf: when(marketing) }),
         check("review.note", "Rule test results", TEST_NOTE, { group: "07 Review the rule test results", required: false }),
       ] } },
     { kind: "fields", page: { id: "final", title: "08 Final approval and go-live", intro: "Your decision-maker confirms each statement, then signs. After that, ORAGROL switches your system from testing to live. You are watched closely in the first week.", fields: [
@@ -181,7 +183,7 @@ export function baSetup(app: Answers): FormDefinition {
       ...confirmRow("term", "Contract term and monthly fee date", "as in your contract", "Contract"),
     ]) } },
     { kind: "fields", page: { id: "signoff", title: "02 Confirm your sign-off sheet and rules · 03 Your named approvers accept their roles",
-      intro: "This is the sign-off sheet from your application. For each line, confirm whether it runs automatically or needs your approval. A blank or unclear line stays on \"Needs my approval\". Each person named on your application receives an email asking them to accept the role; until a person accepts, anything that needs that person cannot go live.",
+      intro: "You decide. ORAGROL takes no decision on your behalf unless you ask us in writing. Where a line needs your approval, your named decider approves first and ORAGROL then carries out exactly what was approved. Your own rules are applied; we do not invent them. This is the sign-off sheet from your application. For each line, confirm whether it runs automatically or needs your approval. A blank or unclear line stays on \"Needs my approval\". Each person named on your application receives an email asking them to accept the role; until a person accepts, anything that needs that person cannot go live.",
       fields: [
         ...signOff,
         long("rules_always", "Rules we must always follow, or \"None\"", { allowNone: true, group: "02 Confirm your sign-off sheet and rules", help: `As on your application: ${String(app.so_always ?? "")}` }),
@@ -219,12 +221,13 @@ export function baSetup(app: Answers): FormDefinition {
     { kind: "fields", page: { id: "phone_ads", title: "06 Phone and ad accounts · 07 Review the rule test results",
       intro: "Only the parts that match your packages appear. The costs are yours and are shown in your proposal.",
       fields: [
-        text("p.number", "Phone number to use, or a new Canadian number", { group: "AI-answered calls", showIf: when(cs) }),
-        text("p.person", "Who takes a call that needs a person", { group: "AI-answered calls", showIf: when(cs) }),
-        text("a.account", "Ad platform and account ID (your own account)", { group: "Paid ads", showIf: when(ads) }),
-        num("a.cap", "Monthly ad budget cap", { group: "Paid ads", showIf: when(ads) }),
-        text("a.approver", "Who approves campaigns", { group: "Paid ads", showIf: when(ads) }),
-        check("plan.notice", "Your plan size: notices", "I understand and agree to receive notices about my plan size (85%, 97% and 100%) at the contacts above.", { group: "Your plan size" }),
+        text("p.number", "Phone number to use, or a new Canadian number", { group: "AI-answered calls (Customer Service add-on)", showIf: when(cs) }),
+        text("p.person", "Who takes a call that needs a person", { group: "AI-answered calls (Customer Service add-on)", showIf: when(cs) }),
+        long("p.notice", "Notice that calls are recorded and answered by AI (your wording)", { group: "AI-answered calls (Customer Service add-on)", showIf: when(cs) }),
+        text("a.account", "Ad platform and account ID (your own account)", { group: "Paid ads (Marketing)", showIf: when(ads) }),
+        num("a.cap", "Monthly ad budget cap", { group: "Paid ads (Marketing)", showIf: when(ads) }),
+        text("a.approver", "Who approves campaigns", { group: "Paid ads (Marketing)", showIf: when(ads) }),
+        check("plan.notice", "Your plan size: notices", "I understand and agree to receive notices about my plan size (85%, 97% and 100%) at the contacts above.", { group: "Your plan size", help: "Your plan has a monthly size limit. We tell you at 85% and again at 97%. At 100% you have 3 days to continue or upgrade. We never stop service because you reached the limit without warning you first." }),
         check("review.note", "Rule test results", TEST_NOTE, { group: "07 Review the rule test results", required: false }),
       ] } },
     { kind: "fields", page: { id: "final", title: "08 Final approval and go-live", intro: "Your decision-maker confirms each statement, then signs. After that, ORAGROL switches your system from testing to live. You are watched closely in the first week.", fields: [
@@ -234,7 +237,12 @@ export function baSetup(app: Answers): FormDefinition {
   return setupDefinition("ba-setup", "Business Automation Business Setup", "ba", pages);
 }
 
-function setupDefinition(id: string, name: string, product: "or_one" | "ba", pages: PageSpec[]): FormDefinition {
+/** A setup is "confirm or correct", not "discuss": the meeting box that the application forms offer is switched off on every setup field. */
+const withoutMeetingBoxes = (pages: PageSpec[]): PageSpec[] =>
+  pages.map((p) => (p.kind === "fields" ? { ...p, page: { ...p.page, fields: p.page.fields.map((f) => ({ ...f, discuss: false })) } } : p));
+
+function setupDefinition(id: string, name: string, product: "or_one" | "ba", rawPages: PageSpec[]): FormDefinition {
+  const pages = withoutMeetingBoxes(rawPages);
   return {
     id, name, formType: "setup", product, status: "draft", version: "draft-1", pages, tiers: [],
     signature: { name: "signer_name", title: "signer_title", typed: "signature", agree: "final.golive" },

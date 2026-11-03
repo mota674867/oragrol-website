@@ -98,7 +98,7 @@ const CATEGORIES: Category[] = [
     ],
     items: [
       ctl("f-bookkeeping", "Bookkeeping", 9, "Categorises day-to-day transactions from bank feeds, receipts and invoices; tracks subscriptions and loan payments.", ["Unclear items go to a person"], "Automatic for clear matches"),
-      crit("f-ap", "Accounts payable", 8, "Captures incoming bills, checks them against orders and your rules, and prepares them; after approval, schedules or pays them.", ["Your named approver approves every payment before ORAGROL's automation acts", "ORAGROL's automation carries out exactly what was approved"], "Needs my approval before any payment"),
+      crit("f-ap", "Accounts payable", 8, "Captures incoming bills, checks them against orders and your rules, and prepares them; after approval, schedules or pays them.", ["Your named approver approves every payment before ORAGROL Automation acts", "ORAGROL Automation carries out exactly what was approved"], "Needs my approval before any payment"),
       ctl("f-ar", "Accounts receivable/invoicing", 8, "Prepares and sends invoices with tax from your confirmed setup, tracks what clients owe, and sends reminders.", ["Tax only from your confirmed configuration; no invented rates"], "Reminders automatic; write-offs and credit notes need approval"),
       crit("f-payroll", "Payroll processing", 10, "Prepares each payroll run from your data; after approval, runs it in your payroll system.", ["Your named approver approves every run", "Runs only in your own payroll tool"], "Needs my approval before every run"),
       ctl("f-bankrec", "Bank reconciliation", 7, "Matches the books to bank statements and flags differences.", ["Uses the accounting software's bank feeds; no bank credentials"], "Automatic matches; differences to a person"),
@@ -107,7 +107,7 @@ const CATEGORIES: Category[] = [
       crit("f-expense", "Expense tracking/reimbursement", 6, "Collects receipts, checks them against your policy, prepares reimbursements; after approval, pays them.", ["Your named approver approves before any reimbursement is paid"], "Needs my approval before any reimbursement"),
       ctl("f-cashflow", "Cash flow management", 7, "Monitors cash, upcoming bills and receipts, and flags problems early.", ["Alerts only"], "Automatic alerts"),
       std("f-reporting", "Financial reporting to ownership", 6, "Prepares regular summaries for the owner from the books.", ["Figures trace to records"], "Automatic on your schedule"),
-      crit("f-tax", "Tax preparation (client-validated filing)", 12, "Prepares the information for filings and deadline reminders, and delivers the package to your designated person.", ["ORAGROL's automation never files", "No tax advice; your accountant keeps professional judgment"], "Prepare only; your designated person reviews and files"),
+      crit("f-tax", "Tax preparation (client-validated filing)", 12, "Prepares the information for filings and deadline reminders, and delivers the package to your designated person.", ["ORAGROL Automation never files", "No tax advice; your accountant keeps professional judgment"], "Prepare only; your designated person reviews and files"),
     ],
   },
   {
@@ -223,7 +223,7 @@ const CATEGORIES: Category[] = [
       row("records", "Corporate records", ["My own storage + ORAGROL register", "Ownr", "Collage"]),
     ],
     items: [
-      crit("l-license", "License/permit renewal tracking and filing", 7, "Tracks every licence and permit with dates and fees, reminds you early, and prepares renewal packages and forms.", ["Government portals: ORAGROL's automation prepares; your authorised person submits", "Your credentials never go in chat"], "Reminders automatic; every renewal needs your named approver"),
+      crit("l-license", "License/permit renewal tracking and filing", 7, "Tracks every licence and permit with dates and fees, reminds you early, and prepares renewal packages and forms.", ["Government portals: ORAGROL Automation prepares; your authorised person submits", "Your credentials never go in chat"], "Reminders automatic; every renewal needs your named approver"),
       ctl("l-regulatory", "Regulatory compliance tracking", 8, "Keeps a list of the rules that apply to your business and province, watches for changes, and flags what needs action.", ["Alerts and summaries only, not legal advice"], "Alerts automatic"),
       ctl("l-insurance", "Insurance management", 6, "Tracks policies, coverage, premiums and renewal dates; compares broker quotes you provide.", ["Never buys, changes or cancels cover"], "Reminders automatic; changes need approval"),
       ctl("l-records", "Corporate record-keeping", 6, "Keeps the minute book, registers, resolutions and annual-filing dates; drafts resolutions.", ["Drafts only; never signs; never deletes a record"], "Drafts need approval; filing by your authorised person"),
@@ -240,7 +240,7 @@ const CATEGORIES: Category[] = [
     items: [
       std("d-kpi", "KPI/performance dashboards", 7, "Builds live dashboards of the metrics you choose, from your connected tools.", ["Shows only numbers that trace to a connected tool"], "Automatic"),
       ctl("d-investor", "Investor/board reporting", 7, "Drafts and compiles the report pack from the books and dashboards, with commentary drafts.", ["Every report labelled as a draft", "Sends only to the recipients you list", "Figures trace to the books"], "Every report needs your named approver before it goes to anyone", true),
-      std("d-analytics", "Company-wide analytics", 9, "Joins data across the business and finds patterns and trends for the owner.", ["Shows what the data says and how complete it is; no decisions by ORAGROL's automation"], "Automatic as reports"),
+      std("d-analytics", "Company-wide analytics", 9, "Joins data across the business and finds patterns and trends for the owner.", ["Shows what the data says and how complete it is; no decisions by ORAGROL Automation"], "Automatic as reports"),
       std("d-risk", "Risk monitoring/flagging", 7, "Watches the risk signals you define (cash, late payments, supplier problems, compliance dates) and flags them.", ["Flags only; you decide what to do"], "Alerts automatic"),
     ],
   },

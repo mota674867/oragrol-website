@@ -4,7 +4,7 @@ import { BrandLogo } from "../brand-logo";
 import { rateLimitShared } from "../../lib/rate-limit-shared";
 import { getCatalogue, withDetails } from "../../lib/apply/catalogue";
 import { withPrefill } from "../../lib/apply/engine";
-import { restore } from "../../lib/apply/handler";
+import { restore, restoreFor, setupFromOpen } from "../../lib/apply/handler";
 import { formToken, LINK_CODE, ocsApply, ocsApplyConfig } from "../../lib/apply/ocs";
 import { draftFormsAllowed, openableForm } from "../../lib/apply/registry";
 import { ApplyForm } from "./apply-form";
@@ -54,13 +54,16 @@ export default async function ApplyPage({ params }: { params: Promise<{ code: st
   if (o.state === "submitted") {
     return <Notice title="Thank you, this form has been submitted">Reference {reference}. We will be in touch about the next step. If you need to change something, reply to the email we sent you.</Notice>;
   }
-  const form = typeof o.formType === "string" && typeof o.product === "string" ? openableForm(o.formType, o.product, draftFormsAllowed()) : null;
+  const catalogue = getCatalogue();
+  // A Business setup is built from the application it was sent for; an application form is a fixed form. Either must also be cleared to open.
+  const setup = o.formType === "setup" && typeof o.product === "string" ? setupFromOpen(o.product, o, catalogue) : null;
+  const form = setup ? (setup.status === "published" || draftFormsAllowed() ? setup : null)
+    : typeof o.formType === "string" && typeof o.product === "string" ? openableForm(o.formType, o.product, draftFormsAllowed()) : null;
   if (!form) return <Notice title="This form is not open yet">Your private link is valid, but the form is not ready. We will contact you when it is.</Notice>;
 
-  const catalogue = getCatalogue();
   const p = (o.prefill ?? {}) as Record<string, unknown>;
   const invitation = { company: String(p.company ?? ""), person: String(p.person ?? ""), phone: String(p.phone ?? ""), email: String(p.email ?? "") };
-  const saved = restore(form.id, catalogue, o.answers);
+  const saved = setup ? restoreFor(form, catalogue, o.answers) : restore(form.id, catalogue, o.answers);
   const answers = withPrefill(form, catalogue, saved.answers, invitation);
 
   return (
