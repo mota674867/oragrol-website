@@ -258,7 +258,7 @@ export function ApplyForm({ code, token, form, catalogue, reference, expiresAt, 
           </div>
         </form>
       </main>
-      <p className="ap-foot">ORAGROL GLOBAL · This page is private to you. Please do not share the link.</p>
+      <p className="ap-foot">ORAGROL GLOBAL · This page is private to you. Please do not share the link.<br />This form was prepared with the help of AI. Mistakes are possible: please check your answers and tell us if anything looks wrong.</p>
     </div>
   );
 }

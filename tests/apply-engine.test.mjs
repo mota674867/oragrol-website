@@ -562,3 +562,8 @@ test("categories: the client ticks them in section 03; only ticked categories sh
   assert.equal(validateField(field([need], "categories"), ctxOf({ categories: [] })), "This is required.");
   assert.equal(validateField(field([need], "items"), ctxOf({ categories: ["Sales"], items: ["fx-leads"] })), null);
 });
+
+test("the web form footer says it was prepared with the help of AI and mistakes are possible", async () => {
+  const client = await readFile(new URL("../app/apply/[code]/apply-form.tsx", import.meta.url), "utf8");
+  assert.match(client, /prepared with the help of AI\. Mistakes are possible/);
+});
