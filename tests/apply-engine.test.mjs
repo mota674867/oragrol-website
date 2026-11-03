@@ -87,13 +87,17 @@ test("a form can only be published once its draft markers are gone", () => {
   }
 });
 
-test("the real catalogue has the 10 categories in the website's order but no items yet, so the form cannot be completed", () => {
+test("the real catalogue is the approved OR ONE menu: 10 categories in the website's order, 77 items, 533 points, 11 locked", () => {
   assert.deepEqual(REAL.categories.map((c) => c.name), ["Sales", "Marketing & Branding", "Finance & Accounting", "HR & People", "Customer Service",
     "Operations & Admin", "IT & Technology", "Procurement & Vendor", "Legal & Compliance", "Leadership & Strategy"]);
-  assert.equal(catalogueReady(REAL), false);
-  const pages = expand(form, REAL, {});
-  const need = pages.find((p) => p.id === "need");
-  assert.equal(validatePage(need, ctxOf(fillAll(REAL, { items: [] }), {}, REAL)).items, "Choose at least one item.");
+  const items = REAL.categories.flatMap((c) => c.items);
+  assert.equal(items.length, 77);
+  assert.equal(items.reduce((n, i) => n + i.points, 0), 533);
+  assert.equal(items.filter((i) => i.locked).length, 11, "the 10 critical items plus investor/board reporting");
+  assert.equal(items.find((i) => i.id === "d-investor").locked, true, "investor/board reporting is locked (decision 2026-11-03)");
+  assert.equal(catalogueReady(REAL), true);
+  const need = expand(form, REAL, {}).find((p) => p.id === "need");
+  assert.equal(validatePage(need, ctxOf({ ...fillAll(REAL, { items: [] }) }, {}, REAL)).items, "Choose at least one item.");
 });
 
 // ---------------------------------------------------------------- gating, formats, the meeting box
@@ -116,12 +120,10 @@ test("wrong formats are refused: email, phone, website, number, date", () => {
   assert.match(ok("start", "2026-02-31"), /valid date/); assert.equal(ok("start", "2026-12-01"), null);
 });
 
-test("\"None / not applicable\" must be chosen explicitly where something does not apply; it unlocks the follow-up field", () => {
+test("\"None / not applicable\" must be chosen explicitly where something does not apply", () => {
   const pages = expand(form, FX, {});
-  const ctx = ctxOf({ tech_name: NONE_TEXT });
-  assert.equal(validateField(field(pages, "tech_name"), ctx), null);
-  assert.equal(validateField(field(pages, "tech_email"), ctx), null, "no email is asked when there is no technical contact");
-  assert.equal(validateField(field(pages, "tech_email"), ctxOf({ tech_name: "Pat" })), "This is required.");
+  assert.equal(validateField(field(pages, "tech_contact"), ctxOf({ tech_contact: NONE_TEXT })), null);
+  assert.equal(validateField(field(pages, "tech_contact"), ctxOf({})), "This is required.", "a blank is never accepted; \"None\" must be chosen");
 });
 
 test("\"I need to discuss this in a meeting\" completes a compulsory field; it is offered on compulsory fields only, never on legal boxes or the signature", () => {
@@ -150,8 +152,8 @@ test("the meeting agenda lists every flagged compulsory field as page and item, 
   const pages = expand(form, FX, answers);
   const list = meetingList(pages, ctxOf(answers, { goal: true, "rule.fx-pay.choice": true, trade_name: true, hours: false }));
   assert.deepEqual(list, [
-    { section: "What you need", item: "Main goal, in your own words", note: null },
-    { section: "Your rules, item by item: Finance & Accounting", item: "Example item C: sending money › Your choice", note: null },
+    { section: "03 What do you need?", item: "Your main goal, in your own words", note: null },
+    { section: "06 Your rules, item by item: Finance & Accounting", item: "Example item C: sending money › Your choice", note: null },
   ]);
 });
 
@@ -160,11 +162,12 @@ test("the meeting agenda lists every flagged compulsory field as page and item, 
 test("the items picked decide the pages: software, size and situation, and one rules page per category with a card per item", () => {
   const answers = { items: ["fx-leads", "fx-pay"] };
   const pages = expand(form, FX, answers);
-  assert.deepEqual(pages.map((p) => p.title), ["Your company", "People", "What you need", "Your software", "Size and situation", "Your rules, item by item: Sales",
-    "Your rules, item by item: Finance & Accounting", "Approvers and escalation", "Your rules in general", "Request a meeting", "Confirm and legal"]);
+  assert.deepEqual(pages.map((p) => p.title), ["Before you start", "01 Your company", "02 People", "03 What do you need?", "04 Your software", "05 Size and situation",
+    "06 Your rules, item by item: Sales", "06 Your rules, item by item: Finance & Accounting", "07 Approvers and escalation", "08 Your rules in general",
+    "09 Request a meeting (optional)", "10 Name, details and signature"]);
   const software = pages.find((p) => p.id === "software");
-  assert.ok(software.fields.some((f) => f.group === "Customer records (CRM)") && software.fields.some((f) => f.group === "Email sending"));
-  assert.ok(software.fields.some((f) => f.id === "platform"), "the platform choice sits on the software page");
+  assert.ok(software.fields.some((f) => f.group === "Sales" && f.label === "Customer records (CRM)"), "the software rows come from the picked category");
+  assert.ok(!software.fields.some((f) => f.group === "Finance & Accounting"), "no software row for a category that was not picked");
   assert.equal(pickedPoints(answers, FX), 28);
   assert.equal(tierEstimate(form, answers, FX), "100", "28 points would fit STARTER, but STARTER is one category only");
   assert.equal(tierEstimate(form, { items: ["fx-leads", "fx-quotes"] }, FX), "STARTER");
@@ -172,9 +175,8 @@ test("the items picked decide the pages: software, size and situation, and one r
 });
 
 test("with nothing picked there are no generated pages; the real catalogue offers no items so none appear", () => {
-  assert.deepEqual(expand(form, FX, {}).map((p) => p.id).filter((id) => ["situation", "rules.sales"].includes(id)), []);
-  const generated = expand(form, REAL, {}).filter((p) => p.spec !== "fields");
-  assert.deepEqual(generated.map((p) => [p.id, p.fields.map((f) => f.id)]), [["software", ["platform"]]], "only the platform question remains");
+  assert.deepEqual(expand(form, FX, {}).filter((p) => p.spec !== "fields"), []);
+  assert.deepEqual(expand(form, REAL, {}).filter((p) => p.spec !== "fields"), [], "nothing is generated until the client picks items");
 });
 
 test("item cards: nothing is pre-selected; locked items offer no Automatic; conditions and approver are compulsory only when they apply", () => {
@@ -193,8 +195,8 @@ test("item cards: nothing is pre-selected; locked items offer no Automatic; cond
 
 test("picking a category makes the related people compulsory on the People page (accountant for Finance)", () => {
   const people = (answers) => expand(form, FX, answers).find((p) => p.id === "people");
-  assert.equal(validatePage(people({ items: ["fx-leads"] }), ctxOf({ items: ["fx-leads"] })).acct_name, undefined);
-  assert.equal(validatePage(people({ items: ["fx-pay"] }), ctxOf({ items: ["fx-pay"] })).acct_name, "This is required.");
+  assert.equal(validatePage(people({ items: ["fx-leads"] }), ctxOf({ items: ["fx-leads"] })).acct, undefined);
+  assert.equal(validatePage(people({ items: ["fx-pay"] }), ctxOf({ items: ["fx-pay"] })).acct, "This is required.");
 });
 
 // ---------------------------------------------------------------- saving and reading back
@@ -217,13 +219,13 @@ test("saved answers are readable (page > field) and read back exactly, including
   const flags = { goal: true, "rule.fx-pay.choice": true };
   const pages = expand(form, FX, answers);
   const labelled = toLabelled(form, pages, ctxOf(answers, flags));
-  assert.deepEqual(labelled.Form, { Name: "OR ONE application form", Version: "draft-1" });
-  assert.equal(labelled["Your company"]["Company legal name"], "Northwind Dental Group");
-  assert.equal(labelled["Your company"]["Employees on payroll"], 12, "numbers are saved as numbers");
-  assert.deepEqual(labelled["What you need"]["Items you need"], ["Example item A: lead replies", "Example item B: quote drafts", "Example item C: sending money"]);
-  assert.deepEqual(labelled["People"]["People allowed to send requests (up to 5)"], [{ Name: "Sam Lee", Role: "Owner", Email: "sam@x.example" }]);
-  assert.equal(labelled["Your rules, item by item: Sales"]["Example item A: lead replies"]["Your choice"], "Automatic");
-  assert.deepEqual(labelled[MEETING_KEY], ["What you need › Main goal, in your own words", "Your rules, item by item: Finance & Accounting › Example item C: sending money › Your choice"]);
+  assert.deepEqual(labelled.Form, { Name: "OR ONE application form", Version: "draft-2" });
+  assert.equal(labelled["01 Your company"]["Company legal name"], "Northwind Dental Group");
+  assert.equal(labelled["01 Your company"]["Employees on payroll"], 12, "numbers are saved as numbers");
+  assert.deepEqual(labelled["03 What do you need?"]["Items you need"], ["Example item A: lead replies", "Example item B: quote drafts", "Example item C: sending money"]);
+  assert.deepEqual(labelled["02 People"]["Up to 5 named people from your team can send us requests. Name at least one."], [{ Name: "Sam Lee", Role: "Owner", Email: "sam@x.example" }]);
+  assert.equal(labelled["06 Your rules, item by item: Sales"]["Example item A: lead replies"]["Your choice"], "Automatic");
+  assert.deepEqual(labelled[MEETING_KEY], ["03 What do you need? › Your main goal, in your own words", "06 Your rules, item by item: Finance & Accounting › Example item C: sending money › Your choice"]);
   assert.ok(Buffer.byteLength(JSON.stringify(labelled)) < 200 * 1024);
 
   const back = fromLabelled(form, FX, JSON.parse(JSON.stringify(labelled)));
@@ -238,9 +240,9 @@ test("only fields of the form are ever saved: junk, hidden answers and over-long
   const pages = expand(form, FX, answers);
   const labelled = toLabelled(form, pages, ctxOf(answers, {}));
   assert.ok(!JSON.stringify(labelled).includes("totally"), "unknown ids are dropped");
-  assert.equal(labelled.People["Technical contact or IT provider: email"], undefined, "a hidden field is not saved");
-  assert.equal(labelled["What you need"]["Main goal, in your own words"].length, 2000, "clipped to the limit");
-  assert.ok(!labelled["What you need"]["Main goal, in your own words"].includes("\u0000"));
+  assert.ok(!JSON.stringify(labelled).includes("left-over@x.example"), "a field the form does not have is not saved");
+  assert.equal(labelled["03 What do you need?"]["Your main goal, in your own words"].length, 2000, "clipped to the limit");
+  assert.ok(!labelled["03 What do you need?"]["Your main goal, in your own words"].includes("\u0000"));
 });
 
 test("invitation details pre-fill the form where it asks for them and never overwrite what the client typed", () => {
@@ -284,7 +286,7 @@ test("save: sends only the readable, form-defined answers to OCS, signed with th
   const ts = call.init.headers["x-ocs-timestamp"];
   assert.equal(call.init.headers["x-ocs-signature"], "sha256=" + createHmac("sha256", SECRET).update(`${ts}.${call.init.body}`).digest("hex"));
   assert.equal(call.body.code, CODE); assert.equal(call.body.page, 3); assert.deepEqual(call.body.client, CLIENT);
-  assert.ok(call.body.answers["Your company"] && !JSON.stringify(call.body.answers).includes("junk"));
+  assert.ok(call.body.answers["01 Your company"] && !JSON.stringify(call.body.answers).includes("junk"));
   assert.equal(sign(SECRET, "1", "x"), "sha256=" + createHmac("sha256", SECRET).update("1.x").digest("hex"));
 });
 
@@ -329,7 +331,7 @@ test("submit: a complete form goes to OCS with the signature and the meeting age
   const sent = h.calls[0].body;
   assert.equal(h.calls[0].url, "https://ocs.example/v1/apply/submit");
   assert.deepEqual(sent.signature, { name: "Laura Chen", title: "Some answer", signature: "Laura Chen", agree: true });
-  assert.deepEqual(sent.meetings, [{ section: "What you need", item: "Main goal, in your own words", note: null }]);
+  assert.deepEqual(sent.meetings, [{ section: "03 What do you need?", item: "Your main goal, in your own words", note: null }]);
   assert.ok(!JSON.stringify(r.body).includes(CODE), "the link code is never echoed");
 });
 

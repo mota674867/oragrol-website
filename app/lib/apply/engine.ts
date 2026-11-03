@@ -100,16 +100,13 @@ export function expand(def: FormDefinition, catalogue: Catalogue, answers: Answe
         c.situation.map((f) => ({ ...f, id: `sit.${c.id}.${f.id}`, group: c.name, required: f.required ?? true })));
       if (fields.length) out.push({ ...base, fields, spec: "situation" });
     } else if (spec.kind === "tools") {
-      const needed = new Set(pickedItems(answers, catalogue).flatMap((p) => p.item.toolTypes));
-      const fields = catalogue.toolTypes.filter((t) => needed.has(t.id)).flatMap((t): Field[] => {
-        const choose = `tool.${t.id}.choice`;
-        return [
-          { id: choose, label: "Your choice", group: t.name, kind: "select", choice: true, required: true,
-            options: [...t.vendors, "Already use one (tell us which)", "Not sure, recommend for me"] },
-          { id: `tool.${t.id}.current`, label: "Product name and version or plan", group: t.name, kind: "text", discuss: false,
-            requiredIf: { field: choose, is: "Already use one (tell us which)" }, showIf: { field: choose, is: "Already use one (tell us which)" } },
-        ];
-      });
+      // One row per tool in each picked category, as the PDF's software section lists them: the options, "Not sure, recommend",
+      // and an "Already use" box. Each row is compulsory (a blank is never accepted; "None" is not a tool choice).
+      const fields = pickedCategories(answers, catalogue).flatMap((c) => c.tools.flatMap((r): Field[] => [
+        { id: `tool.${c.id}.${r.id}`, label: r.label, group: c.name, kind: "select", choice: true, required: true, discuss: false,
+          options: [...r.options, "Not sure, recommend"] },
+        { id: `tool.${c.id}.${r.id}.already`, label: `${r.label}: already use`, group: c.name, kind: "text", required: false, discuss: false },
+      ]));
       const all = [...fields, ...(spec.extra ?? [])];
       if (all.length) out.push({ ...base, fields: all, spec: "tools" });
     } else {

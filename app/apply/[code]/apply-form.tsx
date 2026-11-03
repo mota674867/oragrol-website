@@ -218,6 +218,7 @@ export function ApplyForm({ code, token, form, catalogue, reference, expiresAt, 
       <main className="ap-card" id="main">
         <h1 className="ap-h1" tabIndex={-1} ref={heading}>{page.title}</h1>
         {page.intro && <p className="ap-muted ap-intro">{page.intro}</p>}
+        {page.body?.map((paragraph) => <p key={paragraph} className="ap-intro">{paragraph}</p>)}
         <p className="ap-legend"><span className="ap-star" aria-hidden="true">*</span> Compulsory. Everything else is optional. {index === 0 && expiresAt ? <>Your answers are saved as you go; use the same link to come back until {new Date(expiresAt).toLocaleDateString("en-CA", { day: "numeric", month: "long", year: "numeric", timeZone: "America/Toronto" })}.</> : null}</p>
 
         {flagCount > 0 && (

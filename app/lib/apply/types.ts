@@ -54,6 +54,8 @@ export interface Page {
   readonly id: string;
   readonly title: string;
   readonly intro?: string;
+  /** Further paragraphs shown under the intro (for example the start page). */
+  readonly body?: readonly string[];
   readonly fields: readonly Field[];
 }
 
@@ -92,19 +94,20 @@ export interface Item {
   /** ORAGROL's fixed limits for this item: shown, locked. */
   readonly fixedLimits: readonly string[];
   readonly suggestedDefault: string;
-  /** Locked items offer only "needs approval" or "red flag". */
+  /** Locked items offer only "needs approval" or "red flag" (every critical item, and investor/board reporting). */
   readonly locked?: boolean;
-  readonly toolTypes: readonly string[];
 }
+/** One row of the software page: a tool the client chooses from, as the PDF lists it. */
+export interface ToolRow { readonly id: string; readonly label: string; readonly options: readonly string[] }
 export interface Category {
   readonly id: string;
   /** The website name of the category. */
   readonly name: string;
   readonly situation: readonly Field[];
+  readonly tools: readonly ToolRow[];
   readonly items: readonly Item[];
 }
-export interface ToolType { readonly id: string; readonly name: string; readonly vendors: readonly string[] }
-export interface Catalogue { readonly categories: readonly Category[]; readonly toolTypes: readonly ToolType[] }
+export interface Catalogue { readonly categories: readonly Category[] }
 
 /** Flat answers by field id, as the form holds them while the client types. */
 export type Answers = Record<string, unknown>;
