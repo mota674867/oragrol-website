@@ -5,12 +5,13 @@ import { createHmac } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
-  NONE_TEXT, canDiscuss, catalogueReady, expand, firstIncomplete, fromLabelled, isRequired, meetingList, pickedPoints, signaturePayload,
+  NONE_TEXT, canDiscuss, catalogueReady, expand, firstIncomplete, fromLabelled, isRequired, isVisible, meetingList, pickedPoints, signaturePayload,
   tierEstimate, toLabelled, validateAll, validateField, validatePage, withPrefill, MAX_FLAGS_BEFORE_WARNING, MEETING_KEY,
 } from "../app/lib/apply/engine.ts";
 import { fixtureCatalogue } from "../app/lib/apply/catalogue-fixture.ts";
 import { getCatalogue } from "../app/lib/apply/catalogue.ts";
 import { orOneApplication as form } from "../app/lib/apply/forms/or-one-application.ts";
+import { baApplication as ba } from "../app/lib/apply/forms/ba-application.ts";
 import { allForms, openableForm } from "../app/lib/apply/registry.ts";
 import { handleApply } from "../app/lib/apply/handler.ts";
 import { formToken, ocsApplyConfig, sign } from "../app/lib/apply/ocs.ts";
@@ -45,7 +46,7 @@ function sample(f) {
     case "check": return true;
     case "yesno": return "Yes";
     case "select": return f.options?.[0] ?? "x";
-    case "multiselect": return [f.options?.[0] ?? "x"];
+    case "multiselect": return (f.options ?? ["x"]).slice(0, Math.max(1, f.min ?? 1));
     case "people": return [{ name: "Sam Lee", role: "Owner", email: "sam@x.example" }];
     case "typed": return "Laura Chen";
     default: return "Some answer";
@@ -377,4 +378,71 @@ test("the form looks like the dashboard: same font (Inter, self-hosted), same li
   assert.match(layout, /og-theme/); assert.match(layout, /"light"/, "light by default, like the dashboard");
   const fontFile = await readFile(new URL("../public/fonts/InterVariable.woff2", import.meta.url)); assert.ok(fontFile.length > 100_000);
   await readFile(new URL("../public/fonts/Inter-LICENSE.txt", import.meta.url));
+});
+
+// ---------------------------------------------------------------- the BA application form (PDF: BA Application Form v2)
+
+function fillBA(start = {}) {
+  const answers = withPrefill(ba, FX, { packages: ["Sales"], ...start }, INVITE);
+  for (let round = 0; round < 6; round += 1) {
+    for (const page of expand(ba, FX, answers)) {
+      for (const f of page.fields) {
+        if (!isRequired(f, ctxOf(answers, {}, FX)) || (f.id in answers && answers[f.id] !== "" && answers[f.id] !== undefined)) continue;
+        answers[f.id] = sample(f);
+      }
+    }
+  }
+  return answers;
+}
+const ids = (answers) => new Set(expand(ba, FX, answers).flatMap((p) => p.fields.filter((f) => isVisible(f, ctxOf(answers, {}, FX))).map((f) => f.id)));
+const titles = (answers) => expand(ba, FX, answers).map((p) => p.title);
+
+test("BA: the start page comes first and holds the 11 conditions; nothing else opens until they are ticked", () => {
+  assert.equal(ba.status, "draft");
+  assert.equal(openableForm("application", "ba", false), null);
+  assert.equal(expand(ba, FX, {})[0].id, "start");
+  assert.equal(expand(ba, FX, {})[0].fields.length, 11);
+  assert.equal(Object.keys(validatePage(expand(ba, FX, {})[0], ctxOf({}, {}, FX))).length, 11);
+});
+
+test("BA: the packages chosen decide the pages; a package not chosen has no page and no software rows", () => {
+  assert.deepEqual(titles({ packages: ["Sales"] }), ["Before you start", "01 Your company", "02 People", "03 What do you need?", "04 Your software",
+    "05 Sales and Customer Service", "09 Sign-off sheet", "10 Your plan size", "11 Request a meeting (optional)", "12 Name, details and signature"]);
+  const sales = ids({ packages: ["Sales"] });
+  assert.ok(sales.has("tool.crm") && sales.has("tool.esign") && !sales.has("tool.social") && !sales.has("tool.accounting") && !sales.has("tool.device"));
+});
+
+test("BA: a tool that appears under two packages is asked once (payments in Finance, email in Marketing, platform in software)", () => {
+  assert.ok(ids({ packages: ["Sales"] }).has("tool.sales_payments"), "Sales alone asks payments");
+  const both = ids({ packages: ["Sales", "Finance"] });
+  assert.ok(both.has("tool.fin_payments") && !both.has("tool.sales_payments"), "with Finance chosen, payments is asked under Finance only");
+  assert.ok(ids({ packages: ["Sales"] }).has("tool.sales_email") && !ids({ packages: ["Sales", "Marketing"] }).has("tool.sales_email"));
+  assert.ok(ids({ packages: ["Sales", "Marketing"] }).has("tool.mkt_email"));
+  const it = ids({ packages: ["IT"] });
+  assert.ok(it.has("platform") && it.has("tool.itsupport"));
+  assert.ok(!expand(ba, FX, { packages: ["IT"] }).find((p) => p.id === "it").fields.some((f) => f.id === "platform"), "the IT section does not ask the platform again");
+});
+
+test("BA: IT support uses the OR ONE options (decision 4); Zendesk is not offered anywhere on the BA form", () => {
+  const field = expand(ba, FX, { packages: ["IT"] }).flatMap((p) => p.fields).find((f) => f.id === "tool.itsupport");
+  assert.deepEqual(field.options, ["Support desk above", "Freshservice", "Jira Service Mgmt", "Not sure, recommend"]);
+  assert.doesNotMatch(JSON.stringify(ba), /Zendesk/);
+});
+
+test("BA: platforms must be exactly 2, and the ad budget is asked only when ads are wanted", () => {
+  const pages = expand(ba, FX, { packages: ["Marketing"] });
+  const plat = pages.find((p) => p.id === "marketing").fields.find((f) => f.id === "m_platforms");
+  assert.equal(validateField(plat, ctxOf({ m_platforms: ["Facebook"] }, {}, FX)), "Choose exactly 2.");
+  assert.equal(validateField(plat, ctxOf({ m_platforms: ["Facebook", "Instagram"] }, {}, FX)), null);
+  const budget = pages.find((p) => p.id === "marketing").fields.find((f) => f.id === "m_budget");
+  assert.equal(isVisible(budget, ctxOf({ m_ads: "No ads" }, {}, FX)), false);
+  assert.equal(isRequired(budget, ctxOf({ m_ads: "Google Ads" }, {}, FX)), true);
+});
+
+test("BA: something else needs a description; a complete BA form passes every page and the final check", () => {
+  const answers = fillBA({ packages: ["Sales", "Something else (tailored automation)"] });
+  assert.equal(validateField(field(expand(ba, FX, answers), "something_else"), ctxOf({ packages: answers.packages, something_else: "" }, {}, FX)), "This is required.");
+  const full = fillBA();
+  assert.deepEqual(validateAll(ba, FX, full, {}), { ok: true, pageIndex: -1, errors: {} });
+  assert.equal(validateAll(ba, FX, { ...full, legal_11: false }, {}).ok, false, "the last condition must be ticked");
 });

@@ -3,8 +3,9 @@
 // until its content is final" is enforced in code, not by memory.
 import type { FormDefinition } from "./types";
 import { orOneApplication } from "./forms/or-one-application.ts";
+import { baApplication } from "./forms/ba-application.ts";
 
-const FORMS: readonly FormDefinition[] = [orOneApplication];
+const FORMS: readonly FormDefinition[] = [orOneApplication, baApplication];
 
 export const allForms = (): readonly FormDefinition[] => FORMS;
 

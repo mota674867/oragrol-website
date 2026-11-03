@@ -56,6 +56,8 @@ export interface Page {
   readonly intro?: string;
   /** Further paragraphs shown under the intro (for example the start page). */
   readonly body?: readonly string[];
+  /** The page is shown only when this holds (for example a BA package was picked). */
+  readonly showIf?: Cond;
   readonly fields: readonly Field[];
 }
 

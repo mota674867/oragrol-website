@@ -93,7 +93,10 @@ const ruleChoices = (item: Item): string[] =>
 export function expand(def: FormDefinition, catalogue: Catalogue, answers: Answers): ConcretePage[] {
   const out: ConcretePage[] = [];
   for (const spec of def.pages) {
-    if (spec.kind === "fields") { out.push({ ...spec.page, spec: "fields" }); continue; }
+    if (spec.kind === "fields") {
+      if (test(spec.page.showIf, { answers, flags: {}, catalogue })) out.push({ ...spec.page, spec: "fields" });
+      continue;
+    }
     const base = { id: spec.id, title: spec.title, intro: spec.intro };
     if (spec.kind === "situation") {
       const fields = pickedCategories(answers, catalogue).flatMap((c) =>
@@ -162,7 +165,12 @@ export function validateField(f: Field, ctx: Ctx): string | null {
     }
     case "multiselect": {
       const allowed = optionsOf(f);
-      return strings(v).length > 0 && strings(v).every((x) => allowed.includes(x)) ? null : "Choose at least one option.";
+      const chosen = strings(v);
+      if (!chosen.every((x) => allowed.includes(x))) return "Choose one of the options.";
+      const min = f.min ?? 1;
+      if (chosen.length < min) return min === 1 ? "Choose at least one option." : `Choose ${min === f.max ? `exactly ${min}` : `at least ${min}`}.`;
+      if (f.max !== undefined && chosen.length > f.max) return `Choose no more than ${f.max}.`;
+      return null;
     }
   }
   return null;
