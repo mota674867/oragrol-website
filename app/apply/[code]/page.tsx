@@ -29,7 +29,11 @@ export default async function ApplyPage({ params }: { params: Promise<{ code: st
   const { code } = await params;
   if (!LINK_CODE.test(code)) notFound();
   const config = ocsApplyConfig();
-  if (!config) return <Notice title="Temporarily unavailable">This form cannot be opened right now. Please try again later.</Notice>;
+  if (!config) {
+    // Reason only, never a value: lets us tell a missing or invalid setting from an OCS failure in the server logs.
+    console.error("apply open: not configured", { hasUrl: Boolean(process.env.OCS_APPLY_URL), secretLength: (process.env.OCS_APPLY_SECRET ?? "").length });
+    return <Notice title="Temporarily unavailable">This form cannot be opened right now. Please try again later.</Notice>;
+  }
 
   const h = await headers();
   const address = (h.get("x-forwarded-for") ?? "").split(",")[0]?.trim().slice(0, 64) || null;
@@ -39,7 +43,10 @@ export default async function ApplyPage({ params }: { params: Promise<{ code: st
   }
 
   const opened = await ocsApply("/v1/apply/open", { code, client: { address, agent } }, config);
-  if (!opened || opened.status >= 500 || opened.status === 401) return <Notice title="Temporarily unavailable">This form cannot be opened right now. Please try again later.</Notice>;
+  if (!opened || opened.status >= 500 || opened.status === 401) {
+    console.error("apply open: OCS did not accept the request", { reachable: opened !== null, status: opened?.status ?? null });
+    return <Notice title="Temporarily unavailable">This form cannot be opened right now. Please try again later.</Notice>;
+  }
   if (opened.status !== 200 || !opened.body || opened.body.status !== "ok") notFound();
   const o = opened.body;
   const reference = typeof o.reference === "string" ? o.reference : "";
