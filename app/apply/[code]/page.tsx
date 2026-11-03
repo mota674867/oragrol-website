@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { BrandLogo } from "../brand-logo";
 import { rateLimitShared } from "../../lib/rate-limit-shared";
-import { getCatalogue } from "../../lib/apply/catalogue";
+import { getCatalogue, withDetails } from "../../lib/apply/catalogue";
 import { withPrefill } from "../../lib/apply/engine";
 import { restore } from "../../lib/apply/handler";
 import { formToken, LINK_CODE, ocsApply, ocsApplyConfig } from "../../lib/apply/ocs";
@@ -61,7 +61,7 @@ export default async function ApplyPage({ params }: { params: Promise<{ code: st
       code={code}
       token={formToken(config.secret, code, form.id)}
       form={form}
-      catalogue={catalogue}
+      catalogue={withDetails(catalogue, Array.isArray(answers.categories) ? (answers.categories as string[]) : [])}
       reference={reference}
       expiresAt={typeof o.expiresAt === "string" ? o.expiresAt : null}
       lastPage={typeof o.lastPage === "number" ? o.lastPage : 1}

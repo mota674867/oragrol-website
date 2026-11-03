@@ -14,7 +14,7 @@ const NO_STORE = { "cache-control": "private, no-store", "x-robots-tag": "noinde
 
 export async function POST(request: Request, ctx: { params: Promise<{ action: string }> }) {
   const { action } = await ctx.params;
-  if (action !== "save" && action !== "submit") return NextResponse.json({ status: "failed" }, { status: 404, headers: NO_STORE });
+  if (action !== "save" && action !== "submit" && action !== "details") return NextResponse.json({ status: "failed" }, { status: 404, headers: NO_STORE });
   if (Number(request.headers.get("content-length") ?? 0) > 1_000_000) return NextResponse.json({ status: "failed", code: "TOO_LARGE" }, { status: 413, headers: NO_STORE });
   const raw = await request.text();
   const address = getClientIp(request);

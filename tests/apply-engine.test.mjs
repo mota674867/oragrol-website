@@ -9,7 +9,7 @@ import {
   tierEstimate, toLabelled, validateAll, validateField, validatePage, withPrefill, MAX_FLAGS_BEFORE_WARNING, MEETING_KEY,
 } from "../app/lib/apply/engine.ts";
 import { fixtureCatalogue } from "../app/lib/apply/catalogue-fixture.ts";
-import { getCatalogue } from "../app/lib/apply/catalogue.ts";
+import { detailsFor, getCatalogue, withDetails } from "../app/lib/apply/catalogue.ts";
 import { orOneApplication as form } from "../app/lib/apply/forms/or-one-application.ts";
 import { baApplication as ba } from "../app/lib/apply/forms/ba-application.ts";
 import { baSetup, orOneSetup } from "../app/lib/apply/forms/setup.ts";
@@ -566,4 +566,40 @@ test("categories: the client ticks them in section 03; only ticked categories sh
 test("the web form footer says it was prepared with the help of AI and mistakes are possible", async () => {
   const client = await readFile(new URL("../app/apply/[code]/apply-form.tsx", import.meta.url), "utf8");
   assert.match(client, /prepared with the help of AI\. Mistakes are possible/);
+});
+
+// ---------------------------------------------------------------- the browser only receives what the client ticked
+
+test("the browser is first given category names only; a category's items, limits, questions and vendors are sent only when it is ticked", () => {
+  const none = JSON.stringify(withDetails(REAL, []));
+  for (const secret of ["whatItDoes", "fixedLimits", "suggestedDefault", "HubSpot", "Wise Business", "Procurify", "Cold email outreach"]) assert.ok(!none.includes(secret), `${secret} must not be sent before a tick`);
+  assert.equal(JSON.parse(none).categories.length, 10, "the ten category names are public");
+  const sales = JSON.stringify(withDetails(REAL, ["Sales"]));
+  assert.ok(sales.includes("Cold email outreach") && sales.includes("HubSpot"), "ticked Sales is sent");
+  assert.ok(!sales.includes("Wise Business") && !sales.includes("Payroll processing"), "Finance was not ticked, so none of it is sent");
+  assert.deepEqual(detailsFor(REAL, ["Marketing & Branding", "nope"]).map((c) => c.name), ["Marketing & Branding"]);
+});
+
+test("details call: only the ticked categories come back, only for a valid link, and OCS is never contacted", async () => {
+  const h = harness();
+  const ask = (over = {}) => handleApply("details", JSON.stringify({ code: CODE, form: form.id, token: formToken(SECRET, CODE, form.id), categories: ["Sales"], ...over }), CLIENT, h.deps);
+  const ok = await ask();
+  assert.equal(ok.status, 200); assert.deepEqual(ok.body.categories.map((c) => c.name), ["Sales"]);
+  assert.ok(!JSON.stringify(ok.body).includes("Example item C"), "Finance details are not included");
+  assert.deepEqual((await ask({ categories: ["Finance & Accounting", "made up"] })).body.categories.map((c) => c.name), ["Finance & Accounting"]);
+  assert.deepEqual((await ask({ categories: "Sales" })).body.categories, [], "a malformed list gives nothing");
+  assert.equal((await ask({ token: "wrong" })).status, 404);
+  assert.equal((await ask({ code: "short" })).status, 404);
+  assert.equal(h.calls.length, 0, "no call to OCS for details");
+  const limited = harness({ limitOk: false });
+  assert.equal((await handleApply("details", JSON.stringify({ code: CODE, form: form.id, token: formToken(SECRET, CODE, form.id), categories: ["Sales"] }), CLIENT, limited.deps)).status, 429);
+});
+
+test("the page sends the browser a stripped catalogue and the browser fetches details itself", async () => {
+  const page = await readFile(new URL("../app/apply/[code]/page.tsx", import.meta.url), "utf8");
+  assert.match(page, /withDetails\(catalogue/);
+  assert.doesNotMatch(page, /catalogue=\{catalogue\}/, "the full catalogue is never passed to the browser");
+  const client = await readFile(new URL("../app/apply/[code]/apply-form.tsx", import.meta.url), "utf8");
+  assert.match(client, /\/api\/apply\/details/);
+  assert.doesNotMatch(client, /catalogue\.ts|getCatalogue|REAL\b/, "the browser never imports the full catalogue");
 });

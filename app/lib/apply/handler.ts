@@ -5,6 +5,7 @@
 //   - only fields that exist in the form are saved, clipped to their limits; nothing else reaches OCS;
 //   - a submit is checked in full here, with the same engine the browser uses, before OCS stores it;
 //   - replies say nothing about why a link failed: an unknown, expired or switched-off link is a plain 404.
+import { detailsFor } from "./catalogue.ts";
 import { expand, fromLabelled, meetingList, signaturePayload, toLabelled, validateAll } from "./engine.ts";
 import type { Ctx } from "./engine.ts";
 import { formById } from "./registry.ts";
@@ -26,7 +27,7 @@ export interface ApplyResult { readonly status: number; readonly body: Record<st
 const reply = (status: number, body: Record<string, unknown>): ApplyResult => ({ status, body });
 const plain = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === "object" && !Array.isArray(v);
 
-const LIMITS = { save: { limit: 200, windowMs: 10 * 60_000 }, submit: { limit: 12, windowMs: 10 * 60_000 } } as const;
+const LIMITS = { save: { limit: 200, windowMs: 10 * 60_000 }, submit: { limit: 12, windowMs: 10 * 60_000 }, details: { limit: 120, windowMs: 10 * 60_000 } } as const;
 
 /** The result of an OCS call, turned into what the browser may learn. */
 function fromOcs(r: OcsReply | null, okBody: (b: Record<string, unknown>) => Record<string, unknown>): ApplyResult {
@@ -39,7 +40,7 @@ function fromOcs(r: OcsReply | null, okBody: (b: Record<string, unknown>) => Rec
   return reply(r.status === 401 || r.status === 503 ? 503 : 502, { status: "failed", code: "UNAVAILABLE" });
 }
 
-export async function handleApply(action: "save" | "submit", rawBody: string, client: ClientMeta, deps: ApplyDeps): Promise<ApplyResult> {
+export async function handleApply(action: "save" | "submit" | "details", rawBody: string, client: ClientMeta, deps: ApplyDeps): Promise<ApplyResult> {
   if (!deps.config) return reply(503, { status: "failed", code: "UNAVAILABLE" });
   if (rawBody.length > MAX_BODY_CHARS) return reply(413, { status: "failed", code: "TOO_LARGE" });
   let input: unknown;
@@ -51,6 +52,12 @@ export async function handleApply(action: "save" | "submit", rawBody: string, cl
   const def = formById(formId);
   if (!def || (def.status !== "published" && !deps.allowDraft)) return reply(404, { status: "failed" });
   if (!(await deps.limit(`apply:${action}:${client.address ?? "unknown"}`, LIMITS[action]))) return reply(429, { status: "failed", code: "SLOW_DOWN" });
+
+  if (action === "details") {
+    // Only the details of the categories the client ticked are ever sent to the browser.
+    const names = Array.isArray(input.categories) ? input.categories.filter((n): n is string => typeof n === "string").slice(0, 10) : [];
+    return reply(200, { status: "ok", categories: detailsFor(deps.catalogue, names) });
+  }
 
   const answers: Answers = plain(input.answers) ? input.answers : {};
   const flags: Flags = plain(input.flags) ? Object.fromEntries(Object.entries(input.flags).map(([k, v]) => [k, v === true])) : {};

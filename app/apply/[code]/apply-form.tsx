@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { BrandLogo } from "../brand-logo";
 import { ThemeToggle } from "../theme-toggle";
 import {
-  MAX_FLAGS_BEFORE_WARNING, NONE_TEXT, canDiscuss, capsFor, catalogueReady, expand, firstIncomplete, isRequired, isVisible, optionsOf,
+  MAX_FLAGS_BEFORE_WARNING, NONE_TEXT, canDiscuss, capsFor, expand, firstIncomplete, isRequired, isVisible, optionsOf,
   pickedCategories, pickedItems, pickedPoints, tierEstimate, validatePage,
 } from "../../lib/apply/engine";
 import type { Ctx } from "../../lib/apply/engine";
@@ -16,11 +16,14 @@ type Phase = { kind: "form" } | { kind: "done"; reference: string; meetings: num
 
 const timeNow = () => new Date().toLocaleTimeString("en-CA", { hour: "2-digit", minute: "2-digit", hour12: false });
 
-export function ApplyForm({ code, token, form, catalogue, reference, expiresAt, lastPage, initialAnswers, initialFlags }: {
+export function ApplyForm({ code, token, form, catalogue: initialCatalogue, reference, expiresAt, lastPage, initialAnswers, initialFlags }: {
   code: string; token: string; form: FormDefinition; catalogue: Catalogue; reference: string; expiresAt: string | null; lastPage: number;
   initialAnswers: Answers; initialFlags: Flags;
 }) {
   const [answers, setAnswers] = useState<Answers>(initialAnswers);
+  // The browser starts with category names only. A category's items, questions, software and limits are fetched when it is ticked.
+  const [catalogue, setCatalogue] = useState<Catalogue>(initialCatalogue);
+  const asked = useRef<Set<string>>(new Set(initialCatalogue.categories.filter((c) => c.items.length > 0).map((c) => c.name)));
   const [flags, setFlags] = useState<Flags>(initialFlags);
   const [attempted, setAttempted] = useState<Record<string, boolean>>({});
   const [save, setSave] = useState<SaveState>({ kind: "idle" });
@@ -28,6 +31,22 @@ export function ApplyForm({ code, token, form, catalogue, reference, expiresAt, 
   const [submitting, setSubmitting] = useState(false);
   const [notice, setNotice] = useState("");
 
+  const ticked = useMemo(() => (Array.isArray(answers.categories) ? (answers.categories as string[]) : []), [answers.categories]);
+  useEffect(() => {
+    const missing = ticked.filter((name) => !asked.current.has(name));
+    if (missing.length === 0) return;
+    missing.forEach((name) => asked.current.add(name));
+    void fetch("/api/apply/details", {
+      method: "POST", headers: { "content-type": "application/json" }, cache: "no-store",
+      body: JSON.stringify({ code, form: form.id, token, categories: missing }),
+    }).then((r) => r.json()).then((body: { status?: string; categories?: Catalogue["categories"] }) => {
+      if (body.status !== "ok" || !Array.isArray(body.categories)) throw new Error("details");
+      const got = new Map(body.categories.map((c) => [c.id, c]));
+      setCatalogue((current) => ({ categories: current.categories.map((c) => got.get(c.id) ?? c) }));
+    }).catch(() => { missing.forEach((name) => asked.current.delete(name)); });
+  }, [ticked, code, form.id, token]);
+  // Ticked categories whose details have not arrived yet: the client waits a moment before moving on.
+  const waiting = ticked.some((name) => (catalogue.categories.find((c) => c.name === name)?.items.length ?? 1) === 0);
   const ctx: Ctx = useMemo(() => ({ answers, flags, catalogue }), [answers, flags, catalogue]);
   const pages = useMemo(() => expand(form, catalogue, answers), [form, catalogue, answers]);
   const firstBad = firstIncomplete(pages, ctx);
@@ -113,6 +132,7 @@ export function ApplyForm({ code, token, form, catalogue, reference, expiresAt, 
   };
 
   const next = async () => {
+    if (waiting) { setNotice("Loading your categories. Please try again in a moment."); return; }
     const errs = validatePage(page, ctx);
     if (Object.keys(errs).length) {
       setAttempted((a) => ({ ...a, [page.id]: true }));
@@ -384,14 +404,16 @@ function People({ field: f, value, onChange, invalid, id }: { field: Field; valu
 function ItemsPicker({ form, ctx, value, onChange }: { form: FormDefinition; ctx: Ctx; value: unknown; onChange: (v: unknown) => void }) {
   const picked = Array.isArray(value) ? (value as string[]) : [];
   const { catalogue } = ctx;
-  if (!catalogueReady(catalogue)) {
+  if (catalogue.categories.length === 0) {
     return <p className="ap-static ap-muted">The list of items is not published yet. We will contact you when it is.</p>;
   }
   const points = pickedPoints(ctx.answers, catalogue);
   const tier = tierEstimate(form, ctx.answers, catalogue);
   const count = pickedItems(ctx.answers, catalogue).length;
-  const shown = pickedCategories(ctx.answers, catalogue).filter((c) => c.items.length);
-  if (shown.length === 0) return <p className="ap-static ap-muted">Tick at least one category above to see its items.</p>;
+  const ticked = pickedCategories(ctx.answers, catalogue);
+  if (ticked.length === 0) return <p className="ap-static ap-muted">Tick at least one category above to see its items.</p>;
+  const shown = ticked.filter((c) => c.items.length);
+  if (shown.length === 0) return <p className="ap-static ap-muted" role="status">Loading your items…</p>;
   return (
     <div className="ap-items">
       <p className="ap-tier" role="status" aria-live="polite">

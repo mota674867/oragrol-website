@@ -249,6 +249,19 @@ const CATEGORIES: Category[] = [
 /** The live catalogue. Items come from the approved OR ONE sample (77 items, 533 points). */
 export const REAL: Catalogue = { categories: CATEGORIES };
 
+/** What the browser is first given: the category names only. Items, questions, software and limits are sent when a category is ticked. */
+export function stripped(c: Category): Category { return { id: c.id, name: c.name, situation: [], tools: [], items: [] }; }
+/** The full catalogue with details only for the named categories; every other category is names only. */
+export function withDetails(full: Catalogue, names: readonly string[]): Catalogue {
+  const wanted = new Set(names);
+  return { categories: full.categories.map((c) => (wanted.has(c.name) ? c : stripped(c))) };
+}
+/** The details of the named categories (at most the ones that exist), for the "details" call. */
+export function detailsFor(full: Catalogue, names: readonly string[]): Category[] {
+  const wanted = new Set(names);
+  return full.categories.filter((c) => wanted.has(c.name));
+}
+
 /**
  * The catalogue a form uses. A development-only switch loads a small FICTIONAL fixture so the picker and the item pages can be
  * tried before the real items exist. It can never run in production.
