@@ -181,7 +181,7 @@ test("with nothing picked there are no generated pages; the real catalogue offer
   assert.deepEqual(expand(form, REAL, {}).filter((p) => p.spec !== "fields"), [], "nothing is generated until the client picks items");
 });
 
-test("item cards: nothing is pre-selected; locked items offer no Automatic; one "limit, approver or never do" box per item", () => {
+test("item cards: nothing is pre-selected; locked items offer no Automatic; one 'limit, approver or never do' box per item", () => {
   const answers = { items: ["fx-leads", "fx-quotes", "fx-pay"] };
   const pages = expand(form, FX, answers);
   const choice = (item) => field(pages, `rule.${item}.choice`);
