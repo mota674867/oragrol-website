@@ -155,7 +155,7 @@ test("the meeting agenda lists every flagged compulsory field as page and item, 
   const list = meetingList(pages, ctxOf(answers, { goal: true, "rule.fx-pay.choice": true, trade_name: true, hours: false }));
   assert.deepEqual(list, [
     { section: "03 What do you need?", item: "Your main goal, in your own words", note: null },
-    { section: "06 Your rules, item by item: Finance & Accounting", item: "Example item C: sending money › Your choice", note: null },
+    { section: "06 Your rules, item by item: Finance & Accounting", item: "Example item C: sending money (20 pts) › Your choice", note: null },
   ]);
 });
 
@@ -181,18 +181,18 @@ test("with nothing picked there are no generated pages; the real catalogue offer
   assert.deepEqual(expand(form, REAL, {}).filter((p) => p.spec !== "fields"), [], "nothing is generated until the client picks items");
 });
 
-test("item cards: nothing is pre-selected; locked items offer no Automatic; conditions and approver are compulsory only when they apply", () => {
+test("item cards: nothing is pre-selected; locked items offer no Automatic; one "limit, approver or never do" box per item", () => {
   const answers = { items: ["fx-leads", "fx-quotes", "fx-pay"] };
   const pages = expand(form, FX, answers);
   const choice = (item) => field(pages, `rule.${item}.choice`);
   assert.deepEqual(choice("fx-leads").options, ["Automatic", "Needs my approval", "Red flag (hand to a person)"]);
   assert.deepEqual(choice("fx-pay").options, ["Needs my approval", "Red flag (hand to a person)"]);
   assert.equal(validateField(choice("fx-leads"), ctxOf(answers)), "This is required.", "no default is selected");
-  // standard item: conditions are not compulsory; controlled item: they are
-  assert.equal(validateField(field(pages, "rule.fx-leads.conditions"), ctxOf({ ...answers, "rule.fx-leads.choice": "Automatic" })), null);
-  assert.equal(validateField(field(pages, "rule.fx-quotes.conditions"), ctxOf({ ...answers, "rule.fx-quotes.choice": "Automatic" })), "This is required.");
-  assert.equal(validateField(field(pages, "rule.fx-quotes.conditions"), ctxOf({ ...answers, "rule.fx-quotes.choice": "Needs my approval" })), null, "hidden when it does not apply");
-  assert.equal(validateField(field(pages, "rule.fx-pay.approver"), ctxOf({ ...answers, "rule.fx-pay.choice": "Needs my approval" })), "This is required.");
+  // one box per item ("Limit, approver or never do"), as the PDF's table; compulsory only for Automatic on a controlled item
+  assert.equal(validateField(field(pages, "rule.fx-leads.limit"), ctxOf({ ...answers, "rule.fx-leads.choice": "Automatic" })), null, "standard item");
+  assert.equal(validateField(field(pages, "rule.fx-quotes.limit"), ctxOf({ ...answers, "rule.fx-quotes.choice": "Automatic" })), "This is required.", "controlled item on Automatic");
+  assert.equal(validateField(field(pages, "rule.fx-quotes.limit"), ctxOf({ ...answers, "rule.fx-quotes.choice": "Needs my approval" })), null);
+  assert.equal(pages.find((p) => p.id === "rules.sales").fields.length, 4, "two items, two fields each: compact");
 });
 
 test("picking a category makes the related people compulsory on the People page (accountant for Finance)", () => {
@@ -226,8 +226,8 @@ test("saved answers are readable (page > field) and read back exactly, including
   assert.equal(labelled["01 Your company"]["Employees on payroll"], 12, "numbers are saved as numbers");
   assert.deepEqual(labelled["03 What do you need?"]["Items you need"], ["Example item A: lead replies", "Example item B: quote drafts", "Example item C: sending money"]);
   assert.deepEqual(labelled["02 People"]["Up to 5 named people from your team can send us requests. Name at least one."], [{ Name: "Sam Lee", Role: "Owner", Email: "sam@x.example" }]);
-  assert.equal(labelled["06 Your rules, item by item: Sales"]["Example item A: lead replies"]["Your choice"], "Automatic");
-  assert.deepEqual(labelled[MEETING_KEY], ["03 What do you need? › Your main goal, in your own words", "06 Your rules, item by item: Finance & Accounting › Example item C: sending money › Your choice"]);
+  assert.equal(labelled["06 Your rules, item by item: Sales"]["Example item A: lead replies (8 pts)"]["Your choice"], "Automatic");
+  assert.deepEqual(labelled[MEETING_KEY], ["03 What do you need? › Your main goal, in your own words", "06 Your rules, item by item: Finance & Accounting › Example item C: sending money (20 pts) › Your choice"]);
   assert.ok(Buffer.byteLength(JSON.stringify(labelled)) < 200 * 1024);
 
   const back = fromLabelled(form, FX, JSON.parse(JSON.stringify(labelled)));

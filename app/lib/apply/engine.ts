@@ -117,16 +117,14 @@ export function expand(def: FormDefinition, catalogue: Catalogue, answers: Answe
       for (const c of pickedCategories(answers, catalogue)) {
         const fields = pickedItems(answers, catalogue).filter((p) => p.category.id === c.id).flatMap(({ item }): Field[] => {
           const choice = `rule.${item.id}.choice`;
-          const needsApproval = { field: choice, is: "Needs my approval" } as const;
           const automatic = { field: choice, is: "Automatic" } as const;
+          // One choice and one box, as the PDF's table: "Limit, approver or never do". If Automatic is chosen on a controlled
+          // item, the limit is compulsory (PDF section 06).
           return [
-            { id: choice, label: "Your choice", group: item.name, kind: "select", choice: true, required: true, options: ruleChoices(item),
+            { id: choice, label: "Your choice", group: `${item.name} (${item.points} pts)`, kind: "select", choice: true, required: true, options: ruleChoices(item),
               help: `${item.whatItDoes}\nORAGROL's fixed limits (they cannot be changed): ${item.fixedLimits.length ? item.fixedLimits.join("; ") : "none"}.\nOur suggestion: ${item.suggestedDefault}. It is not pre-selected: the choice is yours.` },
-            { id: `rule.${item.id}.conditions`, label: "Conditions for Automatic (for example an amount limit, a recipient list, a time window)", group: item.name, kind: "longtext",
-              showIf: automatic, requiredIf: item.band === "standard" ? undefined : automatic, discuss: false },
-            { id: `rule.${item.id}.approver`, label: "Approver for this item", group: item.name, kind: "text", showIf: needsApproval, requiredIf: needsApproval },
-            { id: `rule.${item.id}.never`, label: "Things ZM77 must never do for this item", group: item.name, kind: "longtext" },
-            { id: `rule.${item.id}.notes`, label: "Notes", group: item.name, kind: "longtext" },
+            { id: `rule.${item.id}.limit`, label: "Limit, approver or \"never do\"", group: `${item.name} (${item.points} pts)`, kind: "text", discuss: false,
+              requiredIf: item.band === "standard" ? undefined : automatic },
           ];
         });
         if (fields.length) out.push({ ...base, id: `${spec.id}.${c.id}`, title: `${spec.title}: ${c.name}`, fields, spec: "itemRules" });

@@ -89,7 +89,7 @@ export function orOneSetup(app: Answers, catalogue: Catalogue): FormDefinition {
   const tools = catalogue.categories.flatMap((c) => c.tools.map((r) => ({ key: `tool.${c.id}.${r.id}`, label: r.label })));
 
   const itemRows = items.flatMap(({ item }) => confirmRow(`item.${item.id}`, item.name,
-    `${String(app[`rule.${item.id}.choice`] ?? "no rule chosen")}${app[`rule.${item.id}.conditions`] ? `; limit: ${String(app[`rule.${item.id}.conditions`])}` : ""}${app[`rule.${item.id}.approver`] ? `; approver: ${String(app[`rule.${item.id}.approver`])}` : ""}`,
+    `${String(app[`rule.${item.id}.choice`] ?? "no rule chosen")}${app[`rule.${item.id}.limit`] ? `; ${String(app[`rule.${item.id}.limit`])}` : ""}`,
     "02 Your items and rules"));
   const approverRow = (key: string, area: string): Field[] => typeof app[key] === "string" && app[key]
     ? confirmRow(`approver.${key}`, `${area}: ${String(app[key])}`, String(app[key]), "03 Your named approvers accept their roles") : [];
