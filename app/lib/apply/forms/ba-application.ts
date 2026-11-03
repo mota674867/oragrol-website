@@ -46,7 +46,7 @@ const LEGAL: readonly { title: string; text: string }[] = [
   { title: "Third-party software.", text: "I buy my software directly from vendors and pay them. ORAGROL is not the seller. Vendor price, features and data location change and are confirmed at order time; ORAGROL does not state that data is stored in Canada unless the vendor says so." },
   { title: "Plan size limit.", text: "My plan has a monthly size limit and the proposal will set my starting band." },
   { title: "No contract and no promise.", text: "This form is not a contract and no price is agreed. Nothing is built or charged before I sign the contract. ORAGROL commits to the agreed work, not to a result, ranking, saving or level of availability. ORAGROL may decline an application or ask for more information." },
-  { title: "Confidential and kept.", text: "The form is confidential and used only to assess my application and prepare my proposal. If no contract is signed, ORAGROL keeps it for [retention period, to confirm] and then deletes it. Governing law: Ontario and the federal laws of Canada [to confirm with counsel]." },
+  { title: "Confidential and kept.", text: "The form is confidential and used only to assess my application and prepare my proposal. If no contract is signed, ORAGROL keeps it for 24 months and then deletes it. Governing law: Ontario and the federal laws of Canada." },
   { title: "The contract governs once signed.", text: "Once a contract is signed, the contract and the signed proposal govern and replace this form." },
 ];
 
@@ -230,8 +230,8 @@ export const baApplication: FormDefinition = {
   name: "Business Automation application form",
   formType: "application",
   product: "ba",
-  status: "draft",
-  version: "draft-2",
+  status: "published",
+  version: "1.0",
   pages,
   tiers: [],
   signature: { name: "signer_name", title: "signer_title", typed: "signature", agree: "signer_authority" },

@@ -75,11 +75,15 @@ test("every field id is unique and every label is unique on its page and group (
   }
 });
 
-test("the OR ONE form is a draft and cannot open for a client; a draft opens only where the preview switch is on", () => {
-  assert.equal(form.status, "draft");
-  assert.equal(openableForm("application", "or_one", false), null);
-  assert.equal(openableForm("application", "or_one", true)?.id, "or-one-application");
-  assert.equal(openableForm("setup", "ba", true), null, "forms that do not exist yet never open");
+test("the OR ONE form is published and opens for a client; the draft gate still keeps any draft form closed unless the preview switch is on", () => {
+  assert.equal(form.status, "published");
+  assert.equal(openableForm("application", "or_one", false)?.id, "or-one-application");
+  assert.equal(openableForm("setup", "ba", true), null, "a setup is never a fixed form");
+  form.status = "draft";
+  try {
+    assert.equal(openableForm("application", "or_one", false), null);
+    assert.equal(openableForm("application", "or_one", true)?.id, "or-one-application");
+  } finally { form.status = "published"; }
 });
 
 test("a form can only be published once its draft markers are gone", () => {
@@ -223,7 +227,7 @@ test("saved answers are readable (page > field) and read back exactly, including
   const flags = { goal: true, "rule.fx-pay.choice": true };
   const pages = expand(form, FX, answers);
   const labelled = toLabelled(form, pages, ctxOf(answers, flags));
-  assert.deepEqual(labelled.Form, { Name: "OR ONE application form", Version: "draft-2" });
+  assert.deepEqual(labelled.Form, { Name: "OR ONE application form", Version: "1.0" });
   assert.equal(labelled["01 Your company"]["Company legal name"], "Northwind Dental Group");
   assert.equal(labelled["01 Your company"]["Employees on payroll"], 12, "numbers are saved as numbers");
   assert.deepEqual(labelled["03 What do you need?"]["Items you need"], ["Example item A: lead replies", "Example item B: quote drafts", "Example item C: sending money"]);
@@ -306,7 +310,9 @@ test("a link that does not belong to the form named is refused: the browser cann
 
 test("a draft form cannot be saved or submitted unless drafts are allowed; no OCS settings means 'unavailable', never a crash", async () => {
   const closed = harness({ allowDraft: false });
-  assert.equal((await handleApply("save", body(), CLIENT, closed.deps)).status, 404);
+  form.status = "draft";
+  try { assert.equal((await handleApply("save", body(), CLIENT, closed.deps)).status, 404); } finally { form.status = "published"; }
+  assert.equal((await handleApply("save", body(), CLIENT, closed.deps)).status, 200, "published: opens without the preview switch");
   assert.equal((await handleApply("save", body(), CLIENT, harness({ config: null }).deps)).status, 503);
   assert.equal(ocsApplyConfig({}), null); assert.equal(ocsApplyConfig({ OCS_APPLY_URL: "http://evil.example", OCS_APPLY_SECRET: SECRET }), null);
   assert.deepEqual(ocsApplyConfig({ OCS_APPLY_URL: "https://ocs.example/path?x=1", OCS_APPLY_SECRET: SECRET }), CONFIG);
@@ -401,8 +407,8 @@ const ids = (answers) => new Set(expand(ba, FX, answers).flatMap((p) => p.fields
 const titles = (answers) => expand(ba, FX, answers).map((p) => p.title);
 
 test("BA: the start page comes first with the 11 terms to read and ONE tick to agree; nothing else opens until it is ticked", () => {
-  assert.equal(ba.status, "draft");
-  assert.equal(openableForm("application", "ba", false), null);
+  assert.equal(ba.status, "published");
+  assert.equal(openableForm("application", "ba", false)?.id, "ba-application");
   const start = expand(ba, FX, {})[0];
   assert.equal(start.id, "start");
   assert.equal(start.terms.length, 11);
@@ -501,7 +507,7 @@ const setupFields = (def, catalogue, answers) => expand(def, catalogue, answers)
 test("OR ONE setup: five pages in the PDF's grouping, one confirm row per item the client chose, the rule and approver shown as the application has them", () => {
   const app = fillAll(REAL, { items: ["s-leadgen", "f-ap", "i-patch"] });
   const setup = orOneSetup(app, REAL);
-  assert.equal(setup.formType, "setup"); assert.equal(setup.status, "draft");
+  assert.equal(setup.formType, "setup"); assert.equal(setup.status, "published");
   assert.deepEqual(setup.pages.map((p) => p.page.title.slice(0, 2)), ["01", "02", "04", "06", "08"]);
   const fields = setupFields(setup, REAL, {});
   const rows = fields.filter((f) => f.id.startsWith("c.item.")).map((f) => f.id);
@@ -635,8 +641,8 @@ test("setup: the form is built from the application's own answers: its items and
   assert.equal(setupProductFor("or-one-setup"), "or_one"); assert.equal(setupProductFor("ba-setup"), "ba"); assert.equal(setupProductFor("or-one-application"), null);
 });
 
-test("setup: the draft gate applies; a draft setup opens only where drafts are allowed", () => {
-  assert.equal(openableSetup("or_one", SETUP_APP.answers, FX, false), null);
+test("setup: a published setup opens; the gate still applies to any draft setup", () => {
+  assert.equal(openableSetup("or_one", SETUP_APP.answers, FX, false)?.id, "or-one-setup");
   assert.equal(openableSetup("or_one", SETUP_APP.answers, FX, true)?.id, "or-one-setup");
   assert.equal(openableSetup("services", SETUP_APP.answers, FX, true), null);
 });
@@ -661,11 +667,11 @@ test("setup submit: a complete, signed setup is stored; an incomplete one is ref
   assert.equal(h2.calls.some((c) => c.url.endsWith("/v1/apply/submit")), false);
 });
 
-test("setup: refused when OCS says it is not this product's setup, has no application, or drafts are not allowed", async () => {
+test("setup: refused when OCS says it is not this product's setup, has no application, or the token is wrong", async () => {
   for (const open of [{ ...SETUP_OPEN, product: "ba" }, { ...SETUP_OPEN, formType: "application" }, { ...SETUP_OPEN, basedOn: undefined }, { ...SETUP_OPEN, state: "submitted" }]) {
     assert.equal((await handleApply("save", setupBody(), CLIENT, setupHarness({ open }).deps)).status, 404);
   }
-  assert.equal((await handleApply("save", setupBody(), CLIENT, setupHarness({ allowDraft: false }).deps)).status, 404);
+  assert.equal((await handleApply("save", setupBody(), CLIENT, setupHarness({ allowDraft: false }).deps)).status, 200, "a published setup opens without the preview switch");
   assert.equal((await handleApply("save", setupBody({ token: "x" }), CLIENT, setupHarness().deps)).status, 404);
 });
 
@@ -676,4 +682,17 @@ test("setup: no field offers the meeting box (a setup is confirm or correct), an
     assert.ok(fields.length > 20);
     for (const f of fields) assert.equal(canDiscuss(f, ctxOf({}, {}, FX)), false, f.id);
   }
+});
+
+test("go-live guard: all four forms are published and none carries a placeholder, a 'to confirm' tag or a draft marker in anything a client reads", () => {
+  const app = fillBA({ packages: ["Sales", "Marketing"] });
+  const defs = [form, ba, setupFromOpen("or_one", SETUP_OPEN, FX), baSetup(app)];
+  for (const def of defs) {
+    assert.equal(def.status, "published", def.id);
+    const text = JSON.stringify(def);
+    assert.doesNotMatch(text, /\[[^\]]*(to confirm|counsel|TBD|TODO|retention period)[^\]]*\]/i, `${def.id}: placeholder in client text`);
+    assert.doesNotMatch(text, /draft/i.test(def.version) ? /$^/ : /draft-/i, def.id);
+    assert.doesNotMatch(text, /ZM77/, `${def.id}: internal name`);
+  }
+  assert.match(JSON.stringify(form), /keeps it for 24 months/);
 });

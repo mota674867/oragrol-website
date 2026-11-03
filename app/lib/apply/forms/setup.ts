@@ -244,7 +244,7 @@ const withoutMeetingBoxes = (pages: PageSpec[]): PageSpec[] =>
 function setupDefinition(id: string, name: string, product: "or_one" | "ba", rawPages: PageSpec[]): FormDefinition {
   const pages = withoutMeetingBoxes(rawPages);
   return {
-    id, name, formType: "setup", product, status: "draft", version: "draft-1", pages, tiers: [],
+    id, name, formType: "setup", product, status: "published", version: "1.0", pages, tiers: [],
     signature: { name: "signer_name", title: "signer_title", typed: "signature", agree: "final.golive" },
     whatNext: ["ORAGROL checks each line you confirmed or changed.", "Your named approvers accept their roles.", "We run the rule tests and you review the results.", "You approve go-live, and we switch your system live."],
   };
