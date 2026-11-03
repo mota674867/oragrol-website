@@ -267,7 +267,7 @@ test("the signature needs a name, a typed signature and the authority tick", () 
 const SECRET = "k".repeat(40);
 const CODE = "A".repeat(43);
 const CONFIG = { base: "https://ocs.example", secret: SECRET };
-function harness({ config = CONFIG, ocs = { status: 200, body: { status: "ok", saved: true, savedAt: "2026-11-02T10:00:00.000Z", reference: "APP-7K2M9QXV", submittedAt: "2026-11-02T10:00:00.000Z", meetings: 1 } }, allowDraft = true, limitOk = true, down = false } = {}) {
+function harness({ config = CONFIG, ocs = { status: 200, body: { status: "ok", saved: true, savedAt: "2026-11-02T10:00:00.000Z", reference: "OR-APP-7K2M9QXV", submittedAt: "2026-11-02T10:00:00.000Z", meetings: 1 } }, allowDraft = true, limitOk = true, down = false } = {}) {
   const calls = [];
   const fetchImpl = async (url, init) => {
     calls.push({ url: String(url), init, body: JSON.parse(init.body) });
@@ -331,7 +331,7 @@ test("submit: a complete form goes to OCS with the signature and the meeting age
   const h = harness();
   const answers = { ...fillAll(), meet_options: "Tue or Thu morning, Toronto time", meet_mode: "Phone", meet_attendees: "Laura Chen, Operations Director" };
   const r = await handleApply("submit", body({}, answers, { goal: true }), CLIENT, h.deps);
-  assert.equal(r.status, 200); assert.deepEqual(r.body, { status: "ok", reference: "APP-7K2M9QXV", submittedAt: "2026-11-02T10:00:00.000Z", meetings: 1 });
+  assert.equal(r.status, 200); assert.deepEqual(r.body, { status: "ok", reference: "OR-APP-7K2M9QXV", submittedAt: "2026-11-02T10:00:00.000Z", meetings: 1 });
   const sent = h.calls[0].body;
   assert.equal(h.calls[0].url, "https://ocs.example/v1/apply/submit");
   assert.deepEqual(sent.signature, { name: "Laura Chen", title: "Some answer", signature: "Laura Chen", agree: true });
