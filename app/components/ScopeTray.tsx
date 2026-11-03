@@ -221,12 +221,11 @@ export function ScopeTray({
   const update = (name: keyof ClientInfo, value: string) => setClient((s) => ({ ...s, [name]: value }));
 
   // A Turnstile token works once. After a failed attempt, clear it and show a fresh check.
-  useEffect(() => {
-    if (flow.status === "error") {
-      setHumanToken("");
-      setWidgetKey((k) => k + 1);
-    }
-  }, [flow.status]);
+  const failFlow = (err: unknown) => {
+    setHumanToken("");
+    setWidgetKey((k) => k + 1);
+    setFlow({ status: "error", message: err instanceof Error ? err.message : String(err) });
+  };
 
   const handleDownload = async () => {
     if (!canSubmit) return;
@@ -239,7 +238,7 @@ export function ScopeTray({
       setFlow({ status: "success", intent: "pdf_download", reference, downloadToken });
       clear();
     } catch (err) {
-      setFlow({ status: "error", message: err instanceof Error ? err.message : String(err) });
+      failFlow(err);
     }
   };
 
@@ -252,7 +251,7 @@ export function ScopeTray({
       setFlow({ status: "success", intent: "review_requested", reference, downloadToken });
       clear();
     } catch (err) {
-      setFlow({ status: "error", message: err instanceof Error ? err.message : String(err) });
+      failFlow(err);
     }
   };
 
@@ -266,7 +265,7 @@ export function ScopeTray({
       const blob = await pollForPdf(flow.downloadToken, t("form.pdfTimeout"));
       triggerBrowserDownload(blob, flow.reference);
     } catch (err) {
-      setFlow({ status: "error", message: err instanceof Error ? err.message : String(err) });
+      failFlow(err);
     }
   };
 

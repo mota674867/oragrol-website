@@ -6,6 +6,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
+      // The private application forms are invite-only: never listed, never crawled (they also send noindex headers).
+      disallow: ["/apply/", "/api/apply/"],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };

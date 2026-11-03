@@ -2,6 +2,23 @@
 
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
+## Session: Forms rebuilt to the approved PDFs, one-tick start, ticked-only content, browser test, 2026-11-03
+
+**Done (branch `applications-slice-3`, local commits only, NOT pushed; also OCS `applications-slice-1` and dashboard `applications-slice-2` test changes, local):** OR ONE and BA application forms rebuilt from the approved PDFs (`app/lib/apply/forms/or-one-application.ts`, `ba-application.ts`), Business Setup builders (`forms/setup.ts`, not registered yet), real 77-item OR ONE catalogue (533 points, 11 locked) in `catalogue.ts`. Decisions in D-127. The browser gets category names only and fetches a ticked category's details (`/api/apply/details`).
+- **Verified:** tsc and eslint clean; `node --test tests/apply-engine.test.mjs` 47/47. Browser run with Playwright against `next dev`, the real OCS code and a throwaway PostgreSQL 16: 26 checks (bad links 404; one agree tick; terms collapsed; gating; silent caps; no category data before a tick; ticked-only items, software, size, rules and approvers; reload restores; locked items offer no Automatic; submit stores only ticked sections; new-style reference OR-APP-xxxxxxxx; phone width). The test script lives outside the repo.
+- **Test-setup notes:** open the dev server as `localhost`, not `127.0.0.1` (Next blocks dev resources for other origins, which blanks the 404 screen); the open-page rate limit is 60 per 10 minutes per address, so restart the dev server between repeated runs; the throwaway DB superuser is `admin`.
+- **NEEDS VERIFICATION:** `npm run build` (Vercel preview only); Redis-backed rate limits; an invitation email arriving.
+- **Not done:** filled client-copy PDF at runtime and its email (needs the sender info@orgro.ca); Business setup wiring; paper-application entry screen; vendor round 2; counsel wording; the concept name.
+
+## Session: Private application forms /apply/<code> (Applications slice 3), 2026-11-02
+
+**Done (branch `applications-slice-3`, committed, NOT pushed):** invite-only form engine at `app/apply/[code]` (own root layout, no site chrome), save/submit API `app/api/apply/[action]`, engine and data in `app/lib/apply/` (types, engine, catalogue, fixture, forms/or-one-application, registry, ocs, handler). See D-126. Config: `next.config.ts` headers for `/apply/*`, `proxy.ts` matcher excludes `apply`, `robots.ts` disallows `/apply/` and `/api/apply/`, `tsconfig.json` allows `.ts` imports (so the engine can be tested with plain Node), `.env.local.example` has `OCS_APPLY_URL`, `OCS_APPLY_SECRET`, `APPLY_ALLOW_DRAFT_FORMS`, `APPLY_FIXTURE_CATALOGUE`.
+- Verified: `tsc --noEmit` clean; `eslint` clean on the new files; `node --test tests/apply-engine.test.mjs` 28/28 (gating, formats, None option, meeting boxes, generated pages, save/read-back round trip, server checks, link privacy). Browser run with Playwright against `next dev`, the real OCS code (slice 1) and a throwaway PostgreSQL 16: bad/switched-off/expired/malformed links = 404; page gate; formats; item picker and points; meeting box on a blank field; reload mid-form restores answers and page; walk of all generated pages; submit refused with a legal box unticked; submit stores readable answers, signature, meeting request and events; link then says "submitted"; forged save refused; phone width has no sideways scroll; the submission reads correctly on the staff Applications page.
+- **Look changed same day (Mohammad):** the form now uses the dashboard's font (Inter, self-hosted) and its light/dark palettes with the same switch; `app/apply` no longer imports `globals.css` or `next/font/google`. Checked: page background equals the dashboard's (#F4F2ED light, #5d6063 dark), Inter loads, the switch persists after reload, no Google font requests.
+- **NEEDS VERIFICATION:** `npm run build` (only the Vercel preview can confirm it; the sandbox blocks Google Fonts for the rest of the site); Redis-backed rate limits (the sandbox used the in-memory fallback); an invitation email actually arriving (needs the sender domain).
+- **Not built, on purpose:** the 77 real items, tools and vendors (waiting for the 10 handling-table reviews and vendor verification); BA application form, Business setups, PDF copy (slice 4). The OR ONE form stays `draft`, so it does not open for clients in Production.
+- **Next:** push and Vercel preview only on Mohammad's word; set `OCS_APPLY_URL`/`OCS_APPLY_SECRET` (same secret as OCS) and, in Preview only, `APPLY_ALLOW_DRAFT_FORMS=1`.
+
 ## Session: OR ONE launch fees, 2026-11-02
 
 **Done (branch `or-one-fees-launch`, committed, NOT pushed):** build fees 16,999 / 39,999 / 79,999 / 139,999; OR ONE 100 monthly 4,499 (D-125). File: `app/lib/or-one-fees.ts` only (single source for the OR ONE page cards and the live chat). No other copy mentions these prices (grep EN and FR).
@@ -89,41 +106,3 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 **Next:** Mohammad checks the branch preview, then approves merge and push.
 
 ---
-
-## Session: home photos, 2026-10-19 to 2026-10-20
-- 2026-10-21 additions (all pushed, Vercel success): FR overflow at 1280-1440 fixed (D-106, pre-footer CTA secondary link wraps); chat greeting popup removed (D-107); Business Automation photo replaced with the woman-at-laptop-by-window photo (D-108); Industries hero now has a B&W meeting photo behind the headline, pushed at Mohammad's request against my advice (D-109, licence and six model releases unverified); Cyber Health tablet layout 721-1100px (D-110) and phone layout, both people visible and 77 top-left (D-112), Mohammad approved; home header overflow at 1051-1300px fixed (D-111).
-- Open: photo licences and model releases for the three new photos; the Industries photo implies a bigger team than a solo founder (see D-109 to revert); catalogue back cover, contact details, 16-page count.
-- Business Automation: desk photo on the right half of "Your tools stay" (D-105). Verified EN at 1920/1440/1024/390, FR at 1440; pre-existing FR overflow noted.
-- How We Work page deleted with redirects to home (D-104). Verified: tsc clean, search tests pass, /how-we-work and /fr/how-we-work return 308, sitemap no longer lists it.
-- Cyber Health section: night review photo on the right, score on the photo with no card (D-103). Verified at 1920, 1440, 1024, 390; no horizontal overflow.
-- Hero photo column pushed then reverted (D-101). "The business reality" band now has a black and white night-office background photo (D-102). Files: homepage-v3.css (block at end), public/images/home/reality-office-night.jpg.
-- Verified: tsc clean; playwright-core at 1920, 1440, 1024, 390: photo loads, text readable, no horizontal overflow; /fr returns 200. Pushed to main at Mohammad's request.
-
----
-## Session: ODO and Cyber Health PDFs rebuilt to the approved dashboard style, 2026-10-19
-- Mohammad approved both mockups and asked for push. See D-098. Files: `app/lib/odo-report-pdf.tsx` (rewritten, same props), `app/[locale]/cyber-health/pdf-report.tsx` (rewritten, same props), `app/lib/pdf-brand.tsx` (new: logo and watermark), `app/components/brand/logo.tsx` (geometry constants exported, no visual change).
-- Verified: tsc clean; eslint 0 errors (2 existing-type alt-text warnings on Image, the same as before). Sample ODO renders 4 pages with the QR on page 4; sample Cyber Health renders 5 pages with the QR on page 5. Renders checked by eye at 70 dpi.
-- Not verified: a live `/api/odo/scan/report?format=pdf` run against a real session (no live session was used).
-
-## Session: site search icon live on every public page (branch add-public-search), 2026-10-16
-- Search dialog (PublicSiteSearch, mounted in SiteChrome) now answers every aria-label Search/Recherche/Rechercher button. Keyword-only, no AI, index of 102 public pages/articles/services (excludes scan, ops/outbound, chat, admin, API).
-- header-search.tsx reduced to a plain trigger (its own dead dialog removed). FAQ header gained a search icon. Escape closes in one press (was two: first press cleared the text).
-- FAQ header fits at 360/390/430 phone widths: logo margin removed under 760px, gap 8px under 400px (gpt-pages.css). Pre-existing: /resources/[slug] article page overflows horizontally on phones (its own nav), not caused by search, not fixed here.
-- Verified: 12 search unit tests pass; tsc clean; browser check on 18 public page families at 390px and 1440px: icon opens dialog, "mfa" returns results, Escape closes. npm run build fails only because sandbox cannot reach Google Fonts (next/font), not a code error.
-- Open: careers, talent, partnerships and cyber-health have no search icon. They are standalone pages by decision (see D-096); awaiting Mohammad's call. Not pushed.
-
----
-## Session: founder section on Company page (photo + dark + new content), 2026-10-09
-- Branch `founder-section` (preview only). See D-095. Files: company-client.tsx, gpt-pages.css (founder rules), messages/en.json + fr.json (Company.founder), public/images/company/founder-mohammad-chelouy-tabrizi.jpg.
-- Verified: tsc clean; /company at 1440 and 375 and /fr/company render correctly (screenshots via playwright-core).
-
-## Session: header logo spacing fix + website go-live, 2026-10-09
-- Mohammad approved the website ("all approved") and asked for push; PDFs NOT approved, so the PDF logo commit was reverted (pdf-brand.tsx removed) before merging.
-- Header grid first column 112px -> max-content in gpt-pages.css + homepage-v3.css; HeaderLogo margin-inline-end 48px; 40px logo at 1024-1440px. Measured gap logo->menu >= 74px at 1280-1920 on /, /services, /contact; header heights unchanged; no horizontal overflow.
-
-## Session: logo rollout v3 (horizontal header logo, grey footer icon, share image, 404, chat icon), 2026-10-09
-- Branch `brand-logo-replacement` (preview only, not merged). See D-094.
-- `logo.tsx`: added `variant="horizontal"` and `tone="watermark"`. `HeaderLogo` now renders the horizontal lockup (48/40px). Footer icon grey #282828 bottom-right, hidden on phones. Shared footer now on old-chrome routes; `site-footer.tsx` and `oragrol-ring.tsx` deleted.
-- `SHARE_IMAGE` on every page's openGraph + layout; `public/og/oragrol-share.png`. Branded 404 (`not-found.tsx` + `[...rest]`). Chat launcher shows the brand icon.
-- Verified: tsc clean; lint no new issues (pre-existing ChatWidget setState-in-effect error and two warnings remain); 23 routes + 2 bad URLs checked at 1440 and 375 via playwright-core: logo 167x48 / 140x40 everywhere, header heights unchanged, footer 622/743 unchanged, 404 returns 404 with header+footer; og:image + twitter:card summary_large_image on all checked pages. `npm run build` can't run in this sandbox (Google Fonts blocked) — Vercel preview build is the build check. NEEDS VERIFICATION on the preview: real fonts, LinkedIn Post Inspector.
-

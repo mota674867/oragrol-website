@@ -45,6 +45,16 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
+      // Private application forms (/apply/<code>): invite-only. Never indexed, never cached, and the address (which holds the
+      // private link code) is never sent to another site as a referrer. Later rules override the site-wide ones for the same header.
+      {
+        source: "/apply/:path*",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive, nosnippet" },
+          { key: "Cache-Control", value: "private, no-store, max-age=0" },
+          { key: "Referrer-Policy", value: "no-referrer" },
+        ],
+      },
     ];
   },
   async redirects() {
