@@ -4,8 +4,9 @@
 // application's answers (passed in as `app`), so setup always matches what the client applied for. Nothing here asks for a
 // password, key or card number: tools connect through the vendor's own sign-in or the secure vault.
 //
-// Not yet wired: reading the application back from OCS, and where the page is shown (the plan puts it in the client's dashboard).
-// Until both are built these builders are not registered, so no setup form can open for a client.
+// Wired (2026-11-03): OCS hands over the application's answers when a setup link is opened (a setup invitation names its application), and
+// the website builds the form with these builders for each link (registry.ts buildSetup, handler.ts resolveForm). Like the application forms,
+// a setup stays "draft" until it is cleared to open, and a draft opens only where APPLY_ALLOW_DRAFT_FORMS=1.
 import type { Answers, Catalogue, Cond, Field, FormDefinition, PageSpec } from "../types";
 import { pickedItems } from "../engine.ts";
 

@@ -13,8 +13,8 @@ import { detailsFor, getCatalogue, withDetails } from "../app/lib/apply/catalogu
 import { orOneApplication as form } from "../app/lib/apply/forms/or-one-application.ts";
 import { baApplication as ba } from "../app/lib/apply/forms/ba-application.ts";
 import { baSetup, orOneSetup } from "../app/lib/apply/forms/setup.ts";
-import { allForms, openableForm } from "../app/lib/apply/registry.ts";
-import { handleApply } from "../app/lib/apply/handler.ts";
+import { allForms, openableForm, openableSetup, setupProductFor } from "../app/lib/apply/registry.ts";
+import { handleApply, setupFromOpen } from "../app/lib/apply/handler.ts";
 import { formToken, ocsApplyConfig, sign } from "../app/lib/apply/ocs.ts";
 
 const FX = fixtureCatalogue;
@@ -540,12 +540,13 @@ test("BA setup: five pages, a sign-off line only for the packages chosen, and th
   assert.match(packages.help, /Sales, Finance/);
 });
 
-test("BA setup: a complete setup can be signed, and the setup is not open for any client yet", () => {
+test("BA setup: a complete setup can be signed", () => {
   const app = fillBA({ packages: ["Sales", "IT"] });
   const setup = baSetup(app);
   const answers = fillDef(setup, FX, {});
   assert.deepEqual(validateAll(setup, FX, answers, {}), { ok: true, pageIndex: -1, errors: {} });
-  assert.equal(openableForm("setup", "ba", true), null, "setup forms are not registered until they are read from the application and placed in the dashboard");
+  // A setup is never a fixed form: it is built per link from the application (see the setup tests at the end of this file).
+  assert.equal(openableForm("setup", "ba", true), null);
   assert.equal(openableForm("setup", "or_one", true), null);
 });
 
@@ -602,4 +603,68 @@ test("the page sends the browser a stripped catalogue and the browser fetches de
   const client = await readFile(new URL("../app/apply/[code]/apply-form.tsx", import.meta.url), "utf8");
   assert.match(client, /\/api\/apply\/details/);
   assert.doesNotMatch(client, /catalogue\.ts|getCatalogue|REAL\b/, "the browser never imports the full catalogue");
+});
+
+
+// ---------------------------------------------------------------- Business setup, built from the application it was sent for
+const SETUP_APP = (() => {
+  const answers = fillAll();
+  const labelled = toLabelled(form, expand(form, FX, answers), ctxOf(answers));
+  return { answers, labelled };
+})();
+const SETUP_OPEN = { status: "ok", state: "open", formType: "setup", product: "or_one", basedOn: { reference: "OR-APP-7K2M9QXV", answers: SETUP_APP.labelled } };
+function setupHarness({ open = SETUP_OPEN, allowDraft = true } = {}) {
+  const calls = [];
+  const fetchImpl = async (url, init) => {
+    const call = { url: String(url), body: JSON.parse(init.body) }; calls.push(call);
+    if (call.url.endsWith("/v1/apply/open")) return { status: 200, json: async () => open };
+    return { status: 200, json: async () => ({ status: "ok", saved: true, savedAt: "2026-11-03T10:00:00.000Z", reference: "OR-SET-4G7H2JKM", submittedAt: "2026-11-03T10:00:00.000Z", meetings: 0 }) };
+  };
+  return { calls, deps: { config: CONFIG, catalogue: FX, allowDraft, fetchImpl, limit: async () => true } };
+}
+const setupDef = () => setupFromOpen("or_one", SETUP_OPEN, FX);
+const setupBody = (over = {}, answers = fillDef(setupDef(), FX, {})) => JSON.stringify({ code: CODE, form: "or-one-setup", token: formToken(SECRET, CODE, "or-one-setup"), answers, flags: {}, page: 2, ...over });
+
+test("setup: the form is built from the application's own answers: its items and categories, nothing else", () => {
+  const def = setupDef();
+  assert.equal(def.id, "or-one-setup"); assert.equal(def.formType, "setup");
+  const labels = def.pages.flatMap((p) => (p.kind === "fields" ? p.page.fields : [])).map((f) => f.label).join(" | ");
+  for (const c of FX.categories) for (const i of c.items) if (SETUP_APP.answers.items.includes(i.id)) assert.ok(labels.includes(i.name), i.name);
+  assert.equal(setupFromOpen("or_one", { ...SETUP_OPEN, basedOn: undefined }, FX), null, "no application, no setup");
+  assert.equal(setupFromOpen("services", SETUP_OPEN, FX), null);
+  assert.equal(setupProductFor("or-one-setup"), "or_one"); assert.equal(setupProductFor("ba-setup"), "ba"); assert.equal(setupProductFor("or-one-application"), null);
+});
+
+test("setup: the draft gate applies; a draft setup opens only where drafts are allowed", () => {
+  assert.equal(openableSetup("or_one", SETUP_APP.answers, FX, false), null);
+  assert.equal(openableSetup("or_one", SETUP_APP.answers, FX, true)?.id, "or-one-setup");
+  assert.equal(openableSetup("services", SETUP_APP.answers, FX, true), null);
+});
+
+test("setup save: the server rebuilds the form from OCS (a quiet open), then saves only the setup's own fields", async () => {
+  const h = setupHarness();
+  const r = await handleApply("save", setupBody({}, { ...fillDef(setupDef(), FX, {}), junk: "x" }), CLIENT, h.deps);
+  assert.equal(r.status, 200);
+  assert.equal(h.calls[0].url, "https://ocs.example/v1/apply/open");
+  assert.equal(h.calls[0].body.quiet, true);
+  assert.equal(h.calls[1].url, "https://ocs.example/v1/apply/save");
+  assert.ok(!JSON.stringify(h.calls[1].body.answers).includes("junk"));
+});
+
+test("setup submit: a complete, signed setup is stored; an incomplete one is refused before OCS sees it", async () => {
+  const h = setupHarness();
+  const ok = await handleApply("submit", setupBody(), CLIENT, h.deps);
+  assert.equal(ok.status, 200); assert.equal(ok.body.reference, "OR-SET-4G7H2JKM");
+  const h2 = setupHarness();
+  const bad = await handleApply("submit", setupBody({}, { ...fillDef(setupDef(), FX, {}), signature: "" }), CLIENT, h2.deps);
+  assert.equal(bad.status, 422);
+  assert.equal(h2.calls.some((c) => c.url.endsWith("/v1/apply/submit")), false);
+});
+
+test("setup: refused when OCS says it is not this product's setup, has no application, or drafts are not allowed", async () => {
+  for (const open of [{ ...SETUP_OPEN, product: "ba" }, { ...SETUP_OPEN, formType: "application" }, { ...SETUP_OPEN, basedOn: undefined }, { ...SETUP_OPEN, state: "submitted" }]) {
+    assert.equal((await handleApply("save", setupBody(), CLIENT, setupHarness({ open }).deps)).status, 404);
+  }
+  assert.equal((await handleApply("save", setupBody(), CLIENT, setupHarness({ allowDraft: false }).deps)).status, 404);
+  assert.equal((await handleApply("save", setupBody({ token: "x" }), CLIENT, setupHarness().deps)).status, 404);
 });

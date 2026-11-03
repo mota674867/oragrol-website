@@ -8,10 +8,10 @@
 import { detailsFor } from "./catalogue.ts";
 import { expand, fromLabelled, meetingList, signaturePayload, toLabelled, validateAll } from "./engine.ts";
 import type { Ctx } from "./engine.ts";
-import { formById } from "./registry.ts";
+import { applicationFormIdFor, buildSetup, formById, setupProductFor } from "./registry.ts";
 import { formTokenOk, LINK_CODE, ocsApply } from "./ocs.ts";
 import type { ClientMeta, OcsApplyConfig, OcsReply } from "./ocs.ts";
-import type { Answers, Catalogue, Flags } from "./types";
+import type { Answers, Catalogue, FormDefinition, Flags } from "./types";
 
 export const MAX_BODY_CHARS = 240_000;
 
@@ -40,6 +40,29 @@ function fromOcs(r: OcsReply | null, okBody: (b: Record<string, unknown>) => Rec
   return reply(r.status === 401 || r.status === 503 ? 503 : 502, { status: "failed", code: "UNAVAILABLE" });
 }
 
+/**
+ * The form for a link: a fixed application form, or a Business setup rebuilt from the answers on the application it was sent for.
+ * The setup's answers come from OCS (a quiet open: nothing is logged), never from the browser, so the browser cannot shape its own form.
+ */
+async function resolveForm(formId: string, code: string, client: ClientMeta, deps: ApplyDeps): Promise<FormDefinition | null> {
+  const fixed = formById(formId);
+  if (fixed) return fixed;
+  const product = setupProductFor(formId);
+  if (!product || !deps.config) return null;
+  const opened = await ocsApply("/v1/apply/open", { code, quiet: true, client }, deps.config, deps.fetchImpl);
+  if (!opened || opened.status !== 200 || !opened.body || opened.body.status !== "ok" || opened.body.state !== "open") return null;
+  if (opened.body.formType !== "setup" || opened.body.product !== product) return null;
+  return setupFromOpen(product, opened.body, deps.catalogue);
+}
+
+/** The setup form for an opened setup link: built from the application it is based on. Null when OCS gave no application. */
+export function setupFromOpen(product: string, openBody: Record<string, unknown>, catalogue: Catalogue): FormDefinition | null {
+  const based = openBody.basedOn;
+  if ((product !== "or_one" && product !== "ba") || !plain(based)) return null;
+  const applicationAnswers = restore(applicationFormIdFor(product), catalogue, based.answers).answers;
+  return buildSetup(product, applicationAnswers, catalogue);
+}
+
 export async function handleApply(action: "save" | "submit" | "details", rawBody: string, client: ClientMeta, deps: ApplyDeps): Promise<ApplyResult> {
   if (!deps.config) return reply(503, { status: "failed", code: "UNAVAILABLE" });
   if (rawBody.length > MAX_BODY_CHARS) return reply(413, { status: "failed", code: "TOO_LARGE" });
@@ -49,9 +72,9 @@ export async function handleApply(action: "save" | "submit" | "details", rawBody
   const { code, form: formId, token } = input;
   if (typeof code !== "string" || !LINK_CODE.test(code) || typeof formId !== "string") return reply(404, { status: "failed" });
   if (!formTokenOk(deps.config.secret, code, formId, token)) return reply(404, { status: "failed" });
-  const def = formById(formId);
-  if (!def || (def.status !== "published" && !deps.allowDraft)) return reply(404, { status: "failed" });
   if (!(await deps.limit(`apply:${action}:${client.address ?? "unknown"}`, LIMITS[action]))) return reply(429, { status: "failed", code: "SLOW_DOWN" });
+  const def = await resolveForm(formId, code, client, deps);
+  if (!def || (def.status !== "published" && !deps.allowDraft)) return reply(404, { status: "failed" });
 
   if (action === "details") {
     // Only the details of the categories the client ticked are ever sent to the browser.
@@ -85,5 +108,9 @@ export async function handleApply(action: "save" | "submit" | "details", rawBody
 export function restore(formId: string, catalogue: Catalogue, saved: unknown): { answers: Answers; flags: Flags } {
   const def = formById(formId);
   if (!def) return { answers: {}, flags: {} };
+  return restoreFor(def, catalogue, saved);
+}
+/** The same, for a form that was built for this link (a Business setup). */
+export function restoreFor(def: FormDefinition, catalogue: Catalogue, saved: unknown): { answers: Answers; flags: Flags } {
   return fromLabelled(def, catalogue, plain(saved) ? saved : null);
 }
