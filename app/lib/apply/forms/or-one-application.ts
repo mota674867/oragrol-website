@@ -95,7 +95,7 @@ const pages: PageSpec[] = [
   ] } },
   { kind: "tools", id: "software", title: "04 Your software", intro: "For each tool type you need, choose one, name the tool you already use, or tick \"Not sure, recommend\". We check that a tool you already use can connect before you sign. You buy and pay for your software directly from the vendor. We confirm each vendor's current price and where it stores data when you order. Show only the categories you chose in section 03." },
   { kind: "situation", id: "situation", title: "05 Size and situation", intro: "Complete only the categories you chose in section 03." },
-  { kind: "itemRules", id: "rules", title: "06 Your rules, item by item", intro: "You decide how each item runs, and ORAGROL's automation follows your choice exactly. Automatic: it acts on its own, within the limits you write. Needs my approval: your named approver approves first. Red flag: it hands the case to a person. A blank or unclear choice is treated as \"Needs my approval\". Items marked locked (money, people, law, and investor or board reporting) can never run automatically. ORAGROL's fixed limits are shown on each item. ORAGROL does not give legal, tax or financial advice." },
+  { kind: "itemRules", id: "rules", title: "06 Your rules, item by item", intro: "You decide how each item runs, and ORAGROL Automation follows your choice exactly. Automatic: it acts on its own, within the limits you write. Needs my approval: your named approver approves first. Red flag: it hands the case to a person. A blank or unclear choice is treated as \"Needs my approval\". Items marked locked (money, people, law, and investor or board reporting) can never run automatically. ORAGROL's fixed limits are shown on each item. ORAGROL does not give legal, tax or financial advice." },
   { kind: "fields", page: { id: "approvers", title: "07 Approvers and escalation", intro: "Name who approves each area you chose. Each needs a name, role, email, phone and a backup person.", fields: [
     ...approver("ap_money", "Money", anyCategory(CATEGORY_NAMES.finance, CATEGORY_NAMES.procurement)),
     ...approver("ap_people", "People and hiring", anyCategory(CATEGORY_NAMES.hr)),
@@ -108,8 +108,8 @@ const pages: PageSpec[] = [
     { id: "ap_authorized", label: "The people named above are authorized to approve on behalf of the company", kind: "check", text: "The people named above are authorized to approve on behalf of the company." },
   ] } },
   { kind: "fields", page: { id: "rules_general", title: "08 Your rules in general", fields: [
-    long("always", "Rules ORAGROL's automation must always follow, or \"None\" (policy, discounts, tone, wording)", { allowNone: true }),
-    long("never", "Things ORAGROL's automation must never do, or \"None\"", { allowNone: true }),
+    long("always", "Rules ORAGROL Automation must always follow, or \"None\" (policy, discounts, tone, wording)", { allowNone: true }),
+    long("never", "Things ORAGROL Automation must never do, or \"None\"", { allowNone: true }),
     text("tone", "Tone of voice for messages to customers and suppliers"),
     text("languages", "Languages for messages", { required: false }),
     long("material", "Existing material to share later (brand guide, price list, policies, templates)", { required: false, help: "You upload it after signing, in your Business setup. Nothing is uploaded with this form." }),
