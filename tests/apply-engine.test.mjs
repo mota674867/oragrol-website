@@ -668,3 +668,12 @@ test("setup: refused when OCS says it is not this product's setup, has no applic
   assert.equal((await handleApply("save", setupBody(), CLIENT, setupHarness({ allowDraft: false }).deps)).status, 404);
   assert.equal((await handleApply("save", setupBody({ token: "x" }), CLIENT, setupHarness().deps)).status, 404);
 });
+
+test("setup: no field offers the meeting box (a setup is confirm or correct), and nothing is lost from the forms", () => {
+  const app = fillBA({ packages: ["Sales", "Marketing"] });
+  for (const def of [baSetup(app), setupFromOpen("or_one", SETUP_OPEN, FX)]) {
+    const fields = def.pages.flatMap((p) => (p.kind === "fields" ? p.page.fields : []));
+    assert.ok(fields.length > 20);
+    for (const f of fields) assert.equal(canDiscuss(f, ctxOf({}, {}, FX)), false, f.id);
+  }
+});

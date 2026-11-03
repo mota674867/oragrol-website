@@ -2,6 +2,14 @@
 
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
+## Session: Applications live on the dashboard, OCS door set up, Business setup built for the web, 2026-11-03 (later)
+
+**Done:** PRs #43 (forms, security upgrade of next 16.4.1 and zod 4.6.6, lint fix), #44 (log why a link cannot open) merged; OCS and dashboard Applications merged. Live OCS: migrations 031 + grants run, revision `apply2` live, website settings added; a test invitation reached a real inbox and the link opened (the draft gate said "not open yet", as intended). Then, on branches (NOT pushed until Mohammad says; not merged): the name ORAGROL Automation, setup PDF fixes, and the whole Business setup build: OCS migration 032 + `basedOn` (branch `setup-link`), dashboard reference field (branch `setup-link`), website setup forms (branch `setup-web`, on top of `apply-concept-name` = PR #45).
+- **Verified:** OCS 327/327 in `ocs/` (applications 25), dashboard 194/194, website applications 53/53, tsc clean in all three. Browser flow in a real browser against `next dev` + real OCS code + throwaway Postgres (`scratch/bt_all4.py`): all four forms walked and submitted, setups invited from their applications, refusals checked, 8 checks, no page errors.
+- **Test-setup notes:** throwaway Postgres data is in `/tmp/pgtest` (start as user `claude` with TLS); the daily invitation cap (50 per staff) and the website submit limit (12 per 10 min) block repeated runs: age `application_emails.sent_at` and restart `next dev`.
+- **NEEDS VERIFICATION:** `npm run build` on Vercel; migration 032 on the live database (Mohammad runs it); Redis-backed limits; the dashboard New invitation window with a setup choice in a browser (covered by tests only).
+- **Not done / blocking go-live:** counsel wording; item descriptions, limits, defaults review; drawn signature decision; vendor round 2; filled client-copy PDF email; Services forms.
+
 ## Session: Forms rebuilt to the approved PDFs, one-tick start, ticked-only content, browser test, 2026-11-03
 
 **Done (branch `applications-slice-3`, local commits only, NOT pushed; also OCS `applications-slice-1` and dashboard `applications-slice-2` test changes, local):** OR ONE and BA application forms rebuilt from the approved PDFs (`app/lib/apply/forms/or-one-application.ts`, `ba-application.ts`), Business Setup builders (`forms/setup.ts`, not registered yet), real 77-item OR ONE catalogue (533 points, 11 locked) in `catalogue.ts`. Decisions in D-127. The browser gets category names only and fetches a ticked category's details (`/api/apply/details`).

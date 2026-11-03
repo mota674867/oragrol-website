@@ -237,7 +237,12 @@ export function baSetup(app: Answers): FormDefinition {
   return setupDefinition("ba-setup", "Business Automation Business Setup", "ba", pages);
 }
 
-function setupDefinition(id: string, name: string, product: "or_one" | "ba", pages: PageSpec[]): FormDefinition {
+/** A setup is "confirm or correct", not "discuss": the meeting box that the application forms offer is switched off on every setup field. */
+const withoutMeetingBoxes = (pages: PageSpec[]): PageSpec[] =>
+  pages.map((p) => (p.kind === "fields" ? { ...p, page: { ...p.page, fields: p.page.fields.map((f) => ({ ...f, discuss: false })) } } : p));
+
+function setupDefinition(id: string, name: string, product: "or_one" | "ba", rawPages: PageSpec[]): FormDefinition {
+  const pages = withoutMeetingBoxes(rawPages);
   return {
     id, name, formType: "setup", product, status: "draft", version: "draft-1", pages, tiers: [],
     signature: { name: "signer_name", title: "signer_title", typed: "signature", agree: "final.golive" },
