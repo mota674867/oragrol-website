@@ -49,7 +49,7 @@ const START_BODY = [
   "We ask for this information so that we can understand your business and prepare your proposal. Nothing is built, connected or charged before you sign a contract.",
 ];
 
-const AGREE = "I agree to ORAGROL collecting and using the information in this form to assess my application and prepare my proposal, and I accept the terms and privacy notice above.";
+const AGREE = "to ORAGROL collecting and using the information in this form to assess my application and prepare my proposal, and I accept the terms and privacy notice above.";
 
 const pages: PageSpec[] = [
   { kind: "fields", page: { id: "start", title: "Before you start", body: START_BODY, terms: LEGAL.map((l, i) => ({ title: `${i + 1}. ${l.title}`, text: l.text })), fields: [
@@ -95,7 +95,7 @@ const pages: PageSpec[] = [
   ] } },
   { kind: "tools", id: "software", title: "04 Your software", intro: "For each tool type you need, choose one, name the tool you already use, or tick \"Not sure, recommend\". We check that a tool you already use can connect before you sign. You buy and pay for your software directly from the vendor. We confirm each vendor's current price and where it stores data when you order. Show only the categories you chose in section 03." },
   { kind: "situation", id: "situation", title: "05 Size and situation", intro: "Complete only the categories you chose in section 03." },
-  { kind: "itemRules", id: "rules", title: "06 Your rules, item by item", intro: "The client decides; ORAGROL's automation follows. For each item you chose, choose how the automation works: Automatic (ORAGROL's automation acts alone, within the limits you write), Needs my approval (your named approver approves first), or Red flag (ORAGROL's automation hands the case to a person). A blank or unclear choice is treated as \"Needs my approval\". Items marked locked (money, people, law, and investor or board reporting) can never run automatically. ORAGROL's fixed limits are shown on each item. ORAGROL does not give legal, tax or financial advice." },
+  { kind: "itemRules", id: "rules", title: "06 Your rules, item by item", intro: "You decide how each item runs, and ORAGROL's automation follows your choice exactly. Automatic: it acts on its own, within the limits you write. Needs my approval: your named approver approves first. Red flag: it hands the case to a person. A blank or unclear choice is treated as \"Needs my approval\". Items marked locked (money, people, law, and investor or board reporting) can never run automatically. ORAGROL's fixed limits are shown on each item. ORAGROL does not give legal, tax or financial advice." },
   { kind: "fields", page: { id: "approvers", title: "07 Approvers and escalation", intro: "Name who approves each area you chose. Each needs a name, role, email, phone and a backup person.", fields: [
     ...approver("ap_money", "Money", anyCategory(CATEGORY_NAMES.finance, CATEGORY_NAMES.procurement)),
     ...approver("ap_people", "People and hiring", anyCategory(CATEGORY_NAMES.hr)),

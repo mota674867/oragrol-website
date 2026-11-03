@@ -2,6 +2,14 @@
 
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
+## Session: Forms rebuilt to the approved PDFs, one-tick start, ticked-only content, browser test, 2026-11-03
+
+**Done (branch `applications-slice-3`, local commits only, NOT pushed; also OCS `applications-slice-1` and dashboard `applications-slice-2` test changes, local):** OR ONE and BA application forms rebuilt from the approved PDFs (`app/lib/apply/forms/or-one-application.ts`, `ba-application.ts`), Business Setup builders (`forms/setup.ts`, not registered yet), real 77-item OR ONE catalogue (533 points, 11 locked) in `catalogue.ts`. Decisions in D-127. The browser gets category names only and fetches a ticked category's details (`/api/apply/details`).
+- **Verified:** tsc and eslint clean; `node --test tests/apply-engine.test.mjs` 47/47. Browser run with Playwright against `next dev`, the real OCS code and a throwaway PostgreSQL 16: 26 checks (bad links 404; one agree tick; terms collapsed; gating; silent caps; no category data before a tick; ticked-only items, software, size, rules and approvers; reload restores; locked items offer no Automatic; submit stores only ticked sections; new-style reference OR-APP-xxxxxxxx; phone width). The test script lives outside the repo.
+- **Test-setup notes:** open the dev server as `localhost`, not `127.0.0.1` (Next blocks dev resources for other origins, which blanks the 404 screen); the open-page rate limit is 60 per 10 minutes per address, so restart the dev server between repeated runs; the throwaway DB superuser is `admin`.
+- **NEEDS VERIFICATION:** `npm run build` (Vercel preview only); Redis-backed rate limits; an invitation email arriving.
+- **Not done:** filled client-copy PDF at runtime and its email (needs the sender info@orgro.ca); Business setup wiring; paper-application entry screen; vendor round 2; counsel wording; the concept name.
+
 ## Session: Private application forms /apply/<code> (Applications slice 3), 2026-11-02
 
 **Done (branch `applications-slice-3`, committed, NOT pushed):** invite-only form engine at `app/apply/[code]` (own root layout, no site chrome), save/submit API `app/api/apply/[action]`, engine and data in `app/lib/apply/` (types, engine, catalogue, fixture, forms/or-one-application, registry, ocs, handler). See D-126. Config: `next.config.ts` headers for `/apply/*`, `proxy.ts` matcher excludes `apply`, `robots.ts` disallows `/apply/` and `/api/apply/`, `tsconfig.json` allows `.ts` imports (so the engine can be tested with plain Node), `.env.local.example` has `OCS_APPLY_URL`, `OCS_APPLY_SECRET`, `APPLY_ALLOW_DRAFT_FORMS`, `APPLY_FIXTURE_CATALOGUE`.

@@ -55,7 +55,7 @@ const START_BODY = [
   "We ask for this information so that we can understand your business and prepare your proposal. Nothing is built, connected or charged before you sign a contract.",
 ];
 
-const AGREE = "I agree to ORAGROL collecting and using the information in this form to assess my application and prepare my proposal, and I accept the terms and privacy notice above.";
+const AGREE = "to ORAGROL collecting and using the information in this form to assess my application and prepare my proposal, and I accept the terms and privacy notice above.";
 
 const pages: PageSpec[] = [
   { kind: "fields", page: { id: "start", title: "Before you start", body: START_BODY, terms: LEGAL.map((l, i) => ({ title: `${i + 1}. ${l.title}`, text: l.text })), fields: [
