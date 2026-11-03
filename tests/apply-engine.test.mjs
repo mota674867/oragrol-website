@@ -12,6 +12,7 @@ import { fixtureCatalogue } from "../app/lib/apply/catalogue-fixture.ts";
 import { getCatalogue } from "../app/lib/apply/catalogue.ts";
 import { orOneApplication as form } from "../app/lib/apply/forms/or-one-application.ts";
 import { baApplication as ba } from "../app/lib/apply/forms/ba-application.ts";
+import { baSetup, orOneSetup } from "../app/lib/apply/forms/setup.ts";
 import { allForms, openableForm } from "../app/lib/apply/registry.ts";
 import { handleApply } from "../app/lib/apply/handler.ts";
 import { formToken, ocsApplyConfig, sign } from "../app/lib/apply/ocs.ts";
@@ -445,4 +446,72 @@ test("BA: something else needs a description; a complete BA form passes every pa
   const full = fillBA();
   assert.deepEqual(validateAll(ba, FX, full, {}), { ok: true, pageIndex: -1, errors: {} });
   assert.equal(validateAll(ba, FX, { ...full, legal_11: false }, {}).ok, false, "the last condition must be ticked");
+});
+
+// ---------------------------------------------------------------- the Business Setup forms (PDF: Business Setup samples)
+
+/** Fills every compulsory visible field of a form, repeating until nothing new appears (pages and rows depend on earlier answers). */
+function fillDef(def, catalogue, start) {
+  const answers = { ...start };
+  for (let round = 0; round < 6; round += 1) {
+    for (const page of expand(def, catalogue, answers)) {
+      for (const f of page.fields) {
+        if (!isRequired(f, ctxOf(answers, {}, catalogue)) || (f.id in answers && answers[f.id] !== "" && answers[f.id] !== undefined)) continue;
+        answers[f.id] = sample(f);
+      }
+    }
+  }
+  return answers;
+}
+const setupFields = (def, catalogue, answers) => expand(def, catalogue, answers).flatMap((p) => p.fields.filter((f) => isVisible(f, ctxOf(answers, {}, catalogue))));
+
+test("OR ONE setup: five pages in the PDF's grouping, one confirm row per item the client chose, the rule and approver shown as the application has them", () => {
+  const app = fillAll(REAL, { items: ["s-leadgen", "f-ap", "i-patch"] });
+  const setup = orOneSetup(app, REAL);
+  assert.equal(setup.formType, "setup"); assert.equal(setup.status, "draft");
+  assert.deepEqual(setup.pages.map((p) => p.page.title.slice(0, 2)), ["01", "02", "04", "06", "08"]);
+  const fields = setupFields(setup, REAL, {});
+  const rows = fields.filter((f) => f.id.startsWith("c.item.")).map((f) => f.id);
+  assert.deepEqual(rows, ["c.item.s-leadgen", "c.item.f-ap", "c.item.i-patch"], "one confirm row per picked item and no other");
+  const row = fields.find((f) => f.id === "c.item.f-ap");
+  assert.match(row.help, /Needs my approval/, "the application's rule is shown");
+});
+
+test("OR ONE setup: tools are the ones the application chose, with the vendor shown; nothing asks for a password, key or card number", () => {
+  const app = fillAll(REAL, { items: ["s-leadgen", "i-patch"] });
+  const setup = orOneSetup(app, REAL);
+  const fields = setupFields(setup, REAL, {});
+  const vendor = fields.find((f) => f.id === "t.tool-sales-crm.vendor");
+  assert.ok(vendor, "CRM row present because a sales item was picked");
+  assert.match(vendor.help, /HubSpot/, "the vendor the client chose is shown");
+  assert.equal(fields.some((f) => f.id.startsWith("t.tool-finance-")), false, "no finance tool row without a finance item");
+  for (const f of fields) assert.doesNotMatch(f.label, /your password|api key|card number|secret/i, f.label);
+});
+
+test("OR ONE setup: a complete setup can be signed; the client confirms or corrects every row and the final statements", () => {
+  const app = fillAll(REAL, { items: ["s-leadgen", "f-ap", "i-patch"] });
+  const setup = orOneSetup(app, REAL);
+  const answers = fillDef(setup, REAL, {});
+  assert.deepEqual(validateAll(setup, REAL, answers, {}), { ok: true, pageIndex: -1, errors: {} });
+  assert.equal(validateAll(setup, REAL, { ...answers, "c.item.f-ap": "Change needed" }, {}).ok, false, "a change needs words");
+  assert.equal(validateAll(setup, REAL, { ...answers, "final.golive": false }, {}).ok, false, "go-live needs the decision-maker's tick");
+});
+
+test("BA setup: five pages, a sign-off line only for the packages chosen, and the packages and approvers shown as on the application", () => {
+  const app = fillBA({ packages: ["Sales", "Finance"] });
+  const setup = baSetup(app);
+  assert.deepEqual(setup.pages.map((p) => p.page.title.slice(0, 2)), ["01", "02", "04", "06", "08"]);
+  const lines = setupFields(setup, FX, {}).filter((f) => f.id.startsWith("so.")).map((f) => f.id);
+  assert.deepEqual(lines, ["so.followups", "so.quotes", "so.invoices", "so.money"]);
+  const packages = setupFields(setup, FX, {}).find((f) => f.id === "c.packages");
+  assert.match(packages.help, /Sales, Finance/);
+});
+
+test("BA setup: a complete setup can be signed, and the setup is not open for any client yet", () => {
+  const app = fillBA({ packages: ["Sales", "IT"] });
+  const setup = baSetup(app);
+  const answers = fillDef(setup, FX, {});
+  assert.deepEqual(validateAll(setup, FX, answers, {}), { ok: true, pageIndex: -1, errors: {} });
+  assert.equal(openableForm("setup", "ba", true), null, "setup forms are not registered until they are read from the application and placed in the dashboard");
+  assert.equal(openableForm("setup", "or_one", true), null);
 });
