@@ -65,7 +65,7 @@ function companyFields(app: Answers, extra: Field[]): Field[] {
 const STEPS_INTRO = "Your setup after you sign. Pre-filled from your application. Confirm it, connect your tools and approve it before go-live. Business setup opens after the contract is signed. Nothing is built or connected before that. Never send a password, key or card number by email or chat: you connect each tool through the vendor's own secure sign-in screen, or by placing a key in ORAGROL's secure vault yourself. Go-live happens only when every step is done and every rule test passes.";
 const TEST_NOTE = "Before go-live ORAGROL tests every rule you set. All tests must pass with zero failures. You can open each result and tick it as reviewed. If a test fails, ORAGROL fixes it and runs it again. Go-live waits.";
 const FINAL_STATEMENTS: Field[] = [
-  check("final.rules", "My rules are correct, and I understand ZM77 follows them exactly.", "My rules are correct, and I understand ZM77 follows them exactly."),
+  check("final.rules", "My rules are correct, and I understand ORAGROL's automation follows them exactly.", "My rules are correct, and I understand ORAGROL's automation follows them exactly."),
   check("final.approvers", "My named approvers have accepted their roles.", "My named approvers have accepted their roles."),
   check("final.tools", "My tools are connected through my own accounts.", "My tools are connected through my own accounts."),
   check("final.tests", "I reviewed the rule test results.", "I reviewed the rule test results."),
@@ -112,7 +112,7 @@ export function orOneSetup(app: Answers, catalogue: Catalogue): FormDefinition {
         text("escalation", "Escalation: who to call if the system cannot continue", { group: "03 Your named approvers accept their roles" }),
       ] } },
     { kind: "fields", page: { id: "tools", title: "04 Connect your tools · 05 Share your material",
-      intro: "One row for each tool you chose on your application. You buy and pay for each tool directly from the vendor, in your own account. ORAGROL confirms the current price, the connection and where the vendor stores data before you order. Upload what ZM77 needs for the items you chose; nothing is used until you approve it.",
+      intro: "One row for each tool you chose on your application. You buy and pay for each tool directly from the vendor, in your own account. ORAGROL confirms the current price, the connection and where the vendor stores data before you order. Upload what ORAGROL needs for the items you chose; nothing is used until you approve it.",
       fields: [
         ...toolRows(app, tools),
         text("admin_name", "Your admin for the connections: name", { group: "Connect your tools" }),
@@ -120,7 +120,7 @@ export function orOneSetup(app: Answers, catalogue: Catalogue): FormDefinition {
         phone("admin_phone", "Admin phone", { group: "Connect your tools" }),
         choose("m.brand", "Logo, brand guide and photos", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(marketing) }),
         choose("m.price", "Price list and product or service list", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(sales || finance) }),
-        choose("m.claims", "Approved claims library: the facts ZM77 may state about you (services, prices, results)", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(sales || marketing) }),
+        choose("m.claims", "Approved claims library: the facts ORAGROL's automation may state about you (services, prices, results)", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(sales || marketing) }),
         choose("m.dnc", "Your do-not-contact list", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(sales || marketing || support) }),
         choose("m.templates", "Templates (quotes, emails, letters, contracts)", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(sales || has("hr") || has("legal")) }),
         choose("m.policies", "Policies and procedures (returns, HR, privacy, security)", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(support || has("hr") || has("legal") || has("it")) }),

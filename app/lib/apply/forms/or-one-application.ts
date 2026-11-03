@@ -45,16 +45,15 @@ const LEGAL: readonly { title: string; text: string }[] = [
 ];
 
 const START_BODY = [
-  "What this form is: your application for OR ONE. ORAGROL uses your answers to prepare a proposal for you. It is not a contract, and no price is agreed by completing it.",
-  "Why we ask: to understand your business, the items you need, the tools you already use, and who approves what. ZM77 follows the rules you set, so the rules must be complete and clear. Nothing is built before you sign a contract.",
-  "What happens next: we check that your tools can connect, confirm each vendor's price and data location with you, send a proposal, and build and test only after you sign.",
-  "How many pages: 11 to 20, depending on how many categories you choose (one rules page per category). Compulsory fields are marked with a star *. Your answers are saved as you go.",
-  "Please read the ten conditions below and tick each one. The form opens only after you tick them all.",
+  "Thank you for applying to OR ONE. This application is about 11 pages, with one more page for each extra category you choose. Your answers are saved as you go, so you can leave and return with the same private link.",
+  "We ask for this information so that we can understand your business and prepare your proposal. Nothing is built, connected or charged before you sign a contract.",
 ];
 
+const AGREE = "I agree to ORAGROL collecting and using the information in this form to assess my application and prepare my proposal, and I accept the terms and privacy notice above.";
+
 const pages: PageSpec[] = [
-  { kind: "fields", page: { id: "start", title: "Before you start", body: START_BODY, fields: [
-    ...LEGAL.map((l, i): Field => ({ id: `legal_${i + 1}`, label: `${i + 1}. ${l.title}`, kind: "check", text: l.text })),
+  { kind: "fields", page: { id: "start", title: "Before you start", body: START_BODY, terms: LEGAL.map((l, i) => ({ title: `${i + 1}. ${l.title}`, text: l.text })), fields: [
+    { id: "agree", label: "I agree", kind: "check", text: AGREE },
   ] } },
   { kind: "fields", page: { id: "company", title: "01 Your company", intro: "Standard staff size per tier: STARTER under 8, OR ONE 100 under 20, OR ONE 200 under 30, OR ONE 400 under 50. More staff is possible with an extra charge set in your proposal. One company is included; each extra company counts its own points. Financial year-end is compulsory if you choose Finance items.", fields: [
     text("company_legal_name", "Company legal name", { prefill: "company" }),
@@ -85,17 +84,18 @@ const pages: PageSpec[] = [
     { id: "requesters", label: "Up to 5 named people from your team can send us requests. Name at least one.", kind: "people", required: true, min: 1, max: 5,
       columns: [{ id: "name", label: "Name", kind: "text" }, { id: "role", label: "Role", kind: "text" }, { id: "email", label: "Email", kind: "email" }] },
   ] } },
-  { kind: "fields", page: { id: "need", title: "03 What do you need?", intro: "Choose your items below. Every item has points. Your total decides your size: OR ONE STARTER is one category, up to 30 points; OR ONE 100, 200 and 400 are for larger selections; above 400 points is a Signature setup (contact us). Your proposal states your exact size and fees.", fields: [
+  { kind: "fields", page: { id: "need", title: "03 What do you need?", intro: "Tick the categories you need, then choose your items in each. Every item has points. Your total decides your size: OR ONE STARTER is one category, up to 30 points; OR ONE 100, 200 and 400 are for larger selections; above 400 points is a Signature setup (contact us). Your proposal states your exact size and fees.", fields: [
     long("goal", "Your main goal, in your own words"),
     long("time_sink", "What takes most of your team's time today"),
     num("hours", "Hours a week spent on these tasks (estimate)", { required: false }),
+    { id: "categories", label: "Categories you need", kind: "multiselect", required: true, choice: true, discuss: false, options: Object.values(CATEGORY_NAMES) },
     { id: "items", label: "Items you need", kind: "items", required: true, discuss: false },
     { id: "start", label: "Wanted start date", kind: "date", required: true },
     long("urgent", "Anything urgent or time-limited", { required: false }),
   ] } },
   { kind: "tools", id: "software", title: "04 Your software", intro: "For each tool type you need, choose one, name the tool you already use, or tick \"Not sure, recommend\". We check that a tool you already use can connect before you sign. You buy and pay for your software directly from the vendor. We confirm each vendor's current price and where it stores data when you order. Show only the categories you chose in section 03." },
   { kind: "situation", id: "situation", title: "05 Size and situation", intro: "Complete only the categories you chose in section 03." },
-  { kind: "itemRules", id: "rules", title: "06 Your rules, item by item", intro: "The client decides; ZM77 follows. For each item you chose, choose how ZM77 works: Automatic (ZM77 acts alone, within the limits you write), Needs my approval (your named approver approves first), or Red flag (ZM77 hands the case to a person). A blank or unclear choice is treated as \"Needs my approval\". Items marked locked (money, people, law, and investor or board reporting) can never run automatically. ORAGROL's fixed limits are shown on each item. ORAGROL does not give legal, tax or financial advice." },
+  { kind: "itemRules", id: "rules", title: "06 Your rules, item by item", intro: "The client decides; ORAGROL's automation follows. For each item you chose, choose how the automation works: Automatic (ORAGROL's automation acts alone, within the limits you write), Needs my approval (your named approver approves first), or Red flag (ORAGROL's automation hands the case to a person). A blank or unclear choice is treated as \"Needs my approval\". Items marked locked (money, people, law, and investor or board reporting) can never run automatically. ORAGROL's fixed limits are shown on each item. ORAGROL does not give legal, tax or financial advice." },
   { kind: "fields", page: { id: "approvers", title: "07 Approvers and escalation", intro: "Name who approves each area you chose. Each needs a name, role, email, phone and a backup person.", fields: [
     ...approver("ap_money", "Money", anyCategory(CATEGORY_NAMES.finance, CATEGORY_NAMES.procurement)),
     ...approver("ap_people", "People and hiring", anyCategory(CATEGORY_NAMES.hr)),
@@ -108,8 +108,8 @@ const pages: PageSpec[] = [
     { id: "ap_authorized", label: "The people named above are authorized to approve on behalf of the company", kind: "check", text: "The people named above are authorized to approve on behalf of the company." },
   ] } },
   { kind: "fields", page: { id: "rules_general", title: "08 Your rules in general", fields: [
-    long("always", "Rules ZM77 must always follow, or \"None\" (policy, discounts, tone, wording)", { allowNone: true }),
-    long("never", "Things ZM77 must never do, or \"None\"", { allowNone: true }),
+    long("always", "Rules ORAGROL's automation must always follow, or \"None\" (policy, discounts, tone, wording)", { allowNone: true }),
+    long("never", "Things ORAGROL's automation must never do, or \"None\"", { allowNone: true }),
     text("tone", "Tone of voice for messages to customers and suppliers"),
     text("languages", "Languages for messages", { required: false }),
     long("material", "Existing material to share later (brand guide, price list, policies, templates)", { required: false, help: "You upload it after signing, in your Business setup. Nothing is uploaded with this form." }),

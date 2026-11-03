@@ -5,8 +5,8 @@ import type { ReactNode } from "react";
 import { BrandLogo } from "../brand-logo";
 import { ThemeToggle } from "../theme-toggle";
 import {
-  MAX_FLAGS_BEFORE_WARNING, NONE_TEXT, canDiscuss, catalogueReady, expand, firstIncomplete, isRequired, isVisible, optionsOf,
-  pickedItems, pickedPoints, tierEstimate, validatePage,
+  MAX_FLAGS_BEFORE_WARNING, NONE_TEXT, canDiscuss, capsFor, catalogueReady, expand, firstIncomplete, isRequired, isVisible, optionsOf,
+  pickedCategories, pickedItems, pickedPoints, tierEstimate, validatePage,
 } from "../../lib/apply/engine";
 import type { Ctx } from "../../lib/apply/engine";
 import type { Answers, Catalogue, Field, Flags, FormDefinition } from "../../lib/apply/types";
@@ -219,6 +219,12 @@ export function ApplyForm({ code, token, form, catalogue, reference, expiresAt, 
         <h1 className="ap-h1" tabIndex={-1} ref={heading}>{page.title}</h1>
         {page.intro && <p className="ap-muted ap-intro">{page.intro}</p>}
         {page.body?.map((paragraph) => <p key={paragraph} className="ap-intro">{paragraph}</p>)}
+        {page.terms && (
+          <details className="ap-terms">
+            <summary>Terms and privacy notice</summary>
+            <ol>{page.terms.map((t) => <li key={t.title}><strong>{t.title.replace(/^\d+\.\s*/, "")}</strong> {t.text}</li>)}</ol>
+          </details>
+        )}
         <p className="ap-legend"><span className="ap-star" aria-hidden="true">*</span> Compulsory. Everything else is optional. {index === 0 && expiresAt ? <>Your answers are saved as you go; use the same link to come back until {new Date(expiresAt).toLocaleDateString("en-CA", { day: "numeric", month: "long", year: "numeric", timeZone: "America/Toronto" })}.</> : null}</p>
 
         {flagCount > 0 && (
@@ -284,7 +290,7 @@ function FieldView({ field: f, ctx, form, error, value, flagged, onChange, onFla
   switch (f.kind) {
     case "text": case "email": case "phone": case "url": case "typed":
       control = <input {...common} className={f.kind === "typed" ? "ap-input ap-signature" : "ap-input"} type={f.kind === "email" ? "email" : f.kind === "phone" ? "tel" : "text"}
-        inputMode={f.kind === "url" ? "url" : undefined} autoComplete="off" maxLength={f.kind === "email" ? 254 : 300} placeholder={f.placeholder}
+        inputMode={f.kind === "url" ? "url" : undefined} autoComplete="off" maxLength={capsFor(f).chars} placeholder={f.placeholder}
         disabled={isNone} value={isNone ? "" : text} onChange={(e) => onChange(e.target.value)} />;
       break;
     case "number":
@@ -294,7 +300,7 @@ function FieldView({ field: f, ctx, form, error, value, flagged, onChange, onFla
       control = <input {...common} className="ap-input ap-input-short" type="date" value={text} onChange={(e) => onChange(e.target.value)} />;
       break;
     case "longtext":
-      control = <textarea {...common} className="ap-input ap-area" rows={4} maxLength={2000} disabled={isNone} value={isNone ? "" : text} onChange={(e) => onChange(e.target.value)} />;
+      control = <textarea {...common} className="ap-input ap-area" rows={4} maxLength={capsFor(f).chars} disabled={isNone} value={isNone ? "" : text} onChange={(e) => onChange(e.target.value)} />;
       break;
     case "select": case "yesno": {
       const options = optionsOf(f);
@@ -362,7 +368,7 @@ function People({ field: f, value, onChange, invalid, id }: { field: Field; valu
           <legend>Person {i + 1}</legend>
           {cols.map((c) => (
             <label key={c.id} className="ap-person-col"><span>{c.label}</span>
-              <input className="ap-input" type={c.kind === "email" ? "email" : c.kind === "phone" ? "tel" : "text"} maxLength={254} autoComplete="off" value={row[c.id] ?? ""} onChange={(e) => set(i, c.id, e.target.value)} />
+              <input className="ap-input" type={c.kind === "email" ? "email" : c.kind === "phone" ? "tel" : "text"} maxLength={c.kind === "email" ? 254 : 120} autoComplete="off" value={row[c.id] ?? ""} onChange={(e) => set(i, c.id, e.target.value)} />
             </label>
           ))}
           <button type="button" className="ap-btn ap-btn-quiet ap-small" onClick={() => onChange(rows.filter((_, j) => j !== i))}>Remove</button>
@@ -384,12 +390,14 @@ function ItemsPicker({ form, ctx, value, onChange }: { form: FormDefinition; ctx
   const points = pickedPoints(ctx.answers, catalogue);
   const tier = tierEstimate(form, ctx.answers, catalogue);
   const count = pickedItems(ctx.answers, catalogue).length;
+  const shown = pickedCategories(ctx.answers, catalogue).filter((c) => c.items.length);
+  if (shown.length === 0) return <p className="ap-static ap-muted">Tick at least one category above to see its items.</p>;
   return (
     <div className="ap-items">
       <p className="ap-tier" role="status" aria-live="polite">
         {count === 0 ? "No items chosen yet." : <>{count} {count === 1 ? "item" : "items"} · <strong>{points} points</strong> · estimated plan: <strong>{tier === "Signature" ? "Signature (we will contact you)" : tier}</strong></>}
       </p>
-      {catalogue.categories.filter((c) => c.items.length).map((c) => (
+      {shown.map((c) => (
         <fieldset key={c.id} className="ap-cat">
           <legend>{c.name}</legend>
           {c.items.map((item) => (

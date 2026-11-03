@@ -51,15 +51,15 @@ const LEGAL: readonly { title: string; text: string }[] = [
 ];
 
 const START_BODY = [
-  "What this form is: your application for Business Automation (BA). ORAGROL uses your answers to assess your application and prepare a proposal for you. It is not a contract, and no price is agreed by completing it.",
-  "Why we ask: to understand which packages you need, the tools you already use, who approves what, and your starting plan size. The sign-off sheet is the rule set ORAGROL follows, so it must be complete and clear. Nothing is built before you sign a contract.",
-  "What happens next: we check that the tools you already use can connect, confirm each vendor's price and data location with you, send you a proposal, and build and test only after you sign.",
-  "How many pages: 4 to 11, depending on the packages you choose. Compulsory fields are marked with a star *. Your answers are saved as you go. Please read the eleven conditions below and tick each one. The form opens only after you tick them all.",
+  "Thank you for applying to Business Automation. This application is 4 to 11 pages, depending on the packages you choose. Your answers are saved as you go, so you can leave and return with the same private link.",
+  "We ask for this information so that we can understand your business and prepare your proposal. Nothing is built, connected or charged before you sign a contract.",
 ];
 
+const AGREE = "I agree to ORAGROL collecting and using the information in this form to assess my application and prepare my proposal, and I accept the terms and privacy notice above.";
+
 const pages: PageSpec[] = [
-  { kind: "fields", page: { id: "start", title: "Before you start", body: START_BODY, fields: [
-    ...LEGAL.map((l, i): Field => ({ id: `legal_${i + 1}`, label: `${i + 1}. ${l.title}`, kind: "check", text: l.text })),
+  { kind: "fields", page: { id: "start", title: "Before you start", body: START_BODY, terms: LEGAL.map((l, i) => ({ title: `${i + 1}. ${l.title}`, text: l.text })), fields: [
+    { id: "agree", label: "I agree", kind: "check", text: AGREE },
   ] } },
   { kind: "fields", page: { id: "company", title: "01 Your company", fields: [
     text("company_legal_name", "Company legal name", { prefill: "company" }),

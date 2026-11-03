@@ -5,7 +5,7 @@ import { createHmac } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
-  NONE_TEXT, canDiscuss, catalogueReady, expand, firstIncomplete, fromLabelled, isRequired, isVisible, meetingList, pickedPoints, signaturePayload,
+  NONE_TEXT, canDiscuss, capsFor, catalogueReady, expand, firstIncomplete, fromLabelled, isRequired, isVisible, meetingList, pickedPoints, signaturePayload,
   tierEstimate, toLabelled, validateAll, validateField, validatePage, withPrefill, MAX_FLAGS_BEFORE_WARNING, MEETING_KEY,
 } from "../app/lib/apply/engine.ts";
 import { fixtureCatalogue } from "../app/lib/apply/catalogue-fixture.ts";
@@ -25,7 +25,9 @@ const field = (pages, id) => pages.flatMap((p) => p.fields).find((f) => f.id ===
 
 /** Fills every compulsory visible field with a valid value, repeating until the generated pages have appeared. */
 function fillAll(catalogue = FX, start = {}) {
-  const answers = withPrefill(form, catalogue, { items: ["fx-leads", "fx-quotes", "fx-pay"], ...start }, INVITE);
+  const items = start.items ?? ["fx-leads", "fx-quotes", "fx-pay"];
+  const categories = catalogue.categories.filter((c) => c.items.some((i) => items.includes(i.id))).map((c) => c.name);
+  const answers = withPrefill(form, catalogue, { items, categories, ...start }, INVITE);
   for (let round = 0; round < 6; round += 1) {
     for (const page of expand(form, catalogue, answers)) {
       for (const f of page.fields) {
@@ -135,8 +137,8 @@ test("\"I need to discuss this in a meeting\" completes a compulsory field; it i
   assert.equal(validateField(goal, ctxOf({}, { goal: true })), null);
   assert.equal(canDiscuss(goal, ctxOf({})), true);
   assert.equal(canDiscuss(field(pages, "trade_name"), ctxOf({})), false, "optional field");
-  for (const id of ["legal_1", "signature", "signer_name", "signer_authority", "items", "meet_options"]) assert.equal(canDiscuss(field(pages, id), ctxOf({})), false, id);
-  assert.equal(validateField(field(pages, "legal_1"), ctxOf({}, { legal_1: true })), "Tick this box to continue.");
+  for (const id of ["agree", "signature", "signer_name", "signer_authority", "items", "meet_options"]) assert.equal(canDiscuss(field(pages, id), ctxOf({})), false, id);
+  assert.equal(validateField(field(pages, "agree"), ctxOf({}, { agree: true })), "Tick this box to continue.", "the meeting box never applies to the agreement");
 });
 
 test("a flagged field and the meeting page: marking items for a meeting makes the meeting details compulsory; the page is optional otherwise", () => {
@@ -208,9 +210,9 @@ test("a fully answered form passes every page and the final check; take any comp
   const flags = {};
   assert.deepEqual(validateAll(form, FX, answers, flags), { ok: true, pageIndex: -1, errors: {} });
   assert.equal(firstIncomplete(expand(form, FX, answers), ctxOf(answers)), -1);
-  const noLegal = { ...answers, legal_7: false };
-  const r = validateAll(form, FX, noLegal, flags);
-  assert.equal(r.ok, false); assert.equal(r.errors.legal_7, "Tick this box to continue.");
+  const noAgree = { ...answers, agree: false };
+  const r = validateAll(form, FX, noAgree, flags);
+  assert.equal(r.ok, false); assert.equal(r.errors.agree, "Tick this box to continue.");
   const noItems = { ...answers, items: [] };
   assert.equal(validateAll(form, FX, noItems, flags).ok, false);
   assert.equal(validateAll(form, FX, { ...answers, signature: "" }, flags).ok, false);
@@ -319,9 +321,9 @@ test("limits: too many requests from one address get 'slow down'; oversize bodie
 
 test("submit: an incomplete form is stopped here with the page and fields to fix; OCS never sees it", async () => {
   const h = harness();
-  const answers = fillAll(); answers.legal_3 = false;
+  const answers = fillAll(); answers.agree = false;
   const r = await handleApply("submit", body({}, answers), CLIENT, h.deps);
-  assert.equal(r.status, 422); assert.equal(r.body.status, "invalid"); assert.equal(typeof r.body.pageIndex, "number"); assert.equal(r.body.errors.legal_3, "Tick this box to continue.");
+  assert.equal(r.status, 422); assert.equal(r.body.status, "invalid"); assert.equal(typeof r.body.pageIndex, "number"); assert.equal(r.body.errors.agree, "Tick this box to continue.");
   assert.equal(h.calls.length, 0);
 });
 
@@ -398,12 +400,43 @@ function fillBA(start = {}) {
 const ids = (answers) => new Set(expand(ba, FX, answers).flatMap((p) => p.fields.filter((f) => isVisible(f, ctxOf(answers, {}, FX))).map((f) => f.id)));
 const titles = (answers) => expand(ba, FX, answers).map((p) => p.title);
 
-test("BA: the start page comes first and holds the 11 conditions; nothing else opens until they are ticked", () => {
+test("BA: the start page comes first with the 11 terms to read and ONE tick to agree; nothing else opens until it is ticked", () => {
   assert.equal(ba.status, "draft");
   assert.equal(openableForm("application", "ba", false), null);
-  assert.equal(expand(ba, FX, {})[0].id, "start");
-  assert.equal(expand(ba, FX, {})[0].fields.length, 11);
-  assert.equal(Object.keys(validatePage(expand(ba, FX, {})[0], ctxOf({}, {}, FX))).length, 11);
+  const start = expand(ba, FX, {})[0];
+  assert.equal(start.id, "start");
+  assert.equal(start.terms.length, 11);
+  assert.deepEqual(start.fields.map((f) => f.id), ["agree"]);
+  assert.deepEqual(Object.keys(validatePage(start, ctxOf({}, {}, FX))), ["agree"]);
+  assert.deepEqual(validatePage(start, ctxOf({ agree: true }, {}, FX)), {});
+});
+
+test("OR ONE: the start page is short, the 10 terms are read in one block and agreed with one tick; no internal names reach the client", () => {
+  const start = expand(form, FX, {})[0];
+  assert.equal(start.terms.length, 10);
+  assert.deepEqual(start.fields.map((f) => f.id), ["agree"]);
+  assert.ok(start.body.join(" ").length < 560, "high-level: what it is and why we ask, no more");
+  for (const f of [form, ba]) assert.doesNotMatch(JSON.stringify(f), /ZM77/i, `${f.id} must not name the internal system`);
+  assert.doesNotMatch(JSON.stringify(REAL), /ZM77/i);
+});
+
+test("silent limits: every typed box has a word and character cap by kind of question, enforced on check and on save (nothing shown to the client)", () => {
+  const pages = expand(form, FX, {});
+  const words = (n) => Array.from({ length: n }, (_, i) => `w${i}`).join(" ");
+  assert.equal(validateField(field(pages, "dm_name"), ctxOf({ dm_name: words(15) })), null, "a name of 15 words is fine");
+  assert.equal(validateField(field(pages, "dm_name"), ctxOf({ dm_name: words(16) })), "That answer is too long. Please shorten it.");
+  assert.equal(validateField(field(pages, "goal"), ctxOf({ goal: words(250) })), null);
+  assert.equal(validateField(field(pages, "goal"), ctxOf({ goal: words(300) })), "That answer is too long. Please shorten it.", "300 words in a long box");
+  assert.equal(validateField(field(pages, "address"), ctxOf({ address: words(41) })), "That answer is too long. Please shorten it.");
+  assert.equal(validateField(field(pages, "signature"), ctxOf({ signature: words(20) })), "That answer is too long. Please shorten it.");
+  const people = field(pages, "requesters");
+  assert.equal(validateField(people, ctxOf({ requesters: [{ name: words(20), role: "x", email: "a@b.example" }] })), "That answer is too long. Please shorten it.");
+  // Saving clips instead of failing, so a pasted essay never reaches OCS.
+  const answers = { ...fillAll(), dm_name: words(40), goal: words(900) };
+  const labelled = toLabelled(form, expand(form, FX, answers), ctxOf(answers));
+  assert.equal(labelled["02 People"]["Decision-maker: name and title"].split(" ").length, 15);
+  assert.equal(labelled["03 What do you need?"]["Your main goal, in your own words"].split(" ").length, 250);
+  assert.equal(capsFor({ id: "x", label: "Email", kind: "email" }).words, 1);
 });
 
 test("BA: the packages chosen decide the pages; a package not chosen has no page and no software rows", () => {
@@ -445,7 +478,7 @@ test("BA: something else needs a description; a complete BA form passes every pa
   assert.equal(validateField(field(expand(ba, FX, answers), "something_else"), ctxOf({ packages: answers.packages, something_else: "" }, {}, FX)), "This is required.");
   const full = fillBA();
   assert.deepEqual(validateAll(ba, FX, full, {}), { ok: true, pageIndex: -1, errors: {} });
-  assert.equal(validateAll(ba, FX, { ...full, legal_11: false }, {}).ok, false, "the last condition must be ticked");
+  assert.equal(validateAll(ba, FX, { ...full, agree: false }, {}).ok, false, "the agreement must be ticked");
 });
 
 // ---------------------------------------------------------------- the Business Setup forms (PDF: Business Setup samples)
@@ -514,4 +547,18 @@ test("BA setup: a complete setup can be signed, and the setup is not open for an
   assert.deepEqual(validateAll(setup, FX, answers, {}), { ok: true, pageIndex: -1, errors: {} });
   assert.equal(openableForm("setup", "ba", true), null, "setup forms are not registered until they are read from the application and placed in the dashboard");
   assert.equal(openableForm("setup", "or_one", true), null);
+});
+
+test("categories: the client ticks them in section 03; only ticked categories show items, software, size and rules, and each needs an item", () => {
+  const all = ["fx-leads", "fx-pay"];
+  const pageIds = (answers) => expand(form, FX, answers).map((p) => p.id);
+  assert.ok(pageIds({ categories: ["Sales"], items: all }).includes("situation"));
+  assert.deepEqual(pageIds({ categories: ["Sales"], items: all }).filter((id) => id.startsWith("rules.")), ["rules.sales"], "Finance was not ticked, so its item is dropped");
+  assert.equal(pickedPoints({ categories: ["Sales"], items: all }, FX), 8);
+  assert.deepEqual(pageIds({ categories: [], items: all }).filter((id) => id.startsWith("rules.") || id === "software" || id === "situation"), [], "no category ticked: no generated pages");
+  const ticked = { categories: ["Sales", "Finance & Accounting"], items: ["fx-leads"] };
+  const need = expand(form, FX, ticked).find((p) => p.id === "need");
+  assert.equal(validateField(field([need], "items"), ctxOf(ticked)), "Choose at least one item in each category you ticked.");
+  assert.equal(validateField(field([need], "categories"), ctxOf({ categories: [] })), "This is required.");
+  assert.equal(validateField(field([need], "items"), ctxOf({ categories: ["Sales"], items: ["fx-leads"] })), null);
 });

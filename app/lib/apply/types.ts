@@ -41,6 +41,8 @@ export interface Field {
   readonly discuss?: boolean;
   readonly min?: number;
   readonly max?: number;
+  /** Silent word limit for a typed answer; a default is chosen from the kind of question (see capsFor in engine.ts). */
+  readonly maxWords?: number;
   readonly columns?: readonly PersonColumn[];
   /** Pre-filled from the invitation: company, person, phone, email. */
   readonly prefill?: "company" | "person" | "phone" | "email";
@@ -56,6 +58,8 @@ export interface Page {
   readonly intro?: string;
   /** Further paragraphs shown under the intro (for example the start page). */
   readonly body?: readonly string[];
+  /** Long terms shown in an expandable section under the intro (the start page); read once, agreed with a single tick. */
+  readonly terms?: readonly { readonly title: string; readonly text: string }[];
   /** The page is shown only when this holds (for example a BA package was picked). */
   readonly showIf?: Cond;
   readonly fields: readonly Field[];

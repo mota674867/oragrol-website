@@ -15,6 +15,37 @@ export const MAX_FLAGS_BEFORE_WARNING = 5;
 
 const MAX_TEXT = 300;
 const MAX_LONGTEXT = 2000;
+
+// Silent limits (never shown to the client): every box that can be typed in has a cap in words and characters, set by the kind of
+// question. They are enforced here (browser and server) so nobody can paste a novel into a name box. A field can override its words
+// with `maxWords`.
+export interface Caps { readonly words: number; readonly chars: number }
+const NAME_LIKE = /\b(name|title|role|contact|approver|decider|backup|owner|person|provider|firm|industry|language|languages|currencies|already use)\b/i;
+const PLACE_LIKE = /(address|where|sources|channels|systems|tools|platform|hosting|window|hours|location|recipients|frequency|carriers|keep in sync|provinces|website)/i;
+export function capsFor(f: Field): Caps {
+  if (f.kind === "email") return { words: 1, chars: 254 };
+  if (f.kind === "phone") return { words: 4, chars: 32 };
+  if (f.kind === "url") return { words: 1, chars: 200 };
+  if (f.kind === "longtext") return { words: f.maxWords ?? 250, chars: MAX_LONGTEXT };
+  if (f.kind === "typed") return { words: f.maxWords ?? 15, chars: 120 };
+  if (NAME_LIKE.test(f.label)) return { words: f.maxWords ?? 15, chars: 120 };
+  if (PLACE_LIKE.test(f.label)) return { words: f.maxWords ?? 40, chars: MAX_TEXT };
+  return { words: f.maxWords ?? 25, chars: 250 };
+}
+/** Cell limits of a people list (name, role, email). */
+const CELL_CAPS: Caps = { words: 15, chars: 120 };
+const wordCount = (s: string): number => (s.trim() === "" ? 0 : s.trim().split(/\s+/).length);
+/** The text cut after its Nth word. */
+function clipWords(s: string, words: number): string {
+  let seen = 0;
+  const re = /\S+/g;
+  for (let m = re.exec(s); m; m = re.exec(s)) {
+    seen += 1;
+    if (seen === words) return s.slice(0, m.index + m[0].length);
+  }
+  return s;
+}
+const TOO_LONG = "That answer is too long. Please shorten it.";
 const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const PHONE = /^\+?[0-9 ().-]{7,32}$/;
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -28,11 +59,23 @@ export interface ConcretePage extends Page { readonly spec: "fields" | "situatio
 
 const strings = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : []);
 
+/** The categories the client ticked in section 03, or null when the form has not asked yet (older saves and tests). */
+function tickedCategories(answers: Answers, catalogue: Catalogue): Category[] | null {
+  if (!("categories" in answers)) return null;
+  const names = new Set(strings(answers["categories"]));
+  return catalogue.categories.filter((c) => names.has(c.name));
+}
+/** Items count only inside a ticked category: unticking a category drops its items, its software, size and rules. */
 export function pickedItems(answers: Answers, catalogue: Catalogue): { category: Category; item: Item }[] {
   const picked = new Set(strings(answers["items"]));
-  return catalogue.categories.flatMap((category) => category.items.filter((item) => picked.has(item.id)).map((item) => ({ category, item })));
+  const ticked = tickedCategories(answers, catalogue);
+  const allowed = ticked ? new Set(ticked.map((c) => c.id)) : null;
+  return catalogue.categories.filter((c) => !allowed || allowed.has(c.id))
+    .flatMap((category) => category.items.filter((item) => picked.has(item.id)).map((item) => ({ category, item })));
 }
 export function pickedCategories(answers: Answers, catalogue: Catalogue): Category[] {
+  const ticked = tickedCategories(answers, catalogue);
+  if (ticked) return ticked;
   const ids = new Set(pickedItems(answers, catalogue).map((p) => p.category.id));
   return catalogue.categories.filter((c) => ids.has(c.id));
 }
@@ -147,11 +190,23 @@ export function validateField(f: Field, ctx: Ctx): string | null {
   if (f.kind === "autodate" || f.kind === "copy") return null;
   if (f.kind === "check") return v === true || !required ? null : "Tick this box to continue.";
   if (f.kind === "people") return peopleError(f, v, required, flagged);
-  if (f.kind === "items") return pickedItems(ctx.answers, ctx.catalogue).length > 0 || !required ? null : "Choose at least one item.";
+  if (f.kind === "items") {
+    const picked = pickedItems(ctx.answers, ctx.catalogue);
+    if (picked.length === 0) return required ? "Choose at least one item." : null;
+    const empty = pickedCategories(ctx.answers, ctx.catalogue).some((c) => !picked.some((p) => p.category.id === c.id));
+    return empty ? "Choose at least one item in each category you ticked." : null;
+  }
   if (isBlank(v)) return required && !flagged ? "This is required." : null;
   switch (f.kind) {
-    case "text": case "typed": return typeof v === "string" && v.trim().length <= MAX_TEXT ? (f.kind === "typed" && v.trim().length < 2 ? "Type your full name." : null) : "Too long.";
-    case "longtext": return typeof v === "string" && v.trim().length <= MAX_LONGTEXT ? null : "Too long.";
+    case "text": case "typed": {
+      const caps = capsFor(f);
+      if (typeof v !== "string" || v.trim().length > caps.chars || wordCount(v) > caps.words) return TOO_LONG;
+      return f.kind === "typed" && v.trim().length < 2 ? "Type your full name." : null;
+    }
+    case "longtext": {
+      const caps = capsFor(f);
+      return typeof v === "string" && v.trim().length <= caps.chars && wordCount(v) <= caps.words ? null : TOO_LONG;
+    }
     case "email": return typeof v === "string" && v.trim().length <= 254 && EMAIL.test(v.trim()) ? null : "Enter a valid email address.";
     case "phone": return typeof v === "string" && PHONE.test(v.trim()) ? null : "Enter a valid phone number, for example +1 416 555 0100.";
     case "url": return urlOk(v) ? null : "Enter a valid website address, for example orgro.ca.";
@@ -212,7 +267,7 @@ function peopleError(f: Field, v: unknown, required: boolean, flagged: boolean):
       if (typeof x !== "string" || x.trim() === "") return "Fill in every column for each person.";
       if (c.kind === "email" && !EMAIL.test(x.trim())) return "Enter a valid email address for each person.";
       if (c.kind === "phone" && !PHONE.test(x.trim())) return "Enter a valid phone number for each person.";
-      if (x.trim().length > MAX_TEXT) return "Too long.";
+      if (x.trim().length > CELL_CAPS.chars || wordCount(x) > CELL_CAPS.words) return TOO_LONG;
     }
   }
   return rows.length < min && !flagged ? `Add at least ${min} ${min === 1 ? "person" : "people"}.` : null;
@@ -236,9 +291,8 @@ export function catalogueReady(catalogue: Catalogue): boolean { return catalogue
 const pathOf = (page: Page, f: Field): string[] => (f.group ? [page.title, f.group, f.label] : [page.title, f.label]);
 export const flagKey = (page: Page, f: Field): string => pathOf(page, f).join(PATH_SEPARATOR);
 
-function clip(s: string, f: Field): string {
-  const max = f.kind === "longtext" ? MAX_LONGTEXT : MAX_TEXT;
-  return s.replace(BAD_CHARS, "").trim().slice(0, max);
+function clip(s: string, f: Field, caps: Caps = capsFor(f)): string {
+  return clipWords(s.replace(BAD_CHARS, "").trim().slice(0, caps.chars), caps.words);
 }
 const cleanKey = (s: string) => s.replace(BAD_CHARS, " ").slice(0, 120);
 
@@ -279,7 +333,7 @@ export function toLabelled(def: FormDefinition, pages: readonly Page[], ctx: Ctx
       } else if (f.kind === "people") {
         const rows = (Array.isArray(v) ? v : []).slice(0, f.max ?? 10).map((row) => {
           const r = (row ?? {}) as Record<string, unknown>;
-          return Object.fromEntries((f.columns ?? []).map((c) => [cleanKey(c.label), typeof r[c.id] === "string" ? clip(r[c.id] as string, f) : ""]));
+          return Object.fromEntries((f.columns ?? []).map((c) => [cleanKey(c.label), typeof r[c.id] === "string" ? clip(r[c.id] as string, f, CELL_CAPS) : ""]));
         });
         saved = rows.length ? rows : undefined;
       } else saved = typeof v === "string" && v.trim() !== "" ? clip(v, f) : undefined;
