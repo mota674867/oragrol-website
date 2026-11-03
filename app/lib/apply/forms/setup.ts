@@ -86,6 +86,7 @@ export function orOneSetup(app: Answers, catalogue: Catalogue): FormDefinition {
   const marketing = items.some(({ category }) => category.id === "marketing");
   const support = items.some(({ category }) => category.id === "support");
   const finance = items.some(({ category }) => category.id === "finance");
+  const has = (id: string): boolean => items.some(({ category }) => category.id === id);
   const tools = catalogue.categories.flatMap((c) => c.tools.map((r) => ({ key: `tool.${c.id}.${r.id}`, label: r.label })));
 
   const itemRows = items.flatMap(({ item }) => confirmRow(`item.${item.id}`, item.name,
@@ -121,8 +122,12 @@ export function orOneSetup(app: Answers, catalogue: Catalogue): FormDefinition {
         choose("m.price", "Price list and product or service list", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(sales || finance) }),
         choose("m.claims", "Approved claims library: the facts ZM77 may state about you (services, prices, results)", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(sales || marketing) }),
         choose("m.dnc", "Your do-not-contact list", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(sales || marketing || support) }),
+        choose("m.templates", "Templates (quotes, emails, letters, contracts)", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(sales || has("hr") || has("legal")) }),
+        choose("m.policies", "Policies and procedures (returns, HR, privacy, security)", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(support || has("hr") || has("legal") || has("it")) }),
         choose("m.faq", "Frequently asked questions and answers", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(support) }),
-        choose("m.policies", "Policies and procedures (returns, HR, privacy, security)", SAMPLE_OPTIONS, { group: "05 Share your material" }),
+        choose("m.suppliers", "Supplier list and purchase approval rules", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(has("procurement")) }),
+        choose("m.licences", "Licenses, permits, insurance and minute book", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(has("legal")) }),
+        choose("m.kpi", "KPI list and report recipients", SAMPLE_OPTIONS, { group: "05 Share your material", showIf: when(has("leadership")) }),
       ] } },
     { kind: "fields", page: { id: "phone_ads", title: "06 Email, phone and ad accounts · 07 Review the rule test results",
       intro: "Only the parts that match your items appear. The costs below are yours, not ORAGROL's, and are shown on your sign-off sheet.",
