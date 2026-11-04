@@ -17,14 +17,12 @@ export async function confirmSubmit(info: SubmitInfo, deps: NotifyDeps): Promise
   const attachments = wantsPdf
     ? [{ filename: `ORAGROL-${info.reference}.pdf`, content: await deps.render(info.def, copySections(info.pages, info.ctx), info.reference) }]
     : undefined;
-  const steps = info.def.whatNext.map((x) => `<li>${esc(x)}</li>`).join("");
   await deps.send({
     to: info.email,
     subject: `We received your ${info.def.name} (${info.reference})`,
     html: `<p>Thank you. We received your ${esc(info.def.name)}. Your reference is <strong>${esc(info.reference)}</strong>.</p>`
-      + `<p>What happens next:</p><ol>${steps}</ol>`
       + (wantsPdf ? "<p>Your PDF copy is attached.</p>" : "")
-      + "<p>If you need to change something, reply to this email.</p><p>ORAGROL Global</p>",
+      + "<p>ORAGROL Global</p>",
     attachments,
   });
 }
