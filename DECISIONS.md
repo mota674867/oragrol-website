@@ -1506,3 +1506,6 @@ D-006, D-011, D-012, D-013, D-037, D-050, D-053, D-054, D-061, D-062, D-066, D-0
 
 ### D-131 — Keep OCS asleep until the first client (2026-11-04)
 - **Decision (Mohammad):** `ca-ocs-signin` stays scaled to zero for now, so the first click after a quiet period is slow. When the first client is signed, set Min replicas to 1 in Azure (about 4 to 6 USD a month at 0.25 CPU and 0.5 GB; actual container size NEEDS VERIFICATION). Also let the website retry once after a timeout.
+
+### D-132 — Confirmation email setup deferred (2026-11-04)
+- **Decision (Mohammad):** the website email sending is not set up for now. Until then no confirmation email or PDF copy is sent; the submit itself works and shows the thank-you page with the reference. Pending, for later: set `RESEND_API_KEY` on the website in Vercel and verify the sending domain (optional `APPLY_FROM_EMAIL`, default "ORAGROL <info@orgro.ca>"), then test one real submit. Clients whose form offers "Send me a PDF copy" should not be promised one until this is done: NEEDS DECISION on hiding that tick for now.
