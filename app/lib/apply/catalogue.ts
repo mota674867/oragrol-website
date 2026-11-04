@@ -6,6 +6,10 @@
 // Still to confirm before publishing: the vendor rows (round 2), the fixed limits and defaults text, and the wording of each item.
 import type { Catalogue, Category, Field, Item, ItemBand, ToolRow } from "./types";
 import { fixtureCatalogue } from "./catalogue-fixture.ts";
+import {
+  AD_SPEND, APPROVAL_SPEED, CALL_MINUTES, CUSTOMERS, DEVICES_EACH, HIRES, KPIS, LICENCES, ORDERS, OTHER, PROVINCES, STAFF, STOCK, SUPPLIERS, VOLUME,
+  band, pickMany, withOther,
+} from "./choices.ts";
 
 const n = (id: string, label: string): Field => ({ id, label, kind: "number", required: true });
 const t = (id: string, label: string): Field => ({ id, label, kind: "text", required: true });
@@ -37,8 +41,9 @@ const row = (id: string, label: string, options: string[]): ToolRow => ({ id, la
 const CATEGORIES: Category[] = [
   {
     id: "sales", name: CATEGORY_NAMES.sales,
-    situation: [n("leads", "Leads or enquiries a month"), n("customers", "Customers handled"), t("sources", "Main lead sources"),
-      yn("cold", "Will you send cold email? (Yes / No)"), yn("dnc", "Do-not-contact list exists? (Yes / No)")],
+    situation: [band("leads", "How many leads or enquiries do you get in a typical month?", VOLUME), band("customers", "How many customers do you serve in a typical month?", CUSTOMERS),
+      ...withOther(pickMany("sources", "Where do your leads mainly come from? Choose all that apply.", ["Our website", "Referrals", "Social media", "Paid ads", "Email campaigns", "Events and trade shows", "Marketplaces or partners", "Cold outreach", OTHER])),
+      yn("cold", "Do you plan to send cold email (a first email to people who do not know you)? (Yes / No)"), yn("dnc", "Do you keep a do-not-contact list? (Yes / No)")],
     tools: [
       row("crm", "Customer database (CRM)", ["HubSpot", "Pipedrive", "Zoho CRM"]),
       row("email", "Email marketing", ["Brevo", "Mailchimp", "HubSpot Marketing Hub"]),
@@ -60,9 +65,12 @@ const CATEGORIES: Category[] = [
   },
   {
     id: "marketing", name: CATEGORY_NAMES.marketing,
-    situation: [t("goal", "One main goal"), t("social", "Social platforms you use"), t("ads", "Ad platform and monthly ad budget cap, or \"no ads\""),
-      yn("website", "Website system and admin access? (Yes / No)"), yn("brand", "Brand kit exists? (Yes / No)"),
-      t("approve", "Who approves content, and how fast")],
+    situation: [...withOther(band("goal", "What is the main thing you want marketing to achieve?", ["Get more leads", "Sell more to existing customers", "Build awareness of the brand", "Launch a new product or service", "Improve our online reputation", OTHER])),
+      ...withOther(pickMany("social", "Which social platforms do you use or want to use? Choose all that apply.", ["LinkedIn", "Facebook", "Instagram", "X", "TikTok", "YouTube", "None yet", OTHER])),
+      ...withOther(pickMany("ads", "Which paid ad platforms do you use or want to use?", ["Google Ads", "Meta Ads (Facebook and Instagram)", "LinkedIn Ads", OTHER, "No ads"])),
+      band("ad_spend", "About how much do you spend, or plan to spend, on ads each month?", AD_SPEND, { showIf: { not: { field: "ads", has: "No ads" } } }),
+      yn("website", "Do you have a website system, and can you give us admin access? (Yes / No)"), yn("brand", "Do you have a brand kit (logo, colours, fonts)? (Yes / No)"),
+      t("approve", "Who approves your content before it is published? (name and role)"), band("approve_speed", "How quickly can they approve it?", APPROVAL_SPEED)],
     tools: [
       row("cms", "Website system", ["WordPress", "Webflow", "Wix"]),
       row("social", "Social scheduling", ["Metricool", "Hootsuite", "Buffer"]),
@@ -86,9 +94,10 @@ const CATEGORIES: Category[] = [
   },
   {
     id: "finance", name: CATEGORY_NAMES.finance,
-    situation: [n("transactions", "Transactions a month"), n("payroll", "Employees on payroll"), n("companies", "Number of companies"),
-      t("payroll_provider", "Payroll provider"), yn("hst", "Registered for sales tax (HST)? (Yes / No)"),
-      t("approval_limit", "Amount above which a payment needs approval, or \"every payment\"")],
+    situation: [band("transactions", "How many invoices, payments and expenses do you process in a typical month?", VOLUME),
+      ...withOther(band("payroll_provider", "Who runs your payroll today?", ["Payworks", "ADP", "We run payroll ourselves", "We do not run payroll", OTHER])),
+      yn("hst", "Are you registered for sales tax (HST)? (Yes / No)"),
+      ...withOther(band("approval_limit", "Above what amount should a payment need your approval?", ["Every payment needs my approval", "Above $500", "Above $1,000", "Above $2,500", "Above $5,000", "Above $10,000", OTHER]))],
     tools: [
       row("accounting", "Accounting software (core)", ["QuickBooks Online", "Xero", "Zoho Books"]),
       row("payments", "Payments", ["Stripe", "Square", "PayPal"]),
@@ -112,7 +121,8 @@ const CATEGORIES: Category[] = [
   },
   {
     id: "hr", name: CATEGORY_NAMES.hr,
-    situation: [t("employees_provinces", "Employees and provinces"), n("hires", "Hires a year"), t("hr_system", "HR system (or \"none\")"),
+    situation: [pickMany("employees_provinces", "In which provinces or territories do your employees work? Choose all that apply.", PROVINCES), band("hires", "How many people do you hire in a typical year?", HIRES),
+      ...withOther(band("hr_system", "What do you use for HR records today?", ["Nothing yet", "Spreadsheets", "Our payroll provider's system", "A dedicated HR system", OTHER])),
       yn("screen", "Do you screen resumes today? (Yes / No)"), yn("jobs_on", "Do you advertise jobs publicly in Ontario? (Yes / No)")],
     tools: [
       row("hr", "HR records system", ["Humi", "BambooHR", "Rippling"]),
@@ -134,9 +144,14 @@ const CATEGORIES: Category[] = [
   },
   {
     id: "support", name: CATEGORY_NAMES.support,
-    situation: [t("channels", "Channels (email, chat, phone, social)"), t("hours", "Support hours and time zone"), n("tickets", "Tickets a month"),
-      t("shop", "Order or shop system (or \"none\")"), t("phone", "Phone system and call minutes, if AI calls are wanted"),
-      yn("ca_number", "Canadian phone number needed? (Yes / No)"), t("person", "Who handles a case that needs a person")],
+    situation: [...withOther(pickMany("channels", "Which channels do customers use to contact you? Choose all that apply.", ["Email", "Website chat", "Phone", "Social media messages", "Text messages", OTHER])),
+      ...withOther(band("hours", "When do you offer support?", ["Business hours, weekdays", "Extended hours, weekdays", "Seven days a week", "24 hours a day", OTHER])),
+      ...withOther(band("tz", "Which time zone do you work in?", ["Eastern", "Central", "Mountain", "Pacific", "Atlantic", "Newfoundland", OTHER])),
+      band("tickets", "How many customer support requests do you get in a typical month?", VOLUME),
+      ...withOther(band("shop", "Do you use an order or shop system?", ["No order or shop system", "An online store", "A point-of-sale system", OTHER])),
+      band("phone", "What phone system do you use?", ["Cloud phone service", "Office phone system (PBX)", "Mobile phones only", "No phone line"]),
+      band("call_minutes", "If you want AI to answer calls, about how many call minutes a month?", CALL_MINUTES),
+      yn("ca_number", "Do you need a Canadian phone number? (Yes / No)"), t("person", "Who should take a call that needs a person? (name and role)")],
     tools: [
       row("desk", "Customer support desk: tickets and inbox (core)", ["Freshdesk", "Zoho Desk", "HubSpot Service Hub"]),
       row("chat", "Website chat", ["Tidio", "Intercom", "Zoho SalesIQ"]),
@@ -157,8 +172,12 @@ const CATEGORIES: Category[] = [
   },
   {
     id: "operations", name: CATEGORY_NAMES.operations,
-    situation: [t("calendar", "Calendar platform"), t("sync", "Tools to keep in sync"), t("shipping", "Carriers and shipping spend limit, if shipping"),
-      n("stock_lines", "Number of stock lines, if inventory"), yn("consent", "Consent practice for recording meetings? (Yes / No)")],
+    situation: [...withOther(band("calendar", "Which calendar do you use?", ["Google Calendar", "Microsoft Outlook", "Apple Calendar", "We do not use a shared calendar", OTHER])),
+      t("sync", "Which tools should be kept in sync with each other? (for example: calendar and CRM)"),
+      ...withOther(pickMany("shipping", "Which carriers do you ship with? Choose all that apply.", ["We do not ship", "Canada Post", "UPS", "FedEx", "Purolator", "DHL", OTHER])),
+      band("shipping_limit", "What is the most you would want to spend on shipping in one month?", ["No shipping", "Up to $500", "Up to $2,500", "Up to $10,000", "More than $10,000"]),
+      band("stock_lines", "If you hold stock, how many different products (stock lines) do you carry?", STOCK),
+      yn("consent", "Do you have a practice for getting consent to record meetings? (Yes / No)")],
     tools: [
       row("meetings", "Meetings and notes", ["Zoom", "Microsoft Teams", "Google Meet"]),
       row("tasks", "Project / task tool", ["Asana", "Monday.com", "ClickUp / Trello"]),
@@ -179,9 +198,13 @@ const CATEGORIES: Category[] = [
   },
   {
     id: "it", name: CATEGORY_NAMES.it,
-    situation: [n("users", "Users"), n("devices", "Devices per user"), t("website", "Website address, platform and hosting owner"),
-      yn("site_admin", "Admin access to the website? (Yes / No)"), yn("backups", "Backups exist today? (Yes / No)"), t("window", "Maintenance window"),
-      lt("critical_systems", "Critical systems list")],
+    situation: [band("users", "How many people use your company's computers and accounts?", STAFF), band("devices", "On average, how many devices does each person use (laptop, phone, tablet)?", DEVICES_EACH),
+      ...withOther(band("site_platform", "What is your website built on?", ["WordPress", "Shopify", "Wix", "Squarespace", "Custom built", "We have no website", OTHER])),
+      { id: "website", label: "Website address", kind: "url", required: true, showIf: { not: { field: "site_platform", is: "We have no website" } } },
+      band("site_host", "Who looks after your website hosting?", ["We do", "Our web agency", "Our IT provider"], { showIf: { not: { field: "site_platform", is: "We have no website" } } }),
+      yn("site_admin", "Can you give us admin access to the website? (Yes / No)"), yn("backups", "Do you have backups today? (Yes / No)"),
+      ...withOther(band("window", "When can we do maintenance work?", ["Weeknights after 6 pm", "Weekends", "Early mornings", "Any time", OTHER])),
+      lt("critical_systems", "Which systems must never go down? List them.")],
     tools: [
       row("device", "Device management", ["Microsoft Intune", "NinjaOne", "Atera"]),
       row("backup", "Backup", ["Keepit", "Veeam", "Afi"]),
@@ -203,8 +226,9 @@ const CATEGORIES: Category[] = [
   },
   {
     id: "procurement", name: CATEGORY_NAMES.procurement,
-    situation: [n("suppliers", "Number of suppliers"), n("po_month", "Purchase orders a month"),
-      t("po_limit", "Amount below which a purchase order may run automatically, or \"every order\""), t("po_tool", "Purchase order tool")],
+    situation: [band("suppliers", "About how many suppliers do you work with?", SUPPLIERS), band("po_month", "How many purchase orders do you raise in a typical month?", ORDERS),
+      ...withOther(band("po_limit", "Below what amount may a purchase order run automatically?", ["Every order needs my approval", "Under $500", "Under $1,000", "Under $2,500", "Under $5,000", OTHER])),
+      ...withOther(band("po_tool", "How do you raise purchase orders today?", ["By email or spreadsheet", "In our accounting software", "In a dedicated purchasing tool", OTHER]))],
     tools: [
       row("po", "Purchase orders", ["Accounting tool's POs", "Zoho Inventory", "Procurify"]),
     ],
@@ -217,8 +241,8 @@ const CATEGORIES: Category[] = [
   },
   {
     id: "legal", name: CATEGORY_NAMES.legal,
-    situation: [n("licences", "Number of licences and permits"), yn("broker", "Insurance broker contact exists? (Yes / No)"),
-      t("minute_book", "Minute book location"), t("privacy_contact", "Named privacy contact (from section 02)")],
+    situation: [band("licences", "About how many licences and permits do you hold?", LICENCES), yn("broker", "Do you have an insurance broker we can work with? (Yes / No)"),
+      band("minute_book", "Where is your minute book kept?", ["Our lawyer holds it", "Our accountant holds it", "We keep a paper copy", "We keep a digital copy"])],
     tools: [
       row("records", "Corporate records", ["My own storage + ORAGROL register", "Ownr", "Collage"]),
     ],
@@ -232,8 +256,8 @@ const CATEGORIES: Category[] = [
   },
   {
     id: "leadership", name: CATEGORY_NAMES.leadership,
-    situation: [n("kpis", "Number of KPIs wanted"), t("kpi_tools", "Tools that feed them"), t("recipients", "Report recipients"),
-      t("board_frequency", "Board or investor reporting frequency")],
+    situation: [band("kpis", "How many KPIs (key measures) do you want reported?", KPIS), t("kpi_tools", "Which tools hold the data for those KPIs?"), t("recipients", "Who should receive the reports? (names and roles)"),
+      band("board_frequency", "How often do you report to a board or investors?", ["Monthly", "Quarterly", "Twice a year", "Once a year", "We have no board or investor reporting"])],
     tools: [
       row("dash", "Dashboards", ["My ORAGROL dashboard", "Looker Studio", "Power BI / Zoho Analytics"]),
     ],

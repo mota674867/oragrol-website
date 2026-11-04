@@ -5,7 +5,7 @@ import { createHmac } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
-  NONE_TEXT, canDiscuss, capsFor, catalogueReady, expand, firstIncomplete, fromLabelled, isRequired, isVisible, meetingList, pickedPoints, signaturePayload,
+  DISCUSS_OPTION, NONE_TEXT, canDiscuss, capsFor, limitTokens, offersDiscuss, optionsOf, catalogueReady, expand, firstIncomplete, fromLabelled, isRequired, isVisible, meetingList, pickedPoints, signaturePayload,
   tierEstimate, toLabelled, validateAll, validateField, validatePage, withPrefill, MAX_FLAGS_BEFORE_WARNING, MEETING_KEY,
 } from "../app/lib/apply/engine.ts";
 import { fixtureCatalogue } from "../app/lib/apply/catalogue-fixture.ts";
@@ -124,8 +124,13 @@ test("wrong formats are refused: email, phone, website, number, date", () => {
   assert.match(ok("dm_email", "nope"), /valid email/); assert.equal(ok("dm_email", "a@b.example"), null);
   assert.match(ok("dm_phone", "call me"), /valid phone/); assert.equal(ok("dm_phone", "416-555-0100"), null);
   assert.match(ok("website", "not a site"), /valid website/); assert.equal(ok("website", "https://orgro.ca/x"), null); assert.equal(ok("website", "orgro.ca"), null);
-  assert.match(ok("employees", "twelve"), /number/); assert.match(ok("employees", "-3"), /0 or more/); assert.equal(ok("employees", "45"), null);
-  assert.match(ok("start", "2026-02-31"), /valid date/); assert.equal(ok("start", "2026-12-01"), null);
+  // Business questions are pick lists now: only a listed option is accepted.
+  assert.match(ok("employees", "twelve"), /Choose one/); assert.equal(ok("employees", "8 to 19"), null);
+  // The few exact numbers left (the setup forms' ad cap and mailboxes) take whole numbers, digits only.
+  const cap = field(expand(baSetup(fillBA({ packages: ["Marketing"] })), FX, {}), "a.cap");
+  assert.match(validateField(cap, ctxOf({ "a.cap": "twelve" })), /whole number/); assert.match(validateField(cap, ctxOf({ "a.cap": "12.5" })), /whole number/);
+  assert.match(validateField(cap, ctxOf({ "a.cap": "-3" })), /whole number/); assert.equal(validateField(cap, ctxOf({ "a.cap": "1500" })), null);
+  assert.match(validateField(field(expand(form, FX, {}), "year_end"), ctxOf({ year_end: "2026-02-31", "Categories you need": [] })) ?? "valid date", /valid date/);
 });
 
 test("\"None / not applicable\" must be chosen explicitly where something does not apply", () => {
@@ -134,35 +139,61 @@ test("\"None / not applicable\" must be chosen explicitly where something does n
   assert.equal(validateField(field(pages, "tech_contact"), ctxOf({})), "This is required.", "a blank is never accepted; \"None\" must be chosen");
 });
 
-test("\"I need to discuss this in a meeting\" completes a compulsory field; it is offered on compulsory fields only, never on legal boxes or the signature", () => {
+test("\"I would rather discuss this with you\" completes a compulsory pick list; it is offered on pick lists only, never on legal boxes, the signature, rule choices or tool rows", () => {
   const pages = expand(form, FX, {});
-  const goal = field(pages, "goal");
-  assert.equal(validateField(goal, ctxOf({})), "This is required.");
-  assert.equal(validateField(goal, ctxOf({}, { goal: true })), null);
-  assert.equal(canDiscuss(goal, ctxOf({})), true);
-  assert.equal(canDiscuss(field(pages, "trade_name"), ctxOf({})), false, "optional field");
-  for (const id of ["agree", "signature", "signer_name", "signer_authority", "items", "meet_options"]) assert.equal(canDiscuss(field(pages, id), ctxOf({})), false, id);
-  assert.equal(validateField(field(pages, "agree"), ctxOf({}, { agree: true })), "Tick this box to continue.", "the meeting box never applies to the agreement");
+  const industry = field(pages, "industry");
+  assert.equal(validateField(industry, ctxOf({})), "This is required.");
+  assert.equal(validateField(industry, ctxOf({ industry: DISCUSS_OPTION })), null);
+  assert.equal(optionsOf(industry).at(-1), DISCUSS_OPTION, "the last choice of the list");
+  assert.equal(offersDiscuss(industry), true);
+  assert.equal(offersDiscuss(field(pages, "trade_name")), false, "optional or typed fields carry no such choice");
+  for (const id of ["agree", "signature", "signer_name", "signer_authority", "items", "meet_options"]) assert.equal(offersDiscuss(field(pages, id)), false, id);
+  assert.equal(validateField(field(pages, "agree"), ctxOf({})), "Tick this box to continue.");
+  // a multiple choice with a required count is satisfied by the discuss choice alone
+  const platforms = field(expand(ba, FX, { packages: ["Marketing"] }), "m_platforms");
+  assert.equal(validateField(platforms, ctxOf({ m_platforms: [DISCUSS_OPTION] })), null);
+  assert.match(validateField(platforms, ctxOf({ m_platforms: ["Facebook"] })), /exactly 2/);
+  // the old box under every field is gone
+  assert.equal(canDiscuss(industry, ctxOf({})), false);
 });
 
-test("a flagged field and the meeting page: marking items for a meeting makes the meeting details compulsory; the page is optional otherwise", () => {
+test("rule choices and tool rows never offer the discuss choice; every other pick list does", () => {
+  const answers = { items: ["fx-leads", "fx-pay"] };
+  const pages = expand(form, FX, answers);
+  assert.equal(optionsOf(field(pages, "rule.fx-leads.choice")).includes(DISCUSS_OPTION), false);
+  const tool = pages.flatMap((p) => p.fields).find((f) => f.id.startsWith("tool.") && f.kind === "select");
+  if (tool) assert.equal(optionsOf(tool).includes(DISCUSS_OPTION), false);
+});
+
+test("one optional note ends each page that asks questions; none on the agreement page or the signature page", () => {
+  const pages = expand(form, FX, fillAll());
+  for (const p of pages) {
+    const note = p.fields.find((f) => f.id.startsWith("discuss."));
+    const signature = p.fields.some((f) => f.kind === "typed"); const agreement = p.fields.some((f) => f.id === "agree");
+    if (signature || agreement) assert.equal(note, undefined, p.id); else if (p.fields.some((f) => f.required !== false)) assert.ok(note && note.kind === "longtext" && note.required === false, p.id);
+  }
+  const company = pages.find((p) => p.id === "company");
+  assert.equal(company.fields.at(-1).label, "Anything you want to discuss in a meeting? Tell us here.");
+});
+
+test("choosing the discuss option or writing a page note makes the meeting details compulsory; the page is optional otherwise", () => {
   const pages = expand(form, FX, {});
   const meeting = pages.find((p) => p.id === "meeting");
   assert.deepEqual(validatePage(meeting, ctxOf({})), {});
-  const flagged = validatePage(meeting, ctxOf({}, { goal: true }));
-  assert.deepEqual(Object.keys(flagged).sort(), ["meet_attendees", "meet_mode", "meet_options"]);
+  assert.deepEqual(Object.keys(validatePage(meeting, ctxOf({ industry: DISCUSS_OPTION }))).sort(), ["meet_attendees", "meet_mode", "meet_options"]);
+  assert.deepEqual(Object.keys(validatePage(meeting, ctxOf({ "discuss.need": "Please call me about the budget." }))).sort(), ["meet_attendees", "meet_mode", "meet_options"]);
   assert.deepEqual(Object.keys(validatePage(meeting, ctxOf({ meet_want: true }))).sort(), ["meet_attendees", "meet_mode", "meet_options"]);
-  assert.equal(MAX_FLAGS_BEFORE_WARNING, 5);
 });
 
-test("the meeting agenda lists every flagged compulsory field as page and item, ready for OCS", () => {
-  const answers = fillAll();
+test("the meeting agenda lists every pick list answered 'I would rather discuss this with you' and every page note, as page and item, ready for OCS", () => {
+  const answers = { ...fillAll(), industry: DISCUSS_OPTION, "discuss.need": "Please talk about the budget with me." };
   const pages = expand(form, FX, answers);
-  const list = meetingList(pages, ctxOf(answers, { goal: true, "rule.fx-pay.choice": true, trade_name: true, hours: false }));
+  const list = meetingList(pages, ctxOf(answers));
   assert.deepEqual(list, [
-    { section: "03 What do you need?", item: "Your main goal, in your own words", note: null },
-    { section: "06 Your rules, item by item: Finance & Accounting", item: "Example item C: sending money (20 pts) › Your choice", note: null },
+    { section: "01 Your company", item: "Which industry are you in?", note: null },
+    { section: "03 What do you need?", item: "Anything to discuss on this page", note: "Please talk about the budget with me." },
   ]);
+  assert.deepEqual(meetingList(expand(form, FX, fillAll()), ctxOf(fillAll())), [], "nothing flagged, nothing listed");
 });
 
 // ---------------------------------------------------------------- generated pages
@@ -198,7 +229,7 @@ test("item cards: nothing is pre-selected; locked items offer no Automatic; one 
   assert.equal(validateField(field(pages, "rule.fx-leads.limit"), ctxOf({ ...answers, "rule.fx-leads.choice": "Automatic" })), null, "standard item");
   assert.equal(validateField(field(pages, "rule.fx-quotes.limit"), ctxOf({ ...answers, "rule.fx-quotes.choice": "Automatic" })), "This is required.", "controlled item on Automatic");
   assert.equal(validateField(field(pages, "rule.fx-quotes.limit"), ctxOf({ ...answers, "rule.fx-quotes.choice": "Needs my approval" })), null);
-  assert.equal(pages.find((p) => p.id === "rules.sales").fields.length, 4, "two items, two fields each: compact");
+  assert.equal(pages.find((p) => p.id === "rules.sales").fields.length, 5, "two items, two fields each, plus the page note");
 });
 
 test("picking a category makes the related people compulsory on the People page (accountant for Finance)", () => {
@@ -222,18 +253,20 @@ test("a fully answered form passes every page and the final check; take any comp
   assert.equal(validateAll(form, FX, { ...answers, signature: "" }, flags).ok, false);
 });
 
-test("saved answers are readable (page > field) and read back exactly, including people, numbers, items and meeting flags", () => {
-  const answers = fillAll();
-  const flags = { goal: true, "rule.fx-pay.choice": true };
+test("saved answers are readable (page > field) and read back exactly, including people, pick lists, items and meeting choices", () => {
+  const answers = { ...fillAll(), industry: DISCUSS_OPTION, "discuss.need": "Please talk about the budget with me." };
+  const flags = {};
   const pages = expand(form, FX, answers);
   const labelled = toLabelled(form, pages, ctxOf(answers, flags));
   assert.deepEqual(labelled.Form, { Name: "OR ONE application form", Version: "1.0" });
   assert.equal(labelled["01 Your company"]["Company legal name"], "Northwind Dental Group");
-  assert.equal(labelled["01 Your company"]["Employees on payroll"], 12, "numbers are saved as numbers");
+  assert.equal(labelled["01 Your company"]["How many employees are on your payroll?"], "1 to 7", "a range is saved as the exact text the client chose");
+  assert.equal(labelled["01 Your company"]["Which industry are you in?"], DISCUSS_OPTION, "'discuss' is saved as plain words ZM77 can read");
+  assert.equal(labelled["03 What do you need?"]["Anything you want to discuss in a meeting? Tell us here."], "Please talk about the budget with me.");
   assert.deepEqual(labelled["03 What do you need?"]["Items you need"], ["Example item A: lead replies", "Example item B: quote drafts", "Example item C: sending money"]);
   assert.deepEqual(labelled["02 People"]["Up to 5 named people from your team can send us requests. Name at least one."], [{ Name: "Sam Lee", Role: "Owner", Email: "sam@x.example" }]);
   assert.equal(labelled["06 Your rules, item by item: Sales"]["Example item A: lead replies (8 pts)"]["Your choice"], "Automatic");
-  assert.deepEqual(labelled[MEETING_KEY], ["03 What do you need? › Your main goal, in your own words", "06 Your rules, item by item: Finance & Accounting › Example item C: sending money (20 pts) › Your choice"]);
+  assert.equal(labelled[MEETING_KEY], undefined, "the old flag list is gone: the answers themselves say what is to be discussed");
   assert.ok(Buffer.byteLength(JSON.stringify(labelled)) < 200 * 1024);
 
   const back = fromLabelled(form, FX, JSON.parse(JSON.stringify(labelled)));
@@ -244,13 +277,16 @@ test("saved answers are readable (page > field) and read back exactly, including
 
 test("only fields of the form are ever saved: junk, hidden answers and over-long text do not get through", () => {
   const answers = fillAll();
-  Object.assign(answers, { "totally.unknown": "x", tech_name: NONE_TEXT, tech_email: "left-over@x.example", goal: `bad\u0000text${"y".repeat(5000)}` });
+  Object.assign(answers, { "totally.unknown": "x", tech_name: NONE_TEXT, tech_email: "left-over@x.example", goal: `bad\u0000text ${"yy ".repeat(3000)}`, time_sink: "o".repeat(1500) });
   const pages = expand(form, FX, answers);
   const labelled = toLabelled(form, pages, ctxOf(answers, {}));
   assert.ok(!JSON.stringify(labelled).includes("totally"), "unknown ids are dropped");
   assert.ok(!JSON.stringify(labelled).includes("left-over@x.example"), "a field the form does not have is not saved");
-  assert.equal(labelled["03 What do you need?"]["Your main goal, in your own words"].length, 2000, "clipped to the limit");
-  assert.ok(!labelled["03 What do you need?"]["Your main goal, in your own words"].includes("\u0000"));
+  const goal = labelled["03 What do you need?"]["What is the main problem you want solved first, and what would success look like?"];
+  assert.ok(goal.length <= 1000 && goal.split(" ").length <= 250, "clipped to the limit");
+  assert.ok(!goal.includes("\u0000"));
+  assert.equal(labelled["03 What do you need?"]["What takes most of your team's time today?"].length, 40, "one long run of one letter is cut to 40 characters, never 1,500");
+  assert.equal(limitTokens("a ".repeat(5) + "b".repeat(100)).split(" ").at(-1).length, 40);
 });
 
 test("invitation details pre-fill the form where it asks for them and never overwrite what the client typed", () => {
@@ -335,13 +371,13 @@ test("submit: an incomplete form is stopped here with the page and fields to fix
 
 test("submit: a complete form goes to OCS with the signature and the meeting agenda; the reply tells the browser only what it needs", async () => {
   const h = harness();
-  const answers = { ...fillAll(), meet_options: "Tue or Thu morning, Toronto time", meet_mode: "Phone", meet_attendees: "Laura Chen, Operations Director" };
-  const r = await handleApply("submit", body({}, answers, { goal: true }), CLIENT, h.deps);
+  const answers = { ...fillAll(), industry: DISCUSS_OPTION, meet_options: "Tue or Thu morning, Toronto time", meet_mode: "Phone", meet_attendees: "Laura Chen, Operations Director" };
+  const r = await handleApply("submit", body({}, answers), CLIENT, h.deps);
   assert.equal(r.status, 200); assert.deepEqual(r.body, { status: "ok", reference: "OR-APP-7K2M9QXV", submittedAt: "2026-11-02T10:00:00.000Z", meetings: 1 });
   const sent = h.calls[0].body;
   assert.equal(h.calls[0].url, "https://ocs.example/v1/apply/submit");
   assert.deepEqual(sent.signature, { name: "Laura Chen", title: "Some answer", signature: "Laura Chen", agree: true });
-  assert.deepEqual(sent.meetings, [{ section: "03 What do you need?", item: "Your main goal, in your own words", note: null }]);
+  assert.deepEqual(sent.meetings, [{ section: "01 Your company", item: "Which industry are you in?", note: null }]);
   assert.ok(!JSON.stringify(r.body).includes(CODE), "the link code is never echoed");
 });
 
@@ -429,19 +465,22 @@ test("OR ONE: the start page is short, the 10 terms are read in one block and ag
 test("silent limits: every typed box has a word and character cap by kind of question, enforced on check and on save (nothing shown to the client)", () => {
   const pages = expand(form, FX, {});
   const words = (n) => Array.from({ length: n }, (_, i) => `w${i}`).join(" ");
+  const tiny = (n) => Array(n).fill("w").join(" ");
   assert.equal(validateField(field(pages, "dm_name"), ctxOf({ dm_name: words(15) })), null, "a name of 15 words is fine");
   assert.equal(validateField(field(pages, "dm_name"), ctxOf({ dm_name: words(16) })), "That answer is too long. Please shorten it.");
-  assert.equal(validateField(field(pages, "goal"), ctxOf({ goal: words(250) })), null);
+  assert.equal(validateField(field(pages, "goal"), ctxOf({ goal: tiny(250) })), null);
+  assert.equal(validateField(field(pages, "goal"), ctxOf({ goal: "o".repeat(1500) })), "That answer is too long. Please shorten it.", "one 1,500-letter word is refused");
+  assert.equal(validateField(field(pages, "goal"), ctxOf({ goal: `${"w ".repeat(480)}${"x".repeat(60)}` })), "That answer is too long. Please shorten it.", "over 1,000 characters, or a 60-letter word");
   assert.equal(validateField(field(pages, "goal"), ctxOf({ goal: words(300) })), "That answer is too long. Please shorten it.", "300 words in a long box");
   assert.equal(validateField(field(pages, "address"), ctxOf({ address: words(41) })), "That answer is too long. Please shorten it.");
   assert.equal(validateField(field(pages, "signature"), ctxOf({ signature: words(20) })), "That answer is too long. Please shorten it.");
   const people = field(pages, "requesters");
   assert.equal(validateField(people, ctxOf({ requesters: [{ name: words(20), role: "x", email: "a@b.example" }] })), "That answer is too long. Please shorten it.");
   // Saving clips instead of failing, so a pasted essay never reaches OCS.
-  const answers = { ...fillAll(), dm_name: words(40), goal: words(900) };
+  const answers = { ...fillAll(), dm_name: words(40), goal: tiny(900) };
   const labelled = toLabelled(form, expand(form, FX, answers), ctxOf(answers));
   assert.equal(labelled["02 People"]["Decision-maker: name and title"].split(" ").length, 15);
-  assert.equal(labelled["03 What do you need?"]["Your main goal, in your own words"].split(" ").length, 250);
+  assert.equal(labelled["03 What do you need?"]["What is the main problem you want solved first, and what would success look like?"].split(" ").length, 250);
   assert.equal(capsFor({ id: "x", label: "Email", kind: "email" }).words, 1);
 });
 

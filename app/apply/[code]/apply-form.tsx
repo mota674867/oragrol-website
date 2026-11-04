@@ -5,8 +5,8 @@ import type { ReactNode } from "react";
 import { BrandLogo } from "../brand-logo";
 import { ThemeToggle } from "../theme-toggle";
 import {
-  MAX_FLAGS_BEFORE_WARNING, NONE_TEXT, canDiscuss, capsFor, expand, firstIncomplete, isRequired, isVisible, optionsOf,
-  pickedCategories, pickedItems, pickedPoints, tierEstimate, validatePage,
+  NONE_TEXT, capsFor, expand, limitTokens, firstIncomplete, isRequired, isVisible, optionsOf,
+  pickedCategories, pickedItems, pickedPoints, validatePage,
 } from "../../lib/apply/engine";
 import type { Ctx } from "../../lib/apply/engine";
 import type { Answers, Catalogue, Field, Flags, FormDefinition } from "../../lib/apply/types";
@@ -63,7 +63,6 @@ export function ApplyForm({ code, token, form, catalogue: initialCatalogue, refe
   const isLast = index === pages.length - 1;
   const errors = validatePage(page, ctx);
   const showErrors = attempted[page.id] === true;
-  const flagCount = Object.entries(flags).filter(([id, on]) => on && pages.some((p) => p.fields.some((f) => f.id === id && canDiscuss(f, ctx)))).length;
 
   const heading = useRef<HTMLHeadingElement | null>(null);
 
@@ -247,11 +246,6 @@ export function ApplyForm({ code, token, form, catalogue: initialCatalogue, refe
         )}
         <p className="ap-legend"><span className="ap-star" aria-hidden="true">*</span> Compulsory. Everything else is optional. {index === 0 && expiresAt ? <>Your answers are saved as you go; use the same link to come back until {new Date(expiresAt).toLocaleDateString("en-CA", { day: "numeric", month: "long", year: "numeric", timeZone: "America/Toronto" })}.</> : null}</p>
 
-        {flagCount > 0 && (
-          <p className={`ap-flagbar${flagCount > MAX_FLAGS_BEFORE_WARNING ? " ap-flagbar-warn" : ""}`} role="status">
-            {flagCount} {flagCount === 1 ? "item is" : "items are"} marked for a meeting.{flagCount > MAX_FLAGS_BEFORE_WARNING ? " More than 5 means your proposal will take longer." : ""}
-          </p>
-        )}
         {notice && <p className="ap-notice" role="alert">{notice}</p>}
         {showErrors && errorCount > 0 && !notice && <p className="ap-notice" role="alert">{errorCount === 1 ? "One field needs an answer." : `${errorCount} fields need an answer.`}</p>}
 
@@ -311,16 +305,16 @@ function FieldView({ field: f, ctx, form, error, value, flagged, onChange, onFla
     case "text": case "email": case "phone": case "url": case "typed":
       control = <input {...common} className={f.kind === "typed" ? "ap-input ap-signature" : "ap-input"} type={f.kind === "email" ? "email" : f.kind === "phone" ? "tel" : "text"}
         inputMode={f.kind === "url" ? "url" : undefined} autoComplete="off" maxLength={capsFor(f).chars} placeholder={f.placeholder}
-        disabled={isNone} value={isNone ? "" : text} onChange={(e) => onChange(e.target.value)} />;
+        disabled={isNone} value={isNone ? "" : text} onChange={(e) => onChange(limitTokens(e.target.value))} />;
       break;
     case "number":
-      control = <input {...common} className="ap-input ap-input-short" type="text" inputMode="decimal" autoComplete="off" maxLength={14} value={text} onChange={(e) => onChange(e.target.value)} />;
+      control = <input {...common} className="ap-input ap-input-short" type="text" inputMode="numeric" pattern="[0-9]*" autoComplete="off" maxLength={9} value={text} onChange={(e) => onChange(e.target.value.replace(/\D/g, "").slice(0, 9))} />;
       break;
     case "date":
       control = <input {...common} className="ap-input ap-input-short" type="date" value={text} onChange={(e) => onChange(e.target.value)} />;
       break;
     case "longtext":
-      control = <textarea {...common} className="ap-input ap-area" rows={4} maxLength={capsFor(f).chars} disabled={isNone} value={isNone ? "" : text} onChange={(e) => onChange(e.target.value)} />;
+      control = <textarea {...common} className="ap-input ap-area" rows={4} maxLength={capsFor(f).chars} disabled={isNone} value={isNone ? "" : text} onChange={(e) => onChange(limitTokens(e.target.value))} />;
       break;
     case "select": case "yesno": {
       const options = optionsOf(f);
@@ -366,9 +360,6 @@ function FieldView({ field: f, ctx, form, error, value, flagged, onChange, onFla
       {f.allowNone && (f.kind === "text" || f.kind === "longtext") && (
         <label className="ap-choice ap-none"><input type="checkbox" checked={isNone} onChange={(e) => onChange(e.target.checked ? NONE_TEXT : "")} /><span>{NONE_TEXT}</span></label>
       )}
-      {canDiscuss(f, ctx) && (
-        <label className="ap-choice ap-discuss"><input type="checkbox" checked={flagged} onChange={(e) => onFlag(e.target.checked)} /><span>I need to discuss this in a meeting</span></label>
-      )}
       {error && <p className="ap-err" id={`${id}-err`}>{error}</p>}
     </div>
   );
@@ -408,7 +399,6 @@ function ItemsPicker({ form, ctx, value, onChange }: { form: FormDefinition; ctx
     return <p className="ap-static ap-muted">The list of items is not published yet. We will contact you when it is.</p>;
   }
   const points = pickedPoints(ctx.answers, catalogue);
-  const tier = tierEstimate(form, ctx.answers, catalogue);
   const count = pickedItems(ctx.answers, catalogue).length;
   const ticked = pickedCategories(ctx.answers, catalogue);
   if (ticked.length === 0) return <p className="ap-static ap-muted">Tick at least one category above to see its items.</p>;
@@ -417,7 +407,7 @@ function ItemsPicker({ form, ctx, value, onChange }: { form: FormDefinition; ctx
   return (
     <div className="ap-items">
       <p className="ap-tier" role="status" aria-live="polite">
-        {count === 0 ? "No items chosen yet." : <>{count} {count === 1 ? "item" : "items"} · <strong>{points} points</strong> · estimated plan: <strong>{tier === "Signature" ? "Signature (we will contact you)" : tier}</strong></>}
+        {count === 0 ? "No items chosen yet." : <>{count} {count === 1 ? "item" : "items"} · <strong>{points} points</strong></>}
       </p>
       {shown.map((c) => (
         <fieldset key={c.id} className="ap-cat">
