@@ -6,6 +6,7 @@
 //   - a submit is checked in full here, with the same engine the browser uses, before OCS stores it;
 //   - replies say nothing about why a link failed: an unknown, expired or switched-off link is a plain 404.
 import { detailsFor } from "./catalogue.ts";
+import { buildPackage, PACKAGE_KEY } from "./package.ts";
 import { expand, fromLabelled, meetingList, signaturePayload, toLabelled, validateAll } from "./engine.ts";
 import type { Ctx } from "./engine.ts";
 import { applicationFormIdFor, buildSetup, formById, setupProductFor } from "./registry.ts";
@@ -100,7 +101,8 @@ export async function handleApply(action: "save" | "submit" | "details", rawBody
   const signature = signaturePayload(def, answers);
   if (!signature) return reply(422, { status: "invalid", pageIndex: pages.length - 1, errors: {} });
   const meetings = meetingList(pages, ctx);
-  return fromOcs(await ocsApply("/v1/apply/submit", { code, answers: labelled, signature, meetings, client }, deps.config, deps.fetchImpl),
+  const record = { ...labelled, [PACKAGE_KEY]: buildPackage(def, pages, ctx, meetings) };
+  return fromOcs(await ocsApply("/v1/apply/submit", { code, answers: record, signature, meetings, client }, deps.config, deps.fetchImpl),
     (b) => ({ reference: typeof b.reference === "string" ? b.reference : null, submittedAt: typeof b.submittedAt === "string" ? b.submittedAt : null, meetings: typeof b.meetings === "number" ? b.meetings : 0 }));
 }
 

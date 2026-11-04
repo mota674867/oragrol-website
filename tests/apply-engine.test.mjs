@@ -735,3 +735,17 @@ test("go-live guard: all four forms are published and none carries a placeholder
   }
   assert.match(JSON.stringify(form), /keeps it for 24 months/);
 });
+
+test("the ZM77 record lists code, exact question and answer, and marks typed text as data", async () => {
+  const { buildPackage, PACKAGE_KEY } = await import("../app/lib/apply/package.ts");
+  assert.equal(PACKAGE_KEY, "Machine-readable record");
+  const def = form;
+  const catalogue = fixtureCatalogue;
+  const answers = { company_legal_name: "Acme Ltd" };
+  const pages = expand(def, catalogue, answers);
+  const ctx = { answers, flags: {}, catalogue };
+  const rec = buildPackage(def, pages, ctx, []);
+  assert.equal(rec.form.id, def.id);
+  assert.ok(rec.answers.some((l) => l.startsWith("company_legal_name | ") && l.includes("Acme Ltd") && l.includes("[typed by client]")));
+  assert.ok(rec.answers.every((l) => l.split(" | ").length >= 4));
+});

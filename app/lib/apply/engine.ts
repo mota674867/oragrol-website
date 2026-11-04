@@ -347,6 +347,27 @@ function getPath(root: Labelled, path: string[]): unknown {
   return node;
 }
 
+/** What is saved for one field: its answer in plain words or numbers, or undefined when there is none. */
+export function savedValue(f: Field, ctx: Ctx): unknown {
+  const v = ctx.answers[f.id];
+  let saved: unknown;
+  if (f.kind === "copy") saved = f.copyFrom ? ctx.answers[f.copyFrom] : undefined;
+  else if (f.kind === "check") saved = v === true ? true : undefined;
+  else if (f.kind === "number") saved = typeof v === "number" ? v : typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v)) ? Number(v) : undefined;
+  else if (f.kind === "multiselect") saved = strings(v).length ? strings(v).slice(0, 50).map((x) => clip(x, f)) : undefined;
+  else if (f.kind === "items") {
+    const names = pickedItems(ctx.answers, ctx.catalogue).map((p) => p.item.name);
+    saved = names.length ? names : undefined;
+  } else if (f.kind === "people") {
+    const rows = (Array.isArray(v) ? v : []).slice(0, f.max ?? 10).map((row) => {
+      const r = (row ?? {}) as Record<string, unknown>;
+      return Object.fromEntries((f.columns ?? []).map((c) => [cleanKey(c.label), typeof r[c.id] === "string" ? clip(r[c.id] as string, f, CELL_CAPS) : ""]));
+    });
+    saved = rows.length ? rows : undefined;
+  } else saved = typeof v === "string" && v.trim() !== "" ? clip(v, f) : undefined;
+  return saved;
+}
+
 /** What is saved at OCS: only visible fields of the form, under page title and field label, never anything else. */
 export function toLabelled(def: FormDefinition, pages: readonly Page[], ctx: Ctx): Labelled {
   const out: Labelled = { Form: { Name: def.name, Version: def.version } };
@@ -356,21 +377,7 @@ export function toLabelled(def: FormDefinition, pages: readonly Page[], ctx: Ctx
       if (!isVisible(f, ctx) || f.kind === "autodate") continue;
       const v = ctx.answers[f.id];
       if (ctx.flags[f.id] === true && canDiscuss(f, ctx)) flagged.push(flagKey(page, f));
-      let saved: unknown;
-      if (f.kind === "copy") saved = f.copyFrom ? ctx.answers[f.copyFrom] : undefined;
-      else if (f.kind === "check") saved = v === true ? true : undefined;
-      else if (f.kind === "number") saved = typeof v === "number" ? v : typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v)) ? Number(v) : undefined;
-      else if (f.kind === "multiselect") saved = strings(v).length ? strings(v).slice(0, 50).map((x) => clip(x, f)) : undefined;
-      else if (f.kind === "items") {
-        const names = pickedItems(ctx.answers, ctx.catalogue).map((p) => p.item.name);
-        saved = names.length ? names : undefined;
-      } else if (f.kind === "people") {
-        const rows = (Array.isArray(v) ? v : []).slice(0, f.max ?? 10).map((row) => {
-          const r = (row ?? {}) as Record<string, unknown>;
-          return Object.fromEntries((f.columns ?? []).map((c) => [cleanKey(c.label), typeof r[c.id] === "string" ? clip(r[c.id] as string, f, CELL_CAPS) : ""]));
-        });
-        saved = rows.length ? rows : undefined;
-      } else saved = typeof v === "string" && v.trim() !== "" ? clip(v, f) : undefined;
+      const saved = savedValue(f, ctx);
       if (saved !== undefined && saved !== "") setPath(out, pathOf(page, f), saved);
     }
   }
