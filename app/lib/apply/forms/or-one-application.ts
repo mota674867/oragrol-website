@@ -40,7 +40,7 @@ const LEGAL: readonly { title: string; text: string }[] = [
   { title: "Authority and access.", text: "I may act for the company and may give ORAGROL access to the systems, accounts and data named here. I am responsible for permissions from my own vendors and other third parties. The people named here know their details are given to ORAGROL." },
   { title: "Third-party software.", text: "I buy my software directly from vendors and pay them. ORAGROL is not the seller. Vendor price, features and data location change and are confirmed at order time; ORAGROL does not state that data is stored in Canada unless the vendor says so." },
   { title: "No contract and no promise.", text: "This form is not a contract and no price is agreed. Nothing is built or connected before I sign the contract. ORAGROL commits to the agreed work, not to a result." },
-  { title: "Confidential and kept.", text: "The form is confidential. If no contract is signed, ORAGROL keeps it for [retention period, to confirm] and then deletes it. Governing law: Ontario and the federal laws of Canada [to confirm with counsel]." },
+  { title: "Confidential and kept.", text: "The form is confidential. If no contract is signed, ORAGROL keeps it for 24 months and then deletes it. Governing law: Ontario and the federal laws of Canada." },
   { title: "The contract governs once signed.", text: "Once a contract is signed, the contract and the signed proposal govern, not this form." },
 ];
 
@@ -144,8 +144,8 @@ export const orOneApplication: FormDefinition = {
   name: "OR ONE application form",
   formType: "application",
   product: "or_one",
-  status: "draft",
-  version: "draft-2",
+  status: "published",
+  version: "1.0",
   pages,
   tiers: [
     { name: "STARTER", maxPoints: 30, oneCategoryOnly: true },
