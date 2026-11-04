@@ -6,6 +6,8 @@
 //   - a submit is checked in full here, with the same engine the browser uses, before OCS stores it;
 //   - replies say nothing about why a link failed: an unknown, expired or switched-off link is a plain 404.
 import { detailsFor } from "./catalogue.ts";
+import { confirmSubmit, type NotifyDeps } from "./notify.ts";
+import { buildPackage, PACKAGE_KEY } from "./package.ts";
 import { expand, fromLabelled, meetingList, signaturePayload, toLabelled, validateAll } from "./engine.ts";
 import type { Ctx } from "./engine.ts";
 import { applicationFormIdFor, buildSetup, formById, setupProductFor } from "./registry.ts";
@@ -20,6 +22,8 @@ export interface ApplyDeps {
   readonly catalogue: Catalogue;
   readonly allowDraft: boolean;
   readonly fetchImpl?: typeof fetch;
+  /** Sends the confirmation email after a submit; absent means no email. */
+  readonly notify?: NotifyDeps;
   readonly limit: (key: string, opts: { limit: number; windowMs: number }) => Promise<boolean>;
 }
 export interface ApplyResult { readonly status: number; readonly body: Record<string, unknown> }
@@ -100,8 +104,18 @@ export async function handleApply(action: "save" | "submit" | "details", rawBody
   const signature = signaturePayload(def, answers);
   if (!signature) return reply(422, { status: "invalid", pageIndex: pages.length - 1, errors: {} });
   const meetings = meetingList(pages, ctx);
-  return fromOcs(await ocsApply("/v1/apply/submit", { code, answers: labelled, signature, meetings, client }, deps.config, deps.fetchImpl),
+  const record = { ...labelled, [PACKAGE_KEY]: buildPackage(def, pages, ctx, meetings) };
+  const result = fromOcs(await ocsApply("/v1/apply/submit", { code, answers: record, signature, meetings, client }, deps.config, deps.fetchImpl),
     (b) => ({ reference: typeof b.reference === "string" ? b.reference : null, submittedAt: typeof b.submittedAt === "string" ? b.submittedAt : null, meetings: typeof b.meetings === "number" ? b.meetings : 0 }));
+  if (result.status === 200 && deps.notify && typeof result.body.reference === "string") {
+    try {
+      // The address comes from the invitation held by OCS, never from the browser.
+      const opened = await ocsApply("/v1/apply/open", { code, quiet: true, client }, deps.config, deps.fetchImpl);
+      const prefill = opened?.body && plain(opened.body.prefill) ? opened.body.prefill : {};
+      await confirmSubmit({ def, pages, ctx, reference: result.body.reference, email: String(prefill.email ?? "") }, deps.notify);
+    } catch (err) { console.error("[apply] confirmation email failed", err instanceof Error ? err.message : "error"); }
+  }
+  return result;
 }
 
 /** What the page needs after OCS opened a link: the saved answers read back into the form, and the invitation details. */

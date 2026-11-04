@@ -8,9 +8,8 @@
 // Status stays "draft" until Mohammad approves the form and the vendor round 2 is done. A draft form never opens for a client in production.
 import type { Cond, Field, FormDefinition, PageSpec } from "../types";
 import { CATEGORY_NAMES } from "../catalogue.ts";
+import { ENTITIES, HOURS, INDUSTRIES, OTHER, PROVINCES, START, STAFF, YEARS, band, pickMany, withOther } from "../choices.ts";
 
-const PROVINCES = ["Alberta", "British Columbia", "Manitoba", "New Brunswick", "Newfoundland and Labrador", "Northwest Territories", "Nova Scotia",
-  "Nunavut", "Ontario", "Prince Edward Island", "Quebec", "Saskatchewan", "Yukon", "Outside Canada"];
 
 const anyCategory = (...names: string[]): Cond => ({ any: names.map((category) => ({ category })) });
 
@@ -61,14 +60,14 @@ const pages: PageSpec[] = [
     { id: "website", label: "Website", kind: "url", required: true, placeholder: "orgro.ca" },
     text("address", "Business address"),
     { id: "provinces", label: "Province(s) where you operate", kind: "multiselect", required: true, options: PROVINCES, choice: true },
-    text("industry", "Industry"),
-    num("years", "Years in business", { max: 500 }),
-    text("lang_customers", "Main language of your customers"),
-    text("lang_staff", "Language of your staff"),
-    num("employees", "Employees on payroll"),
-    num("staff_all", "All staff including contractors"),
-    num("entities", "Number of companies (legal entities) to cover", { min: 1 }),
-    text("currencies", "Currencies you work in"),
+    ...withOther(band("industry", "Which industry are you in?", INDUSTRIES)),
+    band("years", "How many years has the company been in business?", YEARS),
+    ...withOther(pickMany("lang_customers", "Which languages do your customers mainly use? Choose all that apply.", ["English", "French", OTHER])),
+    ...withOther(pickMany("lang_staff", "Which languages does your staff use at work? Choose all that apply.", ["English", "French", OTHER])),
+    band("employees", "How many employees are on your payroll?", STAFF),
+    band("staff_all", "How many people work for you in total, including contractors?", STAFF),
+    band("entities", "How many companies (legal entities) should we cover?", ENTITIES),
+    ...withOther(pickMany("currencies", "Which currencies do you work in? Choose all that apply.", ["Canadian dollars (CAD)", "US dollars (USD)", "Euros (EUR)", "British pounds (GBP)", OTHER])),
     { id: "year_end", label: "Financial year-end date", kind: "date", requiredIf: anyCategory(CATEGORY_NAMES.finance) },
   ] } },
   { kind: "fields", page: { id: "people", title: "02 People", intro: "Accountant: compulsory if you choose Finance, Legal or Leadership items. Lawyer: if HR, Legal or Leadership. Privacy contact: if Legal. Otherwise optional.", fields: [
@@ -80,18 +79,21 @@ const pages: PageSpec[] = [
     text("acct", "Accountant: name, firm, email", { required: false, requiredIf: anyCategory(CATEGORY_NAMES.finance, CATEGORY_NAMES.legal, CATEGORY_NAMES.leadership) }),
     text("lawyer", "Lawyer: name and firm", { required: false, requiredIf: anyCategory(CATEGORY_NAMES.hr, CATEGORY_NAMES.legal, CATEGORY_NAMES.leadership) }),
     text("privacy_contact", "Privacy contact: name and email", { required: false, requiredIf: anyCategory(CATEGORY_NAMES.legal) }),
-    text("reach_time", "Best time to reach the decision-maker"),
+    band("decision_style", "How are decisions made in your company?", ["I decide alone", "I decide together with one other person", "A group, board or committee decides"]),
+    text("decision_others", "Is there anyone else who must approve? (names and roles)", { required: false }),
+    band("reach_time", "When is the best time to reach the decision-maker?", ["Mornings", "Afternoons", "Evenings", "Any time"]),
     { id: "requesters", label: "Up to 5 named people from your team can send us requests. Name at least one.", kind: "people", required: true, min: 1, max: 5,
       columns: [{ id: "name", label: "Name", kind: "text" }, { id: "role", label: "Role", kind: "text" }, { id: "email", label: "Email", kind: "email" }] },
   ] } },
   { kind: "fields", page: { id: "need", title: "03 What do you need?", intro: "Tick the categories you need, then choose your items in each. Every item has points. Your total decides your size: OR ONE STARTER is one category, up to 30 points; OR ONE 100, 200 and 400 are for larger selections; above 400 points is a Signature setup (contact us). Your proposal states your exact size and fees.", fields: [
-    long("goal", "Your main goal, in your own words"),
-    long("time_sink", "What takes most of your team's time today"),
-    num("hours", "Hours a week spent on these tasks (estimate)", { required: false }),
+    long("goal", "What is the main problem you want solved first, and what would success look like?"),
+    long("time_sink", "What takes most of your team's time today?"),
+    band("hours", "About how many hours a week does your team spend on these tasks?", HOURS, { required: false }),
     { id: "categories", label: "Categories you need", kind: "multiselect", required: true, choice: true, discuss: false, options: Object.values(CATEGORY_NAMES) },
     { id: "items", label: "Items you need", kind: "items", required: true, discuss: false },
-    { id: "start", label: "Wanted start date", kind: "date", required: true },
-    long("urgent", "Anything urgent or time-limited", { required: false }),
+    band("start", "When would you like to start?", START),
+    long("urgent", "Is there a deadline or an event we must plan around? (optional)", { required: false }),
+    long("fixed_tools", "Are there tools, contracts or suppliers that cannot change? (optional)", { required: false }),
   ] } },
   { kind: "tools", id: "software", title: "04 Your software", intro: "For each tool type you need, choose one, name the tool you already use, or tick \"Not sure, recommend\". We check that a tool you already use can connect before you sign. You buy and pay for your software directly from the vendor. We confirm each vendor's current price and where it stores data when you order. Show only the categories you chose in section 03." },
   { kind: "situation", id: "situation", title: "05 Size and situation", intro: "Complete only the categories you chose in section 03." },

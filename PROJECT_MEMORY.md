@@ -114,3 +114,17 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 **Next:** Mohammad checks the branch preview, then approves merge and push.
 
 ---
+
+---
+
+## Session: Forms v2 build, 2026-11-04
+
+**Request:** after Mohammad's live test, rewrite all four forms (ranges and pick lists, one discuss option, caps, clearer questions), make submissions readable for ZM77, add confirmation email and PDF copy, regenerate the PDFs, give him one before/after table.
+
+**Done (branch `forms-v2`, commits 3000f98, feffa48, 0b40460 plus docs):** engine and forms rewritten; ZM77 record; confirmation email and PDF copy; four PDFs, field kit and client copy regenerated from the new forms; all four forms walked in a real browser (OR ONE and BA applications, both setups) against real OCS code and a throwaway database, record stored for all four.
+
+**Verified:** 58 tests pass, `npx tsc --noEmit` clean, browser run 8 checks, no page errors. NEEDS VERIFICATION: email sending live (RESEND_API_KEY, sender domain), `npm run build` cannot run here (Google Fonts fetch is blocked in this sandbox), so the Vercel build is the check; lint has 0 errors.
+
+**Next:** Mohammad reviews the before/after table; then push, PR, merge, live check. No real invitations before that.
+
+---

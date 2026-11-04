@@ -10,11 +10,20 @@ import type { Answers, Catalogue, Category, Cond, Field, Flags, FormDefinition, 
 
 export const NONE_TEXT = "None / not applicable";
 export const MEETING_KEY = "Discuss in a meeting";
+/** The last choice of every pick list. It counts as an answer and tells us the client wants to talk this through. */
+export const DISCUSS_OPTION = "I would rather discuss this with you";
+/** One optional note at the end of each page. */
+export const PAGE_NOTE_LABEL = "Anything you want to discuss in a meeting? Tell us here.";
+export const PAGE_NOTE_PREFIX = "discuss.";
 export const PATH_SEPARATOR = " › ";
 export const MAX_FLAGS_BEFORE_WARNING = 5;
 
 const MAX_TEXT = 300;
-const MAX_LONGTEXT = 2000;
+const MAX_LONGTEXT = 1000;
+/** No single run of characters without a space may be longer than this, so one repeated letter can never fill a box. */
+const MAX_TOKEN = 40;
+export const limitTokens = (s: string): string => s.replace(new RegExp(`\\S{${MAX_TOKEN + 1},}`, "g"), (m) => m.slice(0, MAX_TOKEN));
+const hasLongToken = (s: string): boolean => new RegExp(`\\S{${MAX_TOKEN + 1},}`).test(s);
 
 // Silent limits (never shown to the client): every box that can be typed in has a cap in words and characters, set by the kind of
 // question. They are enforced here (browser and server) so nobody can paste a novel into a name box. A field can override its words
@@ -100,7 +109,11 @@ export function test(cond: Cond | undefined, ctx: Ctx): boolean {
   if ("all" in cond) return cond.all.every((c) => test(c, ctx));
   if ("any" in cond) return cond.any.some((c) => test(c, ctx));
   if ("not" in cond) return !test(cond.not, ctx);
-  if ("flagged" in cond) return Object.values(ctx.flags).some(Boolean);
+  // Something is flagged for a meeting when a pick list says "I would rather discuss this with you" or a page note was written.
+  if ("flagged" in cond) {
+    return Object.values(ctx.flags).some(Boolean) || Object.entries(ctx.answers).some(([k, v]) => k.startsWith(PAGE_NOTE_PREFIX)
+      ? typeof v === "string" && v.trim() !== "" : v === DISCUSS_OPTION || (Array.isArray(v) && v.includes(DISCUSS_OPTION)));
+  }
   if ("category" in cond) return pickedCategories(ctx.answers, ctx.catalogue).some((c) => c.name === cond.category);
   const v = ctx.answers[cond.field];
   if ("is" in cond) return v === cond.is;
@@ -123,8 +136,8 @@ export function isRequired(f: Field, ctx: Ctx): boolean {
   return f.required === true || (f.requiredIf !== undefined && test(f.requiredIf, ctx));
 }
 /** The meeting box is offered on compulsory fields only, never on legal boxes or the signature. */
-export function canDiscuss(f: Field, ctx: Ctx): boolean {
-  return isRequired(f, ctx) && f.discuss !== false && f.kind !== "check" && f.kind !== "typed" && f.kind !== "autodate" && f.kind !== "copy";
+export function canDiscuss(_f: Field, _ctx: Ctx): boolean {
+  return false; // the box under every field is gone: the choice "I would rather discuss this with you" and one note per page replace it
 }
 
 // ------------------------------------------------------------------ pages
@@ -133,6 +146,15 @@ const ruleChoices = (item: Item): string[] =>
   item.locked ? ["Needs my approval", "Red flag (hand to a person)"] : ["Automatic", "Needs my approval", "Red flag (hand to a person)"];
 
 /** The pages the client actually sees, given what they have picked so far. Pages with nothing to ask are left out. */
+/** A condition written against a category's own question ids, pointed at the prefixed ids the page uses. */
+function prefixCond(c: Cond, prefix: string): Cond {
+  if ("field" in c) return { ...c, field: `${prefix}${c.field}` };
+  if ("all" in c) return { all: c.all.map((x) => prefixCond(x, prefix)) };
+  if ("any" in c) return { any: c.any.map((x) => prefixCond(x, prefix)) };
+  if ("not" in c) return { not: prefixCond(c.not, prefix) };
+  return c;
+}
+
 export function expand(def: FormDefinition, catalogue: Catalogue, answers: Answers): ConcretePage[] {
   const out: ConcretePage[] = [];
   for (const spec of def.pages) {
@@ -143,7 +165,8 @@ export function expand(def: FormDefinition, catalogue: Catalogue, answers: Answe
     const base = { id: spec.id, title: spec.title, intro: spec.intro };
     if (spec.kind === "situation") {
       const fields = pickedCategories(answers, catalogue).flatMap((c) =>
-        c.situation.map((f) => ({ ...f, id: `sit.${c.id}.${f.id}`, group: c.name, required: f.required ?? true })));
+        c.situation.map((f) => ({ ...f, id: `sit.${c.id}.${f.id}`, group: c.name, required: f.required ?? true,
+          ...(f.showIf ? { showIf: prefixCond(f.showIf, `sit.${c.id}.`) } : {}), ...(f.requiredIf ? { requiredIf: prefixCond(f.requiredIf, `sit.${c.id}.`) } : {}) })));
       if (fields.length) out.push({ ...base, fields, spec: "situation" });
     } else if (spec.kind === "tools") {
       // One row per tool in each picked category, as the PDF's software section lists them: the options, "Not sure, recommend",
@@ -164,7 +187,7 @@ export function expand(def: FormDefinition, catalogue: Catalogue, answers: Answe
           // One choice and one box, as the PDF's table: "Limit, approver or never do". If Automatic is chosen on a controlled
           // item, the limit is compulsory (PDF section 06).
           return [
-            { id: choice, label: "Your choice", group: `${item.name} (${item.points} pts)`, kind: "select", choice: true, required: true, options: ruleChoices(item),
+            { id: choice, label: "Your choice", group: `${item.name} (${item.points} pts)`, kind: "select", choice: true, required: true, discuss: false, options: ruleChoices(item),
               help: `${item.whatItDoes}\nORAGROL's fixed limits (they cannot be changed): ${item.fixedLimits.length ? item.fixedLimits.join("; ") : "none"}.\nOur suggestion: ${item.suggestedDefault}. It is not pre-selected: the choice is yours.` },
             { id: `rule.${item.id}.limit`, label: "Limit, approver or \"never do\"", group: `${item.name} (${item.points} pts)`, kind: "text", discuss: false,
               requiredIf: item.band === "standard" ? undefined : automatic },
@@ -174,7 +197,15 @@ export function expand(def: FormDefinition, catalogue: Catalogue, answers: Answe
       }
     }
   }
-  return out;
+  return out.map(withPageNote);
+}
+
+/** The optional note at the end of a page, for any page that asks questions (not the agreement page and not the signature page). */
+function withPageNote(p: ConcretePage): ConcretePage {
+  if (p.fields.some((f) => f.kind === "typed" || f.id === "agree" || f.id.startsWith(PAGE_NOTE_PREFIX))) return p;
+  if (!p.fields.some((f) => f.required !== false)) return p;
+  const note: Field = { id: `${PAGE_NOTE_PREFIX}${p.id}`, label: PAGE_NOTE_LABEL, kind: "longtext", required: false, discuss: false, maxWords: 120, group: "" };
+  return { ...p, fields: [...p.fields, note] };
 }
 
 export function visibleFields(page: Page, ctx: Ctx): Field[] { return page.fields.filter((f) => isVisible(f, ctx)); }
@@ -200,12 +231,12 @@ export function validateField(f: Field, ctx: Ctx): string | null {
   switch (f.kind) {
     case "text": case "typed": {
       const caps = capsFor(f);
-      if (typeof v !== "string" || v.trim().length > caps.chars || wordCount(v) > caps.words) return TOO_LONG;
+      if (typeof v !== "string" || v.trim().length > caps.chars || wordCount(v) > caps.words || hasLongToken(v)) return TOO_LONG;
       return f.kind === "typed" && v.trim().length < 2 ? "Type your full name." : null;
     }
     case "longtext": {
       const caps = capsFor(f);
-      return typeof v === "string" && v.trim().length <= caps.chars && wordCount(v) <= caps.words ? null : TOO_LONG;
+      return typeof v === "string" && v.trim().length <= caps.chars && wordCount(v) <= caps.words && !hasLongToken(v) ? null : TOO_LONG;
     }
     case "email": return typeof v === "string" && v.trim().length <= 254 && EMAIL.test(v.trim()) ? null : "Enter a valid email address.";
     case "phone": return typeof v === "string" && PHONE.test(v.trim()) ? null : "Enter a valid phone number, for example +1 416 555 0100.";
@@ -220,6 +251,7 @@ export function validateField(f: Field, ctx: Ctx): string | null {
       const allowed = optionsOf(f);
       const chosen = strings(v);
       if (!chosen.every((x) => allowed.includes(x))) return "Choose one of the options.";
+      if (chosen.includes(DISCUSS_OPTION)) return null; // "I would rather discuss this" stands in for the count
       const min = f.min ?? 1;
       if (chosen.length < min) return min === 1 ? "Choose at least one option." : `Choose ${min === f.max ? `exactly ${min}` : `at least ${min}`}.`;
       if (f.max !== undefined && chosen.length > f.max) return `Choose no more than ${f.max}.`;
@@ -229,9 +261,11 @@ export function validateField(f: Field, ctx: Ctx): string | null {
   return null;
 }
 
+/** Pick lists end with "I would rather discuss this with you", unless the list is a rule choice, a tool row or says otherwise. */
+export const offersDiscuss = (f: Field): boolean => (f.kind === "select" || f.kind === "multiselect") && f.discuss !== false && f.required !== false;
 export function optionsOf(f: Field): string[] {
   if (f.kind === "yesno") return ["Yes", "No"];
-  return [...(f.options ?? []), ...(f.allowNone ? [NONE_TEXT] : [])];
+  return [...(f.options ?? []), ...(offersDiscuss(f) ? [DISCUSS_OPTION] : []), ...(f.allowNone ? [NONE_TEXT] : [])];
 }
 
 function urlOk(v: unknown): boolean {
@@ -248,8 +282,8 @@ function dateOk(v: unknown): boolean {
   return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === v;
 }
 function numberError(f: Field, v: unknown): string | null {
-  const n = typeof v === "number" ? v : typeof v === "string" && /^-?\d+(\.\d+)?$/.test(v.trim()) ? Number(v.trim()) : NaN;
-  if (!Number.isFinite(n)) return "Enter a number (your best estimate is fine).";
+  const n = typeof v === "number" ? v : typeof v === "string" && /^\d{1,9}$/.test(v.trim()) ? Number(v.trim()) : NaN;
+  if (!Number.isFinite(n) || !Number.isInteger(n)) return "Enter a whole number, digits only.";
   if (n < (f.min ?? 0)) return `Enter ${f.min ?? 0} or more.`;
   if (n > (f.max ?? 1_000_000_000)) return "That number is too large.";
   return null;
@@ -292,7 +326,7 @@ const pathOf = (page: Page, f: Field): string[] => (f.group ? [page.title, f.gro
 export const flagKey = (page: Page, f: Field): string => pathOf(page, f).join(PATH_SEPARATOR);
 
 function clip(s: string, f: Field, caps: Caps = capsFor(f)): string {
-  return clipWords(s.replace(BAD_CHARS, "").trim().slice(0, caps.chars), caps.words);
+  return clipWords(limitTokens(s.replace(BAD_CHARS, "").trim()).slice(0, caps.chars), caps.words);
 }
 const cleanKey = (s: string) => s.replace(BAD_CHARS, " ").slice(0, 120);
 
@@ -313,6 +347,27 @@ function getPath(root: Labelled, path: string[]): unknown {
   return node;
 }
 
+/** What is saved for one field: its answer in plain words or numbers, or undefined when there is none. */
+export function savedValue(f: Field, ctx: Ctx): unknown {
+  const v = ctx.answers[f.id];
+  let saved: unknown;
+  if (f.kind === "copy") saved = f.copyFrom ? ctx.answers[f.copyFrom] : undefined;
+  else if (f.kind === "check") saved = v === true ? true : undefined;
+  else if (f.kind === "number") saved = typeof v === "number" ? v : typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v)) ? Number(v) : undefined;
+  else if (f.kind === "multiselect") saved = strings(v).length ? strings(v).slice(0, 50).map((x) => clip(x, f)) : undefined;
+  else if (f.kind === "items") {
+    const names = pickedItems(ctx.answers, ctx.catalogue).map((p) => p.item.name);
+    saved = names.length ? names : undefined;
+  } else if (f.kind === "people") {
+    const rows = (Array.isArray(v) ? v : []).slice(0, f.max ?? 10).map((row) => {
+      const r = (row ?? {}) as Record<string, unknown>;
+      return Object.fromEntries((f.columns ?? []).map((c) => [cleanKey(c.label), typeof r[c.id] === "string" ? clip(r[c.id] as string, f, CELL_CAPS) : ""]));
+    });
+    saved = rows.length ? rows : undefined;
+  } else saved = typeof v === "string" && v.trim() !== "" ? clip(v, f) : undefined;
+  return saved;
+}
+
 /** What is saved at OCS: only visible fields of the form, under page title and field label, never anything else. */
 export function toLabelled(def: FormDefinition, pages: readonly Page[], ctx: Ctx): Labelled {
   const out: Labelled = { Form: { Name: def.name, Version: def.version } };
@@ -322,21 +377,7 @@ export function toLabelled(def: FormDefinition, pages: readonly Page[], ctx: Ctx
       if (!isVisible(f, ctx) || f.kind === "autodate") continue;
       const v = ctx.answers[f.id];
       if (ctx.flags[f.id] === true && canDiscuss(f, ctx)) flagged.push(flagKey(page, f));
-      let saved: unknown;
-      if (f.kind === "copy") saved = f.copyFrom ? ctx.answers[f.copyFrom] : undefined;
-      else if (f.kind === "check") saved = v === true ? true : undefined;
-      else if (f.kind === "number") saved = typeof v === "number" ? v : typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v)) ? Number(v) : undefined;
-      else if (f.kind === "multiselect") saved = strings(v).length ? strings(v).slice(0, 50).map((x) => clip(x, f)) : undefined;
-      else if (f.kind === "items") {
-        const names = pickedItems(ctx.answers, ctx.catalogue).map((p) => p.item.name);
-        saved = names.length ? names : undefined;
-      } else if (f.kind === "people") {
-        const rows = (Array.isArray(v) ? v : []).slice(0, f.max ?? 10).map((row) => {
-          const r = (row ?? {}) as Record<string, unknown>;
-          return Object.fromEntries((f.columns ?? []).map((c) => [cleanKey(c.label), typeof r[c.id] === "string" ? clip(r[c.id] as string, f, CELL_CAPS) : ""]));
-        });
-        saved = rows.length ? rows : undefined;
-      } else saved = typeof v === "string" && v.trim() !== "" ? clip(v, f) : undefined;
+      const saved = savedValue(f, ctx);
       if (saved !== undefined && saved !== "") setPath(out, pathOf(page, f), saved);
     }
   }
@@ -389,12 +430,16 @@ export function withPrefill(def: FormDefinition, catalogue: Catalogue, answers: 
   return next;
 }
 
-/** The meeting agenda: every flagged compulsory field, as OCS stores it (section = page, item = field). */
+/** The meeting agenda, as OCS stores it (section = page, item = field): every pick list answered "I would rather discuss this with you", and every page note. */
 export function meetingList(pages: readonly Page[], ctx: Ctx): { section: string; item: string; note: string | null }[] {
   const out: { section: string; item: string; note: string | null }[] = [];
   for (const page of pages) {
     for (const f of page.fields) {
-      if (isVisible(f, ctx) && ctx.flags[f.id] === true && canDiscuss(f, ctx)) {
+      if (!isVisible(f, ctx)) continue;
+      const v = ctx.answers[f.id];
+      if (f.id.startsWith(PAGE_NOTE_PREFIX)) {
+        if (typeof v === "string" && v.trim()) out.push({ section: page.title.slice(0, 120), item: "Anything to discuss on this page", note: clip(v, f).slice(0, 1000) });
+      } else if ((f.kind === "select" || f.kind === "multiselect") && (v === DISCUSS_OPTION || strings(v).includes(DISCUSS_OPTION))) {
         out.push({ section: page.title.slice(0, 120), item: (f.group ? `${f.group}${PATH_SEPARATOR}${f.label}` : f.label).slice(0, 300), note: null });
       }
     }

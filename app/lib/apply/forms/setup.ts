@@ -9,6 +9,7 @@
 // a setup stays "draft" until it is cleared to open, and a draft opens only where APPLY_ALLOW_DRAFT_FORMS=1.
 import type { Answers, Catalogue, Cond, Field, FormDefinition, PageSpec } from "../types";
 import { pickedItems } from "../engine.ts";
+import { OTHER, band, withOther } from "../choices.ts";
 
 const CONFIRM = ["Correct", "Change needed"] as const;
 const RUN = ["Runs automatically", "Needs my approval"] as const;
@@ -134,7 +135,7 @@ export function orOneSetup(app: Answers, catalogue: Catalogue): FormDefinition {
       intro: "Only the parts that match your items appear. The costs below are yours, not ORAGROL's, and are shown on your sign-off sheet.",
       fields: [
         choose("e.separate_domain", "Separate sending domain for outreach (cold email)", ["Yes", "No"], { group: "Cold email (Sales)", showIf: when(sales) }),
-        text("e.dns", "Who edits your domain records (DNS)", { group: "Cold email (Sales)", showIf: when(sales) }),
+        ...withOther(band("e.dns", "Who edits your domain records (DNS)?", ["We do", "Our web agency", "Our IT provider", OTHER], { group: "Cold email (Sales)", showIf: when(sales) })),
         num("e.mailboxes", "Sending mailboxes you will add (number)", { group: "Cold email (Sales)", showIf: when(sales) }),
         text("p.number", "Phone number to use, or a new Canadian number", { group: "AI-answered calls (Customer Service)", showIf: when(support) }),
         text("p.person", "Who takes a call that needs a person", { group: "AI-answered calls (Customer Service)", showIf: when(support) }),
