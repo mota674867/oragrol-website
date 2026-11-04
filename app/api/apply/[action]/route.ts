@@ -4,6 +4,8 @@ import { rateLimitShared } from "../../../lib/rate-limit-shared";
 import { getCatalogue } from "../../../lib/apply/catalogue";
 import { handleApply } from "../../../lib/apply/handler";
 import { ocsApplyConfig } from "../../../lib/apply/ocs";
+import { renderClientCopy } from "../../../lib/apply/client-copy";
+import { Resend } from "resend";
 import { draftFormsAllowed } from "../../../lib/apply/registry";
 
 // Save and submit for the private application forms. The browser sends the link code in the body (never in a URL);
@@ -22,6 +24,10 @@ export async function POST(request: Request, ctx: { params: Promise<{ action: st
     config: ocsApplyConfig(),
     catalogue: getCatalogue(),
     allowDraft: draftFormsAllowed(),
+    notify: process.env.RESEND_API_KEY ? { render: renderClientCopy, send: async (m) => {
+      const { error } = await new Resend(process.env.RESEND_API_KEY).emails.send({ from: process.env.APPLY_FROM_EMAIL || "ORAGROL <info@orgro.ca>", to: m.to, subject: m.subject, html: m.html, attachments: m.attachments ? [...m.attachments] : undefined });
+      if (error) throw new Error("send failed");
+    } } : undefined,
     limit: async (key, opts) => (await rateLimitShared(key, opts)).ok,
   });
   return NextResponse.json(result.body, { status: result.status, headers: NO_STORE });

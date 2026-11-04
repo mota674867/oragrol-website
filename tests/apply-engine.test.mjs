@@ -749,3 +749,21 @@ test("the ZM77 record lists code, exact question and answer, and marks typed tex
   assert.ok(rec.answers.some((l) => l.startsWith("company_legal_name | ") && l.includes("Acme Ltd") && l.includes("[typed by client]")));
   assert.ok(rec.answers.every((l) => l.split(" | ").length >= 4));
 });
+
+test("confirmation email: sent with the PDF only when the client asked for it, and a bad address sends nothing", async () => {
+  const { confirmSubmit } = await import("../app/lib/apply/notify.ts");
+  const sent = [];
+  const deps = { send: async (m) => { sent.push(m); }, render: async () => Buffer.from("%PDF-stub") };
+  const base = { company_legal_name: "Acme Ltd" };
+  const mk = (answers) => { const pages = expand(form, fixtureCatalogue, answers); return { def: form, pages, ctx: { answers, flags: {}, catalogue: fixtureCatalogue }, reference: "OR-APP-TEST" }; };
+  await confirmSubmit({ ...mk(base), email: "a@b.com" }, deps);
+  assert.equal(sent.length, 1);
+  assert.equal(sent[0].attachments, undefined);
+  assert.ok(sent[0].subject.includes("OR-APP-TEST"));
+  await confirmSubmit({ ...mk({ ...base, pdf_copy: true }), email: "a@b.com" }, deps);
+  assert.equal(sent.length, 2);
+  assert.equal(sent[1].attachments.length, 1);
+  assert.equal(sent[1].attachments[0].content.subarray(0, 4).toString(), "%PDF");
+  await confirmSubmit({ ...mk(base), email: "not-an-email" }, deps);
+  assert.equal(sent.length, 2);
+});
