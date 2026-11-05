@@ -23,10 +23,10 @@ const advanced = [...base, "Compliance Check", "Vendor Watch", "AI Security Moni
 const comprehensive = [...advanced, "Cloud Guard", "Workload Shield", "Infra Guard", "Cloud Compliance", "App Shield", "Web Shield", "API Guard", "Data Shield", "Data Guard", "Data Classifier"];
 
 export const SERVICE_PACKAGES = [
-  { id: "foundation", name: "Foundation", price: 2756, initialPrice: 3307, value: "Establish your core protection.", fit: "Businesses putting essential security controls around their people, devices and everyday work.", services: base },
-  { id: "advanced", name: "Advanced", price: 6038, initialPrice: 7246, value: "Extend visibility and strengthen access.", fit: "Businesses that need broader monitoring, access governance and oversight of vendors and compliance needs.", services: advanced },
-  { id: "comprehensive", name: "Comprehensive", price: 11706, initialPrice: 14047, value: "Connect protection across your environment.", fit: "Businesses with cloud workloads, applications and data that require a wider, coordinated scope of protection.", services: comprehensive },
-  { id: "elite", name: "Elite", price: 13133, initialPrice: 15760, value: "Bring protection and response together.", fit: "Businesses seeking the broadest package scope, including managed threat response, security response and data monitoring.", services: [...comprehensive, "Managed Threat Response", "Security Response", "Data Watch"] },
+  { id: "foundation", name: "Foundation", price: 2756, initialPrice: 3307, staffCap: 7, extraStaff: 99, value: "Establish your core protection.", fit: "Businesses putting essential security controls around their people, devices and everyday work.", services: base },
+  { id: "advanced", name: "Advanced", price: 6038, initialPrice: 7246, staffCap: 11, extraStaff: 195, value: "Extend visibility and strengthen access.", fit: "Businesses that need broader monitoring, access governance and oversight of vendors and compliance needs.", services: advanced },
+  { id: "comprehensive", name: "Comprehensive", price: 11706, initialPrice: 14047, staffCap: 17, extraStaff: 250, value: "Connect protection across your environment.", fit: "Businesses with cloud workloads, applications and data that require a wider, coordinated scope of protection.", services: comprehensive },
+  { id: "elite", name: "Elite", price: 13133, initialPrice: 15760, staffCap: 22, extraStaff: 280, value: "Bring protection and response together.", fit: "Businesses seeking the broadest package scope, including managed threat response, security response and data monitoring.", services: [...comprehensive, "Managed Threat Response", "Security Response", "Data Watch"] },
 ] as const;
 
 export const INDIVIDUAL_SERVICES = [
