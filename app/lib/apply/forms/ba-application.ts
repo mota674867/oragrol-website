@@ -83,7 +83,7 @@ const pages: PageSpec[] = [
     phone("dm_phone", "Decision-maker phone", { prefill: "phone" }),
     text("billing", "Billing contact: name and email"),
     text("tech_contact", "Technical contact or IT provider (or \"None\")", { allowNone: true }),
-    text("money_approver", "Who approves money actions (payroll, payments): name and title"),
+    text("money_approver", "Who approves money actions (payroll, payments): name and title", { minWords: 3, help: "Name and title, for example Dan Lee, CFO." }),
     text("acct", "Accountant: name, firm, email", { required: false, requiredIf: has("Finance") }),
     band("decision_style", "How are decisions made in your company?", ["I decide alone", "I decide together with one other person", "A group, board or committee decides"]),
     text("decision_others", "Is there anyone else who must approve? (names and roles)", { required: false }),
@@ -160,7 +160,7 @@ const pages: PageSpec[] = [
     yn("m_ad_accounts", "Your ad accounts exist? (Yes / No)"),
     { id: "m_addons", label: "Add-ons you want quoted", kind: "multiselect", choice: true, required: false, options: ["Extra social platform", "Extra content pack", "Extra design pack", "Extra ad platform or campaign", "SEO work", "Market and competitor research", "Digital campaign", "Lead-gen campaign", "Video, photo or offline marketing"] },
     long("m_material", "Existing material to share (logo, brand guide, photos, past content)", { required: false }),
-    text("m_approver", "Who approves your content? (name and role)"),
+    text("m_approver", "Who approves your content? (name and role)", { minWords: 3, help: "Name and role, for example Sara Chen, Marketing Lead." }),
     band("m_approve_speed", "How quickly can they approve it? (we plan for about 2 working days)", APPROVAL_SPEED),
   ] } },
   { kind: "fields", page: { id: "finance", title: "07 Finance", showIf: has("Finance"), intro: "You decide about money. For each money action (payroll, payments, payables) you choose on the sign-off sheet whether we prepare it for your named decider to approve, or carry it out after your approval through your own tools. ORAGROL does not decide amounts or recipients, does not file tax and does not give financial advice. Your accountant keeps professional judgment.", fields: [
@@ -187,8 +187,8 @@ const pages: PageSpec[] = [
     yn("it_admin_access", "Do we get admin access? (Yes / No)", { group: "Your website" }),
     { id: "it_site_state", label: "About your site today", kind: "multiselect", choice: true, required: false, group: "Your website", options: ["Backups exist today", "Software is kept up to date", "The site breaks after updates", "Built by a developer without documentation"] },
     { id: "it_options", label: "Options", kind: "multiselect", choice: true, required: false, group: "Options", options: ["More than 2 devices per user (add-on)", "More than one website (add-on)", "Restore test (add-on)", "Website rescue or migration (quoted first)"] },
-    text("it_account_approver", "Who approves account, password and device actions"),
-    text("it_contact", "Your IT contact or current provider", { required: false }),
+    text("it_account_approver", "Who approves account, password and device actions", { minWords: 3, help: "Name and role, for example Ali Karim, Operations Manager." }),
+    { id: "it_contact", label: "Your IT contact or current provider", kind: "select", choice: true, required: true, group: "Your IT", options: ["We have an in-house IT person", "We use an outside IT provider", "We have no IT contact or provider"] },
   ] } },
   { kind: "fields", page: { id: "sign_off", title: "09 Sign-off sheet", intro: "You decide what runs on its own. Unless you say otherwise, anything we prepare for your customers, suppliers or staff waits for your approval before it is sent. Choose one for each line you use.", fields: [
     { id: "so_replies", label: "Replies to routine customer questions", kind: "select", choice: true, required: true, options: ["Runs automatically", "Needs my approval"], showIf: has("Customer Service") },
