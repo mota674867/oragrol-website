@@ -40,6 +40,7 @@ function fillAll(catalogue = FX, start = {}) {
   return answers;
 }
 function sample(f) {
+  if (f.kind === "text" && f.minWords) return "Dan Lee, CFO";
   switch (f.kind) {
     case "email": return "a@b.example";
     case "phone": return "+1 416 555 0100";
@@ -165,15 +166,28 @@ test("rule choices and tool rows never offer the discuss choice; every other pic
   if (tool) assert.equal(optionsOf(tool).includes(DISCUSS_OPTION), false);
 });
 
-test("one optional note ends each page that asks questions; none on the agreement page or the signature page", () => {
+test("the form has one optional meeting note, on the last question page; never on the agreement or signature page", () => {
   const pages = expand(form, FX, fillAll());
-  for (const p of pages) {
-    const note = p.fields.find((f) => f.id.startsWith("discuss."));
-    const signature = p.fields.some((f) => f.kind === "typed"); const agreement = p.fields.some((f) => f.id === "agree");
-    if (signature || agreement) assert.equal(note, undefined, p.id); else if (p.fields.some((f) => f.required !== false)) assert.ok(note && note.kind === "longtext" && note.required === false, p.id);
+  const withNote = pages.filter((p) => p.fields.some((f) => f.id.startsWith("discuss.")));
+  assert.equal(withNote.length, 1);
+  const last = withNote[0];
+  assert.equal(last.fields.at(-1).label, "Anything you want to discuss in a meeting? Tell us here.");
+  assert.equal(last.fields.at(-1).required, false);
+  assert.equal(last.fields.some((f) => f.kind === "typed" || f.id === "agree"), false);
+  const eligible = (p) => p.fields.some((f) => f.required !== false) && !p.fields.some((f) => f.kind === "typed" || f.id === "agree");
+  assert.equal(pages.indexOf(last), pages.findLastIndex(eligible));
+});
+
+test("a typed answer with too few words is refused; a valid email needs a real domain ending", () => {
+  const pages = expand(form, FX, fillAll());
+  const approver = pages.flatMap((p) => p.fields).find((f) => f.minWords);
+  if (approver) {
+    assert.ok(validateField(approver, ctxOf({ [approver.id]: "me" })));
+    assert.equal(validateField(approver, ctxOf({ [approver.id]: "Dan Lee, CFO" })), null);
   }
-  const company = pages.find((p) => p.id === "company");
-  assert.equal(company.fields.at(-1).label, "Anything you want to discuss in a meeting? Tell us here.");
+  const email = { id: "e", label: "Email", kind: "email", required: true };
+  for (const bad of ["name@x.c", "name@gmail", "name@@x.com", "name@x..com", "name"]) assert.ok(validateField(email, ctxOf({ e: bad })), bad);
+  for (const good of ["name@x.co", "dan.lee@orgro.ca"]) assert.equal(validateField(email, ctxOf({ e: good })), null, good);
 });
 
 test("choosing the discuss option or writing a page note makes the meeting details compulsory; the page is optional otherwise", () => {
@@ -181,17 +195,17 @@ test("choosing the discuss option or writing a page note makes the meeting detai
   const meeting = pages.find((p) => p.id === "meeting");
   assert.deepEqual(validatePage(meeting, ctxOf({})), {});
   assert.deepEqual(Object.keys(validatePage(meeting, ctxOf({ industry: DISCUSS_OPTION }))).sort(), ["meet_attendees", "meet_mode", "meet_options"]);
-  assert.deepEqual(Object.keys(validatePage(meeting, ctxOf({ "discuss.need": "Please call me about the budget." }))).sort(), ["meet_attendees", "meet_mode", "meet_options"]);
+  assert.deepEqual(Object.keys(validatePage(meeting, ctxOf({ "discuss.form": "Please call me about the budget." }))).sort(), ["meet_attendees", "meet_mode", "meet_options"]);
   assert.deepEqual(Object.keys(validatePage(meeting, ctxOf({ meet_want: true }))).sort(), ["meet_attendees", "meet_mode", "meet_options"]);
 });
 
 test("the meeting agenda lists every pick list answered 'I would rather discuss this with you' and every page note, as page and item, ready for OCS", () => {
-  const answers = { ...fillAll(), industry: DISCUSS_OPTION, "discuss.need": "Please talk about the budget with me." };
+  const answers = { ...fillAll(), industry: DISCUSS_OPTION, "discuss.form": "Please talk about the budget with me." };
   const pages = expand(form, FX, answers);
   const list = meetingList(pages, ctxOf(answers));
   assert.deepEqual(list, [
     { section: "01 Your company", item: "Which industry are you in?", note: null },
-    { section: "03 What do you need?", item: "Anything to discuss on this page", note: "Please talk about the budget with me." },
+    { section: "08 Your rules in general", item: "Anything to discuss on this page", note: "Please talk about the budget with me." },
   ]);
   assert.deepEqual(meetingList(expand(form, FX, fillAll()), ctxOf(fillAll())), [], "nothing flagged, nothing listed");
 });
@@ -229,7 +243,7 @@ test("item cards: nothing is pre-selected; locked items offer no Automatic; one 
   assert.equal(validateField(field(pages, "rule.fx-leads.limit"), ctxOf({ ...answers, "rule.fx-leads.choice": "Automatic" })), null, "standard item");
   assert.equal(validateField(field(pages, "rule.fx-quotes.limit"), ctxOf({ ...answers, "rule.fx-quotes.choice": "Automatic" })), "This is required.", "controlled item on Automatic");
   assert.equal(validateField(field(pages, "rule.fx-quotes.limit"), ctxOf({ ...answers, "rule.fx-quotes.choice": "Needs my approval" })), null);
-  assert.equal(pages.find((p) => p.id === "rules.sales").fields.length, 5, "two items, two fields each, plus the page note");
+  assert.equal(pages.find((p) => p.id === "rules.sales").fields.length, 4, "two items, two fields each; the single meeting note is not on this page");
 });
 
 test("picking a category makes the related people compulsory on the People page (accountant for Finance)", () => {
@@ -254,7 +268,7 @@ test("a fully answered form passes every page and the final check; take any comp
 });
 
 test("saved answers are readable (page > field) and read back exactly, including people, pick lists, items and meeting choices", () => {
-  const answers = { ...fillAll(), industry: DISCUSS_OPTION, "discuss.need": "Please talk about the budget with me." };
+  const answers = { ...fillAll(), industry: DISCUSS_OPTION, "discuss.form": "Please talk about the budget with me." };
   const flags = {};
   const pages = expand(form, FX, answers);
   const labelled = toLabelled(form, pages, ctxOf(answers, flags));
@@ -262,7 +276,7 @@ test("saved answers are readable (page > field) and read back exactly, including
   assert.equal(labelled["01 Your company"]["Company legal name"], "Northwind Dental Group");
   assert.equal(labelled["01 Your company"]["How many employees are on your payroll?"], "1 to 7", "a range is saved as the exact text the client chose");
   assert.equal(labelled["01 Your company"]["Which industry are you in?"], DISCUSS_OPTION, "'discuss' is saved as plain words ZM77 can read");
-  assert.equal(labelled["03 What do you need?"]["Anything you want to discuss in a meeting? Tell us here."], "Please talk about the budget with me.");
+  assert.equal(labelled["08 Your rules in general"]["Anything you want to discuss in a meeting? Tell us here."], "Please talk about the budget with me.");
   assert.deepEqual(labelled["03 What do you need?"]["Items you need"], ["Example item A: lead replies", "Example item B: quote drafts", "Example item C: sending money"]);
   assert.deepEqual(labelled["02 People"]["Up to 5 named people from your team can send us requests. Name at least one."], [{ Name: "Sam Lee", Role: "Owner", Email: "sam@x.example" }]);
   assert.equal(labelled["06 Your rules, item by item: Sales"]["Example item A: lead replies (8 pts)"]["Your choice"], "Automatic");

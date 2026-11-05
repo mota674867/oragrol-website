@@ -55,7 +55,7 @@ function clipWords(s: string, words: number): string {
   return s;
 }
 const TOO_LONG = "That answer is too long. Please shorten it.";
-const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+const EMAIL = /^[^@\s]+@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/i;
 const PHONE = /^\+?[0-9 ().-]{7,32}$/;
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 // Characters OCS refuses (control characters other than tab, new line and carriage return).
@@ -197,15 +197,18 @@ export function expand(def: FormDefinition, catalogue: Catalogue, answers: Answe
       }
     }
   }
-  return out.map(withPageNote);
+  return singleNote(out);
 }
 
-/** The optional note at the end of a page, for any page that asks questions (not the agreement page and not the signature page). */
-function withPageNote(p: ConcretePage): ConcretePage {
-  if (p.fields.some((f) => f.kind === "typed" || f.id === "agree" || f.id.startsWith(PAGE_NOTE_PREFIX))) return p;
-  if (!p.fields.some((f) => f.required !== false)) return p;
-  const note: Field = { id: `${PAGE_NOTE_PREFIX}${p.id}`, label: PAGE_NOTE_LABEL, kind: "longtext", required: false, discuss: false, maxWords: 120, group: "" };
-  return { ...p, fields: [...p.fields, note] };
+/** The form has ONE optional meeting note, at the end of the last page that asks questions (never the agreement or signature page). */
+function singleNote(pages: ConcretePage[]): ConcretePage[] {
+  const stripped = pages.map((p) => ({ ...p, fields: p.fields.filter((f) => !f.id.startsWith(PAGE_NOTE_PREFIX)) }));
+  const eligible = (p: ConcretePage): boolean => p.fields.some((f) => f.required !== false) && !p.fields.some((f) => f.kind === "typed" || f.id === "agree");
+  let last = -1;
+  stripped.forEach((p, i) => { if (eligible(p)) last = i; });
+  if (last < 0) return stripped;
+  const note: Field = { id: `${PAGE_NOTE_PREFIX}form`, label: PAGE_NOTE_LABEL, kind: "longtext", required: false, discuss: false, maxWords: 120, group: "" };
+  return stripped.map((p, i) => (i === last ? { ...p, fields: [...p.fields, note] } : p));
 }
 
 export function visibleFields(page: Page, ctx: Ctx): Field[] { return page.fields.filter((f) => isVisible(f, ctx)); }
@@ -232,7 +235,8 @@ export function validateField(f: Field, ctx: Ctx): string | null {
     case "text": case "typed": {
       const caps = capsFor(f);
       if (typeof v !== "string" || v.trim().length > caps.chars || wordCount(v) > caps.words || hasLongToken(v)) return TOO_LONG;
-      return f.kind === "typed" && v.trim().length < 2 ? "Type your full name." : null;
+      if (f.kind === "typed") return v.trim().length < 2 ? "Type your full name." : null;
+      return f.minWords && wordCount(v) < f.minWords ? `Give a full answer: at least ${f.minWords} words.` : null;
     }
     case "longtext": {
       const caps = capsFor(f);

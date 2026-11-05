@@ -43,6 +43,8 @@ export interface Field {
   readonly max?: number;
   /** Silent word limit for a typed answer; a default is chosen from the kind of question (see capsFor in engine.ts). */
   readonly maxWords?: number;
+  /** Minimum word count for a typed answer, so a one-word answer ("me", "no") is refused. */
+  readonly minWords?: number;
   readonly columns?: readonly PersonColumn[];
   /** Pre-filled from the invitation: company, person, phone, email. */
   readonly prefill?: "company" | "person" | "phone" | "email";
