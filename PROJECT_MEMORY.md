@@ -38,85 +38,6 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 **Done (branch `starter-osf-1599`):** `app/lib/or-one-fees.ts` STARTER monthly 999 -> 1599 (OR ONE page card and live chat both read this file). See D-124. No other copy mentions the STARTER fee or term.
 - Verified: tsc clean. Not checked in a browser (the page reads the one fee constant; the sandbox cannot build the site because Google Fonts is blocked). Term (12 months) and early-cancel (3 months OSF) are contract terms, not shown on the public pages.
 
-## Session: BA public pages "From" prices, 2026-10-30
-
-**Done (branch `ba-amend-2026-10-30`, local commit e82f0e9, NOT pushed):** "From" / "À partir de" before monthly fees on the BA page (EN+FR); price note reworded (D-123). Bands, add-ons, vendors and exit terms deliberately NOT on the site.
-
-**Verified:** tsc clean; playwright at 1440 and 390, EN and FR: new text shows, no horizontal overflow. Not run: lint, build (Google Fonts blocked in sandbox).
-
-**Open:** Mohammad to confirm dropping the API/subscription sentence from the price note; push only on his word. The branch also carries older local commit 2ce9fcb (country dropdown), unpushed before this session.
-
-## Session: Country dropdown on the careers/talent/partnerships form, 2026-10-28
-
-**Done (branch `form-country-picker`, pushed, not merged):** after PR #35 merged (commit 1ddc61b), Mohammad asked for Country to be a pick-list as well. Country is now a dropdown of the 243 regions (D-122 follow-up); picking it pre-selects the phone code. Server accepts only listed English names.
-
-**Verified:** tsc clean, eslint 0 errors on changed files; tests: all 243 names pass the server check, free-typed country refused, French names sorted. NOT verified: look on the preview.
-
-**Next:** Mohammad checks the preview, then approves merge.
-
----
-
-## Session: shared rate limits + bot check on careers/talent/partnerships, 2026-10-28
-
-**Done (branch `security-shared-limits`, pushed, not merged):** `app/lib/rate-limit-shared.ts` (Redis-backed, hashed keys, timeout, in-memory fallback) now backs the limits on chat, contact, newsletter, Cyber Health, My Scope and opportunity. `/api/opportunity` runs the Turnstile check; `oragrol-opportunity-page.tsx` shows the widget and the submit button waits for the token. ODO popup cookie is Secure on https. Decision D-121.
-
-**Found, not changed:** chat already had a shared daily per-IP cap, a $5/day ceiling and strike blocking; dashboard cookies were already httpOnly + Secure + SameSite=Lax. My first read of the chat as "only in-memory" was wrong.
-
-**Verified:** tsc clean, eslint 0 errors on changed files; limiter logic tested against a stand-in Redis (limit, expiry, hashed keys, error, unset, 4 s hang all behave). **NEEDS VERIFICATION on the preview:** real Upstash accepts `PEXPIRE ... NX`; careers/talent/partnerships submit works end to end with the widget; the preview hostname is added to the Cloudflare widget or the check refuses.
-
-**Preview test:** Mohammad submitted the careers form on the preview ("Your submission has been received"), so the bot check and shared limit work there. He then asked for fixed choices: phone country code dropdown and certification tick-boxes (D-122), added to the same branch. Verified: tsc clean, eslint 0 errors, list and validator tests pass (243 countries named in EN and FR, 47 codes spot-checked, schema refuses free-typed values). NOT verified: how the form looks on the preview (no dev server or preview access from the sandbox).
-
-**Next:** Mohammad checks the updated preview (country dropdown, certification boxes, then a submit), then approves merge.
-
----
-
-## Session: Industries page body redesign, 2026-10-22
-
-**Done (branch `industries-redesign`):** new visuals for the three sections between hero and CTA (select an industry, one coordinated path + evidence bar, what leaders need to know). A first version merged them into one section; Mohammad rejected that, so they are separate again. Same content and keys, plus `journey.unifyCta`. Decision D-120.
-
-**Verified:** tsc clean, lint 0 errors; screenshots at 390, 1440, 1920; no horizontal overflow at 360 to 2560; tab click, arrow keys, focus, deep link, French page, mobile rail (page does not jump); no page errors.
-
-**Card version:** Mohammad asked for premium cards and less scroll; sections now use cards, phone step cards swipe, accordion closed. Heights 1765 (1440), 1961 (1920), 2150 (phone).
-
-**Next:** Mohammad reviews the preview; old ind-* CSS cleanup later.
----
-
-## Session: Security Checks fixed and lint errors cleared, 2026-10-22
-
-**Done (branch `fix-security-check-lint`):** the workflow failed at `npm audit` because of a dev-tool-only advisory with no patch (`braces`); it now audits production packages only (0 vulnerabilities). 8 lint errors cleared with no behaviour change. Decision D-119.
-
-**Verified:** lint 0 errors, tsc clean, browser test of popup link, scan resume and chat dismissed-restore, no page errors. Full build left to the Vercel preview.
-
-**Next:** Mohammad checks the preview, then "merge".
-
----
-
-## Session: Batch C cleanup (README, env example, prettier), 2026-10-22
-
-**Done (branch `cleanup-batch-c`):** real README; `.env.local.example` now lists all settings the code reads (23 added, names only); unused `prettier` removed (package.json + lockfile, `npm ci --dry-run` clean). Decision D-118.
-
-**Kept on purpose:** `tests/example.spec.ts`: the Playwright GitHub workflow passes only because it exists.
-
-**Found, not fixed:** "Security Checks" workflow fails on every push to main; `npm run lint` has 8 errors (ChatWidget.tsx, odo-scan.tsx) that were there before.
-
-**Verified:** typecheck clean for source files; lint identical to main (36 problems, 8 errors, none new).
-
----
-
-## Session: Batch B cleanup of instruction and planning documents, 2026-10-22
-
-**Request:** Mohammad approved Batch B of the repository audit (branch `cleanup-batch-b`, not pushed).
-
-**Done:** CLAUDE.md section 12 corrected (next-intl is wired, no react-hook-form, real route list, 26 API routes, real fonts, no Solutions or How We Work). PROJECT_MASTER.md archived to `docs/archive/` with a SUPERSEDED banner; new `docs/CURRENT_SOURCES.md`. This file cut to the last 10 sessions, older ones moved to the archive. DECISIONS.md: current-decisions index added, replaced decisions marked superseded, D-117 added. `ORAGROL_RESOURCES_ALL_ARTICLES_FINAL.md` removed (all 6 articles are in `articles-data.ts`; recoverable from git history). sitemap.ts comment corrected.
-
-**Verified:** facts checked against the code three times; typecheck and lint recorded below.
-
-**Next:** Mohammad checks the branch preview, then approves merge and push.
-
----
-
----
-
 ## Session: Forms v2 build, 2026-11-04
 
 **Request:** after Mohammad's live test, rewrite all four forms (ranges and pick lists, one discuss option, caps, clearer questions), make submissions readable for ZM77, add confirmation email and PDF copy, regenerate the PDFs, give him one before/after table.
@@ -162,3 +83,18 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 **Done (branch `services-forms-live`):** `services-application.ts` and `services-setup.ts` set to `status: "published"`, version 1.0; tests updated (67 pass, tsc clean).
 
 **Next:** after merge, Mohammad re-sends a Services invitation and checks it opens. Counsel review and vendor round 2 still apply before real clients. NOT BUILT: ZM77 Services proposal step.
+
+---
+
+## Session: Lead Finder pilot built (offline-tested), 2026-11-09
+
+**Request:** Mohammad asked for the building part of the Lead Finder pilot to be finished before any test. The pilot finds, for a list of businesses, the owner or manager email each business published on its own site and proves it. Plan and approval brief are in the Claude project (Lead Finder design and pilot build brief notes).
+
+**Done (branch `lead-finder-pilot`):** isolated module `app/lib/lead-finder/` (`text.ts`, `emails.ts`, `pages.ts`, `grade.ts`, `ai.ts`, `run.ts`, `cost.ts`), runner `scripts/lead-finder-pilot.ts`, rule tests `scripts/test-lead-finder.ts` (31 checks), `docs/LEAD_FINDER_PILOT.md`. Rule: the AI picks a NUMBER from a list of addresses the code found; code proves the name is on the site. Generic, missing or no-solicitation sites never reach the AI. Grades A (name and email on same page), B (different pages), C (reject, with a reason). Hard limits: cost cap (default USD 7), valid-lead target, scan cap. Results go to a git-ignored `pilot-results/` folder. Sends nothing, no HubSpot, no change to ODO, the dashboard or the approval gate. D-136.
+
+**Verified:** `npx tsx scripts/test-lead-finder.ts` 31 pass; `npx tsc --noEmit` clean; eslint on the new files 0 errors; runner dry run with no network and no key behaves (all unreadable, files written, missing-key message, exit 1). NEEDS VERIFICATION: everything live. This sandbox has no internet and no `ANTHROPIC_API_KEY`, so real page fetching, the Haiku call (model id `claude-haiku-5-5`, reply shape, real token cost) and real yield are untested. Run on a machine with internet and the key.
+
+**Next:** Mohammad approves the 50 businesses (proposed: GTA, 10 each in dental, accounting, law, physio and health, trades offices), where it runs and the CAD 10 cap; run the pilot; check 20 results by hand; then decide step 2 (ODO outbound changes). robots.txt handling NEEDS DECISION. CASL lawyer review before any send. D-136 does not change the 21 Oct outbound rule; the reminder and daily-batch change is still to be logged.
+
+---
+
