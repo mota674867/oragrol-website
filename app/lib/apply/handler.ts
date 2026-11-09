@@ -62,7 +62,7 @@ async function resolveForm(formId: string, code: string, client: ClientMeta, dep
 /** The setup form for an opened setup link: built from the application it is based on. Null when OCS gave no application. */
 export function setupFromOpen(product: string, openBody: Record<string, unknown>, catalogue: Catalogue): FormDefinition | null {
   const based = openBody.basedOn;
-  if ((product !== "or_one" && product !== "ba") || !plain(based)) return null;
+  if ((product !== "or_one" && product !== "ba" && product !== "services") || !plain(based)) return null;
   const applicationAnswers = restore(applicationFormIdFor(product), catalogue, based.answers).answers;
   return buildSetup(product, applicationAnswers, catalogue);
 }

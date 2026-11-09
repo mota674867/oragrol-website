@@ -13,6 +13,8 @@ import { detailsFor, getCatalogue, withDetails } from "../app/lib/apply/catalogu
 import { orOneApplication as form } from "../app/lib/apply/forms/or-one-application.ts";
 import { baApplication as ba } from "../app/lib/apply/forms/ba-application.ts";
 import { baSetup, orOneSetup } from "../app/lib/apply/forms/setup.ts";
+import { servicesApplication as svc } from "../app/lib/apply/forms/services-application.ts";
+import { servicesSetup } from "../app/lib/apply/forms/services-setup.ts";
 import { allForms, openableForm, openableSetup, setupProductFor } from "../app/lib/apply/registry.ts";
 import { handleApply, setupFromOpen } from "../app/lib/apply/handler.ts";
 import { formToken, ocsApplyConfig, sign } from "../app/lib/apply/ocs.ts";
@@ -690,14 +692,16 @@ test("setup: the form is built from the application's own answers: its items and
   const labels = def.pages.flatMap((p) => (p.kind === "fields" ? p.page.fields : [])).map((f) => f.label).join(" | ");
   for (const c of FX.categories) for (const i of c.items) if (SETUP_APP.answers.items.includes(i.id)) assert.ok(labels.includes(i.name), i.name);
   assert.equal(setupFromOpen("or_one", { ...SETUP_OPEN, basedOn: undefined }, FX), null, "no application, no setup");
-  assert.equal(setupFromOpen("services", SETUP_OPEN, FX), null);
+  assert.equal(setupFromOpen("services", SETUP_OPEN, FX)?.id, "services-setup", "Services has its own setup now (a draft)");
+  assert.equal(setupFromOpen("specialist", SETUP_OPEN, FX), null);
   assert.equal(setupProductFor("or-one-setup"), "or_one"); assert.equal(setupProductFor("ba-setup"), "ba"); assert.equal(setupProductFor("or-one-application"), null);
 });
 
 test("setup: a published setup opens; the gate still applies to any draft setup", () => {
   assert.equal(openableSetup("or_one", SETUP_APP.answers, FX, false)?.id, "or-one-setup");
   assert.equal(openableSetup("or_one", SETUP_APP.answers, FX, true)?.id, "or-one-setup");
-  assert.equal(openableSetup("services", SETUP_APP.answers, FX, true), null);
+  assert.equal(openableSetup("services", SETUP_APP.answers, FX, true)?.id, "services-setup");
+  assert.equal(openableSetup("services", SETUP_APP.answers, FX, false), null, "the Services setup is a draft: it never opens in production");
 });
 
 test("setup save: the server rebuilds the form from OCS (a quiet open), then saves only the setup's own fields", async () => {
@@ -780,4 +784,101 @@ test("confirmation email: sent with the PDF only when the client asked for it, a
   assert.equal(sent[1].attachments[0].content.subarray(0, 4).toString(), "%PDF");
   await confirmSubmit({ ...mk(base), email: "not-an-email" }, deps);
   assert.equal(sent.length, 2);
+});
+
+
+// ---------------------------------------------------------------- Services (managed cybersecurity): application and Business setup (drafts)
+const svcAnswers = (start = {}) => fillDef(svc, FX, { agree: true, ...start });
+const svcVisible = (answers) => new Set(expand(svc, FX, answers).flatMap((p) => p.fields.filter((f) => isVisible(f, ctxOf(answers))).map((f) => f.id)));
+const everyText = (def) => JSON.stringify(def.pages.map((p) => (p.kind === "fields" ? p.page : p)));
+
+test("Services application: a draft that never opens in production, with the start page, 11 terms and ONE tick", () => {
+  assert.equal(svc.status, "draft"); assert.equal(svc.product, "services"); assert.equal(svc.formType, "application");
+  assert.equal(openableForm("application", "services", false), null, "a draft never opens without the preview switch");
+  assert.equal(openableForm("application", "services", true)?.id, "services-application");
+  const start = expand(svc, FX, {})[0];
+  assert.equal(start.id, "start"); assert.equal(start.terms.length, 11); assert.deepEqual(start.fields.map((f) => f.id), ["agree"]);
+  assert.deepEqual(Object.keys(validatePage(start, ctxOf({}))), ["agree"]);
+});
+
+test("Services application: every field id is unique, and a complete valid set of answers passes the whole form", () => {
+  const pages = expand(svc, FX, svcAnswers());
+  const ids = pages.flatMap((p) => p.fields.map((f) => f.id));
+  assert.equal(new Set(ids).size, ids.length, "field ids are unique");
+  for (const p of pages) { const labels = p.fields.map((f) => `${f.group ?? ""}|${f.label}`); assert.equal(new Set(labels).size, labels.length, `labels unique on ${p.id}`); }
+  const full = svcAnswers();
+  assert.deepEqual(validateAll(svc, FX, full, {}), { ok: true, pageIndex: -1, errors: {} });
+  assert.equal(validateAll(svc, FX, { ...full, agree: false }, {}).ok, false, "the agreement must be ticked");
+  assert.equal(validateAll(svc, FX, { ...full, signature: "" }, {}).ok, false, "the signature must be typed");
+});
+
+test("Services application: the questions that decide caps appear only when they matter", () => {
+  const base = svcAnswers({ individual: ["Virtual CISO"], today_provider: "No provider today" });
+  assert.equal(svcVisible(base).has("developers"), false, "no developers question without SSDLC or Application Security Testing");
+  assert.equal(svcVisible(svcAnswers({ individual: ["Secure Software Development Lifecycle (SSDLC)"] })).has("developers"), true);
+  assert.equal(svcVisible(svcAnswers({ individual: ["Application Security Testing"] })).has("developers"), true);
+  assert.equal(svcVisible(base).has("contract_end"), false, "no contract end date when there is no provider today");
+  assert.equal(svcVisible(svcAnswers({ today_provider: "An outside IT provider" })).has("contract_end"), true);
+  assert.equal(svcVisible(svcAnswers({ tech_contact: "We have no IT contact or provider" })).has("tech_name"), false);
+});
+
+test("Services application: approver and urgent-contact answers need a name and a role; the 12 individual services match the live Services page; no price is asked", () => {
+  const f = (id) => field(expand(svc, FX, svcAnswers()), id);
+  assert.equal(validateField(f("change_approver"), ctxOf({ change_approver: "me" })) !== null, true, "one word is refused");
+  assert.equal(validateField(f("change_approver"), ctxOf({ change_approver: "Ali Karim, Operations Manager" })), null);
+  const listed = f("individual").options.filter((o) => o !== "None");
+  assert.deepEqual(listed, ["Virtual CISO", "Secure Software Development Lifecycle (SSDLC)", "Data Privacy Management", "AI Security Assessment", "AI Governance & Risk Management",
+    "Privileged Access Management (PAM)", "Zero Trust Network Access (ZTNA)", "Cloud Network Security", "AI Model Security", "AI Data Security & Privacy", "AI Threat Detection & Protection", "Application Security Testing"]);
+  assert.doesNotMatch(everyText(svc), /\$\s?\d|CAD|per month|per user/i, "the form shows no price, cap or extra charge: the proposal carries them");
+  assert.doesNotMatch(everyText(svc), /Penetration Testing|QSA Assessment|Forensics|SOC 2 Type II/, "specialist services are not offered here");
+});
+
+test("Services application: a draft and its words are clean (no internal names, no certification promise)", () => {
+  const text = everyText(svc);
+  assert.doesNotMatch(text, /ZM77|OCS|TTS\d|Huntress|Tenable|Semgrep|HiddenLayer|UpGuard/i, "no vendor or internal system names reach the client");
+  assert.match(text, /No guarantee and no certification/);
+  assert.match(text, /isolate the affected device/, "the isolation notice is on the form");
+});
+
+const svcSetup = (start = {}) => {
+  const answers = svcAnswers({ platform: "Microsoft 365", cloud_accounts: "None", sites: "None", individual: ["Virtual CISO"], ...start });
+  const labelled = toLabelled(svc, expand(svc, FX, answers), ctxOf(answers));
+  return { answers, labelled, def: servicesSetup(answers) };
+};
+const svcSetupIds = (def, answers = {}) => new Set(expand(def, FX, answers).flatMap((p) => p.fields.filter((f) => isVisible(f, ctxOf(answers))).map((f) => f.id)));
+
+test("Services setup: built from the application's answers; each section shows only what applies", () => {
+  const a = svcSetup();
+  assert.equal(a.def.id, "services-setup"); assert.equal(a.def.status, "draft"); assert.equal(a.def.product, "services");
+  const ids = svcSetupIds(a.def);
+  assert.equal(ids.has("m365.admin"), true); assert.equal(ids.has("g.admin"), false, "no Google section for a Microsoft client");
+  assert.equal(ids.has("cl.list"), false, "no cloud section when the client has no cloud account");
+  assert.equal(ids.has("w.list"), false, "no websites section when the client has none");
+  assert.equal(ids.has("dev.host"), false, "no code host question without a development service");
+  const b = svcSetup({ platform: "Both", cloud_accounts: "2", sites: "2 to 3", individual: ["Application Security Testing"] });
+  const ids2 = svcSetupIds(b.def);
+  for (const id of ["m365.admin", "g.admin", "cl.list", "w.list", "dev.host"]) assert.equal(ids2.has(id), true, id);
+  assert.equal(svcSetupIds(svcSetup({ platform: "Google Workspace" }).def).has("m365.admin"), false);
+});
+
+test("Services setup: a complete, signed setup passes; a change needs words; go-live needs the decision-maker's tick; no meeting box; no secret asked", () => {
+  const { def } = svcSetup({ platform: "Both", cloud_accounts: "2", sites: "2 to 3", individual: ["Application Security Testing"] });
+  const answers = fillDef(def, FX, {});
+  assert.deepEqual(validateAll(def, FX, answers, {}), { ok: true, pageIndex: -1, errors: {} });
+  assert.equal(validateAll(def, FX, { ...answers, "c.company": "Change needed" }, {}).ok, false, "a change needs words");
+  assert.equal(validateAll(def, FX, { ...answers, "final.golive": false }, {}).ok, false);
+  assert.equal(validateAll(def, FX, { ...answers, signature: "" }, {}).ok, false);
+  for (const p of expand(def, FX, answers)) for (const f of p.fields) assert.equal(offersDiscuss(f), false, `${f.id} offers no meeting box`);
+  assert.doesNotMatch(everyText(def), /password:|api key:|card number:/i);
+  assert.match(everyText(def), /Never send|Do not send passwords or keys/);
+});
+
+test("Services setup: opens from an opened setup link and is refused for another product", () => {
+  const { labelled } = svcSetup();
+  const open = { status: "ok", state: "open", formType: "setup", product: "services", basedOn: { reference: "SV-APP-7K2M9QXV", answers: labelled } };
+  const def = setupFromOpen("services", open, FX);
+  assert.equal(def?.id, "services-setup");
+  assert.equal(setupProductFor("services-setup"), "services"); assert.equal(setupProductFor("services-application"), null);
+  assert.equal(setupFromOpen("services", { ...open, basedOn: undefined }, FX), null, "no application, no setup");
+  assert.equal(setupFromOpen("ba", { ...open, product: "services" }, FX)?.id, "ba-setup", "the product asked for decides the builder");
 });

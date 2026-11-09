@@ -140,3 +140,15 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 **Verified:** `npx tsc --noEmit` clean; `npm run lint` 0 errors (39 warnings, none in changed files); browser check on dev server in EN and FR: 10 cap lines on each page, no page errors, layout looked right.
 
 **Next:** legal package V6 (SOW-001 v4.0 Schedule 4) carries the same caps; open items there still marked TO CONFIRM.
+
+---
+
+## Session: Services web forms, 2026-11-09
+
+**Request:** Mohammad asked for the Services application and Business setup as web forms, like the BA and OR ONE ones.
+
+**Done (branch `services-forms`):** `forms/services-application.ts` (9 pages, 11 legal ticks) and `forms/services-setup.ts` (5 pages, built from the application's answers) added; registered in `registry.ts` (draft status, opens only with `APPLY_ALLOW_DRAFT_FORMS=1`); `handler.ts` `setupFromOpen` accepts product services; engine tests updated and extended. OCS and the dashboard already handled product services, no change there.
+
+**Verified:** 67 engine tests pass, `npx tsc --noEmit` clean, eslint 0 errors. Local browser run (fictional data, real OCS code, throwaway Postgres): application and setup submitted, setup linked to its application, BA setup on a Services application refused, no page errors. NEEDS VERIFICATION: Vercel preview, live check, `npm run build`. NOT BUILT: ZM77 brief/proposal step for Services.
+
+**Next:** Mohammad checks the preview; the forms stay draft (closed) until he says open; vendor round 2 and counsel review before any real invitation.
