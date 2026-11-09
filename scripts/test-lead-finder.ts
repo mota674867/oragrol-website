@@ -102,7 +102,7 @@ async function main(): Promise<void> {
     const links = findCandidateLinks(html, SITE);
     assert.equal(links[0], `${SITE}/our-team`);
     assert.ok(links.includes(`${SITE}/about-us`) && links.includes(`${SITE}/contact`));
-    assert.ok(!links.some((l) => l.includes("other.com") || l.endsWith(".pdf") || l.includes("services")));
+    assert.ok(!links.some((l) => new URL(l).hostname === "other.com" || l.endsWith(".pdf") || l.includes("services")));
   });
   await t("falls back to common paths when the home page has no useful links", () => {
     const links = findCandidateLinks("<p>hello</p>", SITE);
