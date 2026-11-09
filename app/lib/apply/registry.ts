@@ -4,10 +4,12 @@
 import type { FormDefinition } from "./types";
 import { orOneApplication } from "./forms/or-one-application.ts";
 import { baApplication } from "./forms/ba-application.ts";
+import { servicesApplication } from "./forms/services-application.ts";
+import { servicesSetup } from "./forms/services-setup.ts";
 import { baSetup, orOneSetup } from "./forms/setup.ts";
 import type { Answers, Catalogue } from "./types";
 
-const FORMS: readonly FormDefinition[] = [orOneApplication, baApplication];
+const FORMS: readonly FormDefinition[] = [orOneApplication, baApplication, servicesApplication];
 
 export const allForms = (): readonly FormDefinition[] => FORMS;
 
@@ -28,13 +30,15 @@ export const draftFormsAllowed = (): boolean => process.env.APPLY_ALLOW_DRAFT_FO
 // ---------------------------------------------------------------- Business setup
 // A setup form is not fixed: it is built for each link from the answers on the client's submitted application (OCS hands them over when the
 // link is opened), so it always matches what that client applied for. The same draft gate applies as for the application forms.
-const SETUP_PRODUCT: Record<string, "or_one" | "ba"> = { "or-one-setup": "or_one", "ba-setup": "ba" };
-const APPLICATION_FORM: Record<"or_one" | "ba", string> = { or_one: "or-one-application", ba: "ba-application" };
-export const setupProductFor = (formId: string): "or_one" | "ba" | null => SETUP_PRODUCT[formId] ?? null;
-export const applicationFormIdFor = (product: "or_one" | "ba"): string => APPLICATION_FORM[product];
+export type SetupProduct = "or_one" | "ba" | "services";
+const SETUP_PRODUCT: Record<string, SetupProduct> = { "or-one-setup": "or_one", "ba-setup": "ba", "services-setup": "services" };
+const APPLICATION_FORM: Record<SetupProduct, string> = { or_one: "or-one-application", ba: "ba-application", services: "services-application" };
+export const setupProductFor = (formId: string): SetupProduct | null => SETUP_PRODUCT[formId] ?? null;
+export const applicationFormIdFor = (product: SetupProduct): string => APPLICATION_FORM[product];
 export function buildSetup(product: string, applicationAnswers: Answers, catalogue: Catalogue): FormDefinition | null {
   if (product === "or_one") return orOneSetup(applicationAnswers, catalogue);
   if (product === "ba") return baSetup(applicationAnswers);
+  if (product === "services") return servicesSetup(applicationAnswers);
   return null;
 }
 /** The setup to show for this link, or null when there is none for the product or it is not cleared to open. */
