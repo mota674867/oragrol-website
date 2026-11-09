@@ -139,7 +139,7 @@ export default function ServicesPage({ onAddToScope, isInScope, onDiscussEngagem
     <section className="os-individual os-light os-section" id="individual-services" aria-labelledby={`${uid}-individual`}>
       <div className="os-section-head"><p className="os-eyebrow">{t("individual.eyebrow")}</p><h2 id={`${uid}-individual`}>{t("individual.headline1")}<br/>{t("individual.headline2")}</h2><p>{t("individual.sub")}</p></div>
       <p className="os-price-note">{t("individual.priceNote")}</p>
-      <div className="os-service-grid">{ALC_SERVICES.map((s, i) => { const item = serviceSelection(s); const added = isInScope(item); const feat = ALC_FEATURED.has(s.code); return <article key={s.code} className={feat ? "os-service-card is-feat" : "os-service-card"}><span className="os-alc-idx" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span><p className="os-eyebrow">{s.billing === "monthly" ? t("individual.monthlyService") : t("individual.projectService")}</p><h3>{s.name}</h3><p className="os-description">{t(`individual.list.${s.code}.line`)}</p>{aLaCarteDetailsContent[s.code] && <DetailsDialog category="CYBERSECURITY" onDark={feat} {...aLaCarteDetailsContent[s.code]} action={{ label: addLabelIndividual(added), onClick: () => onAddToScope(item), disabled: added }} />}<div className="os-card-price">{money(s.price, locale)}<small>{s.billing === "monthly" ? t("money.moSuffix") : s.billing === "per-application" ? t("money.appSuffix") : ""}</small></div><p className="os-billing">{s.billing === "monthly" ? t("individual.monthlyBilling") : s.billing === "per-application" ? t("individual.perApplicationBilling") : t("individual.oneTimeBilling")}</p><Action disabled={added} perform={() => onAddToScope(item)}>{addLabelIndividual(added)}</Action></article>; })}</div>
+      <div className="os-service-grid">{ALC_SERVICES.map((s, i) => { const item = serviceSelection(s); const added = isInScope(item); const feat = ALC_FEATURED.has(s.code); return <article key={s.code} className={feat ? "os-service-card is-feat" : "os-service-card"}><span className="os-alc-idx" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span><p className="os-eyebrow">{s.billing === "monthly" ? t("individual.monthlyService") : t("individual.projectService")}</p><h3>{s.name}</h3><p className="os-description">{t(`individual.list.${s.code}.line`)}</p>{"capEn" in s && <p className="os-cap">{t(`individual.list.${s.code}.cap`)}. {s.extraPrice ? t(`individual.list.${s.code}.extra`, { price: money(s.extraPrice, locale) }) : t(`individual.list.${s.code}.extra`)}</p>}{aLaCarteDetailsContent[s.code] && <DetailsDialog category="CYBERSECURITY" onDark={feat} {...aLaCarteDetailsContent[s.code]} action={{ label: addLabelIndividual(added), onClick: () => onAddToScope(item), disabled: added }} />}<div className="os-card-price">{money(s.price, locale)}<small>{s.billing === "monthly" ? t("money.moSuffix") : s.billing === "per-application" ? t("money.appSuffix") : ""}</small></div><p className="os-billing">{s.billing === "monthly" ? t("individual.monthlyBilling") : s.billing === "per-application" ? t("individual.perApplicationBilling") : t("individual.oneTimeBilling")}</p><Action disabled={added} perform={() => onAddToScope(item)}>{addLabelIndividual(added)}</Action></article>; })}</div>
     </section>
 
     <section className="os-specialists os-dark os-section" id="specialist-engagements" aria-labelledby={`${uid}-specialists`}>
@@ -172,7 +172,7 @@ const styles = `
 .os-individual .os-service-card>span[style] button{margin-top:0!important;min-height:34px!important;padding:2px 0!important}
 .os-individual .os-card-price{font-size:26px;border-top:1px solid #bdbab1;padding-top:10px;margin-top:4px}
 .os-individual .os-card-price small{font-size:13px}
-.os-individual .os-billing{font-size:11px;color:#55595c;margin:1px 0 10px}
+.os-individual .os-billing{font-size:11px;color:#55595c;margin:1px 0 10px}.os-individual .os-cap{font-size:11px;line-height:1.45;color:#55595c;margin:0 0 10px}
 .os-individual .os-standalone{display:none}
 .os-individual .os-action button{font-size:13px;padding:9px 0;min-height:38px}
 .os-individual .os-service-card.is-feat{grid-column:span 2;background:#141618;color:#f2f0ea;padding:24px 26px 20px}
@@ -180,7 +180,7 @@ const styles = `
 .os-individual .is-feat .os-alc-idx{color:#ef4d00;font-size:56px;top:14px;right:22px}
 .os-individual .is-feat .os-eyebrow{color:#b9bcbe}
 .os-individual .os-service-card.is-feat h3{font-size:30px}
-.os-individual .os-service-card.is-feat .os-description,.os-individual .is-feat .os-billing{color:#b9bcbe}
+.os-individual .os-service-card.is-feat .os-description,.os-individual .is-feat .os-billing{color:#b9bcbe}.os-individual .is-feat .os-cap{color:#b9bcbe}
 .os-individual .is-feat .os-card-price{font-size:40px;color:#ef4d00;border-color:#3a3d40}
 .os-individual .is-feat .os-card-price small{font-size:16px}
 .os-individual .is-feat .os-action{position:relative;z-index:1}

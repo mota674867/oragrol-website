@@ -43,7 +43,7 @@ export function cybersecuritySection(): string {
     (p) =>
       `- ${p.name} — ${money(p.price)}/month on a 12-month contract. ${p.value} Ideal for: ${p.fit} Includes ${p.services.length} services: ${p.services.join(", ")}.`,
   ).join("\n");
-  const indiv = INDIVIDUAL_SERVICES.map((s) => `- ${s.name} — ${money(s.price)}${billingLabel(s.billing)}. ${s.line}`).join("\n");
+  const indiv = INDIVIDUAL_SERVICES.map((s) => `- ${s.name} — ${money(s.price)}${billingLabel(s.billing)}. ${s.line}${"capEn" in s ? ` Includes ${s.capEn}${s.extraPrice ? `; beyond that ${money(s.extraPrice)} more each month per extra unit (hour for Virtual CISO)` : "; more units are scoped separately"}.` : ""}`).join("\n");
   const spec = SPECIALIST_ENGAGEMENTS.map(
     (s) => `- ${s.name} — ${s.priceLine}${s.secondaryPriceLine ? ` (${s.secondaryPriceLine})` : ""}. ${s.line}`,
   ).join("\n");
