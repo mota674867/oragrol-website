@@ -2383,3 +2383,92 @@ Fixed: `home/hero.tsx`'s content `Container` gets `pt-[var(--header-height)]`, r
 - `logo.tsx`: added `variant="horizontal"` and `tone="watermark"`. `HeaderLogo` now renders the horizontal lockup (48/40px). Footer icon grey #282828 bottom-right, hidden on phones. Shared footer now on old-chrome routes; `site-footer.tsx` and `oragrol-ring.tsx` deleted.
 - `SHARE_IMAGE` on every page's openGraph + layout; `public/og/oragrol-share.png`. Branded 404 (`not-found.tsx` + `[...rest]`). Chat launcher shows the brand icon.
 - Verified: tsc clean; lint no new issues (pre-existing ChatWidget setState-in-effect error and two warnings remain); 23 routes + 2 bad URLs checked at 1440 and 375 via playwright-core: logo 167x48 / 140x40 everywhere, header heights unchanged, footer 622/743 unchanged, 404 returns 404 with header+footer; og:image + twitter:card summary_large_image on all checked pages. `npm run build` can't run in this sandbox (Google Fonts blocked) — Vercel preview build is the build check. NEEDS VERIFICATION on the preview: real fonts, LinkedIn Post Inspector.
+
+## Session: BA public pages "From" prices, 2026-10-30
+
+**Done (branch `ba-amend-2026-10-30`, local commit e82f0e9, NOT pushed):** "From" / "À partir de" before monthly fees on the BA page (EN+FR); price note reworded (D-123). Bands, add-ons, vendors and exit terms deliberately NOT on the site.
+
+**Verified:** tsc clean; playwright at 1440 and 390, EN and FR: new text shows, no horizontal overflow. Not run: lint, build (Google Fonts blocked in sandbox).
+
+**Open:** Mohammad to confirm dropping the API/subscription sentence from the price note; push only on his word. The branch also carries older local commit 2ce9fcb (country dropdown), unpushed before this session.
+
+## Session: Country dropdown on the careers/talent/partnerships form, 2026-10-28
+
+**Done (branch `form-country-picker`, pushed, not merged):** after PR #35 merged (commit 1ddc61b), Mohammad asked for Country to be a pick-list as well. Country is now a dropdown of the 243 regions (D-122 follow-up); picking it pre-selects the phone code. Server accepts only listed English names.
+
+**Verified:** tsc clean, eslint 0 errors on changed files; tests: all 243 names pass the server check, free-typed country refused, French names sorted. NOT verified: look on the preview.
+
+**Next:** Mohammad checks the preview, then approves merge.
+
+---
+
+## Session: shared rate limits + bot check on careers/talent/partnerships, 2026-10-28
+
+**Done (branch `security-shared-limits`, pushed, not merged):** `app/lib/rate-limit-shared.ts` (Redis-backed, hashed keys, timeout, in-memory fallback) now backs the limits on chat, contact, newsletter, Cyber Health, My Scope and opportunity. `/api/opportunity` runs the Turnstile check; `oragrol-opportunity-page.tsx` shows the widget and the submit button waits for the token. ODO popup cookie is Secure on https. Decision D-121.
+
+**Found, not changed:** chat already had a shared daily per-IP cap, a $5/day ceiling and strike blocking; dashboard cookies were already httpOnly + Secure + SameSite=Lax. My first read of the chat as "only in-memory" was wrong.
+
+**Verified:** tsc clean, eslint 0 errors on changed files; limiter logic tested against a stand-in Redis (limit, expiry, hashed keys, error, unset, 4 s hang all behave). **NEEDS VERIFICATION on the preview:** real Upstash accepts `PEXPIRE ... NX`; careers/talent/partnerships submit works end to end with the widget; the preview hostname is added to the Cloudflare widget or the check refuses.
+
+**Preview test:** Mohammad submitted the careers form on the preview ("Your submission has been received"), so the bot check and shared limit work there. He then asked for fixed choices: phone country code dropdown and certification tick-boxes (D-122), added to the same branch. Verified: tsc clean, eslint 0 errors, list and validator tests pass (243 countries named in EN and FR, 47 codes spot-checked, schema refuses free-typed values). NOT verified: how the form looks on the preview (no dev server or preview access from the sandbox).
+
+**Next:** Mohammad checks the updated preview (country dropdown, certification boxes, then a submit), then approves merge.
+
+---
+
+## Session: Industries page body redesign, 2026-10-22
+
+**Done (branch `industries-redesign`):** new visuals for the three sections between hero and CTA (select an industry, one coordinated path + evidence bar, what leaders need to know). A first version merged them into one section; Mohammad rejected that, so they are separate again. Same content and keys, plus `journey.unifyCta`. Decision D-120.
+
+**Verified:** tsc clean, lint 0 errors; screenshots at 390, 1440, 1920; no horizontal overflow at 360 to 2560; tab click, arrow keys, focus, deep link, French page, mobile rail (page does not jump); no page errors.
+
+**Card version:** Mohammad asked for premium cards and less scroll; sections now use cards, phone step cards swipe, accordion closed. Heights 1765 (1440), 1961 (1920), 2150 (phone).
+
+**Next:** Mohammad reviews the preview; old ind-* CSS cleanup later.
+---
+
+## Session: Security Checks fixed and lint errors cleared, 2026-10-22
+
+**Done (branch `fix-security-check-lint`):** the workflow failed at `npm audit` because of a dev-tool-only advisory with no patch (`braces`); it now audits production packages only (0 vulnerabilities). 8 lint errors cleared with no behaviour change. Decision D-119.
+
+**Verified:** lint 0 errors, tsc clean, browser test of popup link, scan resume and chat dismissed-restore, no page errors. Full build left to the Vercel preview.
+
+**Next:** Mohammad checks the preview, then "merge".
+
+---
+
+## Session: Batch C cleanup (README, env example, prettier), 2026-10-22
+
+**Done (branch `cleanup-batch-c`):** real README; `.env.local.example` now lists all settings the code reads (23 added, names only); unused `prettier` removed (package.json + lockfile, `npm ci --dry-run` clean). Decision D-118.
+
+**Kept on purpose:** `tests/example.spec.ts`: the Playwright GitHub workflow passes only because it exists.
+
+**Found, not fixed:** "Security Checks" workflow fails on every push to main; `npm run lint` has 8 errors (ChatWidget.tsx, odo-scan.tsx) that were there before.
+
+**Verified:** typecheck clean for source files; lint identical to main (36 problems, 8 errors, none new).
+
+---
+
+## Session: Batch B cleanup of instruction and planning documents, 2026-10-22
+
+**Request:** Mohammad approved Batch B of the repository audit (branch `cleanup-batch-b`, not pushed).
+
+**Done:** CLAUDE.md section 12 corrected (next-intl is wired, no react-hook-form, real route list, 26 API routes, real fonts, no Solutions or How We Work). PROJECT_MASTER.md archived to `docs/archive/` with a SUPERSEDED banner; new `docs/CURRENT_SOURCES.md`. This file cut to the last 10 sessions, older ones moved to the archive. DECISIONS.md: current-decisions index added, replaced decisions marked superseded, D-117 added. `ORAGROL_RESOURCES_ALL_ARTICLES_FINAL.md` removed (all 6 articles are in `articles-data.ts`; recoverable from git history). sitemap.ts comment corrected.
+
+**Verified:** facts checked against the code three times; typecheck and lint recorded below.
+
+**Next:** Mohammad checks the branch preview, then approves merge and push.
+
+---
+
+---
+
+---
+
+## Session: Applications live on the dashboard, OCS door set up, Business setup built for the web, 2026-11-03 (later)
+
+**Done:** PRs #43 (forms, security upgrade of next 16.4.1 and zod 4.6.6, lint fix), #44 (log why a link cannot open) merged; OCS and dashboard Applications merged. Live OCS: migrations 031 + grants run, revision `apply2` live, website settings added; a test invitation reached a real inbox and the link opened (the draft gate said "not open yet", as intended). Then, on branches (NOT pushed until Mohammad says; not merged): the name ORAGROL Automation, setup PDF fixes, and the whole Business setup build: OCS migration 032 + `basedOn` (branch `setup-link`), dashboard reference field (branch `setup-link`), website setup forms (branch `setup-web`, on top of `apply-concept-name` = PR #45).
+- **Verified:** OCS 327/327 in `ocs/` (applications 25), dashboard 194/194, website applications 53/53, tsc clean in all three. Browser flow in a real browser against `next dev` + real OCS code + throwaway Postgres (`scratch/bt_all4.py`): all four forms walked and submitted, setups invited from their applications, refusals checked, 8 checks, no page errors.
+- **Test-setup notes:** throwaway Postgres data is in `/tmp/pgtest` (start as user `claude` with TLS); the daily invitation cap (50 per staff) and the website submit limit (12 per 10 min) block repeated runs: age `application_emails.sent_at` and restart `next dev`.
+- **NEEDS VERIFICATION:** `npm run build` on Vercel; migration 032 on the live database (Mohammad runs it); Redis-backed limits; the dashboard New invitation window with a setup choice in a browser (covered by tests only).
+- **Not done / blocking go-live:** counsel wording; item descriptions, limits, defaults review; drawn signature decision; vendor round 2; filled client-copy PDF email; Services forms.
