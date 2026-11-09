@@ -692,7 +692,7 @@ test("setup: the form is built from the application's own answers: its items and
   const labels = def.pages.flatMap((p) => (p.kind === "fields" ? p.page.fields : [])).map((f) => f.label).join(" | ");
   for (const c of FX.categories) for (const i of c.items) if (SETUP_APP.answers.items.includes(i.id)) assert.ok(labels.includes(i.name), i.name);
   assert.equal(setupFromOpen("or_one", { ...SETUP_OPEN, basedOn: undefined }, FX), null, "no application, no setup");
-  assert.equal(setupFromOpen("services", SETUP_OPEN, FX)?.id, "services-setup", "Services has its own setup now (a draft)");
+  assert.equal(setupFromOpen("services", SETUP_OPEN, FX)?.id, "services-setup", "Services has its own setup");
   assert.equal(setupFromOpen("specialist", SETUP_OPEN, FX), null);
   assert.equal(setupProductFor("or-one-setup"), "or_one"); assert.equal(setupProductFor("ba-setup"), "ba"); assert.equal(setupProductFor("or-one-application"), null);
 });
@@ -701,7 +701,7 @@ test("setup: a published setup opens; the gate still applies to any draft setup"
   assert.equal(openableSetup("or_one", SETUP_APP.answers, FX, false)?.id, "or-one-setup");
   assert.equal(openableSetup("or_one", SETUP_APP.answers, FX, true)?.id, "or-one-setup");
   assert.equal(openableSetup("services", SETUP_APP.answers, FX, true)?.id, "services-setup");
-  assert.equal(openableSetup("services", SETUP_APP.answers, FX, false), null, "the Services setup is a draft: it never opens in production");
+  assert.equal(openableSetup("services", SETUP_APP.answers, FX, false)?.id, "services-setup", "the Services setup is published");
 });
 
 test("setup save: the server rebuilds the form from OCS (a quiet open), then saves only the setup's own fields", async () => {
@@ -792,9 +792,9 @@ const svcAnswers = (start = {}) => fillDef(svc, FX, { agree: true, ...start });
 const svcVisible = (answers) => new Set(expand(svc, FX, answers).flatMap((p) => p.fields.filter((f) => isVisible(f, ctxOf(answers))).map((f) => f.id)));
 const everyText = (def) => JSON.stringify(def.pages.map((p) => (p.kind === "fields" ? p.page : p)));
 
-test("Services application: a draft that never opens in production, with the start page, 11 terms and ONE tick", () => {
-  assert.equal(svc.status, "draft"); assert.equal(svc.product, "services"); assert.equal(svc.formType, "application");
-  assert.equal(openableForm("application", "services", false), null, "a draft never opens without the preview switch");
+test("Services application: published, with the start page, 11 terms and ONE tick", () => {
+  assert.equal(svc.status, "published"); assert.equal(svc.product, "services"); assert.equal(svc.formType, "application");
+  assert.equal(openableForm("application", "services", false)?.id, "services-application", "published: opens for a client");
   assert.equal(openableForm("application", "services", true)?.id, "services-application");
   const start = expand(svc, FX, {})[0];
   assert.equal(start.id, "start"); assert.equal(start.terms.length, 11); assert.deepEqual(start.fields.map((f) => f.id), ["agree"]);
@@ -849,7 +849,7 @@ const svcSetupIds = (def, answers = {}) => new Set(expand(def, FX, answers).flat
 
 test("Services setup: built from the application's answers; each section shows only what applies", () => {
   const a = svcSetup();
-  assert.equal(a.def.id, "services-setup"); assert.equal(a.def.status, "draft"); assert.equal(a.def.product, "services");
+  assert.equal(a.def.id, "services-setup"); assert.equal(a.def.status, "published"); assert.equal(a.def.product, "services");
   const ids = svcSetupIds(a.def);
   assert.equal(ids.has("m365.admin"), true); assert.equal(ids.has("g.admin"), false, "no Google section for a Microsoft client");
   assert.equal(ids.has("cl.list"), false, "no cloud section when the client has no cloud account");
