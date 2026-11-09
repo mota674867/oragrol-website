@@ -29,19 +29,21 @@ export const SERVICE_PACKAGES = [
   { id: "elite", name: "Elite", price: 13133, initialPrice: 15760, staffCap: 22, extraStaff: 280, value: "Bring protection and response together.", fit: "Businesses seeking the broadest package scope, including managed threat response, security response and data monitoring.", services: [...comprehensive, "Managed Threat Response", "Security Response", "Data Watch"] },
 ] as const;
 
+// Caps (approved by Mohammad 2026-11-09, D-133): what each monthly or project fee includes and the monthly charge beyond it.
+// capEn is English text for the chat assistant; the website text lives in messages (individual.list.<code>.cap / .extra). Keep both in step.
 export const INDIVIDUAL_SERVICES = [
-  { code: "C01-S04", name: "Virtual CISO", price: 3500, billing: "monthly", line: "Security leadership to guide priorities, decisions and oversight." },
-  { code: "C07-S04", name: "Secure Software Development Lifecycle (SSDLC)", price: 600, billing: "monthly", line: "Bring security practices into your software delivery process." },
-  { code: "C08-S03", name: "Data Privacy Management", price: 700, billing: "monthly", line: "Coordinate how personal information is handled and protected." },
+  { code: "C01-S04", name: "Virtual CISO", price: 3500, billing: "monthly", capEn: "1 live call and 1 report a month", extraPrice: 250, line: "Security leadership to guide priorities, decisions and oversight." },
+  { code: "C07-S04", name: "Secure Software Development Lifecycle (SSDLC)", price: 600, billing: "monthly", capEn: "up to 5 developers", extraPrice: 60, line: "Bring security practices into your software delivery process." },
+  { code: "C08-S03", name: "Data Privacy Management", price: 700, billing: "monthly", capEn: "up to 17 users", extraPrice: 40, line: "Coordinate how personal information is handled and protected." },
   { code: "C09-S01", name: "AI Security Assessment", price: 4500, billing: "one-time", line: "Assess security risks in your AI use and identify practical next steps." },
   { code: "C09-S02", name: "AI Governance & Risk Mgmt", price: 1500, billing: "monthly", line: "Define responsibilities and manage risks around business use of AI." },
-  { code: "C05-S03", name: "Privileged Access Management (PAM)", price: 400, billing: "monthly", line: "Strengthen oversight of accounts with elevated permissions." },
-  { code: "C05-S05", name: "Zero Trust Network Access (ZTNA)", price: 1000, billing: "monthly", line: "Apply identity and context checks to access decisions." },
-  { code: "C06-S04", name: "Cloud Network Security", price: 700, billing: "monthly", line: "Strengthen network controls across your cloud environment." },
-  { code: "C09-S03", name: "AI Model Security", price: 700, billing: "monthly", line: "Address security risks affecting AI models and their use." },
-  { code: "C09-S04", name: "AI Data Security & Privacy", price: 500, billing: "monthly", line: "Protect sensitive information used by AI systems and workflows." },
-  { code: "C09-S05", name: "AI Threat Detection & Protection", price: 1500, billing: "monthly", line: "Identify and address threats involving your AI environment." },
-  { code: "C07-S05", name: "Application Security Testing", price: 3500, billing: "per-application", line: "Test an application's security and prioritize the findings." },
+  { code: "C05-S03", name: "Privileged Access Management (PAM)", price: 400, billing: "monthly", capEn: "up to 10 privileged accounts", extraPrice: 40, line: "Strengthen oversight of accounts with elevated permissions." },
+  { code: "C05-S05", name: "Zero Trust Network Access (ZTNA)", price: 1000, billing: "monthly", capEn: "up to 40 users", extraPrice: 24, line: "Apply identity and context checks to access decisions." },
+  { code: "C06-S04", name: "Cloud Network Security", price: 700, billing: "monthly", capEn: "up to 3 cloud accounts", extraPrice: 150, line: "Strengthen network controls across your cloud environment." },
+  { code: "C09-S03", name: "AI Model Security", price: 700, billing: "monthly", capEn: "1 AI system", extraPrice: null, line: "Address security risks affecting AI models and their use." },
+  { code: "C09-S04", name: "AI Data Security & Privacy", price: 500, billing: "monthly", capEn: "up to 17 users", extraPrice: 40, line: "Protect sensitive information used by AI systems and workflows." },
+  { code: "C09-S05", name: "AI Threat Detection & Protection", price: 1500, billing: "monthly", capEn: "up to 25 data sources", extraPrice: 15, line: "Identify and address threats involving your AI environment." },
+  { code: "C07-S05", name: "Application Security Testing", price: 3500, billing: "per-application", capEn: "1 application (up to 2 domains)", extraPrice: 300, line: "Test an application's security and prioritize the findings." },
 ] as const;
 
 // Specialist engagement pricing (updated 2026-09-08 per Mohammad's review):

@@ -128,3 +128,15 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 **Next:** Mohammad reviews the before/after table; then push, PR, merge, live check. No real invitations before that.
 
 ---
+
+---
+
+## Session: caps on the 12 individual services, 2026-11-09
+
+**Request:** Mohammad approved the caps and extra charges for the 12 individual services and asked to push and merge them.
+
+**Done (branch `services-alacarte-caps`):** `capEn`/`extraPrice` added to `INDIVIDUAL_SERVICES`; cap and extra lines shown on each card (EN and FR, messages `individual.list.<code>.cap` and `.extra`); chat knowledge mentions the caps; styles `.os-cap`. Decision logged as D-133.
+
+**Verified:** `npx tsc --noEmit` clean; `npm run lint` 0 errors (39 warnings, none in changed files); browser check on dev server in EN and FR: 10 cap lines on each page, no page errors, layout looked right.
+
+**Next:** legal package V6 (SOW-001 v4.0 Schedule 4) carries the same caps; open items there still marked TO CONFIRM.

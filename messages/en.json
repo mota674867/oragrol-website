@@ -310,13 +310,19 @@
       "addedToScope": "Added to My Scope",
       "list": {
         "C01-S04": {
-          "line": "Security leadership to guide priorities, decisions and oversight."
+          "line": "Security leadership to guide priorities, decisions and oversight.",
+          "cap": "Includes 1 live call and 1 report a month",
+          "extra": "Each extra hour: {price}/hour"
         },
         "C07-S04": {
-          "line": "Bring security practices into your software delivery process."
+          "line": "Bring security practices into your software delivery process.",
+          "cap": "Includes up to 5 developers",
+          "extra": "Each extra developer: {price}/mo"
         },
         "C08-S03": {
-          "line": "Coordinate how personal information is handled and protected."
+          "line": "Coordinate how personal information is handled and protected.",
+          "cap": "Includes up to 17 users",
+          "extra": "Each extra user: {price}/mo"
         },
         "C09-S01": {
           "line": "Assess security risks in your AI use and identify practical next steps."
@@ -325,25 +331,39 @@
           "line": "Define responsibilities and manage risks around business use of AI."
         },
         "C05-S03": {
-          "line": "Strengthen oversight of accounts with elevated permissions."
+          "line": "Strengthen oversight of accounts with elevated permissions.",
+          "cap": "Includes up to 10 privileged accounts",
+          "extra": "Each extra account: {price}/mo"
         },
         "C05-S05": {
-          "line": "Apply identity and context checks to access decisions."
+          "line": "Apply identity and context checks to access decisions.",
+          "cap": "Includes up to 40 users",
+          "extra": "Each extra user: {price}/mo"
         },
         "C06-S04": {
-          "line": "Strengthen network controls across your cloud environment."
+          "line": "Strengthen network controls across your cloud environment.",
+          "cap": "Includes up to 3 cloud accounts",
+          "extra": "Each extra account: {price}/mo"
         },
         "C09-S03": {
-          "line": "Address security risks affecting AI models and their use."
+          "line": "Address security risks affecting AI models and their use.",
+          "cap": "Includes 1 AI system",
+          "extra": "Additional systems are scoped separately."
         },
         "C09-S04": {
-          "line": "Protect sensitive information used by AI systems and workflows."
+          "line": "Protect sensitive information used by AI systems and workflows.",
+          "cap": "Includes up to 17 users",
+          "extra": "Each extra user: {price}/mo"
         },
         "C09-S05": {
-          "line": "Identify and address threats involving your AI environment."
+          "line": "Identify and address threats involving your AI environment.",
+          "cap": "Includes up to 25 data sources",
+          "extra": "Each extra data source: {price}/mo"
         },
         "C07-S05": {
-          "line": "Test an application's security and prioritize the findings."
+          "line": "Test an application's security and prioritize the findings.",
+          "cap": "Includes 1 application (up to 2 domains)",
+          "extra": "Each extra domain: {price}/mo"
         }
       }
     },

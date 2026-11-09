@@ -310,13 +310,19 @@
       "addedToScope": "Ajouté à ma portée",
       "list": {
         "C01-S04": {
-          "line": "Un leadership en sécurité pour orienter vos priorités, vos décisions et votre supervision."
+          "line": "Un leadership en sécurité pour orienter vos priorités, vos décisions et votre supervision.",
+          "cap": "Comprend 1 appel en direct et 1 rapport par mois",
+          "extra": "Chaque heure supplémentaire : {price}/heure"
         },
         "C07-S04": {
-          "line": "Intégrez des pratiques de sécurité à votre processus de développement logiciel."
+          "line": "Intégrez des pratiques de sécurité à votre processus de développement logiciel.",
+          "cap": "Comprend jusqu’à 5 développeurs",
+          "extra": "Chaque développeur supplémentaire : {price}/mois"
         },
         "C08-S03": {
-          "line": "Coordonnez la façon dont les renseignements personnels sont traités et protégés."
+          "line": "Coordonnez la façon dont les renseignements personnels sont traités et protégés.",
+          "cap": "Comprend jusqu’à 17 utilisateurs",
+          "extra": "Chaque utilisateur supplémentaire : {price}/mois"
         },
         "C09-S01": {
           "line": "Évaluez les risques de sécurité liés à votre utilisation de l'IA et déterminez les prochaines étapes concrètes."
@@ -325,25 +331,39 @@
           "line": "Définissez les responsabilités et gérez les risques liés à l'utilisation de l'IA en entreprise."
         },
         "C05-S03": {
-          "line": "Renforcez la supervision des comptes disposant de droits d'accès élevés."
+          "line": "Renforcez la supervision des comptes disposant de droits d'accès élevés.",
+          "cap": "Comprend jusqu’à 10 comptes privilégiés",
+          "extra": "Chaque compte supplémentaire : {price}/mois"
         },
         "C05-S05": {
-          "line": "Appliquez des vérifications d'identité et de contexte à vos décisions d'accès."
+          "line": "Appliquez des vérifications d'identité et de contexte à vos décisions d'accès.",
+          "cap": "Comprend jusqu’à 40 utilisateurs",
+          "extra": "Chaque utilisateur supplémentaire : {price}/mois"
         },
         "C06-S04": {
-          "line": "Renforcez les contrôles réseau dans votre environnement infonuagique."
+          "line": "Renforcez les contrôles réseau dans votre environnement infonuagique.",
+          "cap": "Comprend jusqu’à 3 comptes infonuagiques",
+          "extra": "Chaque compte supplémentaire : {price}/mois"
         },
         "C09-S03": {
-          "line": "Traitez les risques de sécurité touchant vos modèles d'IA et leur utilisation."
+          "line": "Traitez les risques de sécurité touchant vos modèles d'IA et leur utilisation.",
+          "cap": "Comprend 1 système d’IA",
+          "extra": "Les systèmes supplémentaires font l’objet d’une évaluation distincte."
         },
         "C09-S04": {
-          "line": "Protégez les renseignements sensibles utilisés par vos systèmes et flux de travail en IA."
+          "line": "Protégez les renseignements sensibles utilisés par vos systèmes et flux de travail en IA.",
+          "cap": "Comprend jusqu’à 17 utilisateurs",
+          "extra": "Chaque utilisateur supplémentaire : {price}/mois"
         },
         "C09-S05": {
-          "line": "Détectez et traitez les menaces touchant votre environnement d'IA."
+          "line": "Détectez et traitez les menaces touchant votre environnement d'IA.",
+          "cap": "Comprend jusqu’à 25 sources de données",
+          "extra": "Chaque source de données supplémentaire : {price}/mois"
         },
         "C07-S05": {
-          "line": "Testez la sécurité d'une application et priorisez les constats."
+          "line": "Testez la sécurité d'une application et priorisez les constats.",
+          "cap": "Comprend 1 application (jusqu’à 2 domaines)",
+          "extra": "Chaque domaine supplémentaire : {price}/mois"
         }
       }
     },
