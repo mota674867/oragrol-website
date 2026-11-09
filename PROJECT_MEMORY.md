@@ -152,3 +152,13 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 **Verified:** 67 engine tests pass, `npx tsc --noEmit` clean, eslint 0 errors. Local browser run (fictional data, real OCS code, throwaway Postgres): application and setup submitted, setup linked to its application, BA setup on a Services application refused, no page errors. NEEDS VERIFICATION: Vercel preview, live check, `npm run build`. NOT BUILT: ZM77 brief/proposal step for Services.
 
 **Next:** Mohammad checks the preview; the forms stay draft (closed) until he says open; vendor round 2 and counsel review before any real invitation.
+
+---
+
+## Session: Services forms published, 2026-11-09
+
+**Request:** Mohammad's test invitation showed "This form is not open yet" on orgro.ca; he asked for the Services forms to be live.
+
+**Done (branch `services-forms-live`):** `services-application.ts` and `services-setup.ts` set to `status: "published"`, version 1.0; tests updated (67 pass, tsc clean).
+
+**Next:** after merge, Mohammad re-sends a Services invitation and checks it opens. Counsel review and vendor round 2 still apply before real clients. NOT BUILT: ZM77 Services proposal step.

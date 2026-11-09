@@ -1,6 +1,6 @@
 // The Services application form (managed cybersecurity: four packages and the 12 individual services). DRAFT for Mohammad's review,
 // built in the same format as the BA and OR ONE applications (start page with the legal ticks, ranges and pick lists, one optional
-// meeting note, signature page). Not registered and not published: status "draft" never opens for a client in production.
+// meeting note, signature page). Published 2026-11-09 at Mohammad's request.
 // Price is NOT asked or shown: the proposal carries fees, caps and extra charges (live Services page is the only price source).
 // Specialist services (C10) are not offered here: they are held until after landing (Mohammad, 2026-11-09).
 import type { Cond, Field, FormDefinition, PageSpec } from "../types";
@@ -151,8 +151,8 @@ export const servicesApplication: FormDefinition = {
   name: "Services application form",
   formType: "application",
   product: "services",
-  status: "draft",
-  version: "0.1",
+  status: "published",
+  version: "1.0",
   pages,
   tiers: [],
   signature: { name: "signer_name", title: "signer_title", typed: "signature", agree: "signer_authority" },

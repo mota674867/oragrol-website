@@ -95,7 +95,7 @@ export function servicesSetup(app: Answers): FormDefinition {
   ];
   const clean = pages.map((p) => (p.kind === "fields" ? { ...p, page: { ...p.page, fields: p.page.fields.map((f) => ({ ...f, discuss: false })) } } : p));
   return {
-    id: "services-setup", name: "Services Business Setup", formType: "setup", product: "services", status: "draft", version: "0.1", pages: clean, tiers: [],
+    id: "services-setup", name: "Services Business Setup", formType: "setup", product: "services", status: "published", version: "1.0", pages: clean, tiers: [],
     signature: { name: "signer_name", title: "signer_title", typed: "signature", agree: "final.golive" },
     whatNext: ["ORAGROL checks each line you confirmed or changed.", "Your administrator approves the read-only access we request.", "We run a first scan and check that every connection works.", "We start your service and send your first report."],
   };

@@ -1518,3 +1518,6 @@ D-006, D-011, D-012, D-013, D-037, D-050, D-053, D-054, D-061, D-062, D-066, D-0
 
 ### D-134 — Services web forms built as draft, same engine as BA and OR ONE (2026-11-09)
 Services application (9 pages) and Services Business setup (5 pages) use the private-form engine; setup is built per link from the client's submitted application. Registered with `status: "draft"` so nothing opens without `APPLY_ALLOW_DRAFT_FORMS=1`. No prices on the forms; specialist (C10) services are not offered. Mohammad approved committing and previewing; opening to real clients is a separate yes.
+
+### D-135 — Services forms published (2026-11-09)
+D-134 registered the Services forms as draft (closed on the live site). Mohammad asked for them live to test his own invitations, so both are now `published`, version 1.0. Links only exist when staff send an invitation, so nothing is public until he sends one.
