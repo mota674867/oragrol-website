@@ -14,7 +14,7 @@ export const OUTBOUND_LIMITS = {
   maxScanPerDay: 400,
   /** Hard stop on AI cost per day, CAD. */
   dailyCostCapCad: 25,
-  /** Hard stop on AI cost per month, CAD. PROPOSED (22 working days x 25); Mohammad to confirm. */
+  /** Hard stop on AI cost per month, CAD (22 working days x 25). Confirmed by Mohammad 2026-11-10. */
   monthlyCostCapCad: 550,
   /** A finished area x sector, and a contacted business, rest this many days. */
   restDays: 90,
