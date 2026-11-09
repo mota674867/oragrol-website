@@ -94,7 +94,7 @@ export function summarize(results: LeadResult[], stoppedBecause: StopReason): Ru
 }
 
 const CSV_COLUMNS: Array<keyof LeadResult> = [
-  "business", "website", "grade", "reason", "person", "title", "email", "proofUrl", "proofSnippet",
+  "business", "website", "grade", "reason", "person", "title", "roleType", "email", "proofUrl", "proofSnippet",
   "proofDate", "needsHumanCheck", "webmail", "quebecHint", "pagesFetched", "aiCalled", "costUsd", "ms",
 ];
 

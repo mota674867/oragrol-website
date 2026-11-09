@@ -47,6 +47,7 @@ export type LeadResult = {
   reason: string;
   person: string | null;
   title: string | null;
+  roleType: "owner" | "manager" | null;
   email: string | null;
   proofUrl: string | null;
   proofSnippet: string | null;
@@ -98,6 +99,7 @@ export async function gradeBusiness(p: {
     reason,
     person: null,
     title: null,
+    roleType: null,
     email: null,
     proofUrl: null,
     proofSnippet: null,
@@ -180,6 +182,7 @@ export async function gradeBusiness(p: {
   return done(samePage ? "A" : "B", samePage ? "ok-same-page" : "ok-other-page", {
     person,
     title,
+    roleType: out.choice.roleType,
     email: found.email,
     proofUrl: proofPage.url,
     proofSnippet: found.snippet || `link on ${proofPage.url}`,

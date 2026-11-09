@@ -277,7 +277,7 @@ async function main(): Promise<void> {
 
   // ---- files ----------------------------------------------------------------
   await t("CSV output escapes commas and quotes; the input list is read with a header row", () => {
-    const csv = toCsv([{ business: 'Smith, "Best" Dental', website: "s.ca", grade: "C", reason: "no-email", person: null, title: null, email: null, proofUrl: null, proofSnippet: null, proofDate: "2026-11-09", quebecHint: false, webmail: false, needsHumanCheck: false, pagesFetched: 3, aiCalled: false, costUsd: 0, ms: 12 }]);
+    const csv = toCsv([{ business: 'Smith, "Best" Dental', website: "s.ca", grade: "C", reason: "no-email", person: null, title: null, roleType: null, email: null, proofUrl: null, proofSnippet: null, proofDate: "2026-11-09", quebecHint: false, webmail: false, needsHumanCheck: false, pagesFetched: 3, aiCalled: false, costUsd: 0, ms: 12 }]);
     assert.ok(csv.includes('"Smith, ""Best"" Dental"'));
     const rows = parseBusinessCsv('Name,Website\n"Smith, Dental",smith.ca\n\nOther,other.ca\r\n');
     assert.deepEqual(rows, [{ name: "Smith, Dental", website: "smith.ca" }, { name: "Other", website: "other.ca" }]);

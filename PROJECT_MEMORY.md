@@ -2,14 +2,6 @@
 
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
-## Session: Applications live on the dashboard, OCS door set up, Business setup built for the web, 2026-11-03 (later)
-
-**Done:** PRs #43 (forms, security upgrade of next 16.4.1 and zod 4.6.6, lint fix), #44 (log why a link cannot open) merged; OCS and dashboard Applications merged. Live OCS: migrations 031 + grants run, revision `apply2` live, website settings added; a test invitation reached a real inbox and the link opened (the draft gate said "not open yet", as intended). Then, on branches (NOT pushed until Mohammad says; not merged): the name ORAGROL Automation, setup PDF fixes, and the whole Business setup build: OCS migration 032 + `basedOn` (branch `setup-link`), dashboard reference field (branch `setup-link`), website setup forms (branch `setup-web`, on top of `apply-concept-name` = PR #45).
-- **Verified:** OCS 327/327 in `ocs/` (applications 25), dashboard 194/194, website applications 53/53, tsc clean in all three. Browser flow in a real browser against `next dev` + real OCS code + throwaway Postgres (`scratch/bt_all4.py`): all four forms walked and submitted, setups invited from their applications, refusals checked, 8 checks, no page errors.
-- **Test-setup notes:** throwaway Postgres data is in `/tmp/pgtest` (start as user `claude` with TLS); the daily invitation cap (50 per staff) and the website submit limit (12 per 10 min) block repeated runs: age `application_emails.sent_at` and restart `next dev`.
-- **NEEDS VERIFICATION:** `npm run build` on Vercel; migration 032 on the live database (Mohammad runs it); Redis-backed limits; the dashboard New invitation window with a setup choice in a browser (covered by tests only).
-- **Not done / blocking go-live:** counsel wording; item descriptions, limits, defaults review; drawn signature decision; vendor round 2; filled client-copy PDF email; Services forms.
-
 ## Session: Forms rebuilt to the approved PDFs, one-tick start, ticked-only content, browser test, 2026-11-03
 
 **Done (branch `applications-slice-3`, local commits only, NOT pushed; also OCS `applications-slice-1` and dashboard `applications-slice-2` test changes, local):** OR ONE and BA application forms rebuilt from the approved PDFs (`app/lib/apply/forms/or-one-application.ts`, `ba-application.ts`), Business Setup builders (`forms/setup.ts`, not registered yet), real 77-item OR ONE catalogue (533 points, 11 locked) in `catalogue.ts`. Decisions in D-127. The browser gets category names only and fetches a ticked category's details (`/api/apply/details`).
@@ -98,3 +90,14 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 
 ---
 
+---
+
+## Session: Outbound engine built (sending off), 2026-11-10
+
+**Request:** Mohammad approved the ODO outbound build checklist (Claude project note "ODO Outbound Build Checklist") and asked to build the engine. Everything stays paused until he lands in Canada; domains and mailboxes come then.
+
+**Done (branch `lead-finder-pilot`, on top of the pilot):** `app/lib/outbound/` — `config.ts` (limits: 70 valid, 60 per batch, 400 sites, CAD 25 a day, CAD 550 a month proposed; `SENDING_ENABLED` fixed false), `plan.ts` (default plan: 17 areas GTA, Ontario, Canada; 8 sectors), `source-geoapify.ts`, `dedupe.ts`, `robots.ts`, `first-look.ts` (SPF and DMARC only), `writer.ts` (Sonnet, code checks, footer), `store.ts` (MemoryStore and RedisStore, keys `outbound:*`), `engine.ts` (resumable slices, stop rules, batch, `approveBatch`), `report.ts`, `hubspot-sync.ts` (off), `live.ts`. Routes `app/api/outbound/cron` (locked, not scheduled) and `app/api/outbound/report` (locked). Local runner `scripts/outbound-run.ts` (state in git-ignored `outbound-local/`). Tests `scripts/test-outbound-engine.ts` (27). Lead Finder result now carries `roleType`. D-137.
+
+**Verified:** 27 engine tests and 31 Lead Finder tests pass; `npx tsc --noEmit` clean; eslint 0 errors on changed files; runner refuses without keys. `npm run build` could not finish here: the sandbox cannot reach Google Fonts (unrelated to this change), so NEEDS VERIFICATION on a Vercel preview. NOT verified live: Geoapify categories and response fields, Haiku and Sonnet model ids and real cost, real yield, HubSpot write, Redis store against Upstash.
+
+**Next:** run the local pilot on Mohammad's computer (`npx tsx --env-file=.env.local scripts/outbound-run.ts --max-scan 50 --max-cost-cad 10 --write-limit 10`), check about 20 results by hand; then the staff Outbound page in the dashboard (design shown 2026-11-10, needs dashboard master update after v28), with approval through the existing gate; schedule only when he switches it on. After landing: domains, mailboxes, warm-up, CASL review, sending build.

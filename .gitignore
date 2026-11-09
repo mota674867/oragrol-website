@@ -62,3 +62,6 @@ vendor-dashboard-app/
 
 # Lead Finder pilot results (business contact data: private)
 pilot-results/
+
+# Outbound engine local runs (private business contact data)
+outbound-local/
