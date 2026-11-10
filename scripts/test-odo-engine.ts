@@ -577,7 +577,7 @@ async function main() {
     check("chat says English only", /English only/.test(SYSTEM_PROMPT));
     const baSrc = readFileSync("app/[locale]/business-automation/ba-client.tsx", "utf8");
     const builds = [...baSrc.matchAll(/buildCAD:\s*(\d+)/g)].map((m) => Number(m[1])).filter((n) => n > 0);
-    const monthly = [...baSrc.matchAll(/monthlyLabel:\s*\{\s*en:\s*"(\$[\d,]+)/g)].map((m) => m[1]);
+    const monthly = [...baSrc.matchAll(/monthlyLabel:\s*\{\s*en:\s*"(?:From )?(\$[\d,]+)/g)].map((m) => m[1]);
     check("chat's Business Automation numbers match ba-client.tsx", builds.length === 5 && builds.every((b) => BUSINESS_AUTOMATION_SECTION.includes("$" + b.toLocaleString("en-CA"))) && monthly.length === 5 && monthly.every((mm) => BUSINESS_AUTOMATION_SECTION.includes(mm)));
     check("chat cost math: 10k in + 200 out ~ $0.033", Math.abs(chatCostUsd({ input: 10000, output: 200, cacheRead: 0, cacheWrite: 0 }) - 0.033) < 1e-9);
     check("daily chat cap is $5", CHAT_DAILY_CAP_USD === 5);

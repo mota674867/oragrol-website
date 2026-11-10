@@ -61,11 +61,12 @@ export function cybersecuritySection(): string {
 
 // Verified against app/[locale]/business-automation/ba-client.tsx by the test suite.
 export const BUSINESS_AUTOMATION_SECTION = `BUSINESS AUTOMATION — 5 named packages, each with a one-time build fee plus a monthly fee (CAD):
-- Sales: $9,500 build + $2,200/mo — capture, qualify and follow every sales opportunity to close.
-- Customer Service: $7,000 build + $2,800/mo — faster response, correct routing, consistent support.
-- Finance: $7,500 build + $3,500/mo — one dependable view of business data for reporting and decisions.
+- Sales: $9,500 build + $4,300/mo — capture, qualify and follow every sales opportunity to close.
+- Customer Service: $7,000 build + $3,200/mo — faster response, correct routing, consistent support.
+- Finance: $7,500 build + $4,000/mo — one dependable view of business data for reporting and decisions.
 - IT: $4,000 build + $700/mo base + $110/user/mo — AI-driven IT operations/monitoring layer (not a full break-fix helpdesk MSP).
 - Marketing: $7,000 build + $4,500/mo — onboarding, retention, reactivation and revenue across the customer lifecycle.
+- Each monthly fee is flat and includes a defined monthly volume, agreed in writing before work begins. Do not quote the individual volume limits in chat; say they are confirmed in the proposal.
 - Tailored Automation: privately scoped for needs that don't fit the five packages — pricing confirmed after scoping.`;
 
 type OrOneDetail = { title: string; subtitle: string; intro: string; pointsLabel: string; whoItSuits?: string };
