@@ -54,9 +54,9 @@ const jobIds: JobId[] = [
 // formatted at render time per locale) and which job has DetailsDialog
 // content at all (all 6 do here).
 const jobMeta: Record<JobId, { index: string; buildCAD: number; monthlyLabel: { en: string; fr: string } }> = {
-  "sales-flow": { index: "01", buildCAD: 9500, monthlyLabel: { en: "From $2,200/mo", fr: "À partir de 2 200 $/mois" } },
-  "customer-support": { index: "02", buildCAD: 7000, monthlyLabel: { en: "From $2,800/mo", fr: "À partir de 2 800 $/mois" } },
-  "operational-intelligence": { index: "03", buildCAD: 7500, monthlyLabel: { en: "From $3,500/mo", fr: "À partir de 3 500 $/mois" } },
+  "sales-flow": { index: "01", buildCAD: 9500, monthlyLabel: { en: "$4,300/mo", fr: "4 300 $/mois" } },
+  "customer-support": { index: "02", buildCAD: 7000, monthlyLabel: { en: "$3,200/mo", fr: "3 200 $/mois" } },
+  "operational-intelligence": { index: "03", buildCAD: 7500, monthlyLabel: { en: "$4,000/mo", fr: "4 000 $/mois" } },
   "managed-it": {
     index: "04",
     buildCAD: 4000,
