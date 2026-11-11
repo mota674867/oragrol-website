@@ -14,7 +14,9 @@
  * var (see .env.local.example) — this constant is NOT used as a fallback
  * for real mail delivery for exactly that reason (see route.ts).
  */
-export const SITE_URL = "https://orgro.ca";
+// D-139: the live site answers at www.orgro.ca (orgro.ca redirects there). The canonical link,
+// language links, sitemap and robots must name the same address, or Google flags a mismatch.
+export const SITE_URL = "https://www.orgro.ca";
 export const SITE_DOMAIN = "orgro.ca";
 
 // Not yet a live mailbox — see the note above. Referenced only in UI copy

@@ -1535,3 +1535,8 @@ Mohammad approved building the ODO outbound engine now and keeping everything pa
 - **Unchanged:** the picture, scrim, text and layout. D-109 reservations (licence and model releases) still apply.
 - **Revert:** point the two CSS rules back to `hero-meeting-rings.jpg` and remove the two link tags; the JPG is kept.
 
+### D-139 — Site address set to https://www.orgro.ca so canonical, language links, sitemap and robots agree (2026-11-11)
+- **Why:** PageSpeed SEO 92 on all six pages tested: the canonical pointed to another hreflang location. `SITE_URL` was `https://orgro.ca`, but the live site redirects `orgro.ca` to `www.orgro.ca` (confirmed by opening orgro.ca/industries in Chrome).
+- **Change:** `SITE_URL` in `app/lib/site-config.ts` is now `https://www.orgro.ca`. `SITE_DOMAIN` (`orgro.ca`) and email addresses are unchanged. English stays the `x-default` language.
+- **Revert:** set `SITE_URL` back to `https://orgro.ca`. When the domain moves (see site-config note), this stays the one line to change.
+

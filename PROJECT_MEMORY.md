@@ -101,7 +101,9 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 
 **Verified:** `npx tsc --noEmit` clean; eslint on the page 0 errors; dev server: both preload tags in the HTML, each viewport (1440 and 390) requests only its own file once, no page errors, screenshots look unchanged. NEEDS VERIFICATION: `npm run build` (sandbox cannot reach Google Fonts) and the real PageSpeed score on a Vercel preview.
 
-**Open:** the SEO 92 on every page is a canonical versus hreflang mismatch (PageSpeed: canonical points to another hreflang location, https://www.orgro.ca/); not changed yet. Cyber Health page images are 2.5 and 2.8 MB (not tested). Business Automation 89 (unused JS/CSS).
+**Also done (same branch):** the SEO 92 on every page (PageSpeed: canonical points to another hreflang location) came from `SITE_URL` being `https://orgro.ca` while the live site redirects to `https://www.orgro.ca` (confirmed in Chrome). `app/lib/site-config.ts` now `https://www.orgro.ca` (SITE_DOMAIN stays `orgro.ca`). Dev check: canonical, en/fr/x-default links, sitemap and robots all use www; English is x-default. D-139. NEEDS VERIFICATION: the SEO score on a Vercel preview.
+
+**Open:** Cyber Health page images are 2.5 and 2.8 MB (not tested). Business Automation 89 (unused JS/CSS).
 
 **Next:** push the branch for a preview only when Mohammad says, re-run PageSpeed on Industries, then merge on his yes.
 
