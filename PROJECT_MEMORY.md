@@ -2,14 +2,6 @@
 
 Rolling log, most recent session at the top. Keep to last ~10 sessions — older entries move to `PROJECT_MEMORY_ARCHIVE.md`. Durable design/architecture decisions go in `DECISIONS.md`, not here — this file is session history, not a decision record.
 
-## Session: Forms rebuilt to the approved PDFs, one-tick start, ticked-only content, browser test, 2026-11-03
-
-**Done (branch `applications-slice-3`, local commits only, NOT pushed; also OCS `applications-slice-1` and dashboard `applications-slice-2` test changes, local):** OR ONE and BA application forms rebuilt from the approved PDFs (`app/lib/apply/forms/or-one-application.ts`, `ba-application.ts`), Business Setup builders (`forms/setup.ts`, not registered yet), real 77-item OR ONE catalogue (533 points, 11 locked) in `catalogue.ts`. Decisions in D-127. The browser gets category names only and fetches a ticked category's details (`/api/apply/details`).
-- **Verified:** tsc and eslint clean; `node --test tests/apply-engine.test.mjs` 47/47. Browser run with Playwright against `next dev`, the real OCS code and a throwaway PostgreSQL 16: 26 checks (bad links 404; one agree tick; terms collapsed; gating; silent caps; no category data before a tick; ticked-only items, software, size, rules and approvers; reload restores; locked items offer no Automatic; submit stores only ticked sections; new-style reference OR-APP-xxxxxxxx; phone width). The test script lives outside the repo.
-- **Test-setup notes:** open the dev server as `localhost`, not `127.0.0.1` (Next blocks dev resources for other origins, which blanks the 404 screen); the open-page rate limit is 60 per 10 minutes per address, so restart the dev server between repeated runs; the throwaway DB superuser is `admin`.
-- **NEEDS VERIFICATION:** `npm run build` (Vercel preview only); Redis-backed rate limits; an invitation email arriving.
-- **Not done:** filled client-copy PDF at runtime and its email (needs the sender info@orgro.ca); Business setup wiring; paper-application entry screen; vendor round 2; counsel wording; the concept name.
-
 ## Session: Private application forms /apply/<code> (Applications slice 3), 2026-11-02
 
 **Done (branch `applications-slice-3`, committed, NOT pushed):** invite-only form engine at `app/apply/[code]` (own root layout, no site chrome), save/submit API `app/api/apply/[action]`, engine and data in `app/lib/apply/` (types, engine, catalogue, fixture, forms/or-one-application, registry, ocs, handler). See D-126. Config: `next.config.ts` headers for `/apply/*`, `proxy.ts` matcher excludes `apply`, `robots.ts` disallows `/apply/` and `/api/apply/`, `tsconfig.json` allows `.ts` imports (so the engine can be tested with plain Node), `.env.local.example` has `OCS_APPLY_URL`, `OCS_APPLY_SECRET`, `APPLY_ALLOW_DRAFT_FORMS`, `APPLY_FIXTURE_CATALOGUE`.
@@ -101,3 +93,17 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 **Verified:** 27 engine tests and 31 Lead Finder tests pass; `npx tsc --noEmit` clean; eslint 0 errors on changed files; runner refuses without keys. `npm run build` could not finish here: the sandbox cannot reach Google Fonts (unrelated to this change), so NEEDS VERIFICATION on a Vercel preview. NOT verified live: Geoapify categories and response fields, Haiku and Sonnet model ids and real cost, real yield, HubSpot write, Redis store against Upstash.
 
 **Next:** (pilot run PENDING by Mohammad, 2026-11-10: test later) run the local pilot on Mohammad's computer (`npx tsx --env-file=.env.local scripts/outbound-run.ts --max-scan 50 --max-cost-cad 10 --write-limit 10`), check about 20 results by hand; then the staff Outbound page in the dashboard (design shown 2026-11-10, needs dashboard master update after v28), with approval through the existing gate; schedule only when he switches it on. After landing: domains, mailboxes, warm-up, CASL review, sending build.
+## Session: Industries hero speed fix, 2026-11-11
+
+**Request:** Mohammad asked to work on SEO and site speed. I ran Google PageSpeed (mobile) on six pages in his Chrome: Home 99, Services 92, Business Automation 89, OR ONE 92, Industries 69, Contact 100; SEO 92 on all six. Industries was slow because its hero photo (D-109) is a CSS background, discovered late, and 614 KB (LCP 15.5 s).
+
+**Done (branch `industries-hero-speed`, local only, not pushed):** two WebP files (`hero-meeting-rings.webp` 240 KB for desktop, `hero-meeting-rings-mobile.webp` 43 KB for phones), the two D-109 CSS rules in `app/gpt-pages.css` now point to them, and `app/[locale]/industries/page.tsx` adds two media-matched preload links (hoisted to head). Original JPG kept for revert. D-138.
+
+**Verified:** `npx tsc --noEmit` clean; eslint on the page 0 errors; dev server: both preload tags in the HTML, each viewport (1440 and 390) requests only its own file once, no page errors, screenshots look unchanged. NEEDS VERIFICATION: `npm run build` (sandbox cannot reach Google Fonts) and the real PageSpeed score on a Vercel preview.
+
+**Open:** the SEO 92 on every page is a canonical versus hreflang mismatch (PageSpeed: canonical points to another hreflang location, https://www.orgro.ca/); not changed yet. Cyber Health page images are 2.5 and 2.8 MB (not tested). Business Automation 89 (unused JS/CSS).
+
+**Next:** push the branch for a preview only when Mohammad says, re-run PageSpeed on Industries, then merge on his yes.
+
+---
+
