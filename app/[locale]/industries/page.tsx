@@ -42,5 +42,28 @@ export async function generateMetadata({
 }
 
 export default function Page() {
-  return <IndustriesClient />;
+  // D-138: the hero photo is a CSS background, so the browser only finds it after the stylesheet.
+  // These links (hoisted to <head> by React 19) start the download at once; the media queries
+  // match the two CSS rules in gpt-pages.css so a phone never downloads the desktop file.
+  return (
+    <>
+      <link
+        rel="preload"
+        as="image"
+        href="/images/industries/hero-meeting-rings.webp"
+        type="image/webp"
+        media="(min-width: 701px)"
+        fetchPriority="high"
+      />
+      <link
+        rel="preload"
+        as="image"
+        href="/images/industries/hero-meeting-rings-mobile.webp"
+        type="image/webp"
+        media="(max-width: 700px)"
+        fetchPriority="high"
+      />
+      <IndustriesClient />
+    </>
+  );
 }

@@ -500,8 +500,8 @@ footer{min-height:75svh;background:#0c0e0f;color:#eee;padding:4vw 3vw 22px;displ
 
 /* D-109 Industries hero: black-and-white meeting photo behind the centred headline.
    Dark scrim keeps the headline and the orange OR readable. Phones get a heavier scrim. */
-.ind-hero.ind-hero-clean{background:linear-gradient(180deg,rgba(17,19,21,.62),rgba(17,19,21,.78)),#111315 url(/images/industries/hero-meeting-rings.jpg) 50% 35%/cover no-repeat}
-@media(max-width:700px){.ind-hero.ind-hero-clean{background:linear-gradient(180deg,rgba(17,19,21,.74),rgba(17,19,21,.86)),#111315 url(/images/industries/hero-meeting-rings.jpg) 38% 40%/cover no-repeat}}
+.ind-hero.ind-hero-clean{background:linear-gradient(180deg,rgba(17,19,21,.62),rgba(17,19,21,.78)),#111315 url(/images/industries/hero-meeting-rings.webp) 50% 35%/cover no-repeat}
+@media(max-width:700px){.ind-hero.ind-hero-clean{background:linear-gradient(180deg,rgba(17,19,21,.74),rgba(17,19,21,.86)),#111315 url(/images/industries/hero-meeting-rings-mobile.webp) 38% 40%/cover no-repeat}}
 
 /* Catalogue band on /resources (D-110): the printed cover shown as a physical booklet on the catalogue's own orange disc,
    graphite ground, CTA orange #ef4d00 (same as the pre-footer CTA) used only for the disc, the eyebrow and the primary button. */
