@@ -109,3 +109,15 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 
 ---
 
+
+---
+
+## Session: Client PDFs matched to saved mockups, 2026-11-15
+
+**Request:** Mohammad saved the latest Cyber Health (5 pages), My Scope (1) and ODO (4) PDF mockups and asked that the live website match them 100%, every QR link to orgro.ca/contact, then push and merge. Also asked to remove every other PDF in the backend except the 13 dashboard PDFs and these three (list to be approved first, nothing deleted yet).
+
+**Done (branch `pdf-match-saved-versions`):** Inter embedded for the PDFs (`pdf-inter-data.ts`, `pdf-fonts.ts`), `pdf-brand.tsx` gets `PdfIconMark` and a watermark dot colour, Cyber Health and ODO layouts rebuilt to the mockups (see D-140). My Scope unchanged (already matched; website QR is real).
+
+**Verified:** rendered with synthetic data and compared side by side with every mockup page; QR decoded to https://orgro.ca/contact in all of Cyber Health, ODO and My Scope; stress render (many findings, 3 quick wins, 3 phases, package and OR ONE recommendations) no errors; `npx tsc --noEmit` clean; eslint 0 errors. NEEDS VERIFICATION: `npm run build`, Vercel preview, a real report email.
+
+**Open:** delete list for other PDFs (catalogue PDF, internal outbound documents, apply client copy, opportunity PDF) awaits Mohammad's yes.

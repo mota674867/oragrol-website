@@ -35,12 +35,23 @@ export function PdfLogo({ width }: { width: number }) {
 }
 
 /** Mark only, one flat colour (used as the page watermark). `size` in pt, square. */
-export function PdfIconWatermark({ size, color }: { size: number; color: string }) {
+export function PdfIconWatermark({ size, color, dotColor }: { size: number; color: string; dotColor?: string }) {
   return (
     <Svg viewBox={ICON_VIEWBOX} style={{ width: size, height: size }}>
       <Path d={RING_D} fill={color} fillRule="evenodd" />
       <Path d={STROKE_D} fill={color} />
-      <Circle cx={505} cy={92} r={58} fill={color} />
+      <Circle cx={505} cy={92} r={58} fill={dotColor ?? color} />
+    </Svg>
+  );
+}
+
+/** Icon-only mark in brand colours (graphite ring and stroke, orange dot) for the running page header. `size` in pt, square. */
+export function PdfIconMark({ size }: { size: number }) {
+  return (
+    <Svg viewBox={ICON_VIEWBOX} style={{ width: size, height: size }}>
+      <Path d={RING_D} fill={BRAND_GRAPHITE} fillRule="evenodd" />
+      <Path d={STROKE_D} fill={BRAND_GRAPHITE} />
+      <Circle cx={505} cy={92} r={58} fill={BRAND_ORANGE} />
     </Svg>
   );
 }
