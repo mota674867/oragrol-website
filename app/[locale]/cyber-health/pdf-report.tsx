@@ -1,6 +1,7 @@
 import React from "react";
 import { Document, Page, Text, View, StyleSheet, Link, Image } from "@react-pdf/renderer";
-import { PdfLogo, PdfIconWatermark } from "../../lib/pdf-brand";
+import { PdfIconMark, PdfIconWatermark } from "../../lib/pdf-brand";
+import { registerPdfFonts } from "../../lib/pdf-fonts";
 
 export type Severity = "Critical" | "High" | "Medium" | "Low";
 export type Finding = { title: string; severity: Severity; reportedGap: string; impact: string; action: string; categoryIds: string[] };
@@ -50,6 +51,7 @@ const NOTE_BG = "#F4F2ED";
 const BODY = "#2a3236";
 const TRACK = "#E3E6E8";
 const WATERMARK = "#F1F2F2";
+const WATERMARK_DOT = "#FEF6F3";
 
 const SEV_TAG: Record<Severity, { bg: string; fg: string }> = {
   Critical: { bg: "#FBD9D9", fg: "#8A1C1C" },
@@ -74,97 +76,100 @@ const SEVERITY_ORDER: Severity[] = ["Critical", "High", "Medium", "Low"];
 // full cards regardless of count — they're always few.
 const COMPACT_THRESHOLD = 6;
 const CONTACT = "https://orgro.ca/contact";
+const CONTACT_TEXT = "orgro.ca/contact";
+
+registerPdfFonts();
+const SEMI = { fontFamily: "Inter", fontWeight: 600 } as const;
+const BOLD = { fontFamily: "Inter", fontWeight: 700 } as const;
+
 
 const s = StyleSheet.create({
-  // Letter page. Header and footer are absolute, so the body reserves space
-  // for them with paddingTop/paddingBottom. No lineHeight on `page` or on the
-  // footer's ancestors: a page-level lineHeight made the fixed footer vanish
-  // from the rendered PDF (verified with @react-pdf/renderer 4.x).
-  page: { fontFamily: "Helvetica", fontSize: 8.6, color: INK, backgroundColor: "#FFFFFF", paddingTop: 124, paddingBottom: 84, paddingHorizontal: 42 },
-  header: { position: "absolute", top: 30, left: 42, right: 42, flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", borderBottomWidth: 1.5, borderBottomColor: INK, paddingBottom: 9 },
-  meta: { textAlign: "right", fontSize: 7.5, color: GREY },
-  metaStrong: { color: INK, fontFamily: "Helvetica-Bold" },
-  footer: { position: "absolute", bottom: 26, left: 42, right: 42, borderTopWidth: 1, borderTopColor: INK, paddingTop: 7, flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end" },
-  footerText: { width: "86%", fontSize: 6.3, color: GREY },
-  footerStrong: { color: INK, fontFamily: "Helvetica-Bold" },
-  footerPage: { fontSize: 7, color: INK, fontFamily: "Helvetica-Bold" },
-  h1: { fontSize: 21, fontFamily: "Helvetica-Bold", letterSpacing: -0.3, marginTop: 6, marginBottom: 2 },
-  sub: { fontSize: 9.75, color: GREY, marginBottom: 12 },
-  title: { fontSize: 15, fontFamily: "Helvetica-Bold", marginTop: 6, marginBottom: 3 },
-  titleSub: { fontSize: 9.5, color: GREY, marginBottom: 10, lineHeight: 1.4 },
+  // Letter page. Header and footer are absolute, so the body reserves space for them with paddingTop/paddingBottom.
+  // No lineHeight on `page` or on the footer's ancestors (a page-level lineHeight made the fixed footer vanish, react-pdf 4.x).
+  page: { fontFamily: "Inter", fontSize: 8.6, color: INK, backgroundColor: "#FFFFFF", paddingTop: 88, paddingBottom: 84, paddingHorizontal: 42 },
+  header: { position: "absolute", top: 24, left: 42, right: 42, flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", borderBottomWidth: 1, borderBottomColor: INK, height: 66 },
+  meta: { textAlign: "right", fontSize: 7.3, color: GREY, letterSpacing: 0.55, lineHeight: 1.85, paddingTop: 5 },
+  metaStrong: { color: INK, ...SEMI, fontSize: 7.4, letterSpacing: 0.5 },
+  footer: { position: "absolute", bottom: 24, left: 42, right: 42, borderTopWidth: 1, borderTopColor: INK, paddingTop: 7, flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end" },
+  footerText: { width: "93%", fontSize: 6.0, color: GREY, lineHeight: 1.5 },
+  footerStrong: { color: INK, ...BOLD },
+  footerPage: { fontSize: 7.2, color: INK },
+  h1: { fontSize: 18, ...BOLD, letterSpacing: -0.3, marginTop: 13, marginBottom: 5 },
+  sub: { fontSize: 9.75, color: GREY, marginBottom: 10 },
   h2: { flexDirection: "row", alignItems: "baseline", marginTop: 12, marginBottom: 5 },
-  h2Num: { fontSize: 8.25, color: TEAL, fontFamily: "Helvetica-Bold", marginRight: 8 },
-  h2Title: { fontSize: 9.75, fontFamily: "Helvetica-Bold" },
-  h3: { fontSize: 8, fontFamily: "Helvetica-Bold", marginTop: 10, marginBottom: 4 },
-  p: { fontSize: 8.6, color: BODY, marginBottom: 6, lineHeight: 1.4 },
-  lead: { fontSize: 9, color: INK, marginBottom: 6, lineHeight: 1.4 },
-  small: { fontSize: 7.5, color: GREY, marginBottom: 4, lineHeight: 1.4 },
-  label: { fontSize: 6.8, letterSpacing: 0.9, color: GREY, marginBottom: 2 },
+  h2Num: { fontSize: 8.25, color: TEAL, ...BOLD, marginRight: 8 },
+  h2Title: { fontSize: 10, ...BOLD },
+  p: { fontSize: 8.2, color: BODY, marginBottom: 6, lineHeight: 1.4 },
+  lead: { fontSize: 9, color: INK, marginTop: 5, marginBottom: 6, lineHeight: 1.4 },
+  riskLine: { fontSize: 8.2, color: INK, marginBottom: 4, lineHeight: 1.4 },
+  small: { fontSize: 6.8, color: GREY, marginBottom: 4, lineHeight: 1.4 },
+  smallStrong: { ...SEMI, color: GREY },
+  label: { fontSize: 6.5, letterSpacing: 1, color: GREY, marginBottom: 2 },
   cl4: { flexDirection: "row", borderWidth: 1, borderColor: RULE, borderRadius: 3, marginBottom: 8 },
-  cl4Cell: { flex: 1, paddingVertical: 6, paddingHorizontal: 9, borderRightWidth: 1, borderRightColor: RULE },
-  cl4Value: { fontSize: 9, fontFamily: "Helvetica-Bold" },
-  kRow: { flexDirection: "row", borderTopWidth: 1.5, borderTopColor: INK, borderBottomWidth: 1, borderBottomColor: RULE, marginVertical: 8 },
+  cl4Cell: { flex: 1, paddingVertical: 7, paddingHorizontal: 9, borderRightWidth: 1, borderRightColor: RULE },
+  cl4Value: { fontSize: 9, ...SEMI },
+  kRow: { flexDirection: "row", borderTopWidth: 1, borderTopColor: INK, borderBottomWidth: 1, borderBottomColor: RULE, marginTop: 4, marginBottom: 8 },
   kCell: { flex: 1, paddingVertical: 6, paddingRight: 4 },
-  kNum: { fontSize: 20, color: TEAL, fontFamily: "Helvetica-Bold", marginVertical: 1 },
+  kNum: { fontSize: 15.7, color: TEAL, ...BOLD, marginTop: 0, marginBottom: 5 },
   kSmall: { fontSize: 7.5, color: GREY },
-  note: { marginTop: 9, borderLeftWidth: 3, borderLeftColor: TEAL, backgroundColor: NOTE_BG, paddingVertical: 8, paddingHorizontal: 12, fontSize: 8.6, color: BODY, lineHeight: 1.4 },
-  noteLabel: { fontFamily: "Helvetica-Bold", color: INK },
   toc: { flexDirection: "row", flexWrap: "wrap", marginTop: 3 },
-  tocItem: { width: "50%", borderBottomWidth: 1, borderBottomColor: TRACK, paddingVertical: 3, paddingRight: 12, flexDirection: "row", fontSize: 8.6 },
-  tocNum: { color: TEAL, fontFamily: "Helvetica-Bold", width: 22 },
-  // Score coverage
-  groupBlock: { marginBottom: 7 },
-  groupHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", borderBottomWidth: 1.5, borderBottomColor: INK, paddingBottom: 4, marginBottom: 2 },
-  groupName: { fontFamily: "Helvetica-Bold", fontSize: 8.6, letterSpacing: 0.6 },
-  groupScore: { fontFamily: "Helvetica-Bold", fontSize: 9.5, color: TEAL },
-  category: { flexDirection: "row", alignItems: "center", paddingVertical: 3, borderBottomWidth: 1, borderBottomColor: TRACK },
-  categoryName: { width: "46%", fontSize: 8.2, color: BODY },
-  track: { width: "40%", height: 5, backgroundColor: TRACK, marginRight: 8 },
-  bar: { height: 5, backgroundColor: TEAL },
-  percent: { width: "10%", textAlign: "right", fontSize: 8.2, fontFamily: "Helvetica-Bold" },
-  critTag: { fontSize: 6.3, letterSpacing: 0.7, fontFamily: "Helvetica-Bold", paddingVertical: 1.5, paddingHorizontal: 4, marginLeft: 6, backgroundColor: SEV_TAG.Critical.bg, color: SEV_TAG.Critical.fg },
-  // Priority findings
-  sevStrip: { flexDirection: "row", marginBottom: 6 },
-  sevCell: { flex: 1, paddingVertical: 6, paddingHorizontal: 8, backgroundColor: "#ECEDEA", marginRight: 6 },
-  sevNum: { fontSize: 16, fontFamily: "Helvetica-Bold", marginTop: 1 },
-  finding: { borderWidth: 1, borderColor: RULE, padding: 9, marginBottom: 6 },
-  findingTitle: { fontFamily: "Helvetica-Bold", fontSize: 9.5, marginBottom: 4, lineHeight: 1.35 },
-  findingLine: { fontSize: 8.2, color: BODY, marginBottom: 2, lineHeight: 1.4 },
-  findingLabel: { fontFamily: "Helvetica-Bold", color: INK },
-  sevTag: { fontSize: 6.3, letterSpacing: 0.7, fontFamily: "Helvetica-Bold", paddingVertical: 1.5, paddingHorizontal: 4, alignSelf: "flex-start", marginBottom: 4 },
+  tocItem: { width: "50%", borderBottomWidth: 1, borderBottomColor: TRACK, paddingVertical: 3.5, paddingRight: 12, flexDirection: "row", fontSize: 7.9 },
+  tocNum: { color: TEAL, ...BOLD, width: 19 },
+  // Score and control coverage (section 03)
+  barRow: { flexDirection: "row", alignItems: "center", borderBottomWidth: 1, borderBottomColor: TRACK, height: 17, paddingRight: 7 },
+  barName: { width: 116, fontSize: 7.7, color: INK },
+  barTrack: { flex: 1, height: 4, backgroundColor: TRACK, marginRight: 22 },
+  barFill: { height: 4, backgroundColor: TEAL },
+  barPct: { width: 30, textAlign: "right", fontSize: 7.8, color: BODY },
+  bigRow: { flexDirection: "row", borderTopWidth: 1, borderTopColor: INK, borderBottomWidth: 1, borderBottomColor: RULE, marginTop: 8 },
+  bigCell: { flex: 1, paddingVertical: 6, paddingLeft: 0, borderRightWidth: 1, borderRightColor: RULE },
+  bigNum: { fontSize: 13.5, color: TEAL, ...BOLD, marginTop: 1 },
+  tHead: { flexDirection: "row", borderBottomWidth: 1, borderBottomColor: INK, paddingBottom: 6, paddingTop: 10 },
+  tRow: { flexDirection: "row", borderBottomWidth: 1, borderBottomColor: TRACK, height: 17, alignItems: "center" },
+  tCat: { width: 175, fontSize: 7.7, color: INK },
+  tCtl: { width: 177, fontSize: 7.7, color: INK },
+  tCov: { flex: 1, fontSize: 7.7, color: INK, textAlign: "right" },
+  tHeadText: { fontSize: 6.3, letterSpacing: 1.1, color: GREY, ...SEMI },
+  critTag: { fontSize: 5.8, letterSpacing: 0.7, ...BOLD, paddingVertical: 1.5, paddingHorizontal: 4, marginLeft: 6, backgroundColor: SEV_TAG.Critical.bg, color: SEV_TAG.Critical.fg },
+  note: { marginTop: 8, borderLeftWidth: 3, borderLeftColor: TEAL, backgroundColor: NOTE_BG, paddingVertical: 8, paddingHorizontal: 11, fontSize: 7.55, color: BODY, lineHeight: 1.45 },
+  noteLabel: { ...BOLD, color: INK },
+  // Priority findings (section 04)
+  sevStrip: { flexDirection: "row", borderTopWidth: 1, borderTopColor: INK, borderBottomWidth: 1, borderBottomColor: RULE, marginTop: -1, marginBottom: 8 },
+  sevCell: { flex: 1, paddingVertical: 6 },
+  sevNum: { fontSize: 17, ...BOLD, color: TEAL, marginTop: 2 },
+  finding: { borderWidth: 1, borderColor: RULE, borderRadius: 3, paddingVertical: 8, paddingHorizontal: 10, marginBottom: 6 },
+  findingTitle: { ...BOLD, fontSize: 9, marginBottom: 5, lineHeight: 1.35 },
+  findingLine: { fontSize: 7.9, color: BODY, marginBottom: 3, lineHeight: 1.4 },
+  findingLabel: { ...SEMI, color: INK },
+  sevTag: { fontSize: 6.3, letterSpacing: 0.8, ...BOLD, paddingVertical: 2, paddingHorizontal: 5, borderRadius: 2, alignSelf: "flex-start", marginBottom: 5 },
   compactRow: { flexDirection: "row", paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: TRACK },
-  compactTitle: { width: "44%", fontSize: 8.2, fontFamily: "Helvetica-Bold", paddingRight: 8, lineHeight: 1.35 },
+  compactTitle: { width: "40%", fontSize: 8.2, ...SEMI, paddingRight: 8, lineHeight: 1.35 },
   compactAction: { flex: 1, fontSize: 8.2, color: BODY, lineHeight: 1.35 },
-  guideRow: { flexDirection: "row", borderBottomWidth: 1, borderBottomColor: TRACK, paddingVertical: 4 },
-  guideLevel: { width: "16%", fontSize: 8, fontFamily: "Helvetica-Bold" },
-  guideText: { flex: 1, fontSize: 8, color: BODY, lineHeight: 1.4 },
-  // Quick wins and roadmap
-  quickRow: { flexDirection: "row", marginTop: 4 },
-  quickCol: { flex: 1, borderWidth: 1, borderColor: RULE, padding: 10, marginRight: 8 },
-  quickNum: { fontSize: 20, color: TEAL, fontFamily: "Helvetica-Bold", marginBottom: 4 },
-  quickTitle: { fontSize: 9.5, fontFamily: "Helvetica-Bold", marginBottom: 4, lineHeight: 1.35 },
-  quickText: { fontSize: 8.2, color: BODY, marginBottom: 6, lineHeight: 1.4 },
-  quickLabel: { fontSize: 6.8, letterSpacing: 0.9, color: GREY, marginBottom: 1 },
-  quickValue: { fontSize: 8, color: BODY, marginBottom: 6, lineHeight: 1.35 },
-  specialist: { backgroundColor: INK, padding: 12, marginTop: 10 },
-  specialistLabel: { fontSize: 7, letterSpacing: 0.9, color: "#9AA3A8", marginBottom: 4 },
-  specialistText: { fontSize: 9, color: "#FFFFFF", lineHeight: 1.4 },
-  phase: { borderTopWidth: 1.5, borderTopColor: INK, paddingVertical: 8, flexDirection: "row" },
-  phaseLeft: { width: "28%", paddingRight: 10 },
-  phaseRight: { flex: 1 },
-  phasePeriod: { fontSize: 9.5, fontFamily: "Helvetica-Bold", color: TEAL, marginBottom: 3 },
-  phaseAction: { fontSize: 8.4, color: BODY, lineHeight: 1.4 },
-  // Continue
-  three: { flexDirection: "row", marginTop: 6, marginBottom: 6 },
-  threeCell: { flex: 1, paddingRight: 12 },
-  threeTitle: { fontSize: 8.6, fontFamily: "Helvetica-Bold", marginBottom: 2 },
-  threeText: { fontSize: 8.1, color: BODY, lineHeight: 1.4 },
-  qrBox: { flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: RULE, borderRadius: 3, padding: 12, marginTop: 10 },
-  qr: { width: 72, height: 72, marginRight: 14 },
-  qrTitle: { fontSize: 9, fontFamily: "Helvetica-Bold", marginBottom: 3 },
-  qrText: { fontSize: 7.8, color: GREY, lineHeight: 1.4 },
-  reviewRow: { flexDirection: "row", borderTopWidth: 1.5, borderTopColor: INK, marginTop: 12, paddingTop: 6 },
-  reviewCell: { flex: 1, fontSize: 8, color: BODY },
+  guideHead: { flexDirection: "row", borderBottomWidth: 1, borderBottomColor: INK, paddingBottom: 6, paddingTop: 3 },
+  guideRow: { flexDirection: "row", borderBottomWidth: 1, borderBottomColor: TRACK, height: 17, alignItems: "center" },
+  guideLevel: { width: 95 },
+  guideText: { flex: 1, fontSize: 7.9, color: BODY },
+  guideTag: { fontSize: 6.3, letterSpacing: 0.8, ...BOLD, paddingVertical: 2, paddingHorizontal: 5, borderRadius: 2, alignSelf: "flex-start" },
+  // Quick wins and roadmap (sections 05 and 06)
+  itemRow: { flexDirection: "row", paddingTop: 6, paddingBottom: 9, borderBottomWidth: 1, borderBottomColor: TRACK },
+  itemNum: { width: 28, fontSize: 11.5, color: TEAL, ...BOLD },
+  itemBody: { flex: 1 },
+  itemTitle: { fontSize: 8.8, ...BOLD, marginBottom: 3 },
+  itemText: { fontSize: 8.2, color: BODY, marginBottom: 5, lineHeight: 1.4 },
+  itemMeta: { fontSize: 6.8, color: GREY, lineHeight: 1.4 },
+  // Continue (section 07)
+  three: { flexDirection: "row", borderTopWidth: 1, borderTopColor: INK, marginTop: 0, marginBottom: 8 },
+  threeCell: { flex: 1, paddingTop: 5, paddingBottom: 8, paddingRight: 12, paddingLeft: 10, borderLeftWidth: 1, borderLeftColor: RULE },
+  threeTitle: { fontSize: 6.8, ...BOLD, letterSpacing: 1, color: TEAL, marginBottom: 5 },
+  threeText: { fontSize: 7.9, color: INK, lineHeight: 1.5 },
+  strip: { flexDirection: "row", borderWidth: 1, borderColor: RULE, borderRadius: 3, marginBottom: 12 },
+  stripCell: { paddingVertical: 7, paddingHorizontal: 9, borderRightWidth: 1, borderRightColor: RULE },
+  stripValue: { fontSize: 8.9, ...BOLD, lineHeight: 1.4, marginTop: 2 },
+  limit: { fontSize: 7.1, color: GREY, lineHeight: 1.5, marginBottom: 6 },
+  qrBox: { flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: RULE, borderRadius: 3, paddingVertical: 14, paddingHorizontal: 14, marginTop: 8 },
+  qr: { width: 68, height: 68, marginRight: 18 },
+  qrTitle: { fontSize: 9, ...BOLD, marginBottom: 5 },
+  qrText: { fontSize: 7.9, color: GREY, lineHeight: 1.4 },
 });
 
 function FindingCard({ f }: { f: Finding }) {
@@ -181,8 +186,10 @@ function FindingCard({ f }: { f: Finding }) {
 }
 
 function CompactRow({ f }: { f: Finding }) {
+  const tag = SEV_TAG[f.severity];
   return (
     <View style={s.compactRow} wrap={false}>
+      <View style={{ width: 52 }}><Text style={[s.guideTag, { backgroundColor: tag.bg, color: tag.fg }]}>{f.severity.toUpperCase()}</Text></View>
       <Text style={s.compactTitle}>{f.title}</Text>
       <Text style={s.compactAction}>{f.action}</Text>
     </View>
@@ -193,15 +200,15 @@ function ReportPage({ d, children }: { d: CyberHealthReportData; children: React
   return (
     <Page size="LETTER" style={s.page}>
       <View style={{ position: "absolute", left: 145, top: 258, width: 322, height: 322 }} fixed>
-        <PdfIconWatermark size={322} color={WATERMARK} />
+        <PdfIconWatermark size={322} color={WATERMARK} dotColor={WATERMARK_DOT} />
       </View>
       <View style={s.header} fixed>
-        <PdfLogo width={37.5} />
+        <View style={{ paddingTop: 0 }}><PdfIconMark size={37} /></View>
         <View style={s.meta}>
-          <Text style={s.metaStrong}>Private &amp; confidential</Text>
-          <Text style={s.metaStrong}>Cyber Health Assessment</Text>
-          <Text>{d.assessmentDate}</Text>
-          <Text>Ref {d.clientReference}</Text>
+          <Text style={s.metaStrong}>PRIVATE &amp; CONFIDENTIAL</Text>
+          <Text style={s.metaStrong}>CYBER HEALTH ASSESSMENT</Text>
+          <Text>{d.assessmentDate.toUpperCase()}</Text>
+          <Text>REF {d.clientReference.toUpperCase()}</Text>
         </View>
       </View>
       {children}
@@ -216,9 +223,9 @@ function ReportPage({ d, children }: { d: CyberHealthReportData; children: React
   );
 }
 
-function SectionHead({ num, title }: { num: string; title: string }) {
+function SectionHead({ num, title, top }: { num: string; title: string; top?: number }) {
   return (
-    <View style={s.h2} minPresenceAhead={60}>
+    <View style={top === undefined ? s.h2 : [s.h2, { marginTop: top }]} minPresenceAhead={60}>
       <Text style={s.h2Num}>{num}</Text>
       <Text style={s.h2Title}>{title}</Text>
     </View>
@@ -232,12 +239,11 @@ export default function CyberHealthPdfReport({ data: d, contactQrSrc }: PdfRepor
   const critical = d.findings.filter((f) => f.severity === "Critical");
   const criticalIds = new Set(critical.flatMap((f) => f.categoryIds));
 
-  // Every severity is always shown in full detail EXCEPT when the
-  // combined Medium+Low volume is large — then Medium/Low switch to a
-  // compact (still complete, non-truncated) row. Critical/High are
-  // always full cards.
+  // Every severity is shown in full detail EXCEPT when the combined Medium+Low volume is large: then Medium/Low switch
+  // to a compact (still complete, non-truncated) row. Critical/High are always full cards.
   const mediumLowCount = d.findings.filter((f) => f.severity === "Medium" || f.severity === "Low").length;
   const useCompactMediumLow = mediumLowCount > COMPACT_THRESHOLD;
+  const ordered = SEVERITY_ORDER.flatMap((sev) => d.findings.filter((f) => f.severity === sev));
 
   return (
     <Document title="ORAGROL Cyber Health Assessment Report" author="ORAGROL Global" subject="Questionnaire-based Cyber Health Assessment">
@@ -259,17 +265,17 @@ export default function CyberHealthPdfReport({ data: d, contactQrSrc }: PdfRepor
           <View style={[s.cl4Cell, { borderRightWidth: 0 }]}><Text style={s.label}>REPORTED RISK TIER</Text><Text style={s.cl4Value}>{d.riskTier ?? "—"}</Text></View>
         </View>
 
-        <SectionHead num="01" title="Assessment summary" />
+        <SectionHead num="01" title="Assessment summary" top={6} />
         <View style={s.kRow}>
-          <View style={s.kCell}><Text style={s.label}>CYBER HEALTH SCORE</Text><Text style={s.kNum}>{d.score}<Text style={{ fontSize: 10 }}> / 100</Text></Text><Text style={s.kSmall}>Out of 100</Text></View>
+          <View style={s.kCell}><Text style={s.label}>CYBER HEALTH SCORE</Text><Text style={s.kNum}>{d.score} / 100</Text><Text style={s.kSmall}>Out of 100</Text></View>
           <View style={s.kCell}><Text style={s.label}>CRITICAL FINDINGS</Text><Text style={s.kNum}>{critical.length}</Text><Text style={s.kSmall}>Urgent</Text></View>
           <View style={s.kCell}><Text style={s.label}>HIGH FINDINGS</Text><Text style={s.kNum}>{d.findings.filter((f) => f.severity === "High").length}</Text><Text style={s.kSmall}>Prioritize promptly</Text></View>
           <View style={[s.kCell, { paddingRight: 0 }]}><Text style={s.label}>MEDIUM / LOW</Text><Text style={s.kNum}>{d.findings.filter((f) => f.severity === "Medium").length} / {d.findings.filter((f) => f.severity === "Low").length}</Text><Text style={s.kSmall}>Plan and review</Text></View>
         </View>
         <Text style={s.lead}>{d.scoreInterpretation}</Text>
-        {d.riskTier ? <Text style={s.small}>Reported risk tier: {d.riskTier}. Individual findings take priority over the average.</Text> : null}
+        {d.riskTier ? <Text style={s.riskLine}>Reported risk tier: {d.riskTier}. Individual findings take priority over the average.</Text> : null}
 
-        <SectionHead num="02" title="Inside this report" />
+        <SectionHead num="02" title="Inside this report" top={3} />
         <View style={s.toc}>
           {[
             ["03", "Score & control coverage"],
@@ -290,40 +296,53 @@ export default function CyberHealthPdfReport({ data: d, contactQrSrc }: PdfRepor
       <View>
         <SectionHead num="03" title="Score & control coverage" />
         <Text style={s.p}>Overall score: {d.score}/100. A Critical finding overrides its category status, regardless of the average.</Text>
-        {d.groups.map((g) => (
-          <View key={g.name} style={s.groupBlock} wrap={false}>
-            <View style={s.groupHeader}>
-              <Text style={s.groupName}>{g.name.toUpperCase()}</Text>
-              <Text style={s.groupScore}>{g.score}%</Text>
+        <View>
+          {d.groups.map((g) => (
+            <View key={g.name} style={s.barRow}>
+              <Text style={s.barName}>{g.name.toUpperCase()}</Text>
+              <View style={s.barTrack}><View style={[s.barFill, { width: `${g.score}%` }]} /></View>
+              <Text style={s.barPct}>{g.score}%</Text>
             </View>
-            {g.categories.map((c) => (
-              <View key={c.id} style={s.category}>
-                <Text style={s.categoryName}>
-                  {c.name}
-                  {criticalIds.has(c.id) ? <Text style={s.critTag}>CRITICAL</Text> : null}
-                </Text>
-                <View style={s.track}><View style={[s.bar, { width: `${c.score}%` }]} /></View>
-                <Text style={s.percent}>{c.score}%</Text>
-              </View>
-            ))}
+          ))}
+        </View>
+        <View style={s.bigRow}>
+          {d.groups.map((g, i) => (
+            <View key={g.name} style={[s.bigCell, { flex: [135, 124, 124, 125, 126][i] ?? 125 }, i === 0 ? {} : { paddingLeft: 3 }, i === d.groups.length - 1 ? { borderRightWidth: 0 } : {}]}>
+              <Text style={s.label}>{g.name.toUpperCase()}</Text>
+              <Text style={s.bigNum}>{g.score}%</Text>
+            </View>
+          ))}
+        </View>
+        <View style={s.tHead}>
+          <Text style={[s.tCat, s.tHeadText]}>CATEGORY</Text>
+          <Text style={[s.tCtl, s.tHeadText]}>CONTROLS</Text>
+          <Text style={[s.tHeadText, { flex: 1 }]}>COVERAGE</Text>
+        </View>
+        {d.groups.map((g) => (
+          <View key={g.name} style={s.tRow}>
+            <Text style={s.tCat}>
+              {g.name}
+              {g.categories.some((c) => criticalIds.has(c.id)) ? <Text style={s.critTag}>CRITICAL</Text> : null}
+            </Text>
+            <Text style={s.tCtl}>{g.categories.length}</Text>
+            <Text style={s.tCov}>{g.score}%</Text>
           </View>
         ))}
         <View style={s.note}>
-          <Text style={s.noteLabel}>Reading this score.</Text>
-          <Text>Reported coverage is not independent verification. Critical flags derive from the findings mapped to each category; a high average does not cancel an individual control gap.</Text>
+          <Text><Text style={s.noteLabel}>Reading this score.</Text> Reported coverage is not independent verification. Critical flags derive from the findings mapped to each category; a high average does not cancel an individual control gap.</Text>
         </View>
       </View>
       </ReportPage>
 
       <ReportPage d={d}>
       <View>
-        <SectionHead num="04" title="The gaps that need attention first" />
+        <SectionHead num="04" title="Priority findings" />
         <Text style={s.p}>Reported findings require validation, in the order they should be worked.</Text>
         <View style={s.sevStrip}>
           {SEVERITY_ORDER.map((level) => {
             const count = d.findings.filter((f) => f.severity === level).length;
             return (
-              <View key={level} style={[s.sevCell, { borderLeftWidth: level === "Critical" && count > 0 ? 3 : 0, borderLeftColor: "#8A1C1C" }]}>
+              <View key={level} style={s.sevCell}>
                 <Text style={s.label}>{level.toUpperCase()}</Text>
                 <Text style={s.sevNum}>{count}</Text>
               </View>
@@ -331,28 +350,25 @@ export default function CyberHealthPdfReport({ data: d, contactQrSrc }: PdfRepor
           })}
         </View>
 
-        {SEVERITY_ORDER.map((severity) => {
-          const items = d.findings.filter((f) => f.severity === severity);
-          if (!items.length) return null;
-          const compact = useCompactMediumLow && (severity === "Medium" || severity === "Low");
-          return (
-            <View key={severity}>
-              <Text style={s.h3}>{severity} ({items.length})</Text>
-              {compact
-                ? items.map((f, i) => <CompactRow f={f} key={i} />)
-                : items.map((f, i) => <FindingCard f={f} key={i} />)}
-            </View>
-          );
+        {ordered.map((f, i) => {
+          const compact = useCompactMediumLow && (f.severity === "Medium" || f.severity === "Low");
+          return compact ? <CompactRow f={f} key={i} /> : <FindingCard f={f} key={i} />;
         })}
 
-        <View style={s.h2} minPresenceAhead={60}><Text style={s.h2Num}>A</Text><Text style={s.h2Title}>Risk level guide</Text></View>
+        <View style={[s.h2, { marginTop: 4 }]} minPresenceAhead={60}><Text style={s.h2Num}>A</Text><Text style={s.h2Title}>Risk level guide</Text></View>
+        <View style={s.guideHead}>
+          <Text style={[s.guideLevel, s.tHeadText]}>LEVEL</Text>
+          <Text style={[s.tHeadText, { flex: 1 }]}>MEANING</Text>
+        </View>
         {RISK_GUIDE.map(([level, explanation]) => (
           <View key={level} style={s.guideRow} wrap={false}>
-            <Text style={s.guideLevel}>{level}</Text>
+            <View style={s.guideLevel}>
+              <Text style={[s.guideTag, { backgroundColor: SEV_TAG[level].bg, color: SEV_TAG[level].fg }]}>{level.toUpperCase()}</Text>
+            </View>
             <Text style={s.guideText}>{explanation}</Text>
           </View>
         ))}
-        <Text style={[s.small, { marginTop: 6 }]}>Severity indicates priority, not a prediction that an incident will occur. Every finding above is listed in full — none are omitted or summarized away.</Text>
+        <Text style={[s.small, { marginTop: 4 }]}>Severity indicates priority, not a prediction that an incident will occur. Every finding above is listed in full — none are omitted or summarized away.</Text>
       </View>
       </ReportPage>
 
@@ -361,40 +377,30 @@ export default function CyberHealthPdfReport({ data: d, contactQrSrc }: PdfRepor
         <SectionHead num="05" title="Quick wins" />
         <Text style={s.p}>Actions your team can start now — not a promise every item can be fixed without specialist help.</Text>
         {d.quickWins.length > 0 ? (
-          <View style={s.quickRow}>
-            {d.quickWins.map((q, i) => (
-              <View style={s.quickCol} key={i} wrap={false}>
-                <Text style={s.quickNum}>{String(i + 1).padStart(2, "0")}</Text>
-                <Text style={s.quickTitle}>{q.title}</Text>
-                <Text style={s.quickText}>{q.action}</Text>
-                <Text style={s.quickLabel}>SUGGESTED OWNER</Text>
-                <Text style={s.quickValue}>{q.owner}</Text>
-                <Text style={s.quickLabel}>COMPLETION CHECK</Text>
-                <Text style={s.quickValue}>{q.check}</Text>
+          d.quickWins.map((q, i) => (
+            <View style={s.itemRow} key={i} wrap={false}>
+              <Text style={s.itemNum}>{String(i + 1).padStart(2, "0")}</Text>
+              <View style={s.itemBody}>
+                <Text style={s.itemTitle}>{q.title}</Text>
+                <Text style={s.itemText}>{q.action}</Text>
+                <Text style={s.itemMeta}><Text style={s.smallStrong}>Suggested owner:</Text> {q.owner} · <Text style={s.smallStrong}>Completion check:</Text> {q.check}</Text>
               </View>
-            ))}
-          </View>
+            </View>
+          ))
         ) : (
           <Text style={s.p}>No low-effort quick wins were identified from this assessment — remaining items are addressed in the action roadmap.</Text>
         )}
-        <View style={s.specialist} wrap={false}>
-          <Text style={s.specialistLabel}>WHEN SPECIALIST SUPPORT HELPS</Text>
-          <Text style={s.specialistText}>{d.specialistSupport}</Text>
-        </View>
+        <Text style={[s.small, { marginTop: 6 }]} wrap={false}><Text style={s.smallStrong}>When specialist support helps:</Text> {d.specialistSupport}</Text>
 
-        <SectionHead num="06" title="Action roadmap" />
+        <SectionHead num="06" title="Action roadmap" top={4} />
         <Text style={s.p}>Sequenced by urgency and effort, not automatically by severity alone.</Text>
         {d.roadmap.map((r, i) => (
-          <View key={i} style={s.phase} wrap={false}>
-            <View style={s.phaseLeft}>
-              <Text style={s.phasePeriod}>{r.period}</Text>
-              <Text style={s.quickLabel}>SUGGESTED OWNER</Text>
-              <Text style={s.quickValue}>{r.owner}</Text>
-              <Text style={s.quickLabel}>EVIDENCE TO COLLECT</Text>
-              <Text style={s.quickValue}>{r.evidence}</Text>
-            </View>
-            <View style={s.phaseRight}>
-              <Text style={s.phaseAction}>{r.action}</Text>
+          <View key={i} style={s.itemRow} wrap={false}>
+            <Text style={s.itemNum}>{i + 1}</Text>
+            <View style={s.itemBody}>
+              <Text style={s.itemTitle}>{r.period}</Text>
+              <Text style={s.itemText}>{r.action}</Text>
+              <Text style={s.itemMeta}><Text style={s.smallStrong}>Suggested owner:</Text> {r.owner} · <Text style={s.smallStrong}>Evidence to collect:</Text> {r.evidence}</Text>
             </View>
           </View>
         ))}
@@ -407,36 +413,38 @@ export default function CyberHealthPdfReport({ data: d, contactQrSrc }: PdfRepor
         <SectionHead num="07" title="Continue with ORAGROL" />
         <Text style={s.p}>Bring this report to a focused conversation about what needs attention, what your team can handle and where external support would add value.</Text>
         <View style={s.three}>
-          <View style={s.threeCell}><Text style={s.threeTitle}>Review</Text><Text style={s.threeText}>Validate findings and clarify current controls.</Text></View>
-          <View style={s.threeCell}><Text style={s.threeTitle}>Define</Text><Text style={s.threeText}>Agree priorities, proposed work and responsibilities.</Text></View>
-          <View style={[s.threeCell, { paddingRight: 0 }]}><Text style={s.threeTitle}>Decide</Text><Text style={s.threeText}>Agree whether a Private Scope Review is the right next step.</Text></View>
+          <View style={[s.threeCell, { borderLeftWidth: 0, paddingLeft: 0 }]}><Text style={s.threeTitle}>REVIEW</Text><Text style={s.threeText}>Validate findings and clarify current controls.</Text></View>
+          <View style={s.threeCell}><Text style={s.threeTitle}>DEFINE</Text><Text style={s.threeText}>Agree priorities, proposed work and responsibilities.</Text></View>
+          <View style={s.threeCell}><Text style={s.threeTitle}>DECIDE</Text><Text style={s.threeText}>Agree whether a Private Scope Review is the right next step.</Text></View>
         </View>
+
+        <View style={s.strip} wrap={false}>
+          <View style={[s.stripCell, { flex: 318 }]}>
+            <Text style={s.label}>BOOK A CONVERSATION</Text>
+            <Link src={CONTACT} style={[s.stripValue, { color: INK, textDecoration: "none" }]}>{CONTACT_TEXT}</Link>
+          </View>
+          <View style={[s.stripCell, { flex: 245 }]}><Text style={s.label}>REFERENCE</Text><Text style={s.stripValue}>{d.clientReference}</Text></View>
+          <View style={[s.stripCell, { flex: 246 }]}><Text style={s.label}>REVIEW PROGRESS</Text><Text style={s.stripValue}>{d.reassessment}</Text></View>
+          <View style={[s.stripCell, { flex: 247, borderRightWidth: 0 }]}><Text style={s.label}>SCHEDULING</Text><Text style={s.stripValue}>Confirmed after your enquiry</Text></View>
+        </View>
+
+        <SectionHead num="A" title={"Report use & limitations"} top={2} />
+        <Text style={s.limit}>This questionnaire-based report is not a technical audit, compliance certification or guarantee of security. Reported findings require validation. Share only with authorized recipients.</Text>
+        <Text style={s.limit}>This report is automatically generated; no signature is required. Use it as a reference when booking a Private Scope Review or continuing your enquiry with ORAGROL. It does not constitute a service agreement.</Text>
 
         <View style={s.qrBox} wrap={false}>
           <Image src={contactQrSrc} style={s.qr} />
           <View style={{ flex: 1 }}>
-            <Text style={s.qrTitle}>Book a conversation</Text>
-            <Link src={CONTACT} style={{ fontSize: 9, color: TEAL, fontFamily: "Helvetica-Bold", marginBottom: 3 }}>orgro.ca/contact</Link>
-            <Text style={s.qrText}>Reference: {d.clientReference}. Scheduling is confirmed after your enquiry.</Text>
+            <Text style={s.qrTitle}>Continue the conversation</Text>
+            <Text style={s.qrText}>Scan to book a conversation at {CONTACT_TEXT}. Quote reference {d.clientReference}.</Text>
           </View>
-        </View>
-
-        <Text style={s.h3}>Review progress</Text>
-        <Text style={s.p}>{d.reassessment}</Text>
-
-        <View style={s.h2}><Text style={s.h2Num}>A</Text><Text style={s.h2Title}>Report use &amp; limitations</Text></View>
-        <Text style={s.p}>This questionnaire-based report is not a technical audit, compliance certification or guarantee of security. Reported findings require validation. Share only with authorized recipients.</Text>
-        <Text style={s.p}>This report is automatically generated; no signature is required. Use it as a reference when booking a Private Scope Review or continuing your enquiry with ORAGROL. It does not constitute a service agreement.</Text>
-
-        <View style={s.reviewRow} wrap={false}>
-          <Text style={[s.reviewCell, { fontFamily: "Helvetica-Bold" }]}>ORAGROL GLOBAL</Text>
-          <Text style={[s.reviewCell, { fontFamily: "Helvetica-Bold" }]}>PROTECT / AUTOMATE / UNIFY</Text>
         </View>
       </View>
       </ReportPage>
     </Document>
   );
 }
+
 
 function validate(d: CyberHealthReportData) {
   // Sanity ceilings only — a guard against a truly malformed field, not a
