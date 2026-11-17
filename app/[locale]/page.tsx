@@ -21,14 +21,14 @@ export async function generateMetadata({
 
   return {
     // SEO pass (2026-11-17): the old title was 78 characters (Google cuts titles
-    // near 60) and neither title nor description named where Oragrol works.
+    // near 60) and title shortened.
     // NEEDS VERIFICATION by Mohammad: wording of the visible title/description.
     title: isFr
-      ? "Cybersécurité et automatisation en Ontario | ORAGROL"
-      : "Cybersecurity & Automation for Ontario Businesses | ORAGROL",
+      ? "Cybersécurité et automatisation au Canada | ORAGROL"
+      : "Cybersecurity & Automation for Canadian Businesses | ORAGROL",
     description: isFr
-      ? "ORAGROL Global : une cybersécurité qui agit, une automatisation qui évolue et OR ONE, un système unique pour les entreprises de l'Ontario et du Canada."
-      : "ORAGROL Global gives Ontario and Canadian businesses cybersecurity that acts, automation that scales, and OR ONE, one system for protection and operations.",
+      ? "ORAGROL Global : une cybersécurité qui agit, une automatisation qui évolue et OR ONE, un système unique pour les entreprises canadiennes."
+      : "ORAGROL Global gives Canadian businesses cybersecurity that acts, automation that scales, and OR ONE, one system for protection and operations.",
     alternates: {
       canonical: canonicalPath,
       languages: languageAlternates("/"),

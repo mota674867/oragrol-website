@@ -17,7 +17,7 @@ export function GET() {
 
   const body = `# ORAGROL Global
 
-> ORAGROL Global provides cybersecurity services, intelligent business automation and coordinated security operations (OR ONE) for Canadian small and medium-sized businesses. It serves Ontario, Canada.
+> ORAGROL Global provides cybersecurity services, intelligent business automation and coordinated security operations (OR ONE) for Canadian small and medium-sized businesses.
 
 Pricing, package contents and service details are published on the pages below. The site is available in English and French (French pages are under /fr).
 
