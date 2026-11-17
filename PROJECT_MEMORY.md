@@ -121,3 +121,15 @@ Rolling log, most recent session at the top. Keep to last ~10 sessions — older
 **Verified:** rendered with synthetic data and compared side by side with every mockup page; QR decoded to https://orgro.ca/contact in all of Cyber Health, ODO and My Scope; stress render (many findings, 3 quick wins, 3 phases, package and OR ONE recommendations) no errors; `npx tsc --noEmit` clean; eslint 0 errors. NEEDS VERIFICATION: `npm run build`, Vercel preview, a real report email.
 
 **Open:** delete list for other PDFs (catalogue PDF, internal outbound documents, apply client copy, opportunity PDF) awaits Mohammad's yes.
+
+---
+
+## Session: SEO fixes from live-site check, 2026-11-17
+
+**Request:** after a live-site SEO check of orgro.ca (Chrome), Mohammad asked to fix all of it, based only on the live site. Live robots, sitemap (16 URLs), homepage title/H1/schema, an article page and /llms.txt were read first; repo code matched the live site.
+
+**Done (branch `seo/live-site-fixes`, not pushed):** see D-141. Sitemap now 32 URLs incl. 16 articles; Article, FAQPage, Organization+ProfessionalService+WebSite markup; shorter Ontario-naming homepage title/description (EN+FR); homepage second H1 → H2; new /llms.txt.
+
+**Verified:** `npx tsc --noEmit` clean; eslint 0 errors; production build in a throwaway copy with mocked fonts: 239 pages generated; served locally: one H1 on / and /fr, schema present, sitemap 32 URLs, FAQ markup has 36 questions, llms.txt renders. NEEDS VERIFICATION: Vercel preview, on-screen look of the changed heading, Google Rich Results Test, article dates.
+
+**Open:** Mohammad to approve visible title/description wording; push only when he says. `/scan` not in sitemap. Build tool printed a Next.js security-upgrade notice for 16.4.1 (not acted on; Mohammad to decide).
