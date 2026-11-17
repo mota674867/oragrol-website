@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "./lib/site-config";
+import { RESOURCE_ARTICLES } from "./[locale]/resources/[slug]/ORAGROL_ResourceArticles";
 
 /**
  * Real, live, customer-facing pages that get a French version and an
@@ -26,6 +27,15 @@ const bilingualRoutes: { path: string; priority: number }[] = [
 ];
 
 /**
+ * The resource articles (one page per article, English + French). Built from
+ * the same article data the article pages use, so a new article appears in
+ * the sitemap automatically and can never drift out of sync with the pages.
+ */
+const articleRoutes: { path: string; priority: number }[] = RESOURCE_ARTICLES.map(
+  ({ slug }) => ({ path: `/resources/${slug}`, priority: 0.6 }),
+);
+
+/**
  * Legal pages: real, live, but intentionally English-only for now —
  * Mohammad's explicit decision, no French version until a real legal
  * review happens (Bill 96 implications). No hreflang alternate is
@@ -45,7 +55,7 @@ const englishOnlyRoutes: { path: string; priority: number }[] = [
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
 
-  const bilingual: MetadataRoute.Sitemap = bilingualRoutes.map((route) => ({
+  const bilingual: MetadataRoute.Sitemap = [...bilingualRoutes, ...articleRoutes].map((route) => ({
     url: `${SITE_URL}${route.path}`,
     lastModified,
     priority: route.priority,

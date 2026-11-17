@@ -20,12 +20,15 @@ export async function generateMetadata({
   const canonicalPath = isFr ? "/fr" : "/";
 
   return {
+    // SEO pass (2026-11-17): the old title was 78 characters (Google cuts titles
+    // near 60) and neither title nor description named where Oragrol works.
+    // NEEDS VERIFICATION by Mohammad: wording of the visible title/description.
     title: isFr
-      ? "Cybersécurité, automatisation et protection coordonnée pour les entreprises canadiennes"
-      : "Cybersecurity, Automation & Coordinated Protection for Canadian Businesses",
+      ? "Cybersécurité et automatisation en Ontario | ORAGROL"
+      : "Cybersecurity & Automation for Ontario Businesses | ORAGROL",
     description: isFr
-      ? "ORAGROL Global offre aux entreprises canadiennes une cybersécurité qui agit, une automatisation qui évolue avec elles, et un système coordonné — OR ONE — qui réunit protection et opérations."
-      : "ORAGROL Global gives Canadian businesses cybersecurity that acts, automation that scales, and one coordinated system — OR ONE — that brings protection and operations together.",
+      ? "ORAGROL Global : une cybersécurité qui agit, une automatisation qui évolue et OR ONE, un système unique pour les entreprises de l'Ontario et du Canada."
+      : "ORAGROL Global gives Ontario and Canadian businesses cybersecurity that acts, automation that scales, and OR ONE, one system for protection and operations.",
     alternates: {
       canonical: canonicalPath,
       languages: languageAlternates("/"),
@@ -47,37 +50,61 @@ export async function generateMetadata({
   };
 }
 
+// SEO pass (2026-11-17): the single basic Organization record became a small
+// graph: the business itself (also typed ProfessionalService so search and AI
+// tools read it as a service business) plus the WebSite. Every value below was
+// already stated on the live site (homepage description, Ontario coverage,
+// Toronto / Thunder Bay addresses, LinkedIn / Instagram). No prices, ratings,
+// phone numbers or claims were added.
 const organizationJsonLd = {
   "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "ORAGROL Global",
-  url: SITE_URL,
-  // No `logo` field yet — no logo asset exists at public/ to point to,
-  // and a broken image URL in structured data is worse than omitting the
-  // field. Add it back once a real logo file is in place.
-  description:
-    "ORAGROL Global provides cybersecurity services, intelligent business automation and coordinated security operations (OR ONE) for Canadian small and medium-sized businesses.",
-  areaServed: {
-    "@type": "AdministrativeArea",
-    name: "Ontario, Canada",
-  },
-  address: [
+  "@graph": [
     {
-      "@type": "PostalAddress",
-      addressLocality: "Thunder Bay",
-      addressRegion: "ON",
-      addressCountry: "CA",
+      "@type": ["Organization", "ProfessionalService"],
+      "@id": `${SITE_URL}/#organization`,
+      name: "ORAGROL Global",
+      url: SITE_URL,
+      // No `logo` field yet — no logo asset exists at public/ to point to,
+      // and a broken image URL in structured data is worse than omitting the
+      // field. Add it back once a real logo file is in place.
+      description:
+        "ORAGROL Global provides cybersecurity services, intelligent business automation and coordinated security operations (OR ONE) for Canadian small and medium-sized businesses.",
+      serviceType: [
+        "Cybersecurity services",
+        "Business automation",
+        "Coordinated security operations (OR ONE)",
+      ],
+      areaServed: {
+        "@type": "AdministrativeArea",
+        name: "Ontario, Canada",
+      },
+      address: [
+        {
+          "@type": "PostalAddress",
+          addressLocality: "Thunder Bay",
+          addressRegion: "ON",
+          addressCountry: "CA",
+        },
+        {
+          "@type": "PostalAddress",
+          addressLocality: "Toronto",
+          addressRegion: "ON",
+          addressCountry: "CA",
+        },
+      ],
+      sameAs: [
+        "https://www.linkedin.com/company/oragrol-global/",
+        "https://www.instagram.com/oragrolglobal",
+      ],
     },
     {
-      "@type": "PostalAddress",
-      addressLocality: "Toronto",
-      addressRegion: "ON",
-      addressCountry: "CA",
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: "ORAGROL Global",
+      inLanguage: ["en-CA", "fr-CA"],
+      publisher: { "@id": `${SITE_URL}/#organization` },
     },
-  ],
-  sameAs: [
-    "https://www.linkedin.com/company/oragrol-global/",
-    "https://www.instagram.com/oragrolglobal",
   ],
 };
 

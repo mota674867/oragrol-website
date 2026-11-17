@@ -15,6 +15,7 @@ import { notFound } from "next/navigation";
 import { Fragment, type ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
 import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
+import { SITE_URL } from "@/app/lib/site-config";
 import PreFooterCta from "@/app/components/site/pre-footer-cta";
 import SiteFooter from "@/app/components/site/footer";
 import "@/app/gpt-pages.css";
@@ -274,8 +275,46 @@ export default async function ResourceDetailPage({ params }: PageProps) {
   );
   const related = getRelatedArticles(article);
 
+  // SEO pass (2026-11-17): Article + breadcrumb structured data. Uses only
+  // fields the article already shows on the page. No datePublished /
+  // dateModified on purpose: the article data has no per-article dates, and
+  // dates must not be invented. NEEDS VERIFICATION: add real dates when known.
+  const pageUrl = `${SITE_URL}${isFr ? "/fr" : ""}/resources/${slug}`;
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Article",
+        "@id": `${pageUrl}#article`,
+        headline: T.title,
+        description: isFr ? article.seoDescriptionFr : article.seoDescription,
+        inLanguage: isFr ? "fr-CA" : "en-CA",
+        mainEntityOfPage: pageUrl,
+        image: `${SITE_URL}${SHARE_IMAGE.url}`,
+        author: { "@type": "Organization", name: "ORAGROL Global", url: SITE_URL },
+        publisher: { "@type": "Organization", name: "ORAGROL Global", url: SITE_URL },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: isFr ? "Ressources" : "Resources",
+            item: `${SITE_URL}${isFr ? "/fr" : ""}/resources`,
+          },
+          { "@type": "ListItem", position: 2, name: T.title, item: pageUrl },
+        ],
+      },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       <main className="resource-detail">
         <header className="industry-header resource-header">
           <HeaderLogo />

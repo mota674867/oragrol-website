@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import FAQPageClient from "./faq-client";
 import { languageAlternates, SHARE_IMAGE } from "@/app/lib/seo";
+import { getTranslations } from "next-intl/server";
 
 /**
  * Bilingual (D-086, Task #21): converted from a static `metadata` export
@@ -41,6 +42,36 @@ export async function generateMetadata({
   };
 }
 
-export default function Page() {
-  return <FAQPageClient />;
+// SEO pass (2026-11-17): FAQPage structured data built from the very same
+// questions and answers the page displays (messages Faq.groups), so the
+// markup can never say something the page does not.
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Faq" });
+  const groups = t.raw("groups") as { items: { q: string; a: string }[] }[];
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    inLanguage: locale === "fr" ? "fr-CA" : "en-CA",
+    mainEntity: groups.flatMap((group) =>
+      group.items.map(({ q, a }) => ({
+        "@type": "Question",
+        name: q,
+        acceptedAnswer: { "@type": "Answer", text: a },
+      })),
+    ),
+  };
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <FAQPageClient />
+    </>
+  );
 }
